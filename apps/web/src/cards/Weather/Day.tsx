@@ -1,4 +1,4 @@
-import { icons } from './weather-icons'
+import { icons } from '@repo/weather-icons'
 import { type FC } from 'react'
 import styled from '@emotion/styled'
 import { DayWrapper } from './WeekView'

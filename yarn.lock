@@ -483,6 +483,7 @@
   dependencies:
     react "^18.2.0"
     react-dom "^18.2.0"
+    rxjs "^7.5.6"
 
 "@repo/typescript-config@*", "@repo/typescript-config@file:/Users/marcin/coding/smarthome-k7/packages/typescript-config":
   version "0.0.0"
@@ -494,6 +495,10 @@
   dependencies:
     react "^18.2.0"
     react-dom "^18.2.0"
+
+"@repo/weather-icons@*", "@repo/weather-icons@file:/Users/marcin/coding/smarthome-k7/packages/weather-icons":
+  version "0.0.0"
+  resolved "file:packages/weather-icons"
 
 "@rolldown/pluginutils@1.0.0-rc.3":
   version "1.0.0-rc.3"
@@ -1812,10 +1817,10 @@ uri-js@^4.2.2:
     "@mui/icons-material" "^5.8.4"
     "@mui/material" "^5.8.1"
     "@mui/system" "^5.10.1"
+    "@repo/feed-client" "*"
     "@repo/ui" "*"
     react "^18.2.0"
     react-dom "^18.2.0"
-    rxjs "^7.5.6"
     suncalc "^1.9.0"
 
 which@^2.0.1:

@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import banner from './card-banners/hourly.jpg'
 import zoomBanner from './card-banners/hourly-zoom.jpg'
-import { icons } from './weather-icons'
+import { icons } from '@repo/weather-icons'
 import ApolloCard from '../../apollo-card/ApolloCard'
 import { styled } from '@mui/material'
 import { useUpdate } from '@repo/feed-client'
