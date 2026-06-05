@@ -4,7 +4,7 @@ import banner from './card-banners/torrents.jpg'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import TablePlaceholder from './components/TablePlaceholder'
 import Copy from './components/Copy'
-import useUpdate from '../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 import { TorrentSearch } from './components/TorrentSearch'
 import { styled } from '@mui/material'
 

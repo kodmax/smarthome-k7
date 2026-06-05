@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { subscribe } from '.'
+import { subscribe } from './feed'
 
 type Value<T> = [ T | undefined, number | undefined ]
 const useUpdate = <T, P = any>(topic: string, initialValue?: T, value?: (payload: P) => T): Value<T> => {
@@ -20,4 +20,4 @@ const useUpdate = <T, P = any>(topic: string, initialValue?: T, value?: (payload
     return [payload, updatedAt]
 }
 
-export default useUpdate
+export { useUpdate }

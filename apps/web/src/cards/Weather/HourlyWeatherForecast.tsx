@@ -4,7 +4,7 @@ import zoomBanner from './card-banners/hourly-zoom.jpg'
 import { icons } from './weather-icons'
 import ApolloCard from '../../apollo-card/ApolloCard'
 import { styled } from '@mui/material'
-import useUpdate from '../../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 
 export type HourWeatherForecast = {
     precipIcon: string

@@ -16,6 +16,7 @@
     "@mui/material": "^5.8.1",
     "@mui/system": "^5.10.1",
     "@repo/ui": "*",
+    "@repo/feed-client": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rxjs": "^7.5.6",

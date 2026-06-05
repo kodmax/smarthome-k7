@@ -1,7 +1,7 @@
 import { type FC, useEffect } from 'react'
 import { ColorIndicator } from './ColorIndication'
 import { optimalHumidityRange } from '../../lib'
-import useUpdate from '../../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 
 const Humidity: FC<{ label: string; onUpdate: (ts: number) => void }> = ({ label, onUpdate }) => {
     const [relativeHumidity, humUpdate] = useUpdate<{ value: number; text: string }>('home.air-quality.humidity')

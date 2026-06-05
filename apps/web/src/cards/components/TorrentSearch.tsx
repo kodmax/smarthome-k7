@@ -1,7 +1,7 @@
 import { Button, TextField } from '@mui/material'
 import { styled } from '@mui/system'
 import { type ChangeEventHandler, type FC, type KeyboardEventHandler, useCallback, useState } from 'react'
-import useCommand from '../../feed/useCommand'
+import { useCommand }  from '@repo/feed-client'
 
 const TorrentSearchContainer = styled('div')({
     display: 'flex'

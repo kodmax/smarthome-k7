@@ -7,7 +7,7 @@ import AQI from './components/AQI'
 import Humidity from './components/Humidity'
 import Pressure from './components/Pressure'
 import ApolloCard from '../apollo-card/ApolloCard'
-import feed from '../feed'
+import { feed } from '@repo/feed-client'
 import KnxStateIcon from './components/KnxStateIcon'
 import { Warning } from '@mui/icons-material'
 

@@ -4,7 +4,7 @@ import banner from './card-banners/pollen.jpg'
 import { Allergen, type AllergenData } from './components/Allergen'
 import ApolloCard from '../apollo-card/ApolloCard'
 import TablePlaceholder from './components/TablePlaceholder'
-import useUpdate from '../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 
 export const Allergens: FC<Record<string, never>> = () => {
     const [allergensList, updatedAt] = useUpdate<{ allergens: AllergenData[] }>('weather')

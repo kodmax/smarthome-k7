@@ -1,10 +1,9 @@
 import { type FC, useEffect } from 'react'
-import feed from '../feed'
+import { feed, useUpdate } from '@repo/feed-client'
 import banner from './card-banners/fx.jpg'
 import { Graph } from './components/Graph'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import TablePlaceholder from './components/TablePlaceholder'
-import useUpdate from '../feed/use-update'
 
 const zoomListener: EventListener = (ev: Event) => {
     const { cardId } = (ev as CustomEvent<{ cardId: string }>).detail

@@ -1,5 +1,5 @@
 import { type FC, useEffect } from 'react'
-import useUpdate from '../../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 import { Graph } from './Graph'
 
 type PressureRecord = {

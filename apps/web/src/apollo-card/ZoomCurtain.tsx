@@ -1,6 +1,6 @@
 import { styled } from '@mui/material'
 import { createContext, type FC, type MouseEventHandler, type ReactNode, useCallback, useReducer } from 'react'
-import feed from '../feed'
+import { feed } from '@repo/feed-client'
 
 type ZoomStyle = {
     transition: string

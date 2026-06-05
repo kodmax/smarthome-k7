@@ -8,7 +8,7 @@ import TablePlaceholder from '../components/TablePlaceholder'
 import { HoursBars } from '../components/HoursBars'
 import NorthIcon from '@mui/icons-material/North'
 import { getPosition, getMoonPosition } from 'suncalc'
-import useUpdate from '../../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 
 export type WeatherData = {
     outdoorTemp: Array<{ hour: number; value: string }>

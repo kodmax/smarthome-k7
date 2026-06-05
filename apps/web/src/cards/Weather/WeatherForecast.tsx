@@ -1,7 +1,7 @@
 import banner from './card-banners/weather-forecast-long.jpg'
 import { Day, DayPlaceholder, type DayWeatherForecast } from './Day'
 import ApolloCard from '../../apollo-card/ApolloCard'
-import useUpdate from '../../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 import { type FC } from 'react'
 import { DayWrapper, WeekContainer } from './WeekView'
 

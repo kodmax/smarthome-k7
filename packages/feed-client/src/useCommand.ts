@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { sendCommand } from '.'
+import { sendCommand } from './feed'
 
 const useCommand = (sourceId: string, name: string): (args: string) => void => {
     return useCallback((args: string) => {
@@ -7,4 +7,4 @@ const useCommand = (sourceId: string, name: string): (args: string) => void => {
     }, [sourceId, name])
 }
 
-export default useCommand
+export { useCommand }

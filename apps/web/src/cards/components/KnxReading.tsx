@@ -1,5 +1,5 @@
 import { type FC, type ReactNode, useEffect } from 'react'
-import useUpdate from '../../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 import { ColorIndicator, type ColorIndicationRange } from './ColorIndication'
 import { Graph, type DataPoint, type GraphProps } from './Graph'
 import { HoursBars, type Record } from './HoursBars'

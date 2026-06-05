@@ -1,6 +1,6 @@
 import { type FC, useEffect } from 'react'
 import { type SvgIconComponent } from '@mui/icons-material'
-import useUpdate from '../../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 import type { KnxValue } from './KnxReading'
 
 type KnxStateIconProps = {

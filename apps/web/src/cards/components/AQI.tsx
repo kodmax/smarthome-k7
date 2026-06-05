@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import useUpdate from '../../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 import { ColorIndicator } from './ColorIndication'
 
 type AirQualityIndex = {

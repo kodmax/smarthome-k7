@@ -44,5 +44,4 @@ const sendCommand: (sourceId: string, name: string, args: string) => void = (sou
     feed.dispatchEvent(new CustomEvent('command', { detail: { sourceId, name, args } }))
 }
 
-export default feed
-export { subscribe, sendCommand }
+export { feed, subscribe, sendCommand }

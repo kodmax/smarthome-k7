@@ -1,11 +1,10 @@
 import { type FC, useEffect } from 'react'
 import zoomBanner from './card-banners/news-zoom.jpg'
 import banner from './card-banners/news.jpg'
-import feed from '../feed'
+import { feed, useUpdate } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import LinkOpen from './components/LinkOpen'
 import TablePlaceholder from './components/TablePlaceholder'
-import useUpdate from '../feed/use-update'
 import styled from '@emotion/styled'
 
 const zoomListener: EventListener = (ev: Event) => {

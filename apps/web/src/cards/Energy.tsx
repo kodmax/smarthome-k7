@@ -1,13 +1,12 @@
 import { type FC, useEffect } from 'react'
 import zoomBanner from './card-banners/electricity-zoom.jpg'
 import banner from './card-banners/electricity.jpg'
-import feed from '../feed'
+import { feed, useUpdate } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import { ColorIndicator } from './components/ColorIndication'
 import TablePlaceholder from './components/TablePlaceholder'
 import Copy from './components/Copy'
 import { HoursBars } from './components/HoursBars'
-import useUpdate from '../feed/use-update'
 
 const zoomListener: EventListener = (ev: Event) => {
     const { cardId } = (ev as CustomEvent<{ cardId: string }>).detail

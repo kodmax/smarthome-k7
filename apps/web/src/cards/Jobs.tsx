@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { type FC } from 'react'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
-import useUpdate from '../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
 import banner from './card-banners/job.jpg'
 import LinkOpen from './components/LinkOpen'
 import TablePlaceholder from './components/TablePlaceholder'

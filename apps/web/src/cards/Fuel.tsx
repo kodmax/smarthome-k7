@@ -2,7 +2,8 @@ import banner from './card-banners/fuel.jpg'
 import ApolloCard from '../apollo-card/ApolloCard'
 import { Graph } from './components/Graph'
 import TablePlaceholder from './components/TablePlaceholder'
-import useUpdate from '../feed/use-update'
+import { useUpdate } from '@repo/feed-client'
+
 import { type FC } from 'react'
 
 export const Fuel: FC<Record<string, never>> = () => {
