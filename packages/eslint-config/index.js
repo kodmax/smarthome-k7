@@ -15,5 +15,6 @@ module.exports = {
   },
   rules: {
     "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/consistent-return": 2
   },
 };

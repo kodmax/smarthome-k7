@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><defs><filter id="tsvg"><feColorMatrix in="SourceGraphic" values="0 0 0 0 0.000000 0 0 0 0 0.000000 0 0 0 0 0.000000 0 0 0 1.000000 0"></feColorMatrix></filter></defs><g fill="none" fill-rule="evenodd" stroke-linejoin="round" filter="url(#tsvg)"><g stroke="#FFF" stroke-width="1.225"><path d="M8.139 11.5H2L7.063 1 10 7.09m6.861 4.41H23L17.937 1 15 7.09"></path><path stroke-linecap="round" d="M20 18.8H5L12.5 2zm-7.525.2v3.15"></path></g></g></svg>

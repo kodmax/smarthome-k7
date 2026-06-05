@@ -7,9 +7,16 @@
     "dev": "vite --clearScreen false",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint \"src/**/*.ts\""
+    "lint": "eslint \"src/**/*.ts?\" --fix"
   },
   "dependencies": {
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.8.1",
+    "@mui/system": "^5.10.1",
+    "rxjs": "^7.5.6",
+    "suncalc": "^1.9.0",
     "@repo/ui": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
