@@ -44,4 +44,8 @@ const sendCommand: (sourceId: string, name: string, args: string) => void = (sou
     feed.dispatchEvent(new CustomEvent('command', { detail: { sourceId, name, args } }))
 }
 
-export { feed, subscribe, sendCommand }
+const refreshFeeds = (feeds: string[]): void => {
+  feed.dispatchEvent(new CustomEvent('request-feeds-refresh', { detail: feeds }))
+}
+
+export { feed, subscribe, sendCommand, refreshFeeds }

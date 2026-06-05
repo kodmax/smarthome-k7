@@ -10,7 +10,8 @@ type ApolloCardProps = {
     banner: string
     cardId: string
     height?: number
-    allowZoom?: boolean
+  allowZoom?: boolean
+    onZoom?: () => void
 }
 
 const ApolloCardContent = styled(CardContent)({
@@ -23,10 +24,10 @@ const ApolloCardContent = styled(CardContent)({
     }
 })
 
-const ApolloCard: FC<ApolloCardProps> = ({ height = 4, children, banner, zoomBanner, updatedAt, cardId, allowZoom = true }) => {
+const ApolloCard: FC<ApolloCardProps> = ({ height = 4, children, banner, zoomBanner, updatedAt, cardId, onZoom, allowZoom = true }) => {
 
     return (
-        <ZoomCurtain cardId={cardId} allowZoom={allowZoom}>
+        <ZoomCurtain cardId={cardId} allowZoom={allowZoom} onZoom={onZoom}>
             <ZoomContext.Consumer>
                 { zoom =>
                     <Card sx={{ maxHeight: '100%' }}>
