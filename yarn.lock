@@ -1819,6 +1819,7 @@ uri-js@^4.2.2:
     "@mui/system" "^5.10.1"
     "@repo/feed-client" "*"
     "@repo/ui" "*"
+    "@repo/weather-icons" "*"
     react "^18.2.0"
     react-dom "^18.2.0"
     suncalc "^1.9.0"
