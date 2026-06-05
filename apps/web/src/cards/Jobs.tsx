@@ -28,13 +28,17 @@ const Logo = styled('img')({
     height: '0.5em'
 })
 
-const Company = styled('td')(theme => ({
-    width: '3em', textAlign: 'center'
-}))
+const Company = styled('td')({
+  width: '3em',
+  textAlign: 'center'
+})
 
-const Open = styled('td')(theme => ({
-    padding: '0 1em 0.25em', verticalAlign: 'middle', boxSizing: 'border-box', width: '3em'
-}))
+const Open = styled('td')({
+  padding: '0 1em 0.25em',
+  verticalAlign: 'middle',
+  boxSizing: 'border-box',
+  width: '3em'
+})
 
 const JobTitle = styled('td')({
     textOverflow: 'ellipsis'

@@ -1,5 +1,5 @@
 import { icons } from './weather-icons'
-import { type ReactNode, type FC } from 'react'
+import { type FC } from 'react'
 import styled from '@emotion/styled'
 import { DayWrapper } from './WeekView'
 

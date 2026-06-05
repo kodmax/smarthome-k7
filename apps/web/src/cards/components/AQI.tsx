@@ -6,7 +6,7 @@ type AirQualityIndex = {
     aqi: number
 }
 
-const AQI: FC<{ label: string; onUpdate: (ts: number) => void }> = ({ label, onUpdate }) => {
+const AQI: FC<{ label: string; onUpdate: (ts: number) => void }> = ({ label }) => {
     const [reading] = useUpdate<{ aq: AirQualityIndex }>('weather')
 
     if (reading) {

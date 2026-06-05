@@ -45,7 +45,7 @@ export const AirQuality: FC<Record<string, never>> = () => {
                         }}
                         icon={
                             <KnxStateIcon
-                                icon={payload => Warning}
+                                icon={() => Warning}
                                 onUpdate={setUpdatedAt}
                                 id='home.air-quality.co2'
                                 visible={payload => payload.alert.value}

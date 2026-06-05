@@ -1,4 +1,4 @@
-import { IconButton, styled, SvgIcon } from '@mui/material'
+import { IconButton } from '@mui/material'
 import { type FC } from 'react'
 
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'

@@ -78,7 +78,7 @@ const ZoomCurtain: FC<{ children: ReactNode; cardId: string; allowZoom: boolean 
         for (let node: Node | null = (ev.target as Node); node; node = node.parentNode) {
             if (node instanceof HTMLElement) {
                 if (zoomIgnoreClicksOnTags.includes((node).tagName) || (node).hasAttribute('data-no-close')) {
-                    return false
+                    return
                 }
             }
         }
@@ -88,7 +88,6 @@ const ZoomCurtain: FC<{ children: ReactNode; cardId: string; allowZoom: boolean 
             dispatch({ method: 'zoom-out' })
 
         } else {
-
             feed.dispatchEvent(new CustomEvent('card-zoom', { detail: { cardId } }))
             const rect = wrapper.getBoundingClientRect()
             const scale = 3.5
