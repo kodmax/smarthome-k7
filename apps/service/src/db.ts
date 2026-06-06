@@ -1,11 +1,7 @@
 import * as mariadb from 'mariadb'
+import { config } from './config'
 
-const pool = mariadb.createPool({
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_SCHEMA,
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-})
+const pool = mariadb.createPool({ ...config.db })
 
 export default pool
 

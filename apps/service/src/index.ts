@@ -1,8 +1,5 @@
 #!/usr/bin/ts-node
-import { configDotenv } from 'dotenv'
-
 process.setMaxListeners(100)
-configDotenv()
 
 import { torrents, weather, energyCost, energyConsumption, co2Hourly, indoorTempHistory } from './data-sources'
 import { Server, Cache, sysLog, Feeds } from 'apollo-ws'
@@ -25,7 +22,7 @@ Server.listen({}, async apollo => {
   const feeds = new Feeds(new Cache(path.join(__dirname, '/data-sources/.cache')), apollo.vent)
   const knxEvents: KnxEventEmitter = new EventEmitter()
   knxEvents.setMaxListeners(100)
-  
+
   knxEvents.on('error', e => {
     console.error(e)
   })
