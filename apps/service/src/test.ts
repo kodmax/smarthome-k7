@@ -1,6 +1,6 @@
 import { CacheAgeUnit } from 'apollo-ws'
 import DateTime from './DateTime'
-import db from '../db'
+import db from './db'
 
 const test = async () => {
   const conn = await db.getConnection()
