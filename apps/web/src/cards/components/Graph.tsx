@@ -111,7 +111,7 @@ export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value'
     )
 
     return (
-      <Vector style={{ backgroundImage: `url('data:image/svg+xml;base64,${btoa(svg)}')` }}>
+      <Vector style={{ backgroundImage: `url("data:image/svg+xml;base64,${btoa(svg)}")` }}>
         <Max>{max.toFixed(2).replace('.00', '')}</Max>
         <Min>{min.toFixed(2).replace('.00', '')}</Min>
       </Vector>

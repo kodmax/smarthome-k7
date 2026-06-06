@@ -3,7 +3,7 @@ import { type FC } from 'react'
 import icon from './open-in-new-window.png'
 
 const A = styled('a')({
-  backgroundImage: `url('${icon}')`,
+  backgroundImage: `url("${icon}")`,
   backgroundRepeat: 'no-repeat',
   backgroundSize: 'contain',
   verticalAlign: 'text-bottom',

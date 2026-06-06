@@ -8,8 +8,8 @@ const Icon = styled('div')({
   width: '2.5em',
   height: '2.5em',
 })
-
 const Day: FC<{ forecast?: DayWeatherForecast }> = ({ forecast }) => {
+  console.log(icons)
   return (
     <DayWrapper>
       <div>
@@ -18,7 +18,7 @@ const Day: FC<{ forecast?: DayWeatherForecast }> = ({ forecast }) => {
             <Icon
               style={
                 forecast
-                  ? { backgroundImage: `url('${icons[forecast.icon]}')`, backgroundSize: 'contain' }
+                  ? { backgroundImage: `url("${icons[forecast.icon]}")`, backgroundSize: 'contain' }
                   : { background: 'hsl(0deg 0% 50% / 10%)' }
               }
             ></Icon>

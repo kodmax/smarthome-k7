@@ -63,7 +63,7 @@ export const HoursBars: FC<{ data?: Record[]; positiveMax: number; negativeMax?:
       </svg>,
     )
 
-    return <Vector style={{ backgroundImage: `url('data:image/svg+xml;base64,${btoa(svg)}')` }}></Vector>
+    return <Vector style={{ backgroundImage: `url("data:image/svg+xml;base64,${btoa(svg)}")` }}></Vector>
   } else {
     return null
   }

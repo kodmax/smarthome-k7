@@ -45,7 +45,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
             <tr>
               {forecast?.hourly.map((fc: HourWeatherForecast) => (
                 <td key={fc.hour} style={{ position: 'relative', overflow: 'visible' }}>
-                  <AuraIcon style={{ backgroundImage: `url('${icons[fc.icon]}')` }} />
+                  <AuraIcon style={{ backgroundImage: `url("${icons[fc.icon]}")` }} />
                   &nbsp;
                 </td>
               ))}
@@ -60,7 +60,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
             <tr>
               {forecast?.hourly.map((fc: HourWeatherForecast) => (
                 <td key={fc.hour} style={{ fontSize: '0.7em', lineHeight: '1.2em' }}>
-                  <PercipIcon style={{ backgroundImage: `url('${icons[fc.precipIcon]}')` }} />
+                  <PercipIcon style={{ backgroundImage: `url("${icons[fc.precipIcon]}")` }} />
                   <span>{fc.precip}</span>
                 </td>
               ))}
