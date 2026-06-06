@@ -13,7 +13,6 @@ const Humidity: FC<{ label: string; onUpdate: (ts: number) => void }> = ({ label
   }, [humUpdate, tempUpdate])
 
   if (relativeHumidity && temp) {
-    console.log(relativeHumidity.value)
     return (
       <tr>
         <td>{label}</td>
