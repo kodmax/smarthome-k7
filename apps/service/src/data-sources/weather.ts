@@ -6,6 +6,7 @@ import { JSDOM } from 'jsdom'
 import * as suncalc from 'suncalc'
 import { basename } from 'path'
 import { getTextContent } from './utils/get-text-context'
+import { WeatherData } from '@repo/types'
 
 const windDirectionCodes = [
   'N',
@@ -30,7 +31,7 @@ const long = +(process.env.LOCATION_LONG ?? 0)
 const lat = +(process.env.LOCATION_LAT ?? 0)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const source: DataSourceDefinition<any> = {
+export const source: DataSourceDefinition<WeatherData> = {
   cron: '*/15 * * * *',
   id: 'weather',
 
@@ -134,7 +135,7 @@ export const source: DataSourceDefinition<any> = {
       myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/air-quality-index/274663')
         .then(content => new JSDOM(content.toString('utf-8')).window.document)
         .then((document: Document) => {
-          const aqi = getTextContent(document.body, '.air-quality-content .aq-number')
+          const aqi = +getTextContent(document.body, '.air-quality-content .aq-number')
           const pollutants = Object.fromEntries(
             Array.from(document.querySelectorAll('#pollutants .air-quality-pollutant')).map(pollutant => {
               return [
@@ -163,6 +164,14 @@ export const source: DataSourceDefinition<any> = {
         instant.pressure,
       ])
 
+      const sunTimesResult = suncalc.getTimes(new Date(), 52.2283698, 20.973194)
+      const sunTimes: WeatherData['sunTimes'] = {
+        sunrise: sunTimesResult.sunrise.toISOString(),
+        sunset: sunTimesResult.sunset.toISOString(),
+        dusk: sunTimesResult.dusk.toISOString(),
+        dawn: sunTimesResult.dawn.toISOString(),
+      }
+
       return {
         outdoorTemp: await conn.query(
           'select hour(datetime) as hour, avg(value) as value from outdoor_temp where datetime >= ? group by hour(datetime) order by hour(datetime);',
@@ -174,7 +183,7 @@ export const source: DataSourceDefinition<any> = {
           ]),
           instant: instant.pressure,
         },
-        sunTimes: suncalc.getTimes(new Date(), 52.2283698, 20.973194),
+        sunTimes,
         allergens,
         forecast,
         instant,

@@ -2,13 +2,7 @@ import { icons } from '@repo/weather-icons'
 import { type FC } from 'react'
 import styled from '@emotion/styled'
 import { DayWrapper } from './WeekView'
-
-export type DayWeatherForecast = {
-  temp: { high: number; low: number }
-  date: string
-  dow: string
-  icon: string
-}
+import { DayWeatherForecast } from '@repo/types'
 
 const Icon = styled('div')({
   width: '2.5em',

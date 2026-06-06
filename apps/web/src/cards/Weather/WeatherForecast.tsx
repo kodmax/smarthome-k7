@@ -1,14 +1,15 @@
 import banner from './card-banners/weather-forecast-long.jpg'
-import { Day, DayPlaceholder, type DayWeatherForecast } from './Day'
+import { Day, DayPlaceholder } from './Day'
 import ApolloCard from '../../apollo-card/ApolloCard'
 import { useUpdate } from '@repo/feed-client'
 import { type FC } from 'react'
 import { DayWrapper, WeekContainer } from './WeekView'
+import { DayWeatherForecast, WeatherData } from '@repo/types'
 
 const dows = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'niedz.']
 
 export const WeatherForecast: FC<Record<string, never>> = () => {
-  const [weather, updatedAt] = useUpdate<{ forecast: DayWeatherForecast[] }>('weather')
+  const [weather, updatedAt] = useUpdate<WeatherData>('weather')
 
   if (weather === undefined) {
     const placeholders = new Array(15).fill(undefined)

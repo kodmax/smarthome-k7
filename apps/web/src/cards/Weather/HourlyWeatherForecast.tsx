@@ -5,18 +5,7 @@ import { icons } from '@repo/weather-icons'
 import ApolloCard from '../../apollo-card/ApolloCard'
 import { styled } from '@mui/material'
 import { useUpdate } from '@repo/feed-client'
-
-export type HourWeatherForecast = {
-  precipIcon: string
-  precip: string
-  temp: string
-  icon: string
-  hour: string
-  sun: {
-    altitude: number
-    azimuth: number
-  }
-}
+import { HourWeatherForecast, WeatherData } from '@repo/types'
 
 const AuraIcon = styled('span')({
   backgroundRepeat: 'no-repeat',
@@ -39,7 +28,7 @@ const PercipIcon = styled('span')({
 })
 
 export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
-  const [forecast, updatedAt] = useUpdate<{ hourly: HourWeatherForecast[] }>('weather', { hourly: [] })
+  const [forecast, updatedAt] = useUpdate<WeatherData>('weather')
 
   return (
     <ApolloCard cardId='hourly-weather-forecast' banner={banner} zoomBanner={zoomBanner} updatedAt={updatedAt}>

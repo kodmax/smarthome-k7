@@ -9,33 +9,7 @@ import { HoursBars } from '../components/HoursBars'
 import NorthIcon from '@mui/icons-material/North'
 import { getPosition, getMoonPosition } from 'suncalc'
 import { useUpdate } from '@repo/feed-client'
-
-export type WeatherData = {
-  outdoorTemp: Array<{ hour: number; value: string }>
-  instant: {
-    clouds: {
-      coverage: string
-      height: string
-    }
-    wind: {
-      angle: number
-      maxSpeed: number
-      speedUnit: string
-      direction: string
-      speed: number
-    }
-    humidity: number
-    pressure: number
-    temp: number
-    uv: number
-  }
-  sunTimes: {
-    sunrise: string
-    sunset: string
-    dusk: string
-    dawn: string
-  }
-}
+import { WeatherData } from '@repo/types'
 
 type SunRiseSunSet = {
   timeOfDay: 'day' | 'night'

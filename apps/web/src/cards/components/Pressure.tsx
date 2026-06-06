@@ -1,14 +1,10 @@
 import { type FC, useEffect } from 'react'
 import { useUpdate } from '@repo/feed-client'
 import { Graph } from './Graph'
-
-type PressureRecord = {
-  pressure: number
-  datetime: string
-}
+import { WeatherData } from '@repo/types'
 
 const Pressure: FC<{ onUpdate: (ts: number) => void }> = ({ onUpdate }) => {
-  const [recent, updatedAt] = useUpdate<{ pressure: { week: PressureRecord[]; instant: number } }>('weather')
+  const [recent, updatedAt] = useUpdate<WeatherData>('weather')
 
   useEffect(() => {
     onUpdate(new Date().getTime())
@@ -20,7 +16,7 @@ const Pressure: FC<{ onUpdate: (ts: number) => void }> = ({ onUpdate }) => {
         <td>Ciśnienie</td>
         <td style={{ padding: 0 }}>
           <Graph
-            data={recent.pressure.week.map(({ pressure, datetime }: PressureRecord) => ({
+            data={recent.pressure.week.map(({ pressure, datetime }) => ({
               value: pressure,
               datetime,
             }))}

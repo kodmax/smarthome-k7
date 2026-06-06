@@ -7,12 +7,12 @@ export type EnergyRates = {
   vat: number
 }
 
-export interface EnergyHourConsumption {
+export type EnergyHourConsumption = {
   hourly_consumption: number
   hour: string
 }
 
-export interface EnergyReading {
+export type EnergyReading = {
   total: {
     adjusted: number
     target: string
@@ -32,4 +32,88 @@ export interface EnergyReading {
   }
   instant: KnxReading<number>
   meter: KnxReading<number>
+}
+
+export type Torrent = {
+  added: string
+  category: string
+  id: string
+  imdb: string
+  info_hash: string
+  leechers: string
+  name: string
+  num_files: string
+  seeders: string
+  size: string
+  status: string
+  username: string
+}
+
+export type DayWeatherForecast = {
+  temp: { high: number; low: number }
+  date: string
+  dow: string
+  icon: string
+}
+
+export type HourWeatherForecast = {
+  precipIcon: string
+  precip: string
+  temp: string
+  icon: string
+  hour: string
+  sun: {
+    altitude: number
+    azimuth: number
+  }
+}
+
+export type WeatherData = {
+  outdoorTemp: Array<{ hour: number; value: string }>
+  instant: {
+    clouds: {
+      coverage: string
+      height: string
+    }
+    wind: {
+      angle: number
+      maxSpeed: number
+      speedUnit: string
+      direction: string
+      speed: number
+    }
+    humidity: number
+    pressure: number
+    temp: number
+    uv: number
+  }
+  sunTimes: {
+    sunrise: string
+    sunset: string
+    dusk: string
+    dawn: string
+  }
+  pressure: {
+    week: {
+      datetime: string
+      pressure: number
+    }[]
+    instant: number
+  }
+  allergens: {
+    id: string | null
+    name: string
+    intensity: string
+  }[]
+  forecast: DayWeatherForecast[]
+  hourly: HourWeatherForecast[]
+  aq: {
+    aqi: number
+    pollutants: {
+      [k: string]: {
+        concentration: string
+        index: string
+      }
+    }
+  }
 }

@@ -1,13 +1,10 @@
 import { type FC } from 'react'
 import { useUpdate } from '@repo/feed-client'
 import { ColorIndicator } from './ColorIndication'
-
-type AirQualityIndex = {
-  aqi: number
-}
+import { WeatherData } from '@repo/types'
 
 const AQI: FC<{ label: string; onUpdate: (ts: number) => void }> = ({ label }) => {
-  const [reading] = useUpdate<{ aq: AirQualityIndex }>('weather')
+  const [reading] = useUpdate<WeatherData>('weather')
 
   if (reading) {
     return (

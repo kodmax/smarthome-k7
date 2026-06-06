@@ -7,14 +7,7 @@ import Copy from './components/Copy'
 import { useUpdate } from '@repo/feed-client'
 import { TorrentSearch } from './components/TorrentSearch'
 import { styled } from '@mui/material'
-
-type Torrent = {
-  seeders: string
-  imdb: string
-  size: string
-  info_hash: string
-  name: string
-}
+import { Torrent } from '@repo/types'
 
 const Torrents = styled('table')({
   tableLayout: 'fixed',
