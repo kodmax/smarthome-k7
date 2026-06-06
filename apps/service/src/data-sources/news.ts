@@ -1,6 +1,6 @@
 import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
 import { myFetch } from '../fetch'
-import { JSDOM } from 'jsdom'
+import { parseHTML } from 'linkedom'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const source: DataSourceDefinition<any> = {
@@ -16,7 +16,7 @@ export const source: DataSourceDefinition<any> = {
     const news = await myFetch(url, { accept: 'text/html', cookie })
       .then(resp => resp.toString('utf-8'))
       .then(html => {
-        const document = new JSDOM(html).window.document
+        const document = parseHTML(html).window.document
         return Array.from(document.querySelectorAll('article'))
           .filter(article => article.querySelector('figure'))
           .map(article => {

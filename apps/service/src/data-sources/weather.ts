@@ -2,7 +2,7 @@ import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
 import { myFetch } from '../fetch'
 import db from '../db'
 import DateTime from '../DateTime'
-import { JSDOM } from 'jsdom'
+import { parseHTML } from 'linkedom'
 import * as suncalc from 'suncalc'
 import { basename } from 'path'
 import { getTextContent } from './utils/get-text-context'
@@ -40,7 +40,7 @@ export const source: DataSourceDefinition<WeatherData> = {
     const date = new DateTime().getDate()
     const [forecast, instant, allergens, hourly, aq] = await Promise.all([
       myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/10-day-weather-forecast/274663')
-        .then(content => new JSDOM(content.toString('utf-8')).window.document)
+        .then(content => parseHTML(content.toString('utf-8')).window.document)
         .then((document: Document) => {
           const forecast = []
           for (const day of Array.from(document.querySelectorAll('.daily-wrapper'))) {
@@ -59,7 +59,7 @@ export const source: DataSourceDefinition<WeatherData> = {
         }),
 
       myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/current-weather/274663')
-        .then(content => new JSDOM(content.toString('utf-8')).window.document)
+        .then(content => parseHTML(content.toString('utf-8')).window.document)
         .then((document: Document) => {
           const temp = Number(getTextContent(document.body, '.current-weather-card .display-temp').replace('°C', ''))
           const details: Record<string, string> = Object.fromEntries(
@@ -90,7 +90,7 @@ export const source: DataSourceDefinition<WeatherData> = {
         }),
 
       myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/weather-forecast/274663')
-        .then(content => new JSDOM(content.toString('utf-8')).window.document)
+        .then(content => parseHTML(content.toString('utf-8')).window.document)
         .then((document: Document) => {
           return Array.from(document.querySelectorAll('.allergy-forecast .allergy') as NodeListOf<HTMLAnchorElement>)
             .slice(0, 5)
@@ -106,7 +106,7 @@ export const source: DataSourceDefinition<WeatherData> = {
         }),
 
       myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/hourly-weather-forecast/274663')
-        .then(content => new JSDOM(content.toString('utf-8')).window.document)
+        .then(content => parseHTML(content.toString('utf-8')).window.document)
         .then((document: Document) => {
           return Array.from(document.querySelectorAll('.hourly-wrapper .hour'))
             .map(hour => {
@@ -133,7 +133,7 @@ export const source: DataSourceDefinition<WeatherData> = {
         }),
 
       myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/air-quality-index/274663')
-        .then(content => new JSDOM(content.toString('utf-8')).window.document)
+        .then(content => parseHTML(content.toString('utf-8')).window.document)
         .then((document: Document) => {
           const aqi = +getTextContent(document.body, '.air-quality-content .aq-number')
           const pollutants = Object.fromEntries(

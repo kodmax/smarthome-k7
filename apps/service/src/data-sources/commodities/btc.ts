@@ -1,6 +1,6 @@
 import { getNumberContent } from '../utils/get-number-content'
 import { myFetch } from '../../fetch'
-import { JSDOM } from 'jsdom'
+import { parseHTML } from 'linkedom'
 
 type BtcPrice = {
   usd: string
@@ -11,7 +11,7 @@ const fetchBtcPrice = async (): Promise<BtcPrice> => {
   return myFetch('https://www.cnbc.com/quotes/BTC.BS=', { accept: 'text/html' })
     .then(response => response.toString('utf-8'))
     .then(html => {
-      const document = new JSDOM(html).window.document
+      const document = parseHTML(html).window.document
       const usd = getNumberContent(document.body, '.QuoteStrip-lastPrice').toFixed(2)
 
       return {

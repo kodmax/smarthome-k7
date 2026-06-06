@@ -17,13 +17,15 @@ import knxEnergy from './data-sources/knx/energy'
 import knxPower from './data-sources/knx/power'
 import knxTemp from './data-sources/knx/temp'
 import knxCo2 from './data-sources/knx/co2'
-import { EventEmitter } from 'stream'
+import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
 import { EnergyReading } from '@repo/types'
 
 Server.listen({}, async apollo => {
   const feeds = new Feeds(new Cache(path.join(__dirname, '/data-sources/.cache')), apollo.vent)
   const knxEvents: KnxEventEmitter = new EventEmitter()
+  knxEvents.setMaxListeners(100)
+  
   knxEvents.on('error', e => {
     console.error(e)
   })

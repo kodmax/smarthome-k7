@@ -1,5 +1,5 @@
 import { myFetch } from '../../fetch'
-import { JSDOM } from 'jsdom'
+import { parseHTML } from 'linkedom'
 import { Job, Skill } from '.'
 
 import { getTextContent } from '../utils/get-text-context'
@@ -14,7 +14,7 @@ const getDetails = async (url: string): Promise<Details> => {
   return myFetch(url, { accept: 'text/html' })
     .then(resp => resp.toString('utf-8'))
     .then(async html => {
-      const document = new JSDOM(html).window.document
+      const document = parseHTML(html).window.document
 
       return {
         skills: Array.from(document.querySelectorAll('section[branch="musts"] li')).map(li => ({
@@ -31,7 +31,7 @@ const nfj: (salary: number) => Promise<Job[]> = async salary => {
   return myFetch(url, { accept: 'text/html' })
     .then(resp => resp.toString('utf-8'))
     .then(async html => {
-      const document = new JSDOM(html).window.document
+      const document = parseHTML(html).window.document
       const offers: Array<Job> = []
 
       for (const advert of Array.from(document.querySelectorAll('nfj-postings-list > .list-container > a'))) {

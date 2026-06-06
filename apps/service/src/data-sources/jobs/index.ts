@@ -1,5 +1,5 @@
 import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
-import { JSDOM } from 'jsdom'
+import { parseHTML } from 'linkedom'
 import { myFetch } from '../../fetch'
 import { getTextContent } from '../utils/get-text-context'
 import { jjit } from './jjit'
@@ -64,12 +64,12 @@ export const source: DataSourceDefinition<JobsOffers> = {
       myFetch('https://pl.investing.com/currencies/eur-pln', { accept: 'text/html' })
         .then(response => response.toString('utf-8'))
         .then(html => {
-          return getTextContent(new JSDOM(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
+          return getTextContent(parseHTML(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
         }),
       myFetch('https://pl.investing.com/currencies/usd-pln', { accept: 'text/html' })
         .then(response => response.toString('utf-8'))
         .then(html => {
-          return getTextContent(new JSDOM(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
+          return getTextContent(parseHTML(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
         }),
     ])
 

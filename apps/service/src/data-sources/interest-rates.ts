@@ -1,5 +1,5 @@
 import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
-import { JSDOM } from 'jsdom'
+import { parseHTML } from 'linkedom'
 import DateTime from '../DateTime'
 import db from '../db'
 import { myFetch } from '../fetch'
@@ -54,7 +54,7 @@ export const source: DataSourceDefinition<IRS> = {
     })
       .then(resp => resp.toString('utf-8'))
       .then(async html => {
-        const document = new JSDOM(html).window.document
+        const document = parseHTML(html).window.document
         return Object.fromEntries(
           Array.from(document.querySelectorAll('table.nbptable tr'))
             .map(tr => Array.from(tr.children))
