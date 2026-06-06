@@ -18,26 +18,35 @@ export const FX: FC<Record<string, never>> = () => {
   return (
     <ApolloCard cardId='fx' banner={banner} updatedAt={updatedAt} onZoom={onZoom}>
       <ZoomContext.Consumer>
-        {zoom => !fx ? (<TablePlaceholder rows={4} graph={true} value={true} />) : (
-          <table className='apollo-data-table'>
-            <tbody>
-              {(zoom.active ? moreFx : mainFx).filter(pair => pair in fx.rates).map(pair => {
-                return (
-                  <tr key={pair}>
-                    <td>{pair}</td>
-                    <td style={{ padding: 0, width: '4em' }}>
-                      <Graph scaleX={30} scaleY={fx.rates[pair] / 10} data={fx.history[pair]} />
-                    </td>
-                    {zoom.active
-                      ? <td>{Number(fx.rates[pair]).toFixed(2)} ({Number(1 / fx.rates[pair]).toFixed(4)})</td>
-                      : <td>{Number(fx.rates[pair]).toFixed(2)}</td>
-                    }
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        )}
+        {zoom =>
+          !fx ? (
+            <TablePlaceholder rows={4} graph={true} value={true} />
+          ) : (
+            <table className='apollo-data-table'>
+              <tbody>
+                {(zoom.active ? moreFx : mainFx)
+                  .filter(pair => pair in fx.rates)
+                  .map(pair => {
+                    return (
+                      <tr key={pair}>
+                        <td>{pair}</td>
+                        <td style={{ padding: 0, width: '4em' }}>
+                          <Graph scaleX={30} scaleY={fx.rates[pair] / 10} data={fx.history[pair]} />
+                        </td>
+                        {zoom.active ? (
+                          <td>
+                            {Number(fx.rates[pair]).toFixed(2)} ({Number(1 / fx.rates[pair]).toFixed(4)})
+                          </td>
+                        ) : (
+                          <td>{Number(fx.rates[pair]).toFixed(2)}</td>
+                        )}
+                      </tr>
+                    )
+                  })}
+              </tbody>
+            </table>
+          )
+        }
       </ZoomContext.Consumer>
     </ApolloCard>
   )

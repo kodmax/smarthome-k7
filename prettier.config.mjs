@@ -3,7 +3,7 @@
  * @type {import("prettier").Config}
  */
 const config = {
-  "arrowParens": "always",
+  "arrowParens": "avoid",
   "bracketSpacing": true,
   "htmlWhitespaceSensitivity": "css",
   "insertPragma": false,

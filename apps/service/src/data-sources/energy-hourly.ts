@@ -3,34 +3,33 @@ import DateTime from '../DateTime'
 import db from '../db'
 
 type HourConsumption = {
-    hourly_consumption: number
-    hour: string
+  hourly_consumption: number
+  hour: string
 }
 
-export const source: DataSourceDefinition<{ date: string; bars: HourConsumption[], startOfDayValue: number }> = {
-    cron: '1 * * * *',
-    id: 'energy-hourly',
+export const source: DataSourceDefinition<{ date: string; bars: HourConsumption[]; startOfDayValue: number }> = {
+  cron: '1 * * * *',
+  id: 'energy-hourly',
 
-    expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 5,
-    script: async () => {
-        const conn = await db.getConnection()
-        try {
-            const startOfDayRecord = await conn.query(
-                'select date, total_reading from daily_energy_readings order by date desc limit 1'
-            )
-            const bars = await conn.query(
-                'SELECT hour, hourly_consumption FROM hourly_energy_readings WHERE Date(datetime) = ? and hourly_consumption is not null',
-                [new DateTime().getDate()]
-            )
+  expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 5,
+  script: async () => {
+    const conn = await db.getConnection()
+    try {
+      const startOfDayRecord = await conn.query(
+        'select date, total_reading from daily_energy_readings order by date desc limit 1',
+      )
+      const bars = await conn.query(
+        'SELECT hour, hourly_consumption FROM hourly_energy_readings WHERE Date(datetime) = ? and hourly_consumption is not null',
+        [new DateTime().getDate()],
+      )
 
-            return {
-                startOfDayValue: startOfDayRecord[0].total_reading,
-                date: new DateTime().getDate(),
-                bars
-            }
-
-        } finally {
-            await conn.end()
-        }
+      return {
+        startOfDayValue: startOfDayRecord[0].total_reading,
+        date: new DateTime().getDate(),
+        bars,
+      }
+    } finally {
+      await conn.end()
     }
+  },
 }

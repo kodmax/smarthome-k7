@@ -7,19 +7,33 @@ import { Weather, WeatherForecast, HourlyWeatherForecast } from './cards/Weather
 import { useRef, type FC } from 'react'
 
 export const Dashboard: FC<Record<string, never>> = () => {
-    const div = useRef < HTMLDivElement>(null)
+  const div = useRef<HTMLDivElement>(null)
 
-    return (
-        <div>
-            <Grid container spacing={2} ref={div}>
-                <Grid item xs={6} sm={6} md={3} xl={3}><Weather /></Grid>
-                <Grid item xs={6} sm={6} md={3} xl={3}><AirQuality /></Grid>
-                <Grid item xs={6} sm={6} md={3} xl={3}><Temperature /></Grid>
-                <Grid item xs={12} sm={6} md={3} xl={3}><Energy /></Grid>
-                <Grid item xs={12} sm={12} md={12} xl={12}><WeatherForecast /></Grid>
-                <Grid item xs={12} sm={12} md={3} xl={3}><TopTorrents /></Grid>
-                <Grid item xs={6} sm={6} md={9} xl={9}><HourlyWeatherForecast /></Grid>
-            </Grid>
-        </div>
-    )
+  return (
+    <div>
+      <Grid container spacing={2} ref={div}>
+        <Grid item xs={6} sm={6} md={3} xl={3}>
+          <Weather />
+        </Grid>
+        <Grid item xs={6} sm={6} md={3} xl={3}>
+          <AirQuality />
+        </Grid>
+        <Grid item xs={6} sm={6} md={3} xl={3}>
+          <Temperature />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3} xl={3}>
+          <Energy />
+        </Grid>
+        <Grid item xs={12} sm={12} md={12} xl={12}>
+          <WeatherForecast />
+        </Grid>
+        <Grid item xs={12} sm={12} md={3} xl={3}>
+          <TopTorrents />
+        </Grid>
+        <Grid item xs={6} sm={6} md={9} xl={9}>
+          <HourlyWeatherForecast />
+        </Grid>
+      </Grid>
+    </div>
+  )
 }

@@ -1,5 +1,13 @@
 import { styled } from '@mui/material'
-import { createContext, type FC, type MouseEventHandler, type ReactNode, useCallback, useEffect, useReducer } from 'react'
+import {
+  createContext,
+  type FC,
+  type MouseEventHandler,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useReducer,
+} from 'react'
 
 type ZoomStyle = {
   transition: string
@@ -12,13 +20,15 @@ type ZoomStyle = {
   lineHeight: number
 }
 
-type ZoomSetup = { active: false } | {
-  style: ZoomStyle
-  active: true
-}
+type ZoomSetup =
+  | { active: false }
+  | {
+      style: ZoomStyle
+      active: true
+    }
 
 const ZoomContext = createContext<ZoomSetup>({
-  active: false
+  active: false,
 })
 
 const Curtain = styled('div')({
@@ -28,20 +38,26 @@ const Curtain = styled('div')({
   top: 0,
   transition: 'opacity 1s ease-out',
   backgroundColor: 'black',
-  opacity: 0
+  opacity: 0,
 })
 
 const zoomCardTransition = 'left 0.7s ease-out, right 0.7s ease-out, top 0.7s ease-out, bottom 0.7s ease-out'
 const zoomIgnoreClicksOnTags = ['A', 'BUTTON', 'INPUT']
 
-type ZoomAction = {
-  method: 'zoom-out'
-} | {
-  method: 'focus' | 'expand'
-  style: ZoomStyle
-}
+type ZoomAction =
+  | {
+      method: 'zoom-out'
+    }
+  | {
+      method: 'focus' | 'expand'
+      style: ZoomStyle
+    }
 
-const ZoomCurtain: FC<{ children: ReactNode; cardId: string; allowZoom: boolean, onZoom?: () => void }> = ({ children, allowZoom, onZoom }) => {
+const ZoomCurtain: FC<{ children: ReactNode; cardId: string; allowZoom: boolean; onZoom?: () => void }> = ({
+  children,
+  allowZoom,
+  onZoom,
+}) => {
   const [zoom, dispatch] = useReducer(
     (state: ZoomSetup, action: ZoomAction): ZoomSetup => {
       switch (action.method) {
@@ -49,24 +65,24 @@ const ZoomCurtain: FC<{ children: ReactNode; cardId: string; allowZoom: boolean,
           return {
             ...state,
             active: true,
-            style: action.style
+            style: action.style,
           }
 
         case 'focus':
           return {
             ...state,
             active: true,
-            style: action.style
+            style: action.style,
           }
 
         case 'zoom-out':
           return {
             ...state,
-            active: false
+            active: false,
           }
       }
     },
-    { active: false }
+    { active: false },
   )
 
   useEffect(() => {
@@ -75,64 +91,73 @@ const ZoomCurtain: FC<{ children: ReactNode; cardId: string; allowZoom: boolean,
     }
   }, [zoom.active, onZoom])
 
-  const click: React.MouseEventHandler<HTMLDivElement> = useCallback<MouseEventHandler<HTMLDivElement>>(ev => {
-    if (!allowZoom) {
-      return
-    }
+  const click: React.MouseEventHandler<HTMLDivElement> = useCallback<MouseEventHandler<HTMLDivElement>>(
+    ev => {
+      if (!allowZoom) {
+        return
+      }
 
-    for (let node: Node | null = (ev.target as Node); node; node = node.parentNode) {
-      if (node instanceof HTMLElement) {
-        if (zoomIgnoreClicksOnTags.includes((node).tagName) || (node).hasAttribute('data-no-close')) {
-          return
+      for (let node: Node | null = ev.target as Node; node; node = node.parentNode) {
+        if (node instanceof HTMLElement) {
+          if (zoomIgnoreClicksOnTags.includes(node.tagName) || node.hasAttribute('data-no-close')) {
+            return
+          }
         }
       }
-    }
 
-    const wrapper = ev.currentTarget
-    if (zoom.active) {
-      dispatch({ method: 'zoom-out' })
+      const wrapper = ev.currentTarget
+      if (zoom.active) {
+        dispatch({ method: 'zoom-out' })
+      } else {
+        const rect = wrapper.getBoundingClientRect()
+        const scale = 3.5
 
-    } else {
-      const rect = wrapper.getBoundingClientRect()
-      const scale = 3.5
-
-      dispatch({
-        method: 'focus',
-        style: {
-          transition: zoomCardTransition,
-          bottom: window.innerHeight - rect.bottom,
-          right: window.innerWidth - rect.right,
-          left: rect.left,
-          top: rect.top,
-
-          fontSize: 12 * scale,
-          lineHeight: 1.2
-        }
-      })
-
-      setTimeout(() => {
         dispatch({
-          method: 'expand',
+          method: 'focus',
           style: {
             transition: zoomCardTransition,
-            bottom: '10vh',
-            top: '10vh',
-            right: '5vw',
-            left: '5vw',
+            bottom: window.innerHeight - rect.bottom,
+            right: window.innerWidth - rect.right,
+            left: rect.left,
+            top: rect.top,
 
             fontSize: 12 * scale,
-            lineHeight: 1.2
-          }
+            lineHeight: 1.2,
+          },
         })
-      }, 0)
-    }
-  }, [allowZoom, zoom])
+
+        setTimeout(() => {
+          dispatch({
+            method: 'expand',
+            style: {
+              transition: zoomCardTransition,
+              bottom: '10vh',
+              top: '10vh',
+              right: '5vw',
+              left: '5vw',
+
+              fontSize: 12 * scale,
+              lineHeight: 1.2,
+            },
+          })
+        }, 0)
+      }
+    },
+    [allowZoom, zoom],
+  )
 
   return (
     <ZoomContext.Provider value={zoom}>
       <Curtain style={zoom.active ? { position: 'fixed', opacity: 0.9, zIndex: 10 } : { width: '100%' }} />
 
-      <div onClick={click} style={zoom.active ? { position: 'fixed', zIndex: 11, ...zoom.style } : { width: '100%', transition: zoomCardTransition }}>
+      <div
+        onClick={click}
+        style={
+          zoom.active
+            ? { position: 'fixed', zIndex: 11, ...zoom.style }
+            : { width: '100%', transition: zoomCardTransition }
+        }
+      >
         {children}
       </div>
     </ZoomContext.Provider>

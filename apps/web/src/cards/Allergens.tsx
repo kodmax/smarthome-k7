@@ -7,19 +7,21 @@ import TablePlaceholder from './components/TablePlaceholder'
 import { useUpdate } from '@repo/feed-client'
 
 export const Allergens: FC<Record<string, never>> = () => {
-    const [allergensList, updatedAt] = useUpdate<{ allergens: AllergenData[] }>('weather')
+  const [allergensList, updatedAt] = useUpdate<{ allergens: AllergenData[] }>('weather')
 
-    return (
-        <ApolloCard cardId='allergens' banner={banner} updatedAt={updatedAt} zoomBanner={zoomBanner} height={5}>
-            { !allergensList ? (<TablePlaceholder rows={5} graph={false} value={true} />) : (
-                <table className='apollo-data-table'>
-                    <tbody>
-                        {allergensList.allergens.map(allergen => (
-                            <Allergen key={allergen.id} data={allergen} />
-                        ))}
-                    </tbody>
-                </table>
-            )}
-        </ApolloCard>
-    )
+  return (
+    <ApolloCard cardId='allergens' banner={banner} updatedAt={updatedAt} zoomBanner={zoomBanner} height={5}>
+      {!allergensList ? (
+        <TablePlaceholder rows={5} graph={false} value={true} />
+      ) : (
+        <table className='apollo-data-table'>
+          <tbody>
+            {allergensList.allergens.map(allergen => (
+              <Allergen key={allergen.id} data={allergen} />
+            ))}
+          </tbody>
+        </table>
+      )}
+    </ApolloCard>
+  )
 }

@@ -31,7 +31,7 @@ export const AirQuality: FC<Record<string, never>> = () => {
             graph={{
               historyKey: 'today',
               scaleX: 1,
-              scaleY: 1000
+              scaleY: 1000,
             }}
             icon={
               <KnxStateIcon
@@ -40,7 +40,8 @@ export const AirQuality: FC<Record<string, never>> = () => {
                 id='home.air-quality.co2'
                 visible={payload => payload.alert.value}
               />
-            } />
+            }
+          />
           <Humidity onUpdate={setUpdatedAt} label='Humidity' />
           <Pressure onUpdate={setUpdatedAt} />
         </tbody>

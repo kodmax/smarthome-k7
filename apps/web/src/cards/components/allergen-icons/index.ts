@@ -5,9 +5,9 @@ import ragweedPollen from './ragweed-pollen.svg'
 import treePollen from './tree-pollen.svg'
 
 export const icons: Record<string, string> = {
-    'ragweed-pollen': ragweedPollen,
-    'grass-pollen': grassPollen,
-    'dust-dander': dustDander,
-    'tree-pollen': treePollen,
-    mold
+  'ragweed-pollen': ragweedPollen,
+  'grass-pollen': grassPollen,
+  'dust-dander': dustDander,
+  'tree-pollen': treePollen,
+  mold,
 }

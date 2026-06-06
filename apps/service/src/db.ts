@@ -1,13 +1,13 @@
-import * as mariadb from "mariadb";
+import * as mariadb from 'mariadb'
 
 const pool = mariadb.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_SCHEMA,
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-});
+})
 
-export default pool;
+export default pool
 
 // export default {
 //     getConnection: () => ({

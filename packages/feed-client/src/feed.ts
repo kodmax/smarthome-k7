@@ -31,7 +31,10 @@ const server = new Observable<Update<any>>(subscriber => {
 })
 
 const updates = server.pipe(share())
-const subscribe: <T = any>(topic: string, observer: (update: Update<T>) => void) => Subscription = (topic, observer) => {
+const subscribe: <T = any>(topic: string, observer: (update: Update<T>) => void) => Subscription = (
+  topic,
+  observer,
+) => {
   const subs = updates.pipe(filter(update => update.topic === topic)).subscribe(observer)
   subs.add(() => {
     feed.dispatchEvent(new CustomEvent('unsubscribe', { detail: topic }))
