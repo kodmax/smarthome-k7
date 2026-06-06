@@ -9,7 +9,6 @@ const Icon = styled('div')({
   height: '2.5em',
 })
 const Day: FC<{ forecast?: DayWeatherForecast }> = ({ forecast }) => {
-  console.log(icons)
   return (
     <DayWrapper>
       <div>
