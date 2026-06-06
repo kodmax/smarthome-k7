@@ -7,9 +7,10 @@ import { ColorIndicator } from './components/ColorIndication'
 import TablePlaceholder from './components/TablePlaceholder'
 import Copy from './components/Copy'
 import { HoursBars } from './components/HoursBars'
+import { EnergyReading } from '@repo/types'
 
 export const Energy: FC<Record<string, never>> = () => {
-  const [reading, updatedAt] = useUpdate<any>('energy')
+  const [reading, updatedAt] = useUpdate<EnergyReading>('energy')
 
   const onZoom = useCallback(() => {
     refreshFeeds(['energy', 'home.power-draw', 'home.energy-consumption.today'])

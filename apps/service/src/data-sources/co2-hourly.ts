@@ -1,13 +1,9 @@
 import { DataSourceDefinition, CacheAgeUnit } from 'apollo-ws'
 import DateTime from '../DateTime'
 import db from '../db'
+import { EnergyHourConsumption } from '@repo/types'
 
-type HourConsumption = {
-  hourly_consumption: number
-  hour: string
-}
-
-export const source: DataSourceDefinition<{ date: string; today: HourConsumption[] }> = {
+export const source: DataSourceDefinition<{ date: string; today: EnergyHourConsumption[] }> = {
   cron: '1 * * * *',
   id: 'co2-hourly',
 

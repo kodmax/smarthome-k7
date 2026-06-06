@@ -6,7 +6,7 @@ const test = async () => {
   const conn = await db.getConnection()
   try {
     const from = new DateTime(-30, CacheAgeUnit.DAYS)
-    const avg = Number(
+    const avg = +Number(
       (
         await conn.query('select avg(daily_consumption) as avg from daily_energy_readings where date > ?', [
           from.getDate(),

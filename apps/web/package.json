@@ -7,7 +7,7 @@
     "dev": "vite --clearScreen false",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint \"src/**/*.ts?\" --fix"
+    "lint": "eslint \"src/**/*.ts?\""
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@repo/types": "*",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
     "@types/suncalc": "^1.9.2",

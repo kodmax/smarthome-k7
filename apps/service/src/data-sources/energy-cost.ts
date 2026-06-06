@@ -1,13 +1,7 @@
 import { DataSourceDefinition, CacheAgeUnit } from 'apollo-ws'
 import DateTime from '../DateTime'
 import db from '../db'
-
-type EnergyRates = {
-  added: number
-  distribution: string
-  energy: string
-  vat: number
-}
+import { EnergyRates } from '@repo/types'
 
 const rates: EnergyRates = {
   added: 33.8,
@@ -21,7 +15,7 @@ export const calculateCost = (energy: number): string => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const source: DataSourceDefinition<{ datetime: string; rates: EnergyRates; avg: string }> = {
+export const source: DataSourceDefinition<{ datetime: string; rates: EnergyRates; avg: number }> = {
   cron: '0 0 * * *',
   id: 'energy-cost',
 
@@ -30,7 +24,7 @@ export const source: DataSourceDefinition<{ datetime: string; rates: EnergyRates
     const conn = await db.getConnection()
     try {
       const from = new DateTime(-30, CacheAgeUnit.DAYS)
-      const avg = Number(
+      const avg = +Number(
         (
           await conn.query('select avg(daily_consumption) as avg from daily_energy_readings where date > ?', [
             from.getDate(),
