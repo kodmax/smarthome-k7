@@ -1,15 +1,4 @@
-export type Message = {
-  topic: string
-  payload: string
-}
-
-export type Command = {
-  sourceId: string
-  name: string
-  args: string
-}
-
-export type OnMessage = (msg: Message) => void
+import { Command, OnMessage } from './types'
 
 export class WSClient {
   private readonly topics: Set<string> = new Set<string>()
