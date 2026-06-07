@@ -50,7 +50,7 @@ export const Weather: FC<Record<string, never>> = () => {
                   <HoursBars data={weather.outdoorTemp} positiveMax={30} />
                 </td>
                 <td>
-                  <ColorIndicator instant={weather.instant.temp} range={{ optimal: 21, higest: 30, lowest: 15 }} />
+                  <ColorIndicator instant={weather.instant.temp} range={{ optimal: 21, highest: 30, lowest: 15 }} />
                   {Number(weather.instant.temp).toFixed(0)} °C
                 </td>
               </tr>
@@ -58,7 +58,7 @@ export const Weather: FC<Record<string, never>> = () => {
                 <td>Indeks UV</td>
                 <td></td>
                 <td>
-                  <ColorIndicator instant={weather.instant.uv} range={{ optimal: 2, higest: 7, lowest: 0 }} />
+                  <ColorIndicator instant={weather.instant.uv} range={{ optimal: 4, highest: 8, lowest: 0 }} />
                   {weather.instant.uv}
                 </td>
               </tr>
@@ -77,7 +77,7 @@ export const Weather: FC<Record<string, never>> = () => {
                   {zoom.active ? (
                     <NorthIcon sx={{ transform: `rotate(${weather.instant.wind.angle}deg)`, marginRight: '0.25em' }} />
                   ) : null}
-                  <ColorIndicator instant={bs} range={{ lowest: 0, higest: 7, optimal: 1 }} />
+                  <ColorIndicator instant={bs} range={{ lowest: 0, highest: 7, optimal: 1 }} />
                   {windSpeed} m/s
                 </td>
               </tr>
@@ -94,7 +94,7 @@ export const Weather: FC<Record<string, never>> = () => {
                   <td></td>
                   {sun.timeOfDay === 'day' ? (
                     <td>
-                      <ColorIndicator instant={sunAlt} range={{ lowest: -6, optimal: 30, higest: 50 }} />
+                      <ColorIndicator instant={sunAlt} range={{ lowest: -6, optimal: 30, highest: 50 }} />
                       {Number(sunAlt).toFixed(0)}°
                     </td>
                   ) : (

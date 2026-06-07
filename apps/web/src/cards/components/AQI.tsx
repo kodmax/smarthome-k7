@@ -13,7 +13,7 @@ const AQI: FC<{ label: string }> = ({ label }) => {
         <td></td>
         <td></td>
         <td>
-          <ColorIndicator instant={reading.aq.aqi} range={{ optimal: 0, higest: 150 }} />
+          <ColorIndicator instant={reading.aq.aqi} range={{ optimal: 0, highest: 150 }} />
           {reading.aq.aqi} AQI
         </td>
       </tr>

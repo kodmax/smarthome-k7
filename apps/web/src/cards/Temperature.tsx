@@ -26,7 +26,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             onUpdate={setUpdatedAt}
             id='home.temp.bathroom-floor'
             label='Podłoga łazienki'
-            range={{ optimal: 25, lowest: 21, higest: 30 }}
+            range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
               <KnxStateIcon
                 icon={payload => icons[payload.mode.bathroom.text] ?? ThermostatAuto}
@@ -43,7 +43,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             id='home.temp.livingroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
             label='Salon'
-            range={{ optimal: 25, lowest: 21, higest: 30 }}
+            range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
               <KnxStateIcon
                 icon={payload => icons[payload.mode.livingroom.text] ?? ThermostatAuto}
@@ -60,7 +60,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             id='home.temp.bedroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
             label='Sypialnia'
-            range={{ optimal: 25, lowest: 21, higest: 30 }}
+            range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
               <KnxStateIcon
                 icon={payload => icons[payload.mode.bedroom.text] ?? ThermostatAuto}
@@ -77,7 +77,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             id='home.temp.bathroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
             label='Łazienka'
-            range={{ optimal: 25, lowest: 21, higest: 30 }}
+            range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
               <KnxStateIcon
                 icon={payload => icons[payload.mode.bathroom.text] ?? ThermostatAuto}

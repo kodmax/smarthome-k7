@@ -6,7 +6,7 @@ function hsl(deg: number): string {
 }
 export type ColorIndicationRange = {
   optimal?: number
-  higest?: number
+  highest?: number
   lowest?: number
   below?: number
   above?: number
@@ -23,13 +23,13 @@ const Indicator = styled('span')({
 
 function chooseColor(
   instant: number,
-  { lowest, below, optimal, above, higest, reverse }: ColorIndicationRange,
+  { lowest, below, optimal, above, highest, reverse }: ColorIndicationRange,
 ): string {
   if (optimal !== undefined) {
-    if (instant > optimal && higest !== undefined) {
-      return instant > higest
+    if (instant > optimal && highest !== undefined) {
+      return instant > highest
         ? hsl(reverse ? 240 : 0)
-        : hsl(120 - ((instant - optimal) / (higest - optimal)) * (reverse ? -120 : 120))
+        : hsl(120 - ((instant - optimal) / (highest - optimal)) * (reverse ? -120 : 120))
     } else if (instant < optimal && lowest !== undefined) {
       return instant < lowest
         ? hsl(reverse ? 0 : 240)

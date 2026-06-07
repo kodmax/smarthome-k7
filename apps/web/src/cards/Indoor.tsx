@@ -39,7 +39,7 @@ export const Indoor: FC<Record<string, never>> = () => {
             onUpdate={setUpdatedAt}
             id='home.air-quality.co2'
             label='Poziom CO₂'
-            range={{ optimal: 400, higest: 1000 }}
+            range={{ optimal: 400, highest: 1500 }}
             graph={{
               historyKey: 'today',
               scaleX: 1,
@@ -60,7 +60,7 @@ export const Indoor: FC<Record<string, never>> = () => {
             <td></td>
             <td></td>
             <td>
-              <ColorIndicator instant={weather.aq.aqi} range={{ optimal: 0, higest: 150 }} />
+              <ColorIndicator instant={weather.aq.aqi} range={{ optimal: 0, highest: 150 }} />
               {weather.aq.aqi} AQI
             </td>
           </tr>

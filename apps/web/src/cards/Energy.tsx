@@ -110,7 +110,7 @@ export const Energy: FC<Record<string, never>> = () => {
                   <td>
                     <ColorIndicator
                       instant={reading.instant.value}
-                      range={{ optimal: 400, lowest: 100, higest: 2400 }}
+                      range={{ optimal: 400, lowest: 100, highest: 2400 }}
                     />
                     {Number(reading.instant.value).toLocaleString('en-PL', { maximumFractionDigits: 0 })} W
                   </td>

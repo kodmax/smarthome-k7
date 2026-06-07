@@ -45,7 +45,7 @@ const KnxReading: FC<Props> = ({
       <tr>
         <td>{label}</td>
         <td>
-          {!bars ? null : <HoursBars positiveMax={range?.higest || 0} data={reading[bars] as Record[]} />}
+          {!bars ? null : <HoursBars positiveMax={range?.highest || 0} data={reading[bars] as Record[]} />}
           {!graph ? null : (
             <Graph
               scaleX={graph.scaleX}

@@ -8,7 +8,7 @@ export function getAbsoluteHumidity(temp: number, relativeHumidity: number): num
 
 export const optimalHumidityRange: ColorIndicationRange = {
   optimal: 45,
-  higest: 60,
+  highest: 60,
   lowest: 20,
   reverse: true,
 }
