@@ -11,7 +11,6 @@ import { getPosition, getMoonPosition } from 'suncalc'
 import { useUpdate } from '@repo/feed-client'
 import { WeatherData } from '@repo/types'
 import { sunTimes } from './sunTimes'
-import Pressure from '../components/Pressure'
 
 export const Weather: FC<Record<string, never>> = () => {
   const [weather, updatedAt] = useUpdate<WeatherData>('weather')
@@ -96,7 +95,7 @@ export const Weather: FC<Record<string, never>> = () => {
                     <td>{weather.instant.clouds.coverage}</td>
                   </tr>
                 )}
-                <Pressure />
+                {/* <Pressure /> */}
               </tbody>
             </table>
           )}

@@ -60,7 +60,7 @@ export const Indoor: FC<Record<string, never>> = () => {
             <td></td>
             <td></td>
             <td>
-              <ColorIndicator instant={weather.instant.uv} range={{ optimal: 2, higest: 10, lowest: 0 }} />
+              <ColorIndicator instant={weather.instant.uv} range={{ optimal: 2, higest: 7, lowest: 0 }} />
               {weather.instant.uv}
             </td>
           </tr>

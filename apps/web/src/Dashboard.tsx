@@ -12,8 +12,8 @@ export const Dashboard: FC<Record<string, never>> = () => {
   return (
     <div>
       <Grid container spacing={2} ref={div}>
-        <Grid item xs={6} sm={6} md={3} xl={3}>
-          <Weather />
+        <Grid item xs={12} sm={6} md={3} xl={3}>
+          <Energy />
         </Grid>
         <Grid item xs={6} sm={6} md={3} xl={3}>
           <Indoor />
@@ -21,8 +21,8 @@ export const Dashboard: FC<Record<string, never>> = () => {
         <Grid item xs={6} sm={6} md={3} xl={3}>
           <Temperature />
         </Grid>
-        <Grid item xs={12} sm={6} md={3} xl={3}>
-          <Energy />
+        <Grid item xs={6} sm={6} md={3} xl={3}>
+          <Weather />
         </Grid>
         <Grid item xs={12} sm={12} md={12} xl={12}>
           <WeatherForecast />
