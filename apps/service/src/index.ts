@@ -9,7 +9,7 @@ import path from 'path'
 import { energy, airQuality, temp, heating } from './home.knx-schema'
 import KnxHVACMode from './data-sources/knx/hvac-mode'
 import knxHumidity from './data-sources/knx/humidity'
-import knxSwitch from './data-sources/knx/switch'
+import knxB1 from './data-sources/knx/b1'
 import knxEnergy from './data-sources/knx/energy'
 import knxPower from './data-sources/knx/power'
 import knxTemp from './data-sources/knx/temp'
@@ -43,19 +43,19 @@ Server.listen({}, async apollo => {
     })
 
     const heatersReadings = {
-      bathroomState: knxSwitch(
+      bathroomState: knxB1(
         'home.heating.lazienka.water-heating',
         knx.getDatapoint(heating['Grzejniki wodne']['Lazienka stan']),
       ),
-      bathroomFloorState: knxSwitch(
+      bathroomFloorState: knxB1(
         'home.heating.lazienka.floor-heating',
         knx.getDatapoint(heating['Podłoga Łazienka'].state),
       ),
-      livingRoomState: knxSwitch(
+      livingRoomState: knxB1(
         'home.heating.salon.water-heating',
         knx.getDatapoint(heating['Grzejniki wodne']['Salon stan']),
       ),
-      bedroomState: knxSwitch(
+      bedroomState: knxB1(
         'home.heating.sypialnia.water-heating',
         knx.getDatapoint(heating['Grzejniki wodne']['Sypialnia stan']),
       ),
@@ -110,10 +110,7 @@ Server.listen({}, async apollo => {
     )
 
     const co2Level = knxCo2('home.air-quality.co2', knx.getDatapoint(airQuality.CO2.reading))
-    const co2Alert = knxSwitch(
-      'home.air-quality.co2-alert',
-      knx.getDatapoint({ address: '2/5/1', DataType: DPT_Alarm }),
-    )
+    const co2Alert = knxB1('home.air-quality.co2-alert', knx.getDatapoint({ address: '2/5/1', DataType: DPT_Alarm }))
     feeds.addFeed('home.air-quality.co2', { co2Hourly, co2Level, co2Alert }, ({ co2Level, co2Hourly, co2Alert }) => {
       return {
         alert: co2Alert,

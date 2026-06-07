@@ -3,7 +3,7 @@ import { CacheAgeUnit } from 'apollo-ws'
 export default class DateTime {
   private readonly datetime: string
 
-  public constructor(shift: number = 0, unit: CacheAgeUnit = CacheAgeUnit.HOURS) {
+  public constructor(shift = 0, unit: CacheAgeUnit = CacheAgeUnit.HOURS) {
     this.datetime = new Date(
       new Date().getTime() - new Date().getTimezoneOffset() * 60000 + shift * unit * 1000,
     ).toISOString()

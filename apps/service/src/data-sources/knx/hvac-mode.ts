@@ -12,7 +12,7 @@ export default (id: string, dp: DPT_HVACMode) => {
       return await dp.read()
     },
 
-    push: (push, cmd, err) => {
+    push: push => {
       dp.addValueListener(reading => {
         push(reading)
       })

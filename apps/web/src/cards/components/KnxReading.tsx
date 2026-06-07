@@ -7,7 +7,8 @@ import { HoursBars, type Record } from './HoursBars'
 type KnxValue = {
   value: string | number
   text: string
-  [key: string]: any
+  unit: string
+  [key: string]: unknown
 }
 
 type Props = {
@@ -64,7 +65,7 @@ const KnxReading: FC<Props> = ({
         <td>
           <ColorIndicator instant={reading.value as number} range={range || {}} />
           {Number(reading.value).toFixed(precision)}
-          {unit ? reading.unit : null}
+          {unit ? (reading.unit as string) : null}
         </td>
       </tr>
     )

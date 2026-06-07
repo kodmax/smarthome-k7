@@ -9,7 +9,7 @@ type KnxStateIconProps = {
   active?: (payload: KnxValue) => boolean
   visible?: (payload: KnxValue) => boolean
   icon: (payload: KnxValue) => SvgIconComponent
-  opacity?: (payload: any) => number
+  opacity?: (payload: unknown) => number
 }
 const KnxStateIcon: FC<KnxStateIconProps> = ({
   id,

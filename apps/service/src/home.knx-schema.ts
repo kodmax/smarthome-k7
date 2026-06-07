@@ -16,7 +16,6 @@ import {
   DPT_Value_Electric_Potential,
   DPT_Value_ApparentPower,
   DPT_State,
-  DPT_Scaling,
 } from 'js-knx'
 
 export const lights = {

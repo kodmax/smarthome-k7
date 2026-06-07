@@ -1,10 +1,10 @@
 import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
-import { DataPointAbstract, DPT_Value_Temp, KnxReading } from 'js-knx'
+import { DataPointAbstract, DPT_Generic_B1, KnxReading } from 'js-knx'
 
-export default (id: string, dp: DPT_Value_Temp) => {
+export default (id: string, dp: DPT_Generic_B1) => {
   const source: DataSourceDefinition<typeof dp extends DataPointAbstract<infer T> ? KnxReading<T> : never> = {
-    id,
     volatile: true,
+    id,
 
     expired: snapshot => snapshot.age(CacheAgeUnit.SECONDS) > 60,
 
