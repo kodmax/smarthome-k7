@@ -39,6 +39,14 @@ export const Weather: FC<Record<string, never>> = () => {
                   </td>
                 </tr>
                 <tr>
+                  <td>Indeks UV</td>
+                  <td></td>
+                  <td>
+                    <ColorIndicator instant={weather.instant.uv} range={{ optimal: 2, higest: 7, lowest: 0 }} />
+                    {weather.instant.uv}
+                  </td>
+                </tr>
+                <tr>
                   <td>Predkość wiatru</td>
                   <td style={{ fontSize: '0.5em' }}>{zoom.active ? `${bs} - ${beaufortLevelLabel(bs)}` : `${bs} B`}</td>
                   <td>
@@ -57,14 +65,6 @@ export const Weather: FC<Record<string, never>> = () => {
                   <td>
                     <ColorIndicator instant={hum} range={optimalHumidityRange} />
                     {hum.toFixed(0)}%
-                  </td>
-                </tr>
-                <tr>
-                  <td>Jakość powietrza</td>
-                  <td></td>
-                  <td>
-                    <ColorIndicator instant={weather.aq.aqi} range={{ optimal: 0, higest: 150 }} />
-                    {weather.aq.aqi} AQI
                   </td>
                 </tr>
                 {!zoom.active || weather.instant.wind.speed === weather.instant.wind.maxSpeed ? null : (

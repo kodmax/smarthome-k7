@@ -56,12 +56,12 @@ export const Indoor: FC<Record<string, never>> = () => {
           />
           <Humidity onUpdate={setUpdatedAt} label='Wilgotność' />
           <tr>
-            <td>Indeks UV</td>
+            <td>Jakość powietrza</td>
             <td></td>
             <td></td>
             <td>
-              <ColorIndicator instant={weather.instant.uv} range={{ optimal: 2, higest: 7, lowest: 0 }} />
-              {weather.instant.uv}
+              <ColorIndicator instant={weather.aq.aqi} range={{ optimal: 0, higest: 150 }} />
+              {weather.aq.aqi} AQI
             </td>
           </tr>
           <tr>
