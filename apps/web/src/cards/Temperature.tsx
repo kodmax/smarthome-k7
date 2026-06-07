@@ -5,6 +5,7 @@ import banner from './card-banners/indoor-temp.jpg'
 import ApolloCard from '../apollo-card/ApolloCard'
 import KnxStateIcon from './components/KnxStateIcon'
 import { Bedtime, Fireplace, LightMode, Air, type SvgIconComponent, ThermostatAuto } from '@mui/icons-material'
+import { TemperatureData } from '@repo/types'
 
 const icons: Record<string, SvgIconComponent> = {
   FrostProtection: Air,
@@ -28,7 +29,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             label='Podłoga łazienki'
             range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
-              <KnxStateIcon
+              <KnxStateIcon<TemperatureData>
                 icon={payload => icons[payload.mode.bathroom.text] ?? ThermostatAuto}
                 onUpdate={setUpdatedAt}
                 id='heating'
@@ -45,7 +46,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             label='Salon'
             range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
-              <KnxStateIcon
+              <KnxStateIcon<TemperatureData>
                 icon={payload => icons[payload.mode.livingroom.text] ?? ThermostatAuto}
                 onUpdate={setUpdatedAt}
                 id='heating'
@@ -62,7 +63,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             label='Sypialnia'
             range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
-              <KnxStateIcon
+              <KnxStateIcon<TemperatureData>
                 icon={payload => icons[payload.mode.bedroom.text] ?? ThermostatAuto}
                 onUpdate={setUpdatedAt}
                 id='heating'
@@ -79,7 +80,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             label='Łazienka'
             range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
-              <KnxStateIcon
+              <KnxStateIcon<TemperatureData>
                 icon={payload => icons[payload.mode.bathroom.text] ?? ThermostatAuto}
                 onUpdate={setUpdatedAt}
                 id='heating'

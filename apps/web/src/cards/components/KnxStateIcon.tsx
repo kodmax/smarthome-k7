@@ -1,25 +1,25 @@
-import { type FC, useEffect } from 'react'
+import { useEffect } from 'react'
 import { type SvgIconComponent } from '@mui/icons-material'
 import { useUpdate } from '@repo/feed-client'
-import type { KnxValue } from './KnxReading'
 
-type KnxStateIconProps = {
+type KnxStateIconProps<T> = {
   id: string
   onUpdate: (ts: number) => void
-  active?: (payload: KnxValue) => boolean
-  visible?: (payload: KnxValue) => boolean
-  icon: (payload: KnxValue) => SvgIconComponent
-  opacity?: (payload: unknown) => number
+  active?: (payload: T) => boolean
+  visible?: (payload: T) => boolean
+  icon: (payload: T) => SvgIconComponent
+  opacity?: (payload: T) => number
 }
-const KnxStateIcon: FC<KnxStateIconProps> = ({
+
+const KnxStateIcon = <T,>({
   id,
   onUpdate,
   active = () => false,
   icon,
   opacity = () => 1,
   visible = () => true,
-}) => {
-  const [reading, updatedAt] = useUpdate<KnxValue>(id)
+}: KnxStateIconProps<T>) => {
+  const [reading, updatedAt] = useUpdate<T>(id)
 
   useEffect(() => {
     onUpdate(new Date().getTime())

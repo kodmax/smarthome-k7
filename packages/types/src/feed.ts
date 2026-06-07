@@ -1,4 +1,6 @@
-import { KnxReading } from 'js-knx'
+import { type KnxReading } from 'js-knx'
+
+export { KnxReading as KnxReadingType }
 
 export type EnergyRates = {
   added: number
@@ -10,6 +12,11 @@ export type EnergyRates = {
 export type EnergyHourConsumption = {
   hourly_consumption: number
   hour: string
+}
+
+export type Co2HistoryRecord = {
+  datetime: string
+  value: number
 }
 
 export type EnergyReading = {
@@ -149,5 +156,30 @@ export type CommoditiesData = {
       datetime: string
       value: number
     }>
+  }
+}
+
+export type Co2Data = {
+  date: string
+  today: Co2HistoryRecord[]
+  target: string
+  source: string
+  text: string
+  unit: string
+  value: number
+  alert: KnxReading<number>
+}
+
+export type TemperatureData = {
+  status: {
+    lazienka: KnxReading<number>
+    lazienkaPodloga: KnxReading<number>
+    sypialnia: KnxReading<number>
+    salon: KnxReading<number>
+  }
+  mode: {
+    livingroom: KnxReading<number>
+    bathroom: KnxReading<number>
+    bedroom: KnxReading<number>
   }
 }

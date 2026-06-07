@@ -8,8 +8,8 @@ import {
   energyConsumption,
   co2Hourly,
   indoorTempHistory,
-  commodities,
-  fx,
+  // commodities,
+  // fx,
 } from './data-sources'
 import { Server, Cache, sysLog, Feeds } from 'apollo-ws'
 import { DPT_Alarm, DPT_HVACMode, DPT_Value_Temp, KnxLink } from 'js-knx'
@@ -25,7 +25,7 @@ import knxTemp from './data-sources/knx/temp'
 import knxCo2 from './data-sources/knx/co2'
 import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
-import { CommoditiesData, CommoditiesPrices, EnergyReading } from '@repo/types'
+import { CommoditiesData, EnergyReading, TemperatureData } from '@repo/types'
 
 Server.listen({}, async apollo => {
   const feeds = new Feeds(new Cache(path.join(__dirname, '/data-sources/.cache')), apollo.vent)
@@ -83,19 +83,23 @@ Server.listen({}, async apollo => {
         knx.getDatapoint({ DataType: DPT_HVACMode, address: '2/2/4' }),
       ),
     }
-    feeds.addFeed('heating', { ...heatersReadings, ...hvacModes }, readings => ({
-      status: {
-        lazienka: readings.bathroomState,
-        lazienkaPodloga: readings.bathroomFloorState,
-        sypialnia: readings.bedroomState,
-        salon: readings.livingRoomState,
-      },
-      mode: {
-        livingroom: readings.livingroomMode,
-        bathroom: readings.bathroomMode,
-        bedroom: readings.bedroomMode,
-      },
-    }))
+    feeds.addFeed(
+      'heating',
+      { ...heatersReadings, ...hvacModes },
+      (readings): TemperatureData => ({
+        status: {
+          lazienka: readings.bathroomState,
+          lazienkaPodloga: readings.bathroomFloorState,
+          sypialnia: readings.bedroomState,
+          salon: readings.livingRoomState,
+        },
+        mode: {
+          livingroom: readings.livingroomMode,
+          bathroom: readings.bathroomMode,
+          bedroom: readings.bedroomMode,
+        },
+      }),
+    )
 
     const energyReadings = {
       total: knxEnergy('home.energy-consumption.meter-total-reading', knx.getDatapoint(energy.Total.reading)),
@@ -193,32 +197,32 @@ Server.listen({}, async apollo => {
 
   feeds.addFeed('top-torrents', { torrents })
 
-  feeds.addFeed('commodities', { commodities, fx }, ({ commodities, fx: { rates } }): CommoditiesData => {
-    const er = Number(rates['USD/PLN'])
-    return {
-      oil: {
-        'PLN/l': +Number(+commodities.oil.l * er).toFixed(2),
-        history: commodities.oil.history,
-      },
-      ng: {
-        'PLN/GJ': +Number(+commodities.ng.GJ * er).toFixed(0),
-        history: commodities.ng.history,
-      },
-      coal: {
-        'PLN/MT': +Number(+commodities.coal.ton * er).toFixed(0),
-        history: commodities.coal.history,
-      },
-      gold: {
-        'PLN/g': +Number(+commodities.gold.g * er).toFixed(0),
-        history: commodities.gold.history,
-      },
-      btc: {
-        'BTC/USD': +Number(commodities.btc.usd).toFixed(0),
-        history: commodities.btc.history,
-      },
-      inflation: {
-        history: commodities.inflation,
-      },
-    }
-  })
+  // feeds.addFeed('commodities', { commodities, fx }, ({ commodities, fx: { rates } }): CommoditiesData => {
+  //   const er = Number(rates['USD/PLN'])
+  //   return {
+  //     oil: {
+  //       'PLN/l': +Number(+commodities.oil.l * er).toFixed(2),
+  //       history: commodities.oil.history,
+  //     },
+  //     ng: {
+  //       'PLN/GJ': +Number(+commodities.ng.GJ * er).toFixed(0),
+  //       history: commodities.ng.history,
+  //     },
+  //     coal: {
+  //       'PLN/MT': +Number(+commodities.coal.ton * er).toFixed(0),
+  //       history: commodities.coal.history,
+  //     },
+  //     gold: {
+  //       'PLN/g': +Number(+commodities.gold.g * er).toFixed(0),
+  //       history: commodities.gold.history,
+  //     },
+  //     btc: {
+  //       'BTC/USD': +Number(commodities.btc.usd).toFixed(0),
+  //       history: commodities.btc.history,
+  //     },
+  //     inflation: {
+  //       history: commodities.inflation,
+  //     },
+  //   }
+  // })
 })

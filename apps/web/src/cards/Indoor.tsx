@@ -8,7 +8,7 @@ import ApolloCard from '../apollo-card/ApolloCard'
 import { refreshFeeds, useUpdate } from '@repo/feed-client'
 import KnxStateIcon from './components/KnxStateIcon'
 import { Warning } from '@mui/icons-material'
-import { WeatherData } from '@repo/types'
+import { Co2Data, WeatherData } from '@repo/types'
 import { sunTimes } from './Weather/sunTimes'
 import TablePlaceholder from './components/TablePlaceholder'
 import { ColorIndicator } from './components/ColorIndication'
@@ -46,11 +46,11 @@ export const Indoor: FC<Record<string, never>> = () => {
               scaleY: 1000,
             }}
             icon={
-              <KnxStateIcon
+              <KnxStateIcon<Co2Data>
                 icon={() => Warning}
                 onUpdate={setUpdatedAt}
                 id='home.air-quality.co2'
-                visible={payload => payload.alert.value}
+                visible={payload => payload.alert.value === 1}
               />
             }
           />

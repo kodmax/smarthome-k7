@@ -3,7 +3,7 @@ import { type FC } from 'react'
 import { renderToString } from 'react-dom/server'
 
 export interface Record {
-  [key: string]: any
+  [key: string]: string | number
   hour: string | number
 }
 
@@ -37,7 +37,7 @@ export const HoursBars: FC<{ data?: Record[]; positiveMax: number; negativeMax?:
     const dataPoints: DataPoint[] = data.map(record => {
       return {
         hour: Number(typeof record.hour === 'string' ? record.hour.substring(0, 2) : record.hour),
-        value: record[valueKey],
+        value: Number(record[valueKey]),
       }
     })
 

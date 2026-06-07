@@ -3,8 +3,8 @@ import { type FC } from 'react'
 import { renderToString } from 'react-dom/server'
 
 export interface Record {
-  [key: string]: any
   datetime: string
+  [key: string]: string | number | boolean
 }
 
 export type DataPoint = {
@@ -53,8 +53,8 @@ export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value'
     const dataPoints: DataPoint[] = data.map(record => {
       return {
         datetime: record.datetime,
-        active: record[activeKey],
-        value: record[valueKey],
+        active: Boolean(record[activeKey]),
+        value: Number(record[valueKey]),
       }
     })
 

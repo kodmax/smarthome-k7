@@ -1,17 +1,15 @@
-import { type FC, type ReactNode, useEffect } from 'react'
+import { type ReactNode, useEffect } from 'react'
 import { useUpdate } from '@repo/feed-client'
 import { ColorIndicator, type ColorIndicationRange } from './ColorIndication'
 import { Graph, type DataPoint, type GraphProps } from './Graph'
 import { HoursBars, type Record } from './HoursBars'
+import { KnxReadingType } from '@repo/types'
 
-type KnxValue = {
-  value: string | number
-  text: string
-  unit: string
+type KnxValue<T> = KnxReadingType<T> & {
   [key: string]: unknown
 }
 
-type Props = {
+type Props<P> = {
   precision?: number
   id: string
   label: string
@@ -21,9 +19,10 @@ type Props = {
   bars?: string
   graph?: Omit<GraphProps, 'data'> & { historyKey: string }
   icon?: ReactNode
-  target?: (reading: KnxValue) => string
+  target?: (payload: P) => string
 }
-const KnxReading: FC<Props> = ({
+
+const KnxReading = <T extends KnxValue<string | number> = KnxValue<string | number>>({
   icon,
   id,
   label,
@@ -34,8 +33,8 @@ const KnxReading: FC<Props> = ({
   graph,
   precision = 0,
   target,
-}) => {
-  const [reading, updatedAt] = useUpdate<KnxValue>(id)
+}: Props<T>) => {
+  const [reading, updatedAt] = useUpdate<T>(id)
 
   useEffect(() => {
     onUpdate(new Date().getTime())
