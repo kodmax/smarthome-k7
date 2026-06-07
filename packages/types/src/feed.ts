@@ -117,3 +117,37 @@ export type WeatherData = {
     }
   }
 }
+
+export type PriceHistory = {
+  datetime: string
+  price: string
+}
+
+export type CommoditiesData = {
+  oil: {
+    'PLN/l': number
+    history: PriceHistory[]
+  }
+  ng: {
+    'PLN/GJ': number
+    history: PriceHistory[]
+  }
+  coal: {
+    'PLN/MT': number
+    history: PriceHistory[]
+  }
+  gold: {
+    'PLN/g': number
+    history: PriceHistory[]
+  }
+  btc: {
+    'BTC/USD': number
+    history: PriceHistory[]
+  }
+  inflation: {
+    history: Array<{
+      datetime: string
+      value: number
+    }>
+  }
+}

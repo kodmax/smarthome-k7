@@ -4,7 +4,6 @@ import { parseHTML } from 'linkedom'
 
 type CoalPrice = {
   ton: string
-  history?: History
 }
 
 const fetchCoalPrice = async (): Promise<CoalPrice> => {

@@ -4,7 +4,6 @@ import { parseHTML } from 'linkedom'
 
 type BtcPrice = {
   usd: string
-  history?: History
 }
 
 const fetchBtcPrice = async (): Promise<BtcPrice> => {

@@ -6,7 +6,6 @@ type NaturalGasPrice = {
   GJ: string
   MWh: string
   MMBTU: string
-  history?: History
 }
 
 const fetchNaturalGasPrice = async (): Promise<NaturalGasPrice> => {

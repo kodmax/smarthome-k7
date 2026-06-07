@@ -5,6 +5,7 @@ import { refreshFeeds, useUpdate } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import { Graph } from './components/Graph'
 import TablePlaceholder from './components/TablePlaceholder'
+import { CommoditiesData } from '@repo/types'
 
 type Salaries = {
   median: number
@@ -26,7 +27,7 @@ interface JobsOffers {
 }
 
 export const Commodities: FC<Record<string, never>> = () => {
-  const [reading, updatedAt] = useUpdate<any>('commodities')
+  const [reading, updatedAt] = useUpdate<CommoditiesData>('commodities')
   const [jobs] = useUpdate<JobsOffers>('jobs')
 
   const onZoom = useCallback(() => {
@@ -50,9 +51,9 @@ export const Commodities: FC<Record<string, never>> = () => {
 
   // const usd = new Intl.NumberFormat('en-PL', { style: 'currency', currency: 'USD', currencyDisplay: 'symbol', maximumFractionDigits: 0 })
 
-  reading.inflationData = reading.inflation.history.slice(-12)
-  for (let i = 0, a = 1; i < reading.inflationData.length; i++) {
-    reading.inflationData[i].acc = a *= reading.inflationData[i].value / 100
+  const inflationData = reading.inflation.history.slice(-12).map(({ datetime, value }) => ({ datetime, value, acc: 0 }))
+  for (let i = 0, a = 1; i < inflationData.length; i++) {
+    inflationData[i].acc = a *= inflationData[i].value / 100
   }
 
   return (
@@ -68,13 +69,10 @@ export const Commodities: FC<Record<string, never>> = () => {
                   <td>Inflacja</td>
                   <td style={{ display: zoom.active ? 'initial' : 'none' }}>12 mscy</td>
                   <td style={{ width: '4em', padding: 0 }}>
-                    <Graph scaleX={1 * 365} scaleY={0.05} data={reading.inflationData} valueKey='acc' />
+                    <Graph scaleX={1 * 365} scaleY={0.05} data={inflationData} valueKey='acc' />
                   </td>
                   <td>
-                    {reading.inflationData.length > 0
-                      ? Number(reading.inflationData.slice(-1)[0].acc * 100 - 100).toFixed(1)
-                      : '--'}{' '}
-                    %
+                    {inflationData.length > 0 ? Number(inflationData.slice(-1)[0].acc * 100 - 100).toFixed(1) : '--'} %
                   </td>
                 </tr>
                 <tr>

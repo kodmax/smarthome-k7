@@ -5,7 +5,6 @@ import { parseHTML } from 'linkedom'
 type GoldPrice = {
   g: string
   oz: string
-  history?: History
 }
 
 const fetchGoldPrice = (): Promise<GoldPrice> => {

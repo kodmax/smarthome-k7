@@ -1,3 +1,4 @@
+import { PriceHistory } from '@repo/types'
 import { BtcPrice } from './btc'
 import { CoalPrice } from './coal'
 import { GoldPrice } from './gold'
@@ -5,18 +6,15 @@ import { InflationData } from './inflation'
 import { NaturalGasPrice } from './natural-gas'
 import { OilPrice } from './oil'
 
-type History = Array<{
-  datetime: string
-  price: string
-}>
-
-type Commodities = {
-  inflation: InflationData
-  oil: OilPrice
-  ng: NaturalGasPrice
-  coal: CoalPrice
-  gold: GoldPrice
-  btc: BtcPrice
+export type WithHistory<T extends object> = T & {
+  history: PriceHistory[]
 }
 
-export type { History, Commodities }
+export type Commodities = {
+  inflation: InflationData
+  oil: WithHistory<OilPrice>
+  ng: WithHistory<NaturalGasPrice>
+  coal: WithHistory<CoalPrice>
+  gold: WithHistory<GoldPrice>
+  btc: WithHistory<BtcPrice>
+}

@@ -35,31 +35,47 @@ export const source: DataSourceDefinition<Commodities> = {
       await conn.query('insert into commodities (datetime, name, price) values (?, ?, ?)', [now, 'GOLD/g', gold.g])
       await conn.query('insert into commodities (datetime, name, price) values (?, ?, ?)', [now, 'BTC/USD', btc.usd])
 
-      btc.history = await conn.query(
-        'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
-        ['BTC/USD', timeWindow],
-      )
-      coal.history = await conn.query(
-        'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
-        ['COAL/t', timeWindow],
-      )
-      gold.history = await conn.query(
-        'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
-        ['GOLD/g', timeWindow],
-      )
-      oil.history = await conn.query(
-        'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
-        ['OIL/l', timeWindow],
-      )
-      ng.history = await conn.query(
-        'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
-        ['NG/GJ', timeWindow],
-      )
+      return {
+        inflation,
+        oil: {
+          ...oil,
+          history: await conn.query(
+            'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
+            ['OIL/l', timeWindow],
+          ),
+        },
+        ng: {
+          ...ng,
+          history: await conn.query(
+            'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
+            ['NG/GJ', timeWindow],
+          ),
+        },
+        coal: {
+          ...coal,
+          history: await conn.query(
+            'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
+            ['COAL/t', timeWindow],
+          ),
+        },
+        gold: {
+          ...gold,
+          history: await conn.query(
+            'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
+            ['GOLD/g', timeWindow],
+          ),
+        },
+        btc: {
+          ...btc,
+          history: await conn.query(
+            'select price, datetime from commodities where name=? and datetime >= ? order by datetime; ',
+            ['BTC/USD', timeWindow],
+          ),
+        },
+      }
     } finally {
       await conn.end()
     }
-
-    return { inflation, oil, ng, coal, gold, btc }
   },
 }
 
