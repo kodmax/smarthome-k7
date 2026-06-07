@@ -81,7 +81,9 @@ export const source: DataSourceDefinition<WeatherData> = {
               direction: windDirection,
               speed: Number(windSpeed),
             },
-            uv: details['Maksymalny wskaźnik UV'] ? Number(details['Maksymalny wskaźnik UV'].replace(/[^\d]/g, '')) : 0,
+            uv: details['Maksymalny wskaźnik UV']
+              ? Number(details['Maksymalny wskaźnik UV'].replace(/[^\d.]/g, ''))
+              : 0,
             humidity: Number(details['Wilgotność'].replace(/[^\d]/g, '')),
             pressure: Number(details['Ciśnienie'].replace(/[^\d]/g, '')),
             details,

@@ -3,7 +3,7 @@ import { useUpdate } from '@repo/feed-client'
 import { ColorIndicator } from './ColorIndication'
 import { WeatherData } from '@repo/types'
 
-const AQI: FC<{ label: string; onUpdate: (ts: number) => void }> = ({ label }) => {
+const AQI: FC<{ label: string }> = ({ label }) => {
   const [reading] = useUpdate<WeatherData>('weather')
 
   if (reading) {

@@ -10,21 +10,8 @@ import NorthIcon from '@mui/icons-material/North'
 import { getPosition, getMoonPosition } from 'suncalc'
 import { useUpdate } from '@repo/feed-client'
 import { WeatherData } from '@repo/types'
-
-type SunRiseSunSet = {
-  timeOfDay: 'day' | 'night'
-  time: string
-}
-
-function sunTimes(data: WeatherData): SunRiseSunSet {
-  if (new Date(data.sunTimes.dawn).getTime() - new Date().getTime() > 0) {
-    return { timeOfDay: 'night', time: new Date(data.sunTimes.dawn).toLocaleTimeString().substring(0, 5) }
-  } else if (new Date(data.sunTimes.dusk).getTime() - new Date().getTime() > 0) {
-    return { timeOfDay: 'day', time: new Date(data.sunTimes.dusk).toLocaleTimeString().substring(0, 5) }
-  } else {
-    return { timeOfDay: 'night', time: new Date(data.sunTimes.dawn).toLocaleTimeString().substring(0, 5) }
-  }
-}
+import { sunTimes } from './sunTimes'
+import Pressure from '../components/Pressure'
 
 export const Weather: FC<Record<string, never>> = () => {
   const [weather, updatedAt] = useUpdate<WeatherData>('weather')
@@ -73,6 +60,14 @@ export const Weather: FC<Record<string, never>> = () => {
                     {hum.toFixed(0)}%
                   </td>
                 </tr>
+                <tr>
+                  <td>Jakość powietrza</td>
+                  <td></td>
+                  <td>
+                    <ColorIndicator instant={weather.aq.aqi} range={{ optimal: 0, higest: 150 }} />
+                    {weather.aq.aqi} AQI
+                  </td>
+                </tr>
                 {!zoom.active || weather.instant.wind.speed === weather.instant.wind.maxSpeed ? null : (
                   <tr>
                     <td>Porywy wiatru</td>
@@ -96,26 +91,12 @@ export const Weather: FC<Record<string, never>> = () => {
                 )}
                 {!zoom.active ? null : (
                   <tr>
-                    <td>Indeks UV</td>
-                    <td></td>
-                    <td>
-                      <ColorIndicator instant={weather.instant.uv} range={{ optimal: 2, higest: 10, lowest: 0 }} />
-                      {weather.instant.uv}
-                    </td>
-                  </tr>
-                )}
-                {!zoom.active ? null : (
-                  <tr>
                     <td>Zachmurzenie</td>
                     <td></td>
                     <td>{weather.instant.clouds.coverage}</td>
                   </tr>
                 )}
-                <tr>
-                  <td>{sun.timeOfDay === 'day' ? 'Zmierzch' : 'Świt'}</td>
-                  <td></td>
-                  <td>{sun.time}</td>
-                </tr>
+                <Pressure />
               </tbody>
             </table>
           )}

@@ -25,7 +25,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             precision={2}
             onUpdate={setUpdatedAt}
             id='home.temp.bathroom-floor'
-            label='Ba. floor'
+            label='Podłoga łazienki'
             range={{ optimal: 25, lowest: 21, higest: 30 }}
             icon={
               <KnxStateIcon
@@ -42,7 +42,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             onUpdate={setUpdatedAt}
             id='home.temp.livingroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
-            label='Livingroom'
+            label='Salon'
             range={{ optimal: 25, lowest: 21, higest: 30 }}
             icon={
               <KnxStateIcon
@@ -59,7 +59,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             onUpdate={setUpdatedAt}
             id='home.temp.bedroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
-            label='Bedroom'
+            label='Sypialnia'
             range={{ optimal: 25, lowest: 21, higest: 30 }}
             icon={
               <KnxStateIcon
@@ -76,7 +76,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             onUpdate={setUpdatedAt}
             id='home.temp.bathroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
-            label='Bathroom'
+            label='Łazienka'
             range={{ optimal: 25, lowest: 21, higest: 30 }}
             icon={
               <KnxStateIcon

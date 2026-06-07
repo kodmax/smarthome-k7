@@ -1,14 +1,10 @@
-import { type FC, useEffect } from 'react'
+import { type FC } from 'react'
 import { useUpdate } from '@repo/feed-client'
 import { Graph } from './Graph'
 import { WeatherData } from '@repo/types'
 
-const Pressure: FC<{ onUpdate: (ts: number) => void }> = ({ onUpdate }) => {
-  const [recent, updatedAt] = useUpdate<WeatherData>('weather')
-
-  useEffect(() => {
-    onUpdate(new Date().getTime())
-  }, [updatedAt])
+const Pressure: FC = () => {
+  const [recent] = useUpdate<WeatherData>('weather')
 
   if (recent) {
     return (
@@ -24,7 +20,6 @@ const Pressure: FC<{ onUpdate: (ts: number) => void }> = ({ onUpdate }) => {
             scaleY={25}
           />
         </td>
-        <td></td>
         <td>{Number(recent.pressure.instant).toFixed(0)} hPa</td>
       </tr>
     )
@@ -32,7 +27,6 @@ const Pressure: FC<{ onUpdate: (ts: number) => void }> = ({ onUpdate }) => {
     return (
       <tr>
         <td>Zmiany ciśnienia</td>
-        <td></td>
         <td></td>
         <td style={{ color: 'silver' }}>--</td>
       </tr>

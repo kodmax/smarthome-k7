@@ -1,5 +1,5 @@
 import { Grid } from '@mui/material'
-import { AirQuality } from './cards/AirQuality'
+import { Indoor } from './cards/Indoor'
 import { Energy } from './cards/Energy'
 import { Temperature } from './cards/Temperature'
 import { TopTorrents } from './cards/TopTorrents'
@@ -16,7 +16,7 @@ export const Dashboard: FC<Record<string, never>> = () => {
           <Weather />
         </Grid>
         <Grid item xs={6} sm={6} md={3} xl={3}>
-          <AirQuality />
+          <Indoor />
         </Grid>
         <Grid item xs={6} sm={6} md={3} xl={3}>
           <Temperature />
