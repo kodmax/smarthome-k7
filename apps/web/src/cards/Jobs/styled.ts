@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 
 export const Logo = styled('img')<{ isUnwanted: boolean }>(({ isUnwanted }) => ({
-  opacity: isUnwanted ? 0.1 : 1,
+  opacity: isUnwanted ? 0.2 : 1,
   maxHeight: '1em',
 }))
 

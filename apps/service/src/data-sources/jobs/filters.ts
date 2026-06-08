@@ -3,12 +3,12 @@ import { JobAd } from '@repo/types'
 export const isRemote: (offer: JobAd) => boolean = offer =>
   offer.workplaceType === 'hybrid' || offer.workplaceType === 'remote'
 
-const MIN_SALARY = 20_000
+const MIN_SALARY = 27_000
 export const isSalaryAcceptable = (ad: JobAd): boolean =>
   ad.monthlySalaryRangeAfterTaxes !== undefined && ad.monthlySalaryRangeAfterTaxes.to > MIN_SALARY
 
 const unwantedCompanies = [
-  'Monday',
+  'monday.com',
   'FINN',
   'Kalepa',
   'ClickUp',
