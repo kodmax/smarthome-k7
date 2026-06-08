@@ -183,7 +183,7 @@ Server.listen({}, async apollo => {
   })
 
   feeds.addFeed('jobs', { jobs }, ({ jobs }): JobsData => {
-      return jobs
+    return jobs
   })
 
   feeds.addFeed('top-torrents', { torrents })

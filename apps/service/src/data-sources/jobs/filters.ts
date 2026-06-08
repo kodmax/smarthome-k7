@@ -8,6 +8,7 @@ export const isSalaryAcceptable = (ad: JobAd): boolean =>
   ad.monthlySalaryRangeAfterTaxes !== undefined && ad.monthlySalaryRangeAfterTaxes.to > MIN_SALARY
 
 const unwantedCompanies = [
+  'Monday',
   'FINN',
   'Kalepa',
   'ClickUp',
@@ -39,7 +40,7 @@ const unwantedCompanies = [
   'DCX',
 ]
 
-export const noUnwantedCompanies: (ad: JobAd) => boolean = ({ companyName }) =>
+export const isUnwantedCompany: (companyName: string) => boolean = companyName =>
   unwantedCompanies.some(name => companyName.startsWith(name))
 
 const unwantedSkills = [

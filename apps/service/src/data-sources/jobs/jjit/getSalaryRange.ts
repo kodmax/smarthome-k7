@@ -2,8 +2,8 @@ import { SalaryRange } from '@repo/types'
 import { JJEmploymentType } from './types'
 
 const unitMultiplier = {
-  Hour: 2000,
-  Day: 250,
+  Hour: 2008,
+  Day: 251,
   Month: 12,
   Year: 1,
 }

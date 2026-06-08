@@ -1,6 +1,7 @@
 import { JobAd } from '@repo/types'
 import { JustJoinAd } from './types'
 import { getSalaryRange } from './getSalaryRange'
+import { isUnwantedCompany } from '../filters'
 
 export const toJobAd = (jjAd: JustJoinAd): JobAd => {
   const jjEmploymentType = jjAd.employmentTypes.find(item => item.currency === 'PLN')
@@ -15,5 +16,6 @@ export const toJobAd = (jjAd: JustJoinAd): JobAd => {
     workplaceType: jjAd.workplaceType,
     employmentType: jjEmploymentType?.type === 'permanent' ? 'permanent' : 'b2b',
     monthlySalaryRangeAfterTaxes: jjEmploymentType !== undefined ? getSalaryRange(jjEmploymentType) : undefined,
+    isUnwantedCompany: isUnwantedCompany(jjAd.companyName),
   }
 }

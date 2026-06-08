@@ -5,6 +5,7 @@ import { Temperature } from './cards/Temperature'
 import { TopTorrents } from './cards/TopTorrents'
 import { Weather, WeatherForecast, HourlyWeatherForecast } from './cards/Weather'
 import { useRef, type FC } from 'react'
+import { Jobs } from './cards/Jobs'
 
 export const Dashboard: FC<Record<string, never>> = () => {
   const div = useRef<HTMLDivElement>(null)
@@ -32,6 +33,9 @@ export const Dashboard: FC<Record<string, never>> = () => {
         </Grid>
         <Grid item xs={6} sm={6} md={9} xl={9}>
           <HourlyWeatherForecast />
+        </Grid>
+        <Grid item xs={12} sm={12} md={3} xl={3}>
+          <Jobs />
         </Grid>
       </Grid>
     </div>

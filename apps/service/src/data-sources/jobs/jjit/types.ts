@@ -1,6 +1,6 @@
 import { Skill } from '..'
 
-export type SalaryCurrency = 'PLN' | 'USD' | 'EUR'
+export type SalaryCurrency = 'PLN' | 'USD' | 'EUR' | 'CHF' | 'GBP'
 
 export type Location = {
   city: string
@@ -12,7 +12,7 @@ export type JJEmploymentType = {
   to: number | null
   toPerUnit: number | null
   currency: SalaryCurrency
-  currencySource: 'original'
+  currencySource: 'original' | 'conversion'
   type: 'permanent' | 'b2b' | 'any' | 'mandate_contract'
   unit: 'Month' | 'Year' | 'Day' | 'Hour'
   gross: boolean

@@ -1,6 +1,6 @@
 import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
 import { jjit } from './jjit'
-import { isRemote, isSalaryAcceptable, noUnwantedCompanies, noUwantedSkills } from './filters'
+import { isRemote, isSalaryAcceptable, noUwantedSkills } from './filters'
 import { JobsData } from '@repo/types'
 
 // export type FXRates = {
@@ -32,11 +32,7 @@ export const source: DataSourceDefinition<JobsData> = {
     //   'USD/PLN': Number(usd).toFixed(4),
     // }
 
-    const jj = (await jjit())
-      .filter(noUnwantedCompanies)
-      .filter(noUwantedSkills)
-      .filter(isSalaryAcceptable)
-      .filter(isRemote)
+    const jj = (await jjit()).filter(noUwantedSkills).filter(isSalaryAcceptable).filter(isRemote)
 
     // const top20 = jj.slice(0, Math.floor(0.2 * jj.length))
     // const middle = jj[Math.floor(jj.length / 2)]

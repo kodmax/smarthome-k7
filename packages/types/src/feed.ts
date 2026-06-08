@@ -199,6 +199,7 @@ export type JobAd = {
   workplaceType: 'office' | 'remote' | 'hybrid'
   employmentType: 'permanent' | 'b2b'
   monthlySalaryRangeAfterTaxes?: SalaryRange
+  isUnwantedCompany: boolean
 }
 
 export type JobsData = {
