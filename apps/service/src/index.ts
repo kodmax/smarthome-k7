@@ -1,14 +1,7 @@
 #!/usr/bin/ts-node
 process.setMaxListeners(100)
 
-import {
-  torrents,
-  weather,
-  energyCost,
-  energyConsumption,
-  co2Hourly,
-  indoorTempHistory
-} from './data-sources'
+import { torrents, weather, energyCost, energyConsumption, co2Hourly, indoorTempHistory, jobs } from './data-sources'
 import { Server, Cache, sysLog, Feeds } from 'apollo-ws'
 import { DPT_Alarm, DPT_HVACMode, DPT_Value_Temp, KnxLink } from 'js-knx'
 import path from 'path'
@@ -23,7 +16,7 @@ import knxTemp from './data-sources/knx/temp'
 import knxCo2 from './data-sources/knx/co2'
 import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
-import { EnergyReading, TemperatureData } from '@repo/types'
+import { EnergyReading, JobsData, TemperatureData } from '@repo/types'
 
 Server.listen({}, async apollo => {
   const feeds = new Feeds(new Cache(path.join(__dirname, '/data-sources/.cache')), apollo.vent)
@@ -189,9 +182,9 @@ Server.listen({}, async apollo => {
     )
   })
 
-  // feeds.addFeed('jobs', { jobs }, ({ jobs }) => {
-  //     return jobs
-  // })
+  feeds.addFeed('jobs', { jobs }, ({ jobs }): JobsData => {
+      return jobs
+  })
 
   feeds.addFeed('top-torrents', { torrents })
 

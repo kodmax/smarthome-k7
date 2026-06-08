@@ -183,3 +183,24 @@ export type TemperatureData = {
     bedroom: KnxReading<number>
   }
 }
+
+export type SalaryRange = {
+  from: number
+  to: number
+}
+
+export type JobAd = {
+  id: string
+  title: string
+  advertUrl: string
+  companyLogoUrl: string
+  companyName: string
+  requiredSkills: string[]
+  workplaceType: 'office' | 'remote' | 'hybrid'
+  employmentType: 'permanent' | 'b2b'
+  monthlySalaryRangeAfterTaxes?: SalaryRange
+}
+
+export type JobsData = {
+  ads: JobAd[]
+}

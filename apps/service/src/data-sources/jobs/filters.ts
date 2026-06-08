@@ -1,4 +1,11 @@
-import { Skill } from '.'
+import { JobAd } from '@repo/types'
+
+export const isRemote: (offer: JobAd) => boolean = offer =>
+  offer.workplaceType === 'hybrid' || offer.workplaceType === 'remote'
+
+const MIN_SALARY = 20_000
+export const isSalaryAcceptable = (ad: JobAd): boolean =>
+  ad.monthlySalaryRangeAfterTaxes !== undefined && ad.monthlySalaryRangeAfterTaxes.to > MIN_SALARY
 
 const unwantedCompanies = [
   'FINN',
@@ -32,31 +39,23 @@ const unwantedCompanies = [
   'DCX',
 ]
 
-export const noUnwantedCompanies: (company_name: string) => boolean = company_name =>
-  unwantedCompanies.some(name => company_name.startsWith(name))
+export const noUnwantedCompanies: (ad: JobAd) => boolean = ({ companyName }) =>
+  unwantedCompanies.some(name => companyName.startsWith(name))
 
 const unwantedSkills = [
   /^vue/i,
-  /^angular/i,
   /^\.net/i,
-  /^python/i,
   /^java$|^java /i,
   /^ruby/i,
-  /^react native$/i,
   /^c#.*/i,
   /^kotlin/i,
-  /^next\.js/i,
   /^gatsby/i,
-  /^jquery/i,
   /^adobe/i,
-  /^kuber/i,
-  /^azure/i,
-  /^google/i,
   /^golang/i,
   /^grails/i,
   /^elixir/i,
 ]
 
-export const noUwantedSkills: (skills: Skill[]) => boolean = skills => {
-  return !skills.some(skill => skill.level >= 2 && unwantedSkills.some(unwanted => unwanted.test(skill.name)))
+export const noUwantedSkills: (ad: JobAd) => boolean = ({ requiredSkills }) => {
+  return !requiredSkills.some(skillName => unwantedSkills.some(unwanted => unwanted.test(skillName)))
 }
