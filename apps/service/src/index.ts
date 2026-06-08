@@ -7,9 +7,7 @@ import {
   energyCost,
   energyConsumption,
   co2Hourly,
-  indoorTempHistory,
-  // commodities,
-  // fx,
+  indoorTempHistory
 } from './data-sources'
 import { Server, Cache, sysLog, Feeds } from 'apollo-ws'
 import { DPT_Alarm, DPT_HVACMode, DPT_Value_Temp, KnxLink } from 'js-knx'
@@ -25,7 +23,7 @@ import knxTemp from './data-sources/knx/temp'
 import knxCo2 from './data-sources/knx/co2'
 import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
-import { CommoditiesData, EnergyReading, TemperatureData } from '@repo/types'
+import { EnergyReading, TemperatureData } from '@repo/types'
 
 Server.listen({}, async apollo => {
   const feeds = new Feeds(new Cache(path.join(__dirname, '/data-sources/.cache')), apollo.vent)

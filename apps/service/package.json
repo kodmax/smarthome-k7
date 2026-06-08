@@ -2,7 +2,7 @@
   "name": "service",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "@types/suncalc": "^1.8.1",
     "apollo-ws": "^4.0.10",
@@ -27,7 +27,7 @@
     "typescript": "^4.7.3"
   },
   "scripts": {
-    "build": "bun build src/index.ts --target=node --outdir=./dist",
+    "build": "bun build src/index.ts --target=node --format=cjs --outdir=./dist",
     "lint": "eslint \"src/**/*.ts\""
   }
 }
