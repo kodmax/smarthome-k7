@@ -12,7 +12,7 @@ export class FetchError<T> extends Error {
   }
 }
 
-export async function myFetch(url: string, extraHeaders?: Record<string, string>): Promise<Buffer> {
+export async function myFetch(url: string, extraHeaders?: Record<string, string>, method = 'GET'): Promise<Buffer> {
   const chunks: Buffer[] = []
   const purl = new URL(url)
 
@@ -33,6 +33,7 @@ export async function myFetch(url: string, extraHeaders?: Record<string, string>
         path: `${purl.pathname}${purl.search}`,
         port: purl.port,
         headers,
+        method,
       },
       res => {
         res.on('data', chunk => {

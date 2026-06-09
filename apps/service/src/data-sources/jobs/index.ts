@@ -1,7 +1,8 @@
 import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
 import { jjit } from './jjit'
 import { isRemote, isSalaryAcceptable, noUwantedSkills } from './filters'
-import { JobsData } from '@repo/types'
+import { JobAd, JobsData } from '@repo/types'
+import { nfj } from './nfj'
 
 // export type FXRates = {
 //   'EUR/PLN': string
@@ -32,8 +33,23 @@ export const source: DataSourceDefinition<JobsData> = {
     //   'USD/PLN': Number(usd).toFixed(4),
     // }
 
-    const jj = (await jjit()).filter(noUwantedSkills).filter(isSalaryAcceptable).filter(isRemote)
+    const allAds = new Map<string, JobAd>()
 
+    const jjAds = (await jjit()).filter(noUwantedSkills).filter(isSalaryAcceptable).filter(isRemote)
+    for (const ad of jjAds) {
+      const uid = `${ad.companyName.toLocaleLowerCase()} -- ${ad.title.toLocaleUpperCase()}`
+      if (!allAds.has(uid)) {
+        allAds.set(uid, ad)
+      }
+    }
+
+    const nfjAds = (await nfj()).filter(noUwantedSkills).filter(isSalaryAcceptable).filter(isRemote)
+    for (const ad of nfjAds) {
+      const uid = `${ad.companyName.toLocaleLowerCase()} -- ${ad.title.toLocaleUpperCase()}`
+      if (!allAds.has(uid)) {
+        allAds.set(uid, ad)
+      }
+    }
     // const top20 = jj.slice(0, Math.floor(0.2 * jj.length))
     // const middle = jj[Math.floor(jj.length / 2)]
     // const salaries = {
@@ -81,7 +97,9 @@ export const source: DataSourceDefinition<JobsData> = {
     // }
 
     return {
-      ads: jj.sort((a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0)),
+      ads: [...allAds.values()].sort(
+        (a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0),
+      ),
       // salaries,
       // history,
     }

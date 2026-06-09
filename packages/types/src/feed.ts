@@ -184,6 +184,9 @@ export type TemperatureData = {
   }
 }
 
+export type SalaryUnit = 'Year' | 'Month' | 'Day' | 'Hour'
+export type ContractType = 'permanent' | 'b2b'
+
 export type SalaryRange = {
   from: number
   to: number
@@ -200,6 +203,7 @@ export type JobAd = {
   employmentType: 'permanent' | 'b2b'
   monthlySalaryRangeAfterTaxes?: SalaryRange
   isUnwantedCompany: boolean
+  origin: 'jj' | 'nfj'
 }
 
 export type JobsData = {
