@@ -9,7 +9,7 @@ export const toJobAd = (ad: NoFluffJobsAd): JobAd => {
     origin: 'nfj',
     title: ad.title,
     advertUrl: `https://nofluffjobs.com/pl/job/${ad.url}`,
-    companyLogoUrl: ad.logo.original,
+    companyLogoUrl: `https://static.nofluffjobs.com/${ad.logo.original}`,
     companyName: ad.name,
     requiredSkills: ad.tiles.values.filter(item => item.type === 'requirement').map(item => item.value),
     workplaceType: ad.fullyRemote ? 'remote' : 'hybrid',
