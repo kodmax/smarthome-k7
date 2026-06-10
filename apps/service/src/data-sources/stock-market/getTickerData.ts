@@ -2,6 +2,7 @@ import { TickerData } from '@repo/types'
 import { parseHTML } from 'linkedom'
 import { getText, getFinStreamerText, getTestIdText, getStatisticText } from './getText'
 import { getOptionalStatisticText } from './getText/getOptionalStatisticText'
+import { toNumber } from './toNumber'
 
 export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const req = fetch(`https://finance.yahoo.com/quote/${ticker}`)
@@ -19,10 +20,10 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const priceAtClose = isAtMarketClose ? price : getFinStreamerText(document, 'regularMarketPreviousClose')
   const marketCap = getStatisticText(document, 'Market Cap (intraday)')
   const eps = getStatisticText(document, 'EPS (TTM)')
-  const pe = +eps > 0 ? getStatisticText(document, 'PE Ratio (TTM)') : undefined
+  const pe = toNumber(eps) > 0 ? getStatisticText(document, 'PE Ratio (TTM)') : undefined
   const confirmedEarningsDate = getOptionalStatisticText(document, 'Earnings Date')
   const estimatedEarningsDate = getOptionalStatisticText(document, 'Earnings Date (est.)')
-  const eg = `${((+priceTarget / +price - 1) * 100).toFixed(0)}%`
+  const eg = ((toNumber(priceTarget) / toNumber(price) - 1) * 100).toFixed(0)
 
   return {
     ticker,

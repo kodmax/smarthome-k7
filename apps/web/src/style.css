@@ -31,6 +31,10 @@ code {
   width: 100%;
 }
 
+.apollo-data-table th:first-child {
+  text-align: left;
+}
+
 .apollo-data-table td {
     white-space: nowrap;
     overflow: hidden;
