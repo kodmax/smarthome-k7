@@ -1,0 +1,123 @@
+import EventEmitter from 'events'
+import { CachedSnapshot, CacheEntry } from './cache'
+
+type DSCT<S> = S extends DataSourceDefinition<infer T> ? T : never
+type DSM<S extends Record<string, DataSourceDefinition<any>>> = {
+  [K in keyof S]: DSCT<S[K]>
+}
+
+type CommandArguments = string
+export interface CommandEventEmitter extends EventEmitter {
+  on(command: string, listener: (args: CommandArguments) => void)
+  emit(command: string, args: CommandArguments)
+}
+
+type DD = DataSourceDefinition<any>
+type DataSourceDefinition<T> = {
+  expired: (cache: CachedSnapshot<T>) => boolean
+  script: () => Promise<T>
+  id: string
+
+  push?: (push: (content: T) => void, command: CommandEventEmitter, err: (e: Error) => void) => void
+  dependencies?: string[]
+  volatile?: boolean
+  cron?: string
+}
+
+export type DataSourceCommand = {
+  sourceId: string
+  name: string
+  args: string
+}
+
+class DataSource<S extends DataSourceDefinition<any>, T = DSCT<S>> {
+  private updating: Promise<T>
+
+  public constructor(
+    private definition: S,
+    private cacheEntry: CacheEntry<T>,
+    private vent: EventEmitter,
+  ) {
+    const command = new EventEmitter() as CommandEventEmitter
+
+    if (definition.push) {
+      this.vent.on('command', (ev: DataSourceCommand) => {
+        if (ev.sourceId === definition.id) {
+          try {
+            command.emit(ev.name, ev.args)
+          } catch (e) {
+            this.vent.emit(
+              'sys-log',
+              4,
+              `Data source <${this.definition.id}> command <${ev.name} execution error: ${e}`,
+              e,
+            )
+          }
+        }
+      })
+
+      definition.push(
+        (content: T) => this.push(content),
+        command,
+        e => {
+          this.vent.emit('sys-log', 4, `Push data source <${this.definition.id}> update error: ${e}`, e)
+        },
+      )
+    }
+  }
+
+  public async push(content: T): Promise<void> {
+    await this.cacheEntry.write(content)
+
+    this.vent.emit('sys-log', 7, `Push data source <${this.definition.id}>`)
+    this.vent.emit('data-update', this.definition.id)
+  }
+
+  public isCacheFresh(): boolean {
+    return !this.cacheEntry.isEmpty() && !this.definition.expired(this.cacheEntry.getSnapshot())
+  }
+
+  public getId(): string {
+    return this.definition.id
+  }
+
+  public getRecentContent(): T {
+    if (!this.cacheEntry.isEmpty()) {
+      return this.cacheEntry.getSnapshot().content()
+    } else {
+      throw new Error('No recent content')
+    }
+  }
+
+  public async getData(forceRefresh = false): Promise<T> {
+    if (this.updating) {
+      return this.updating
+    } else if (!forceRefresh && this.isCacheFresh()) {
+      this.vent.emit('sys-log', 7, `Cache hit on data source <${this.definition.id}>`)
+
+      return this.cacheEntry.getSnapshot().content()
+    } else {
+      this.updating = new Promise((resolve, reject) => {
+        this.definition
+          .script()
+          .then(async content => {
+            await this.cacheEntry.write(content)
+            resolve(content)
+
+            this.vent.emit('sys-log', 7, `Data source <${this.definition.id}> content refreshed`)
+            this.vent.emit('data-update', this.definition.id)
+            this.updating = void 0
+          })
+          .catch(e => {
+            this.updating = void 0
+            reject(e)
+          })
+      })
+
+      return this.updating
+    }
+  }
+}
+
+export type { DataSourceDefinition, DSCT, DSM, DD }
+export { DataSource }

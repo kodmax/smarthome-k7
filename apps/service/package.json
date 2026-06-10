@@ -5,7 +5,7 @@
   "type": "commonjs",
   "dependencies": {
     "@types/suncalc": "^1.8.1",
-    "apollo-ws": "^4.0.10",
+    "apollo-ws": "*",
     "dotenv": "^17.4.2",
     "js-knx": "^2.18.0",
     "linkedom": "^0.18.12",
