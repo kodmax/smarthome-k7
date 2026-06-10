@@ -1,7 +1,16 @@
 #!/usr/bin/ts-node
 process.setMaxListeners(100)
 
-import { torrents, weather, energyCost, energyConsumption, co2Hourly, indoorTempHistory, jobs } from './data-sources'
+import {
+  torrents,
+  weather,
+  energyCost,
+  energyConsumption,
+  co2Hourly,
+  indoorTempHistory,
+  jobs,
+  stockMarket,
+} from './data-sources'
 import { Server, Cache, sysLog, Feeds } from 'apollo-ws'
 import { DPT_Alarm, DPT_HVACMode, DPT_Value_Temp, KnxLink } from 'js-knx'
 
@@ -33,6 +42,7 @@ Server.listen({}, async apollo => {
   // feeds.addFeed('irs', { irs })
   // feeds.addFeed('fuel', { fuel })
   feeds.addFeed('weather', { weather })
+  feeds.addFeed('stock-market', { stockMarket })
   // feeds.addFeed('news', { news })
   // feeds.addFeed('fx', { fx })
 

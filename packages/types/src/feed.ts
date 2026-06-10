@@ -14,6 +14,30 @@ export type EnergyHourConsumption = {
   hour: string
 }
 
+export type TickerData = {
+  ticker: string
+  title: string
+  daily: {
+    isAtMarketClose: boolean
+    marketTime: string
+    price: string
+    priceAtClose: string
+    priceTarget: string
+    marketCap: string
+    eps: string
+    pe?: string
+    eg: string
+  }
+  earningsDate: {
+    confirmed?: string
+    estimated?: string
+  }
+}
+
+export type StockMarketData = {
+  tickers: TickerData[]
+}
+
 export type Co2HistoryRecord = {
   datetime: string
   value: number

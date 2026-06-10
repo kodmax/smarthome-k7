@@ -1,14 +1,7 @@
-import { source } from './data-sources/jobs'
+import { source } from './data-sources/stock-market'
 
-source.script().then(jobData => {
-  for (const ad of jobData.ads) {
-    console.log(
-      ad.origin,
-      ad.companyName,
-      ad.employmentType,
-      ad.title,
-      ad.monthlySalaryRangeAfterTaxes?.to,
-      ad.requiredSkills,
-    )
+source.script().then(stockMarket => {
+  for (const ticker of stockMarket.tickers) {
+    console.log(ticker)
   }
 })
