@@ -4,7 +4,6 @@ process.setMaxListeners(100)
 import { torrents, weather, energyCost, energyConsumption, co2Hourly, indoorTempHistory, jobs } from './data-sources'
 import { Server, Cache, sysLog, Feeds } from 'apollo-ws'
 import { DPT_Alarm, DPT_HVACMode, DPT_Value_Temp, KnxLink } from 'js-knx'
-import path from 'path'
 
 import { energy, airQuality, temp, heating } from './home.knx-schema'
 import KnxHVACMode from './data-sources/knx/hvac-mode'
@@ -18,8 +17,10 @@ import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
 import { EnergyReading, JobsData, TemperatureData } from '@repo/types'
 import { config } from './config'
+import path from 'node:path'
 
 Server.listen({}, async apollo => {
+  console.log('Feed cache directory:', path.resolve(config.cache.dir))
   const feeds = new Feeds(new Cache(config.cache.dir), apollo.vent)
   const knxEvents: KnxEventEmitter = new EventEmitter()
   knxEvents.setMaxListeners(100)
