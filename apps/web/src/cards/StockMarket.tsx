@@ -5,7 +5,6 @@ import { refreshFeeds, useUpdate } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import TablePlaceholder from './components/TablePlaceholder'
 import { StockMarketData } from '@repo/types'
-import { Open } from './Jobs/styled'
 import LinkOpen from './components/LinkOpen'
 
 export const StockMarket: FC<Record<string, never>> = () => {
