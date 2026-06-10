@@ -18,7 +18,8 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const marketTime = getText(document, '.marketTimeNotice')
   const isAtMarketClose = marketTime.startsWith('At close:')
   const priceAtClose = isAtMarketClose ? price : getFinStreamerText(document, 'regularMarketPreviousClose')
-  const marketCap = getStatisticText(document, 'Market Cap (intraday)')
+  const marketCap =
+    getOptionalStatisticText(document, 'Market Cap (intraday)') ?? getStatisticText(document, 'Market Cap')
   const eps = getStatisticText(document, 'EPS (TTM)')
   const pe = toNumber(eps) > 0 ? getStatisticText(document, 'PE Ratio (TTM)') : undefined
   const confirmedEarningsDate = getOptionalStatisticText(document, 'Earnings Date')
