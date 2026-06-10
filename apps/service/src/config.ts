@@ -8,4 +8,11 @@ export const config = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
   },
+  geoLocation: {
+    long: +process.env.LOCATION_LONG,
+    lat: +process.env.LOCATION_LAT,
+  },
+  cache: {
+    dir: process.env.CACHE_DIR,
+  },
 }

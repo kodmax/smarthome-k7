@@ -17,9 +17,10 @@ import knxCo2 from './data-sources/knx/co2'
 import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
 import { EnergyReading, JobsData, TemperatureData } from '@repo/types'
+import { config } from './config'
 
 Server.listen({}, async apollo => {
-  const feeds = new Feeds(new Cache(path.join(__dirname, '/data-sources/.cache')), apollo.vent)
+  const feeds = new Feeds(new Cache(config.cache.dir), apollo.vent)
   const knxEvents: KnxEventEmitter = new EventEmitter()
   knxEvents.setMaxListeners(100)
 

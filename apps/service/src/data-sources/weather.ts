@@ -7,6 +7,7 @@ import * as suncalc from 'suncalc'
 import { basename } from 'path'
 import { getTextContent } from './utils/get-text-context'
 import { WeatherData } from '@repo/types'
+import { config } from '../config'
 
 const windDirectionCodes = [
   'N',
@@ -27,8 +28,8 @@ const windDirectionCodes = [
   'NNW',
 ]
 
-const long = +(process.env.LOCATION_LONG ?? 0)
-const lat = +(process.env.LOCATION_LAT ?? 0)
+const long = config.geoLocation.long
+const lat = config.geoLocation.lat
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const source: DataSourceDefinition<WeatherData> = {
