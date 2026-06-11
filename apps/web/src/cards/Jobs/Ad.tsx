@@ -27,7 +27,11 @@ export const Ad: FC<{ ad: JobAd; zoom: boolean }> = ({ ad, zoom }) => {
       ) : null}
       <JobTitle>
         {ad.title}
-        {zoom ? <>{ad.employmentType === 'permanent' ? ' [Perm]' : ' [B2B]'}</> : null}
+        {zoom ? (
+          <>
+            {ad.employmentType === 'permanent' ? ' [Perm] ' : ' [B2B] '}[{ad.workplaceType}]
+          </>
+        ) : null}
       </JobTitle>
       <Salary>
         {' '}

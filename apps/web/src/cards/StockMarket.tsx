@@ -58,11 +58,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
                     {zoom.active ? <LinkOpen href={`https://finance.yahoo.com/quote/${item.ticker}/`} /> : null}
                   </td>
                   <td style={{ width: '2em' }}>{item.daily.pe !== undefined ? Math.round(+item.daily.pe) : '-'}</td>
-                  {zoom.active ? (
-                    <>
-                      <td style={{ width: '2em' }}>{item.daily.eg}%</td>
-                    </>
-                  ) : null}
+                  <td style={{ width: '2em' }}>{item.daily.eg}%</td>
                   <td style={{ width: '4em' }}>{item.daily.priceAtClose}</td>
                 </tr>
               ))}

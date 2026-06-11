@@ -2,7 +2,7 @@ import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
 import { jjit } from './jjit'
 import { isRemote, isSalaryAcceptable, noUwantedSkills } from './filters'
 import { JobAd, JobsData } from '@repo/types'
-import { nfj } from './nfj'
+import { nfj } from './nfj/nfj'
 
 // export type FXRates = {
 //   'EUR/PLN': string

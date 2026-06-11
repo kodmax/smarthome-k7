@@ -3,7 +3,7 @@ import { NoFluffJobsAd } from './types'
 import { isUnwantedCompany } from '../filters'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
 
-export const toJobAd = (ad: NoFluffJobsAd): JobAd => {
+export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {
   return {
     id: ad.id,
     origin: 'nfj',
@@ -12,7 +12,7 @@ export const toJobAd = (ad: NoFluffJobsAd): JobAd => {
     companyLogoUrl: `https://static.nofluffjobs.com/${ad.logo.original}`,
     companyName: ad.name,
     requiredSkills: ad.tiles.values.filter(item => item.type === 'requirement').map(item => item.value),
-    workplaceType: ad.fullyRemote ? 'remote' : 'hybrid',
+    workplaceType: hybridIds.has(ad.id) ? 'hybrid' : ad.location.fullyRemote ? 'remote' : 'office',
     employmentType: ad.salary.type === 'permanent' ? 'permanent' : 'b2b',
     isUnwantedCompany: isUnwantedCompany(ad.name),
     monthlySalaryRangeAfterTaxes:

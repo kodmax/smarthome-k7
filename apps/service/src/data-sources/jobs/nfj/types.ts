@@ -4,7 +4,9 @@ export type NoFluffJobsAd = {
   url: string
   name: string
   logo: { original: string }
-  fullyRemote: boolean
+  location: {
+    fullyRemote: boolean
+  }
   salary: {
     from?: number
     to?: number
