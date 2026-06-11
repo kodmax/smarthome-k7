@@ -1,4 +1,4 @@
-import { CacheAgeUnit } from 'apollo-ws'
+import { CacheAgeUnit } from '@repo/apollo-ws'
 import DateTime from './DateTime'
 import db from './db'
 

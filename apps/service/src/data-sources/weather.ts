@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { myFetch } from '../fetch'
 import db from '../db'
 import DateTime from '../DateTime'

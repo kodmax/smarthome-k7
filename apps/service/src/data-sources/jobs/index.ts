@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { jjit } from './jjit'
 import { isRemote, isSalaryAcceptable, noUwantedSkills } from './filters'
 import { JobAd, JobsData } from '@repo/types'

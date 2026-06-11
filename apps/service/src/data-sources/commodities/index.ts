@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../../DateTime'
 import db from '../../db'
 import { fetchBtcPrice } from './btc'

@@ -1,4 +1,4 @@
-import { CacheAgeUnit } from 'apollo-ws'
+import { CacheAgeUnit } from '@repo/apollo-ws'
 
 export default class DateTime {
   private readonly datetime: string

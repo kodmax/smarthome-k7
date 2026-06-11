@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { DataPointAbstract, DPT_ActiveEnergy, KnxReading } from 'js-knx'
 
 export default (id: string, dp: DPT_ActiveEnergy) => {

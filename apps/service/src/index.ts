@@ -11,7 +11,7 @@ import {
   jobs,
   stockMarket,
 } from './data-sources'
-import { Server, Cache, sysLog, Feeds } from 'apollo-ws'
+import { Server, Cache, sysLog, Feeds } from '@repo/apollo-ws'
 import { DPT_Alarm, DPT_HVACMode, DPT_Value_Temp, KnxLink } from 'js-knx'
 
 import { energy, airQuality, temp, heating } from './home.knx-schema'

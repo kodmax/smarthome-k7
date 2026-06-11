@@ -1,5 +1,5 @@
 {
-  "name": "apollo-ws",
+  "name": "@repo/apollo-ws",
   "version": "4.1.0",
   "description": "",
   "main": "./src/index.ts",

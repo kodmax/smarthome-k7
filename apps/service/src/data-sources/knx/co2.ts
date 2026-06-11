@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from 'apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { KnxReading, DPT_Value_AirQuality, DataPointAbstract } from 'js-knx'
 import DateTime from '../../DateTime'
 import db from '../../db'
