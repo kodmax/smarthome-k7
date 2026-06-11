@@ -31,7 +31,7 @@ export type DataSourceCommand = {
 }
 
 class DataSource<S extends DataSourceDefinition<any>, T = DSCT<S>> {
-  private updating: Promise<T>
+  private updating: Promise<T> | undefined
 
   public constructor(
     private definition: S,
@@ -104,11 +104,12 @@ class DataSource<S extends DataSourceDefinition<any>, T = DSCT<S>> {
             await this.cacheEntry.write(content)
             resolve(content)
 
-            this.vent.emit('sys-log', 7, `Data source <${this.definition.id}> content refreshed`)
+            this.vent.emit('sys-log', 4, `Data source <${this.definition.id}> content refreshed`)
             this.vent.emit('data-update', this.definition.id)
             this.updating = void 0
           })
           .catch(e => {
+            this.vent.emit('sys-log', 4, `Data source <${this.definition.id}> update error: ` + e)
             this.updating = void 0
             reject(e)
           })
