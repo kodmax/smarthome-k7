@@ -30,22 +30,29 @@ export function decode(item: string, min: number, max: number, names: Record<str
     const [from, to] = range === '*' ? [min, max] : range.split('-').map(value => names[value] ?? +value)
 
     const f = +from
-    if (isNaN(f)) {
-      throw new Error('Cron invalid element: ' + item)
+    if (isNaN(f) || f < min || f > max) {
+      throw new Error('Cron invalid from: ' + item)
     }
 
-    if (to !== undefined || step !== undefined) {
-      const t = +(to ?? max),
-        s = +(step ?? 1)
-      if (isNaN(t) || isNaN(s)) {
-        throw new Error('Cron invalid element: ' + item)
-      }
-
-      for (let i = f; i <= t; i += s) {
-        values.push(i)
-      }
-    } else {
+    if (to === undefined && step === undefined) {
       values.push(from)
+      continue
+    }
+
+    const t = +(to ?? max)
+    if (isNaN(t) || t < min || t > max) {
+      throw new Error('Cron invalid to: ' + item)
+    }
+
+    const s = +(step ?? 1)
+    if (isNaN(s) || s < 1 || s > max) {
+      throw new Error('Cron invalid step: ' + item)
+    }
+
+    const m = max - min + 1
+    const e = t > f ? t : t + m
+    for (let i = f; i <= e; i += s) {
+      values.push(((i - min) % m) + min)
     }
   }
 
