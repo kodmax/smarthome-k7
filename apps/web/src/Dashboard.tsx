@@ -6,7 +6,7 @@ import { TopTorrents } from './cards/TopTorrents'
 import { Weather, WeatherForecast, HourlyWeatherForecast } from './cards/Weather'
 import { useRef, type FC } from 'react'
 import { Jobs } from './cards/Jobs'
-import { StockMarket } from './cards/StockMarket'
+import { StockMarket } from './cards/stock-market'
 
 export const Dashboard: FC<Record<string, never>> = () => {
   const div = useRef<HTMLDivElement>(null)

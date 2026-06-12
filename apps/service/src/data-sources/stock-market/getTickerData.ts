@@ -13,12 +13,15 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
     .then(html => parseHTML(html))
     .then(window => window.document)
 
-  const price = getTestIdText(document, 'qsp-price')
-  const priceTarget = getFinStreamerText(document, 'targetMeanPrice')
-  const title = getTestIdText(document, 'quote-title')
   const marketTime = getText(document, '.marketTimeNotice')
   const isAtMarketClose = marketTime.startsWith('At close:')
-  const priceAtClose = isAtMarketClose ? price : getFinStreamerText(document, 'regularMarketPreviousClose')
+
+  const spotPrice = isAtMarketClose ? undefined : getTestIdText(document, 'qsp-price')
+  const priceAtClose = isAtMarketClose
+    ? getTestIdText(document, 'qsp-price')
+    : getFinStreamerText(document, 'regularMarketPreviousClose')
+  const priceTarget = getFinStreamerText(document, 'targetMeanPrice')
+  const title = getTestIdText(document, 'quote-title')
   const priceAtOpen = getFinStreamerText(document, 'regularMarketOpen')
   const marketCap =
     getOptionalStatisticText(document, 'Market Cap (intraday)') ?? getStatisticText(document, 'Market Cap')
@@ -26,24 +29,26 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const pe = toNumber(eps) > 0 ? getStatisticText(document, 'PE Ratio (TTM)') : undefined
   const confirmedEarningsDate = getOptionalStatisticText(document, 'Earnings Date')
   const estimatedEarningsDate = getOptionalStatisticText(document, 'Earnings Date (est.)')
-  const eg = ((toNumber(priceTarget) / toNumber(price) - 1) * 100).toFixed(0)
   const overnightPrice = getOptionalTestIdText(document, 'qsp-overnight-price')
+  const preMarketPrice = getOptionalTestIdText(document, 'qsp-pre-price')
 
   return {
     ticker,
     title,
-    price,
-    overnightPrice,
+    price: {
+      overnight: overnightPrice,
+      preMarket: preMarketPrice,
+      atClose: priceAtClose,
+      atOpen: priceAtOpen,
+      spot: spotPrice,
+    },
     daily: {
       isAtMarketClose,
-      priceAtClose,
-      priceAtOpen,
       marketTime,
       priceTarget,
       marketCap,
       eps,
       pe,
-      eg,
     },
     earningsDate: {
       confirmed: confirmedEarningsDate,

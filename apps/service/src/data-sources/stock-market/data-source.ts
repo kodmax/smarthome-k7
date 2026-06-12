@@ -5,7 +5,7 @@ import { tickerList } from './tickerList'
 import { sleep } from './sleep'
 
 export const source: DataSourceDefinition<StockMarketData> = {
-  cron: '1,31 10-2 * * Mon-Fri',
+  cron: '5,35 10-2 * * Mon-Fri',
   id: 'stock-market',
 
   expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 24,

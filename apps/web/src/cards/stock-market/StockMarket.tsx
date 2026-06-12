@@ -1,11 +1,12 @@
-import zoomBanner from './card-banners/commodities-zoom.jpg'
-import banner from './card-banners/commodities.jpg'
+import zoomBanner from './commodities-zoom.jpg'
+import banner from './commodities.jpg'
 import { type FC, useCallback, useMemo } from 'react'
 import { refreshFeeds, useUpdate } from '@repo/feed-client'
-import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
-import TablePlaceholder from './components/TablePlaceholder'
+import ApolloCard, { ZoomContext } from '../../apollo-card/ApolloCard'
+import TablePlaceholder from '../components/TablePlaceholder'
 import { StockMarketData } from '@repo/types'
-import LinkOpen from './components/LinkOpen'
+import { Ticker } from './Ticker'
+import { TickerDetails } from './types'
 
 export const StockMarket: FC<Record<string, never>> = () => {
   const [data, updatedAt] = useUpdate<StockMarketData>('stock-market')
@@ -14,10 +15,21 @@ export const StockMarket: FC<Record<string, never>> = () => {
     refreshFeeds(['stock-market'])
   }, [])
 
-  const tickers = useMemo(
+  const tickers = useMemo<TickerDetails[] | undefined>(
     () =>
       data !== undefined
-        ? data.tickers.filter(item => +item.daily.eps > 0).sort((a, b) => +b.daily.eg - +a.daily.eg)
+        ? data.tickers
+            .map((data): TickerDetails => {
+              const price = data.price.spot ?? data.price.overnight ?? data.price.preMarket ?? data.price.atClose
+
+              const eg = (+data.daily.priceTarget.replaceAll(',', '') / +price.replaceAll(',', '') - 1) * 100
+              return {
+                price,
+                eg,
+                data,
+              }
+            })
+            .sort((a, b) => +b.eg - +a.eg)
         : undefined,
     [data],
   )
@@ -52,15 +64,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
             ) : null}
             <tbody>
               {tickers.map(item => (
-                <tr>
-                  <td>
-                    {item.ticker}
-                    {zoom.active ? <LinkOpen href={`https://finance.yahoo.com/quote/${item.ticker}/`} /> : null}
-                  </td>
-                  <td style={{ width: '2em' }}>{item.daily.pe !== undefined ? Math.round(+item.daily.pe) : '-'}</td>
-                  <td style={{ width: '2em' }}>{item.daily.eg}%</td>
-                  <td style={{ width: '4em' }}>{item.overnightPrice ?? item.price}</td>
-                </tr>
+                <Ticker key={item.data.ticker} item={item} zoom={zoom.active} />
               ))}
             </tbody>
           </table>
