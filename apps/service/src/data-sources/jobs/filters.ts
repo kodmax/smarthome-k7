@@ -61,3 +61,7 @@ const unwantedSkills = [
 export const noUwantedSkills: (ad: JobAd) => boolean = ({ requiredSkills }) => {
   return !requiredSkills.some(skillName => unwantedSkills.some(unwanted => unwanted.test(skillName)))
 }
+
+export const noManager: (ad: JobAd) => boolean = ({ title }) => {
+  return !/\bmanager\b/i.test(title)
+}

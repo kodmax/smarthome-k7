@@ -1,4 +1,4 @@
-import { Skill } from '..'
+import { Skill } from '../data-source'
 
 export type SalaryCurrency = 'PLN' | 'USD' | 'EUR' | 'CHF' | 'GBP'
 
