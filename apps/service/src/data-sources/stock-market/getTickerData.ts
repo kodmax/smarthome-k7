@@ -4,6 +4,7 @@ import { getText, getFinStreamerText, getTestIdText, getStatisticText } from './
 import { getOptionalStatisticText } from './getText/getOptionalStatisticText'
 import { toNumber } from './toNumber'
 import { getOptionalTestIdText } from './getText/getOptionalTestIdText'
+import { getOptionalText } from './getText/getOptionalText'
 
 export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const req = fetch(`https://finance.yahoo.com/quote/${ticker}`)
@@ -13,11 +14,9 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
     .then(html => parseHTML(html))
     .then(window => window.document)
 
-  const marketTime = getText(document, '.marketTimeNotice')
-  const isAtMarketClose = marketTime.startsWith('At close:')
-
-  const spotPrice = isAtMarketClose ? undefined : getTestIdText(document, 'qsp-price')
-  const priceAtClose = isAtMarketClose
+  const isAtMarketClosed = getText(document, '.primary .marketTimeNotice').startsWith('At close:')
+  const spotPrice = isAtMarketClosed ? undefined : getTestIdText(document, 'qsp-price')
+  const priceAtClose = isAtMarketClosed
     ? getTestIdText(document, 'qsp-price')
     : getFinStreamerText(document, 'regularMarketPreviousClose')
   const priceTarget = getFinStreamerText(document, 'targetMeanPrice')
@@ -29,12 +28,16 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const pe = toNumber(eps) > 0 ? getStatisticText(document, 'PE Ratio (TTM)') : undefined
   const confirmedEarningsDate = getOptionalStatisticText(document, 'Earnings Date')
   const estimatedEarningsDate = getOptionalStatisticText(document, 'Earnings Date (est.)')
-  const overnightPrice = getOptionalTestIdText(document, 'qsp-overnight-price')
+  const overnightPrice =
+    getOptionalTestIdText(document, 'qsp-post-price') ?? getOptionalTestIdText(document, 'qsp-overnight-price')
   const preMarketPrice = getOptionalTestIdText(document, 'qsp-pre-price')
+  const marketTime =
+    getOptionalText(document, '.secondary .marketTimeNotice') ?? getText(document, '.primary .marketTimeNotice')
 
   return {
     ticker,
     title,
+    marketTime,
     price: {
       overnight: overnightPrice,
       preMarket: preMarketPrice,
@@ -43,8 +46,7 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
       spot: spotPrice,
     },
     daily: {
-      isAtMarketClose,
-      marketTime,
+      isAtMarketClosed,
       priceTarget,
       marketCap,
       eps,

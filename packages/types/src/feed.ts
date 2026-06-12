@@ -17,6 +17,7 @@ export type EnergyHourConsumption = {
 export type TickerData = {
   ticker: string
   title: string
+  marketTime: string
   price: {
     overnight: string | undefined
     preMarket: string | undefined
@@ -25,8 +26,7 @@ export type TickerData = {
     atOpen: string
   }
   daily: {
-    isAtMarketClose: boolean
-    marketTime: string
+    isAtMarketClosed: boolean
     priceTarget: string
     marketCap: string
     eps: string
