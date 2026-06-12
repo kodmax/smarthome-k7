@@ -3,6 +3,7 @@ import { parseHTML } from 'linkedom'
 import { getText, getFinStreamerText, getTestIdText, getStatisticText } from './getText'
 import { getOptionalStatisticText } from './getText/getOptionalStatisticText'
 import { toNumber } from './toNumber'
+import { getOptionalTestIdText } from './getText/getOptionalTestIdText'
 
 export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const req = fetch(`https://finance.yahoo.com/quote/${ticker}`)
@@ -18,6 +19,7 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const marketTime = getText(document, '.marketTimeNotice')
   const isAtMarketClose = marketTime.startsWith('At close:')
   const priceAtClose = isAtMarketClose ? price : getFinStreamerText(document, 'regularMarketPreviousClose')
+  const priceAtOpen = getFinStreamerText(document, 'regularMarketOpen')
   const marketCap =
     getOptionalStatisticText(document, 'Market Cap (intraday)') ?? getStatisticText(document, 'Market Cap')
   const eps = getStatisticText(document, 'EPS (TTM)')
@@ -25,14 +27,17 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const confirmedEarningsDate = getOptionalStatisticText(document, 'Earnings Date')
   const estimatedEarningsDate = getOptionalStatisticText(document, 'Earnings Date (est.)')
   const eg = ((toNumber(priceTarget) / toNumber(price) - 1) * 100).toFixed(0)
+  const overnightPrice = getOptionalTestIdText(document, 'qsp-overnight-price')
 
   return {
     ticker,
     title,
+    price,
+    overnightPrice,
     daily: {
-      price,
       isAtMarketClose,
       priceAtClose,
+      priceAtOpen,
       marketTime,
       priceTarget,
       marketCap,
@@ -41,8 +46,8 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
       eg,
     },
     earningsDate: {
-      confirmed: confirmedEarningsDate ?? undefined,
-      estimated: estimatedEarningsDate ?? undefined,
+      confirmed: confirmedEarningsDate,
+      estimated: estimatedEarningsDate,
     },
   }
 }

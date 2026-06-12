@@ -1,4 +1,4 @@
-export const getOptionalStatisticText = (document: Document, title: string): string | null => {
+export const getOptionalStatisticText = (document: Document, title: string): string | undefined => {
   const container = document.querySelector('[data-testid="quote-statistics"]')
   if (container === null) {
     throw new Error('Statistics section not found')
@@ -6,7 +6,7 @@ export const getOptionalStatisticText = (document: Document, title: string): str
 
   const value = container.querySelector(`.label[title="${title}"]`)?.nextElementSibling
   if (value === undefined || value === null) {
-    return null
+    return undefined
   }
 
   const text = value.textContent

@@ -59,7 +59,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
                   </td>
                   <td style={{ width: '2em' }}>{item.daily.pe !== undefined ? Math.round(+item.daily.pe) : '-'}</td>
                   <td style={{ width: '2em' }}>{item.daily.eg}%</td>
-                  <td style={{ width: '4em' }}>{item.daily.price}</td>
+                  <td style={{ width: '4em' }}>{item.overnightPrice ?? item.price}</td>
                 </tr>
               ))}
             </tbody>
