@@ -27,8 +27,12 @@ code {
 }
 
 .apollo-data-table {
-  border-spacing: 2px;
+  border-spacing: 0px;
   width: 100%;
+}
+
+.apollo-data-table tr:nth-child(even) {
+  background-color: #fcfcfc;
 }
 
 .apollo-data-table th:first-child {

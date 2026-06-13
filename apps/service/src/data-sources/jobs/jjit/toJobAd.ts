@@ -13,7 +13,7 @@ export const toJobAd = (jjAd: JustJoinAd): JobAd => {
     advertUrl: `https://justjoin.it/job-offer/${jjAd.slug}`,
     companyLogoUrl: jjAd.companyLogoThumbUrl,
     companyName: jjAd.companyName,
-    requiredSkills: jjAd.requiredSkills.map(item => item.name),
+    requiredSkills: jjAd.requiredSkills.filter(item => item.level >= 3).map(item => item.name),
     workplaceType: jjAd.workplaceType,
     employmentType: jjEmploymentType?.type === 'permanent' ? 'permanent' : 'b2b',
     isUnwantedCompany: isUnwantedCompany(jjAd.companyName),

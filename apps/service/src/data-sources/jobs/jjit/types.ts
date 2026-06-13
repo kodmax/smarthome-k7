@@ -1,4 +1,7 @@
-import { Skill } from '../data-source'
+export type Skill = {
+  name: string
+  level: number
+}
 
 export type SalaryCurrency = 'PLN' | 'USD' | 'EUR' | 'CHF' | 'GBP'
 

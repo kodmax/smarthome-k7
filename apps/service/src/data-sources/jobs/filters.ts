@@ -56,6 +56,10 @@ const unwantedSkills = [
   /^golang/i,
   /^grails/i,
   /^elixir/i,
+  /^llm/i,
+  /^sap/i,
+  /^salesforce/i,
+  /^angular/i,
 ]
 
 export const noUwantedSkills: (ad: JobAd) => boolean = ({ requiredSkills }) => {
