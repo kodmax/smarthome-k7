@@ -50,7 +50,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
   }
 
   return (
-    <ApolloCard cardId='stock-market' banner={banner} zoomBanner={zoomBanner} updatedAt={updatedAt} height={6}>
+    <ApolloCard cardId='stock-market' banner={banner} zoomBanner={zoomBanner} updatedAt={updatedAt} height={10}>
       <ZoomContext.Consumer>
         {zoom => (
           <table className='apollo-data-table'>

@@ -1,33 +1,34 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { myFetch } from '../fetch'
 import { parseHTML } from 'linkedom'
+import { Article, NewsData } from '@repo/types'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const source: DataSourceDefinition<any> = {
+const FEED_URL =
+  'https://news.google.com/topics/CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE/sections/CAQiTkNCSVNORG9JYkc5allXeGZkakpDRUd4dlkyRnNYM1l5WDNObFkzUnBiMjV5Q2hJSUwyMHZNRGd4YlY5NkNnb0lMMjB2TURneGJWOG9BQSowCAAqLAgKIiZDQklTRmpvSWJHOWpZV3hmZGpKNkNnb0lMMjB2TURneGJWOG9BQVABUAE?hl=pl&gl=PL&ceid=PL%3Apl'
+const COOKIES = 'SOCS=CAISHAgCEhJnd3NfMjAyNTExMTktMF9SQzEaAnBsIAEaBgiA1_7IBg'
+
+export const source: DataSourceDefinition<NewsData> = {
   cron: '*/15 * * * *',
   id: 'news',
 
   expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 5,
   script: async () => {
-    const url =
-      'https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRFZxYUdjU0FuQnNHZ0pRVENnQVAB?hl=pl&gl=PL&ceid=PL:pl'
-    const cookie = 'SOCS=CAISNQgLEitib3FfaWRlbnRpdHlmcm9udGVuZHVpc2VydmVyXzIwMjIxMjExLjA5X3AxGgJwbCACGgYIgKTknAY'
-
-    const news = await myFetch(url, { accept: 'text/html', cookie })
+    const news = await myFetch(FEED_URL, { accept: 'text/html', cookie: COOKIES })
       .then(resp => resp.toString('utf-8'))
       .then(html => {
         const document = parseHTML(html).window.document
-        return Array.from(document.querySelectorAll('article'))
-          .filter(article => article.querySelector('figure'))
-          .map(article => {
+        const articles: Article[] = Array.from(document.querySelectorAll('a[href^="./read"][aria-label]')).map(
+          anchor => {
             return {
-              href: new URL(
-                article.querySelector('a[href^="./articles"]')?.getAttribute('href') ?? '',
-                'https://news.google.com',
-              ).toString(),
-              title: article.querySelector('h4')?.innerHTML,
+              href: new URL(anchor.getAttribute('href') ?? '', 'https://news.google.com').toString(),
+              title: anchor.textContent,
             }
-          })
+          },
+        )
+
+        return {
+          articles,
+        }
       })
 
     return news

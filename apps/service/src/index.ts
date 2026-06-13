@@ -10,6 +10,7 @@ import {
   indoorTempHistory,
   jobs,
   stockMarket,
+  news,
 } from './data-sources'
 import { Server, Cache, sysLog, Feeds } from '@repo/apollo-ws'
 import { DPT_Alarm, DPT_HVACMode, DPT_Value_Temp, KnxLink } from 'js-knx'
@@ -43,7 +44,7 @@ Server.listen({}, async apollo => {
   // feeds.addFeed('fuel', { fuel })
   feeds.addFeed('weather', { weather })
   feeds.addFeed('stock-market', { stockMarket })
-  // feeds.addFeed('news', { news })
+  feeds.addFeed('news', { news })
   // feeds.addFeed('fx', { fx })
 
   console.log('Establishing KNX connection ...')

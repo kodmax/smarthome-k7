@@ -6,6 +6,7 @@ import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import LinkOpen from './components/LinkOpen'
 import TablePlaceholder from './components/TablePlaceholder'
 import styled from '@emotion/styled'
+import { NewsData } from '@repo/types'
 
 const Open = styled('td')({
   verticalAlign: 'middle',
@@ -14,32 +15,32 @@ const Open = styled('td')({
 })
 
 export const News: FC<Record<string, never>> = () => {
-  const [news, updatedAt] = useUpdate<any>('news')
+  const [news, updatedAt] = useUpdate<NewsData>('news')
 
   const onZoom = useCallback(() => {
     refreshFeeds(['news'])
   }, [])
 
   return (
-    <ApolloCard cardId='news' banner={banner} updatedAt={updatedAt} zoomBanner={zoomBanner} height={6} onZoom={onZoom}>
+    <ApolloCard cardId='news' banner={banner} updatedAt={updatedAt} zoomBanner={zoomBanner} height={10} onZoom={onZoom}>
       <ZoomContext.Consumer>
         {zoom =>
           !news ? (
-            <TablePlaceholder rows={6} graph={false} value={false} />
+            <TablePlaceholder rows={10} graph={false} value={false} />
           ) : (
             <table
               className={zoom.active ? '' : 'apollo-data-table'}
               style={zoom.active ? { fontSize: '0.4em', lineHeight: 1.2 } : { tableLayout: 'fixed', width: '100%' }}
             >
               <tbody>
-                {news.map((header: any) => (
-                  <tr key={header.href}>
+                {news.articles.map(article => (
+                  <tr key={article.href}>
                     {!zoom.active ? null : (
                       <Open style={{ padding: '0 1em 0em', verticalAlign: 'middle' }}>
-                        <LinkOpen href={header.href} />
+                        <LinkOpen href={article.href} />
                       </Open>
                     )}
-                    <td style={zoom.active ? { paddingBottom: '0em' } : { textAlign: 'left' }}>{header.title}</td>
+                    <td style={zoom.active ? { paddingBottom: '0em' } : { textAlign: 'left' }}>{article.title}</td>
                   </tr>
                 ))}
               </tbody>

@@ -10,7 +10,7 @@ export const Jobs: FC<Record<string, never>> = () => {
   const [jobs, updatedAt] = useUpdate<JobsData>('jobs')
 
   return (
-    <ApolloCard cardId='jobs' banner={banner} updatedAt={updatedAt} height={6}>
+    <ApolloCard cardId='jobs' banner={banner} updatedAt={updatedAt} height={10}>
       <ZoomContext.Consumer>
         {zoom =>
           !jobs ? (

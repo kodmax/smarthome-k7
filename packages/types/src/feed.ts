@@ -237,3 +237,12 @@ export type JobAd = {
 export type JobsData = {
   ads: JobAd[]
 }
+
+export type Article = {
+  title: string
+  href: string
+}
+
+export type NewsData = {
+  articles: Article[]
+}
