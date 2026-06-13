@@ -116,6 +116,7 @@ describe('toJobAd', () => {
       requiredSkills: ['AWS', 'TypeScript', 'Node.js', 'React', 'SQL', 'SQS/SNS/Kafka', 'NoSQL'],
       workplaceType: 'hybrid',
       employmentType: 'permanent',
+      origin: 'jj',
       monthlySalaryRangeAfterTaxes: {
         from: 30000,
         to: 40200,

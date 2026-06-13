@@ -1,18 +1,14 @@
 import { TickerData } from '@repo/types'
-import { parseHTML } from 'linkedom'
 import { getText, getFinStreamerText, getTestIdText, getStatisticText } from './getText'
 import { getOptionalStatisticText } from './getText/getOptionalStatisticText'
 import { toNumber } from './toNumber'
 import { getOptionalTestIdText } from './getText/getOptionalTestIdText'
 import { getOptionalText } from './getText/getOptionalText'
+import { convertEasterTime } from './convertEasterTime/convertEasterTime'
+import { getDocument } from './getDocument'
 
 export const getTickerData = async (ticker: string): Promise<TickerData> => {
-  const req = fetch(`https://finance.yahoo.com/quote/${ticker}`)
-  console.log(`Fetching ${ticker} ticker data`)
-  const document = await req
-    .then(resp => resp.text())
-    .then(html => parseHTML(html))
-    .then(window => window.document)
+  const document = await getDocument(ticker)
 
   const isAtMarketClosed = getText(document, '.primary .marketTimeNotice').startsWith('At close:')
   const spotPrice = isAtMarketClosed ? undefined : getTestIdText(document, 'qsp-price')
@@ -31,8 +27,10 @@ export const getTickerData = async (ticker: string): Promise<TickerData> => {
   const overnightPrice =
     getOptionalTestIdText(document, 'qsp-post-price') ?? getOptionalTestIdText(document, 'qsp-overnight-price')
   const preMarketPrice = getOptionalTestIdText(document, 'qsp-pre-price')
-  const marketTime =
-    getOptionalText(document, '.secondary .marketTimeNotice') ?? getText(document, '.primary .marketTimeNotice')
+  const marketTime = convertEasterTime(
+    getOptionalText(document, '.secondary .marketTimeNotice') ?? getText(document, '.primary .marketTimeNotice'),
+    -new Date().getTimezoneOffset() / 60,
+  )
 
   return {
     ticker,
