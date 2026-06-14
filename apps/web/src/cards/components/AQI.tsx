@@ -1,20 +1,20 @@
 import { type FC } from 'react'
-import { useUpdate } from '@repo/feed-client'
+import { useFeed } from '@repo/feed-client'
 import { ColorIndicator } from './ColorIndication'
-import { WeatherData } from '@repo/types'
+import { WeatherFeed } from '@repo/types'
 
 const AQI: FC<{ label: string }> = ({ label }) => {
-  const [reading] = useUpdate<WeatherData>('weather')
+  const feed = useFeed<WeatherFeed>('weather')
 
-  if (reading) {
+  if (feed) {
     return (
       <tr>
         <td>{label}</td>
         <td></td>
         <td></td>
         <td>
-          <ColorIndicator instant={reading.aq.aqi} range={{ optimal: 0, highest: 150 }} />
-          {reading.aq.aqi} AQI
+          <ColorIndicator instant={feed.aq.aqi} range={{ optimal: 0, highest: 150 }} />
+          {feed.aq.aqi} AQI
         </td>
       </tr>
     )

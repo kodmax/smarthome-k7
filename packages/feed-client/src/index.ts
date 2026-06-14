@@ -1,3 +1,3 @@
 export { refreshFeeds } from './feed'
-export { useUpdate } from './useUpdate'
+export { useFeed } from './useFeed'
 export { useCommand } from './useCommand'

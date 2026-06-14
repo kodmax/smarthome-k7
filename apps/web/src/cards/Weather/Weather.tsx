@@ -8,14 +8,14 @@ import TablePlaceholder from '../components/TablePlaceholder'
 import { HoursBars } from '../components/HoursBars'
 import NorthIcon from '@mui/icons-material/North'
 import { getPosition, getMoonPosition } from 'suncalc'
-import { useUpdate } from '@repo/feed-client'
-import { WeatherData } from '@repo/types'
+import { useFeed } from '@repo/feed-client'
+import { WeatherFeed } from '@repo/types'
 import { sunTimes } from './sunTimes'
 
 export const Weather: FC<Record<string, never>> = () => {
-  const [weather, updatedAt] = useUpdate<WeatherData>('weather')
+  const feed = useFeed<WeatherFeed>('weather')
 
-  if (weather === undefined) {
+  if (feed === undefined) {
     return (
       <ApolloCard cardId='current-weather' banner={banner}>
         <TablePlaceholder rows={4} graph={true} value={true} />
@@ -24,22 +24,18 @@ export const Weather: FC<Record<string, never>> = () => {
   }
   const moonAlt = (getMoonPosition(new Date(), 52.2287755, 20.9756375).altitude / Math.PI) * 180
   const sunAlt = (getPosition(new Date(), 52.2287755, 20.9756375).altitude / Math.PI) * 180
-  const bs = beaufortScale(weather.instant.wind.speed)
-  const hum = weather.instant.humidity
-  const sun = sunTimes(weather)
+  const bs = beaufortScale(feed.instant.wind.speed)
+  const hum = feed.instant.humidity
+  const sun = sunTimes(feed)
 
   const windMaxSpeed =
-    weather.instant.wind.speedUnit === 'km/h'
-      ? Math.round(weather.instant.wind.maxSpeed / 3.6)
-      : weather.instant.wind.maxSpeed
+    feed.instant.wind.speedUnit === 'km/h' ? Math.round(feed.instant.wind.maxSpeed / 3.6) : feed.instant.wind.maxSpeed
 
   const windSpeed =
-    weather.instant.wind.speedUnit === 'km/h'
-      ? Math.round(weather.instant.wind.speed / 3.6)
-      : weather.instant.wind.speed
+    feed.instant.wind.speedUnit === 'km/h' ? Math.round(feed.instant.wind.speed / 3.6) : feed.instant.wind.speed
 
   return (
-    <ApolloCard cardId='current-weather' banner={banner} zoomBanner={zoomBanner} updatedAt={updatedAt}>
+    <ApolloCard cardId='current-weather' banner={banner} zoomBanner={zoomBanner}>
       <ZoomContext.Consumer>
         {zoom => (
           <table className='apollo-data-table'>
@@ -47,19 +43,19 @@ export const Weather: FC<Record<string, never>> = () => {
               <tr>
                 <td>Temperatura</td>
                 <td>
-                  <HoursBars data={weather.outdoorTemp} positiveMax={30} />
+                  <HoursBars data={feed.outdoorTemp} positiveMax={30} />
                 </td>
                 <td>
-                  <ColorIndicator instant={weather.instant.temp} range={{ optimal: 21, highest: 30, lowest: 15 }} />
-                  {Number(weather.instant.temp).toFixed(0)} °C
+                  <ColorIndicator instant={feed.instant.temp} range={{ optimal: 21, highest: 30, lowest: 15 }} />
+                  {Number(feed.instant.temp).toFixed(0)} °C
                 </td>
               </tr>
               <tr>
                 <td>Indeks UV</td>
                 <td></td>
                 <td>
-                  <ColorIndicator instant={weather.instant.uv} range={{ optimal: 4, highest: 8, lowest: 0 }} />
-                  {weather.instant.uv}
+                  <ColorIndicator instant={feed.instant.uv} range={{ optimal: 4, highest: 8, lowest: 0 }} />
+                  {feed.instant.uv}
                 </td>
               </tr>
               <tr>
@@ -75,7 +71,7 @@ export const Weather: FC<Record<string, never>> = () => {
                 <td style={{ fontSize: '0.5em' }}>{zoom.active ? `${bs} - ${beaufortLevelLabel(bs)}` : `${bs} B`}</td>
                 <td>
                   {zoom.active ? (
-                    <NorthIcon sx={{ transform: `rotate(${weather.instant.wind.angle}deg)`, marginRight: '0.25em' }} />
+                    <NorthIcon sx={{ transform: `rotate(${feed.instant.wind.angle}deg)`, marginRight: '0.25em' }} />
                   ) : null}
                   <ColorIndicator instant={bs} range={{ lowest: 0, highest: 7, optimal: 1 }} />
                   {windSpeed} m/s

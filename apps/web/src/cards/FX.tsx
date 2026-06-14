@@ -1,5 +1,5 @@
 import { useCallback, type FC } from 'react'
-import { refreshFeeds, useUpdate } from '@repo/feed-client'
+import { refreshFeeds, useFeed } from '@repo/feed-client'
 import banner from './card-banners/fx.jpg'
 import { Graph } from './components/Graph'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
@@ -9,14 +9,14 @@ const moreFx = ['EUR/PLN', 'USD/PLN', 'CHF/PLN', 'EUR/UAH', 'GBP/PLN', 'PLN/UAH'
 const mainFx = ['EUR/PLN', 'USD/PLN', 'CHF/PLN', 'EUR/UAH']
 
 export const FX: FC<Record<string, never>> = () => {
-  const [fx, updatedAt] = useUpdate<any>('fx')
+  const fx = useFeed<any>('fx')
 
   const onZoom = useCallback(() => {
     refreshFeeds(['fx'])
   }, [])
 
   return (
-    <ApolloCard cardId='fx' banner={banner} updatedAt={updatedAt} onZoom={onZoom}>
+    <ApolloCard cardId='fx' banner={banner} onZoom={onZoom}>
       <ZoomContext.Consumer>
         {zoom =>
           !fx ? (

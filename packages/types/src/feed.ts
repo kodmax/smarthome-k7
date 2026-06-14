@@ -38,7 +38,7 @@ export type TickerData = {
   }
 }
 
-export type StockMarketData = {
+export type StockMarketFeed = {
   tickers: TickerData[]
 }
 
@@ -47,7 +47,7 @@ export type Co2HistoryRecord = {
   value: number
 }
 
-export type EnergyReading = {
+export type EnergyFeed = {
   total: {
     adjusted: number
     target: string
@@ -103,7 +103,7 @@ export type HourWeatherForecast = {
   }
 }
 
-export type WeatherData = {
+export type WeatherFeed = {
   outdoorTemp: Array<{ hour: number; value: string }>
   instant: {
     clouds: {
@@ -158,7 +158,7 @@ export type PriceHistory = {
   price: string
 }
 
-export type CommoditiesData = {
+export type CommoditiesFeed = {
   oil: {
     'PLN/l': number
     history: PriceHistory[]
@@ -234,7 +234,7 @@ export type JobAd = {
   origin: 'jj' | 'nfj'
 }
 
-export type JobsData = {
+export type JobsFeed = {
   ads: JobAd[]
 }
 
@@ -243,6 +243,16 @@ export type Article = {
   href: string
 }
 
-export type NewsData = {
+export type NewsFeed = {
   articles: Article[]
+}
+
+export type AllergenData = {
+  intensity: string
+  name: string
+  id: string
+}
+
+export type AllergensFeed = {
+  allergens: AllergenData[]
 }

@@ -1,10 +1,10 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { jjit } from './jjit'
 import { isRemote, isSalaryAcceptable, noManager, noUwantedSkills } from './filters'
-import { JobAd, JobsData } from '@repo/types'
+import { JobAd, JobsFeed } from '@repo/types'
 import { nfj } from './nfj/nfj'
 
-export const source: DataSourceDefinition<JobsData> = {
+export const source: DataSourceDefinition<JobsFeed> = {
   cron: '0 8 * * *',
   id: 'jobs',
 

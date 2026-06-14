@@ -1,12 +1,12 @@
 import { type FC, useCallback } from 'react'
 import zoomBanner from './card-banners/news-zoom.jpg'
 import banner from './card-banners/news.jpg'
-import { refreshFeeds, useUpdate } from '@repo/feed-client'
+import { refreshFeeds, useFeed } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import LinkOpen from './components/LinkOpen'
 import TablePlaceholder from './components/TablePlaceholder'
 import styled from '@emotion/styled'
-import { NewsData } from '@repo/types'
+import { NewsFeed } from '@repo/types'
 
 const Open = styled('td')({
   verticalAlign: 'middle',
@@ -15,14 +15,14 @@ const Open = styled('td')({
 })
 
 export const News: FC<Record<string, never>> = () => {
-  const [news, updatedAt] = useUpdate<NewsData>('news')
+  const news = useFeed<NewsFeed>('news')
 
   const onZoom = useCallback(() => {
     refreshFeeds(['news'])
   }, [])
 
   return (
-    <ApolloCard cardId='news' banner={banner} updatedAt={updatedAt} zoomBanner={zoomBanner} height={10} onZoom={onZoom}>
+    <ApolloCard cardId='news' banner={banner} zoomBanner={zoomBanner} height={10} onZoom={onZoom}>
       <ZoomContext.Consumer>
         {zoom =>
           !news ? (

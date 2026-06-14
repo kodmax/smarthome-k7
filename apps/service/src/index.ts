@@ -25,7 +25,7 @@ import knxTemp from './data-sources/knx/temp'
 import knxCo2 from './data-sources/knx/co2'
 import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
-import { EnergyReading, JobsData, TemperatureData } from '@repo/types'
+import { EnergyFeed, JobsFeed, TemperatureData } from '@repo/types'
 import { config } from './config'
 import path from 'node:path'
 
@@ -114,7 +114,7 @@ Server.listen({}, async apollo => {
     feeds.addFeed(
       'energy',
       { energyCost, energyConsumption, ...energyReadings },
-      ({ energyCost, total, instant, energyConsumption, meter }): EnergyReading => ({
+      ({ energyCost, total, instant, energyConsumption, meter }): EnergyFeed => ({
         total: { ...total, adjusted: total.value + 12307130 + 181000 },
         today: {
           value: total.value - energyConsumption.startOfDayValue,
@@ -195,7 +195,7 @@ Server.listen({}, async apollo => {
     )
   })
 
-  feeds.addFeed('jobs', { jobs }, ({ jobs }): JobsData => {
+  feeds.addFeed('jobs', { jobs }, ({ jobs }): JobsFeed => {
     return jobs
   })
 

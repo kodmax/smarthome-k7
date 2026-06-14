@@ -1,11 +1,11 @@
 import zoomBanner from './card-banners/commodities-zoom.jpg'
 import banner from './card-banners/commodities.jpg'
 import { type FC, useCallback } from 'react'
-import { refreshFeeds, useUpdate } from '@repo/feed-client'
+import { refreshFeeds, useFeed } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import { Graph } from './components/Graph'
 import TablePlaceholder from './components/TablePlaceholder'
-import { CommoditiesData } from '@repo/types'
+import { CommoditiesFeed } from '@repo/types'
 
 type Salaries = {
   median: number
@@ -27,23 +27,16 @@ interface JobsOffers {
 }
 
 export const Commodities: FC<Record<string, never>> = () => {
-  const [reading, updatedAt] = useUpdate<CommoditiesData>('commodities')
-  const [jobs] = useUpdate<JobsOffers>('jobs')
+  const commodities = useFeed<CommoditiesFeed>('commodities')
+  const jobs = useFeed<JobsOffers>('jobs')
 
   const onZoom = useCallback(() => {
     refreshFeeds(['commodities'])
   }, [])
 
-  if (reading === undefined) {
+  if (commodities === undefined) {
     return (
-      <ApolloCard
-        cardId='commodities'
-        banner={banner}
-        zoomBanner={zoomBanner}
-        updatedAt={updatedAt}
-        height={4}
-        onZoom={onZoom}
-      >
+      <ApolloCard cardId='commodities' banner={banner} zoomBanner={zoomBanner} height={4} onZoom={onZoom}>
         <TablePlaceholder rows={6} graph={true} value={true} />
       </ApolloCard>
     )
@@ -51,16 +44,18 @@ export const Commodities: FC<Record<string, never>> = () => {
 
   // const usd = new Intl.NumberFormat('en-PL', { style: 'currency', currency: 'USD', currencyDisplay: 'symbol', maximumFractionDigits: 0 })
 
-  const inflationData = reading.inflation.history.slice(-12).map(({ datetime, value }) => ({ datetime, value, acc: 0 }))
+  const inflationData = commodities.inflation.history
+    .slice(-12)
+    .map(({ datetime, value }) => ({ datetime, value, acc: 0 }))
   for (let i = 0, a = 1; i < inflationData.length; i++) {
     inflationData[i].acc = a *= inflationData[i].value / 100
   }
 
   return (
-    <ApolloCard cardId='commodities' banner={banner} zoomBanner={zoomBanner} updatedAt={updatedAt} height={4}>
+    <ApolloCard cardId='commodities' banner={banner} zoomBanner={zoomBanner} height={4}>
       <ZoomContext.Consumer>
         {zoom =>
-          !reading ? (
+          !commodities ? (
             <TablePlaceholder rows={6} graph={true} value={true} />
           ) : (
             <table className='apollo-data-table'>
@@ -81,28 +76,38 @@ export const Commodities: FC<Record<string, never>> = () => {
                   <td style={{ width: '4em', padding: 0 }}>
                     <Graph
                       scaleX={30}
-                      scaleY={reading.coal['PLN/MT'] / 10}
-                      data={reading.coal.history}
+                      scaleY={commodities.coal['PLN/MT'] / 10}
+                      data={commodities.coal.history}
                       valueKey='price'
                     />
                   </td>
-                  <td>{`${reading.coal['PLN/MT']} zł/t`}</td>
+                  <td>{`${commodities.coal['PLN/MT']} zł/t`}</td>
                 </tr>
                 <tr>
                   <td>Ropa naftowa</td>
                   <td style={{ display: zoom.active ? 'initial' : 'none' }}>30 dni</td>
                   <td style={{ width: '4em', padding: 0 }}>
-                    <Graph scaleX={30} scaleY={reading.oil['PLN/l'] / 10} data={reading.oil.history} valueKey='price' />
+                    <Graph
+                      scaleX={30}
+                      scaleY={commodities.oil['PLN/l'] / 10}
+                      data={commodities.oil.history}
+                      valueKey='price'
+                    />
                   </td>
-                  <td>{`${reading.oil['PLN/l']} zł/ℓ`}</td>
+                  <td>{`${commodities.oil['PLN/l']} zł/ℓ`}</td>
                 </tr>
                 <tr>
                   <td>Gaz ziemny</td>
                   <td style={{ display: zoom.active ? 'initial' : 'none' }}>30 dni</td>
                   <td style={{ width: '4em', padding: 0 }}>
-                    <Graph scaleX={30} scaleY={reading.ng['PLN/GJ'] / 10} data={reading.ng.history} valueKey='price' />
+                    <Graph
+                      scaleX={30}
+                      scaleY={commodities.ng['PLN/GJ'] / 10}
+                      data={commodities.ng.history}
+                      valueKey='price'
+                    />
                   </td>
-                  <td>{`${reading.ng['PLN/GJ']} zł/GJ`}</td>
+                  <td>{`${commodities.ng['PLN/GJ']} zł/GJ`}</td>
                 </tr>
                 <tr>
                   <td>Złoto</td>
@@ -110,12 +115,12 @@ export const Commodities: FC<Record<string, never>> = () => {
                   <td style={{ width: '4em', padding: 0 }}>
                     <Graph
                       scaleX={30}
-                      scaleY={Number(reading.gold['PLN/g']) / 10}
-                      data={reading.gold.history}
+                      scaleY={Number(commodities.gold['PLN/g']) / 10}
+                      data={commodities.gold.history}
                       valueKey='price'
                     />
                   </td>
-                  <td>{`${reading.gold['PLN/g']} zł/g`}</td>
+                  <td>{`${commodities.gold['PLN/g']} zł/g`}</td>
                 </tr>
                 {!jobs ? null : (
                   <tr>

@@ -1,10 +1,10 @@
 import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
-import { StockMarketData, TickerData } from '@repo/types'
+import { StockMarketFeed, TickerData } from '@repo/types'
 import { getTickerData } from './getTickerData'
 import { tickerList } from './tickerList'
 import { sleep } from './sleep'
 
-export const source: DataSourceDefinition<StockMarketData> = {
+export const source: DataSourceDefinition<StockMarketFeed> = {
   cron: '5,35 10-2 * * Mon-Fri',
   id: 'stock-market',
 

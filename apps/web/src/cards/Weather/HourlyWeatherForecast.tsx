@@ -4,8 +4,8 @@ import zoomBanner from './card-banners/hourly-zoom.jpg'
 import { icons } from '@repo/weather-icons'
 import ApolloCard from '../../apollo-card/ApolloCard'
 import { styled } from '@mui/material'
-import { useUpdate } from '@repo/feed-client'
-import { HourWeatherForecast, WeatherData } from '@repo/types'
+import { useFeed } from '@repo/feed-client'
+import { HourWeatherForecast, WeatherFeed } from '@repo/types'
 
 const AuraIcon = styled('span')({
   backgroundRepeat: 'no-repeat',
@@ -28,10 +28,10 @@ const PercipIcon = styled('span')({
 })
 
 export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
-  const [forecast, updatedAt] = useUpdate<WeatherData>('weather')
+  const forecast = useFeed<WeatherFeed>('weather')
 
   return (
-    <ApolloCard cardId='hourly-weather-forecast' banner={banner} zoomBanner={zoomBanner} updatedAt={updatedAt}>
+    <ApolloCard cardId='hourly-weather-forecast' banner={banner} zoomBanner={zoomBanner}>
       <div style={{ textAlign: 'center', overflowX: 'auto' }}>
         <table style={{ marginLeft: 'auto', borderSpacing: '1em 0' }}>
           <tbody>

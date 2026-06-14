@@ -2,15 +2,15 @@ import banner from './card-banners/fuel.jpg'
 import ApolloCard from '../apollo-card/ApolloCard'
 import { Graph } from './components/Graph'
 import TablePlaceholder from './components/TablePlaceholder'
-import { useUpdate } from '@repo/feed-client'
+import { useFeed } from '@repo/feed-client'
 
 import { type FC } from 'react'
 
 export const Fuel: FC<Record<string, never>> = () => {
-  const [reading, updatedAt] = useUpdate<any>('fuel')
+  const reading = useFeed<any>('fuel')
 
   return (
-    <ApolloCard cardId='fuel' banner={banner} updatedAt={updatedAt}>
+    <ApolloCard cardId='fuel' banner={banner}>
       {!reading ? (
         <TablePlaceholder rows={4} graph={true} value={true} />
       ) : (

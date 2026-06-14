@@ -6,7 +6,7 @@ import { parseHTML } from 'linkedom'
 import * as suncalc from 'suncalc'
 import { basename } from 'path'
 import { getTextContent } from './utils/get-text-context'
-import { WeatherData } from '@repo/types'
+import { WeatherFeed } from '@repo/types'
 import { config } from '../config'
 
 const windDirectionCodes = [
@@ -32,7 +32,7 @@ const long = config.geoLocation.long
 const lat = config.geoLocation.lat
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const source: DataSourceDefinition<WeatherData> = {
+export const source: DataSourceDefinition<WeatherFeed> = {
   cron: '*/15 * * * *',
   id: 'weather',
 
@@ -168,7 +168,7 @@ export const source: DataSourceDefinition<WeatherData> = {
       ])
 
       const sunTimesResult = suncalc.getTimes(new Date(), 52.2283698, 20.973194)
-      const sunTimes: WeatherData['sunTimes'] = {
+      const sunTimes: WeatherFeed['sunTimes'] = {
         sunrise: sunTimesResult.sunrise.toISOString(),
         sunset: sunTimesResult.sunset.toISOString(),
         dusk: sunTimesResult.dusk.toISOString(),

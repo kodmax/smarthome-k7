@@ -1,10 +1,8 @@
-import { useEffect } from 'react'
 import { type SvgIconComponent } from '@mui/icons-material'
-import { useUpdate } from '@repo/feed-client'
+import { useFeed } from '@repo/feed-client'
 
 type KnxStateIconProps<T> = {
   id: string
-  onUpdate: (ts: number) => void
   active?: (payload: T) => boolean
   visible?: (payload: T) => boolean
   icon: (payload: T) => SvgIconComponent
@@ -13,38 +11,33 @@ type KnxStateIconProps<T> = {
 
 const KnxStateIcon = <T,>({
   id,
-  onUpdate,
   active = () => false,
   icon,
   opacity = () => 1,
   visible = () => true,
 }: KnxStateIconProps<T>) => {
-  const [reading, updatedAt] = useUpdate<T>(id)
+  const reading = useFeed<T>(id)
 
-  useEffect(() => {
-    onUpdate(new Date().getTime())
-  }, [updatedAt])
-
-  if (reading) {
-    const isActive = active(reading)
-    const Icon = icon(reading)
-
-    return (
-      <Icon
-        sx={{
-          paddingRight: '0.1em',
-          width: '0.7em',
-          height: '0.7em',
-          color: isActive ? 'red' : '#636363',
-          fontSize: 'inherit',
-          visibility: visible(reading) ? 'visible' : 'hidden',
-          opacity: opacity(reading),
-        }}
-      />
-    )
-  } else {
+  if (reading === undefined) {
     return null
   }
+
+  const isActive = active(reading)
+  const Icon = icon(reading)
+
+  return (
+    <Icon
+      sx={{
+        paddingRight: '0.1em',
+        width: '0.7em',
+        height: '0.7em',
+        color: isActive ? 'red' : '#636363',
+        fontSize: 'inherit',
+        visibility: visible(reading) ? 'visible' : 'hidden',
+        opacity: opacity(reading),
+      }}
+    />
+  )
 }
 
 export default KnxStateIcon

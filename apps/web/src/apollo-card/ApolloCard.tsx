@@ -1,12 +1,10 @@
 import { Card, CardContent, CardMedia, styled } from '@mui/material'
 import { type FC, type ReactNode } from 'react'
-import StatusBar from './StatusBar'
 import { ZoomContext, ZoomCurtain } from './ZoomCurtain'
 
 type ApolloCardProps = {
   zoomBanner?: string
   children: ReactNode
-  updatedAt?: number
   banner: string
   cardId: string
   height?: number
@@ -29,7 +27,6 @@ const ApolloCard: FC<ApolloCardProps> = ({
   children,
   banner,
   zoomBanner,
-  updatedAt,
   cardId,
   onZoom,
   allowZoom = true,
@@ -46,14 +43,6 @@ const ApolloCard: FC<ApolloCardProps> = ({
             >
               {children}
             </ApolloCardContent>
-
-            <StatusBar>
-              {updatedAt === undefined ? (
-                <>&nbsp;</>
-              ) : (
-                <span>Ostatnia aktualizacja {new Date(updatedAt).toLocaleString()}</span>
-              )}
-            </StatusBar>
           </Card>
         )}
       </ZoomContext.Consumer>

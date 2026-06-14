@@ -1,44 +1,43 @@
 import { type FC, useCallback } from 'react'
 import zoomBanner from './card-banners/electricity-zoom.jpg'
 import banner from './card-banners/electricity.jpg'
-import { refreshFeeds, useUpdate } from '@repo/feed-client'
+import { refreshFeeds, useFeed } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import { ColorIndicator } from './components/ColorIndication'
 import TablePlaceholder from './components/TablePlaceholder'
 import Copy from './components/Copy'
 import { HoursBars } from './components/HoursBars'
-import { EnergyReading } from '@repo/types'
+import { EnergyFeed } from '@repo/types'
 
 export const Energy: FC<Record<string, never>> = () => {
-  const [reading, updatedAt] = useUpdate<EnergyReading>('energy')
+  const feed = useFeed<EnergyFeed>('energy')
 
   const onZoom = useCallback(() => {
     refreshFeeds(['energy', 'home.power-draw', 'home.energy-consumption.today'])
   }, [])
 
-  if (reading === undefined) {
+  if (feed === undefined) {
     return (
-      <ApolloCard cardId='energy' banner={banner} zoomBanner={zoomBanner} updatedAt={updatedAt}>
+      <ApolloCard cardId='energy' banner={banner} zoomBanner={zoomBanner}>
         <TablePlaceholder rows={4} graph={false} value={true} />
       </ApolloCard>
     )
   }
 
-  const grossPrice = +reading.cost.rates.distribution + +reading.cost.rates.energy * reading.cost.rates.vat
-  const cost = (reading.meter.value / 1000) * grossPrice
-  const meterReading = reading.total.adjusted / 1000
+  const grossPrice = +feed.cost.rates.distribution + +feed.cost.rates.energy * feed.cost.rates.vat
+  const cost = (feed.meter.value / 1000) * grossPrice
+  const meterReading = feed.total.adjusted / 1000
 
-  const avgMonthlyConsumption = (reading.cost.avg * 30) / 1000
+  const avgMonthlyConsumption = (feed.cost.avg * 30) / 1000
   const avgMonthlyCost =
-    (avgMonthlyConsumption * (+reading.cost.rates.distribution + +reading.cost.rates.energy) +
-      reading.cost.rates.added) *
-    reading.cost.rates.vat
+    (avgMonthlyConsumption * (+feed.cost.rates.distribution + +feed.cost.rates.energy) + feed.cost.rates.added) *
+    feed.cost.rates.vat
 
   return (
-    <ApolloCard cardId='energy' banner={banner} zoomBanner={zoomBanner} updatedAt={updatedAt} onZoom={onZoom}>
+    <ApolloCard cardId='energy' banner={banner} zoomBanner={zoomBanner} onZoom={onZoom}>
       <ZoomContext.Consumer>
         {zoom =>
-          !reading ? (
+          !feed ? (
             <TablePlaceholder rows={4} graph={false} value={true} />
           ) : (
             <table className='apollo-data-table'>
@@ -46,11 +45,9 @@ export const Energy: FC<Record<string, never>> = () => {
                 <tr>
                   <td>Zużycie dziś</td>
                   <td style={{ padding: 0, width: '4em' }}>
-                    <HoursBars data={reading.today.bars} positiveMax={1000} valueKey='hourly_consumption' />
+                    <HoursBars data={feed.today.bars} positiveMax={1000} valueKey='hourly_consumption' />
                   </td>
-                  <td>
-                    {Number(reading.today.value / 1000).toLocaleString('en-PL', { maximumFractionDigits: 2 })} kWh
-                  </td>
+                  <td>{Number(feed.today.value / 1000).toLocaleString('en-PL', { maximumFractionDigits: 2 })} kWh</td>
                 </tr>
                 {!zoom.active ? null : (
                   <>
@@ -81,7 +78,7 @@ export const Energy: FC<Record<string, never>> = () => {
                     <tr>
                       <td>Meter energy</td>
                       <td></td>
-                      <td>{reading.meter.text}</td>
+                      <td>{feed.meter.text}</td>
                     </tr>
                     <tr>
                       <td>Meter cost</td>
@@ -108,11 +105,8 @@ export const Energy: FC<Record<string, never>> = () => {
                   <td>Chwilowy pobór</td>
                   <td></td>
                   <td>
-                    <ColorIndicator
-                      instant={reading.instant.value}
-                      range={{ optimal: 400, lowest: 100, highest: 2400 }}
-                    />
-                    {Number(reading.instant.value).toLocaleString('en-PL', { maximumFractionDigits: 0 })} W
+                    <ColorIndicator instant={feed.instant.value} range={{ optimal: 400, lowest: 100, highest: 2400 }} />
+                    {Number(feed.instant.value).toLocaleString('en-PL', { maximumFractionDigits: 0 })} W
                   </td>
                 </tr>
               </tbody>
