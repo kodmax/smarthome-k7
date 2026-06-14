@@ -14,37 +14,37 @@ export const source: DataSourceDefinition<FXFeed> = {
   script: async () => {
     const [eur, usd, chf, gbp, uah, rub] = await Promise.all([
       myFetch('https://pl.investing.com/currencies/eur-pln', { accept: 'text/html' })
-        .then(response => response.toString('utf-8'))
+        .then(response => response.toString())
         .then(html => {
           return getTextContent(parseHTML(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
         }),
 
       myFetch('https://pl.investing.com/currencies/usd-pln', { accept: 'text/html' })
-        .then(response => response.toString('utf-8'))
+        .then(response => response.toString())
         .then(html => {
           return getTextContent(parseHTML(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
         }),
 
       myFetch('https://pl.investing.com/currencies/chf-pln', { accept: 'text/html' })
-        .then(response => response.toString('utf-8'))
+        .then(response => response.toString())
         .then(html => {
           return getTextContent(parseHTML(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
         }),
 
       myFetch('https://pl.investing.com/currencies/gbp-pln', { accept: 'text/html' })
-        .then(response => response.toString('utf-8'))
+        .then(response => response.toString())
         .then(html => {
           return getTextContent(parseHTML(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
         }),
 
       myFetch('https://pl.investing.com/currencies/pln-uah', { accept: 'text/html' })
-        .then(response => response.toString('utf-8'))
+        .then(response => response.toString())
         .then(html => {
           return getTextContent(parseHTML(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
         }),
 
       myFetch('https://pl.investing.com/currencies/pln-rub', { accept: 'text/html' })
-        .then(response => response.toString('utf-8'))
+        .then(response => response.toString())
         .then(html => {
           return getTextContent(parseHTML(html).window.document.body, '.text-2xl[data-test=instrument-price-last]')
         }),

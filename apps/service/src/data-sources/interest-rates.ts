@@ -18,7 +18,7 @@ export const source: DataSourceDefinition<InterestRatesFeed> = {
   expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 12,
   script: async () => {
     const wibor = await myFetch('https://www.bankier.pl/mieszkaniowe/stopy-procentowe/wibor', { accept: 'text/html' })
-      .then(resp => resp.toString('utf-8'))
+      .then(resp => resp.toString())
       .then(async html => {
         const rates = [...html.matchAll(irPattern)].map(match => ({
           period: match[1],
@@ -36,7 +36,7 @@ export const source: DataSourceDefinition<InterestRatesFeed> = {
     const nbp = await myFetch('https://nbp.pl/polityka-pieniezna/decyzje-rpp/podstawowe-stopy-procentowe-nbp/', {
       accept: 'text/html',
     })
-      .then(resp => resp.toString('utf-8'))
+      .then(resp => resp.toString())
       .then(async html => {
         const document = parseHTML(html).window.document
         return Object.fromEntries(

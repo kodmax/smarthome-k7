@@ -1,17 +1,17 @@
 import * as path from 'path'
 import * as fs from 'fs'
-
-import { CachedSnapshot, ContentSnapshot } from './CachedSnapshot'
+import { Snapshot } from './Snapshot'
+import { SnapshotContent } from './types'
 
 class CacheEntry<T> {
-  private readonly content: CachedSnapshot<T>
+  private readonly content: Snapshot<T>
 
   public constructor(
     private readonly path: string,
-    private readonly snapshot: ContentSnapshot<T>,
+    private readonly snapshot: SnapshotContent<T>,
     private fileName?: string,
   ) {
-    this.content = new CachedSnapshot<T>(this.snapshot)
+    this.content = new Snapshot<T>(this.snapshot)
   }
 
   public async write(data: T): Promise<T> {
@@ -25,7 +25,7 @@ class CacheEntry<T> {
     return data
   }
 
-  public getSnapshot(): CachedSnapshot<T> {
+  public getSnapshot(): Snapshot<T> {
     return this.content
   }
 

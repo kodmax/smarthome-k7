@@ -1,20 +1,20 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { myFetch } from '../fetch'
 import { parseHTML } from 'linkedom'
-import { Article, NewsData } from '@repo/types'
+import { Article, NewsFeed } from '@repo/types'
 
 const FEED_URL =
   'https://news.google.com/topics/CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE/sections/CAQiTkNCSVNORG9JYkc5allXeGZkakpDRUd4dlkyRnNYM1l5WDNObFkzUnBiMjV5Q2hJSUwyMHZNRGd4YlY5NkNnb0lMMjB2TURneGJWOG9BQSowCAAqLAgKIiZDQklTRmpvSWJHOWpZV3hmZGpKNkNnb0lMMjB2TURneGJWOG9BQVABUAE?hl=pl&gl=PL&ceid=PL%3Apl'
 const COOKIES = 'SOCS=CAISHAgCEhJnd3NfMjAyNTExMTktMF9SQzEaAnBsIAEaBgiA1_7IBg'
 
-export const source: DataSourceDefinition<NewsData> = {
+export const source: DataSourceDefinition<NewsFeed> = {
   cron: '*/15 * * * *',
   id: 'news',
 
   expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 5,
   script: async () => {
     const news = await myFetch(FEED_URL, { accept: 'text/html', cookie: COOKIES })
-      .then(resp => resp.toString('utf-8'))
+      .then(resp => resp.toString())
       .then(html => {
         const document = parseHTML(html).window.document
         const articles: Article[] = Array.from(document.querySelectorAll('a[href^="./read"][aria-label]')).map(

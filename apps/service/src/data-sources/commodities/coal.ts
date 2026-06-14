@@ -8,7 +8,7 @@ type CoalPrice = {
 
 const fetchCoalPrice = async (): Promise<CoalPrice> => {
   return myFetch('https://markets.businessinsider.com/commodities/coal-price', { accept: 'text/html' })
-    .then(response => response.toString('utf-8'))
+    .then(response => response.toString())
     .then(html => {
       const document = parseHTML(html).window.document
 

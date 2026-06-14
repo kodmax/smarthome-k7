@@ -8,7 +8,7 @@ type OilPrice = {
 
 const fetchOilPrice = async (): Promise<OilPrice> => {
   return myFetch('https://www.cnbc.com/quotes/@CL.1', { accept: 'text/html' })
-    .then(response => response.toString('utf-8'))
+    .then(response => response.toString())
     .then(html => {
       const document = parseHTML(html).window.document
 

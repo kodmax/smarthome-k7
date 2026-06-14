@@ -9,7 +9,7 @@ type GoldPrice = {
 
 const fetchGoldPrice = (): Promise<GoldPrice> => {
   return myFetch('https://markets.businessinsider.com/commodities/gold-price', { accept: 'text/html' })
-    .then(response => response.toString('utf-8'))
+    .then(response => response.toString())
     .then(html => {
       const document = parseHTML(html).window.document
 

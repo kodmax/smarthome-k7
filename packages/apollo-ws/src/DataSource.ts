@@ -1,14 +1,14 @@
 import EventEmitter from 'events'
-import { CachedSnapshot, CacheEntry } from './cache'
+import { CacheEntry, Snapshot } from './cache'
 
 type DSCT<S> = S extends DataSourceDefinition<infer T> ? T : never
-type DSM<S extends Record<string, DataSourceDefinition<unknown>>> = {
+type DSM<S extends Record<string, DataSourceDefinition<any>>> = {
   [K in keyof S]: DSCT<S[K]>
 }
 
 type DD = DataSourceDefinition<unknown>
 type DataSourceDefinition<T> = {
-  expired: (cache: CachedSnapshot<T>) => boolean
+  expired: (cache: Snapshot<T>) => boolean
   script: () => Promise<T>
   id: string
 
@@ -24,7 +24,7 @@ export type DataSourceCommand = {
   args: string
 }
 
-class DataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>> {
+class DataSource<S extends DataSourceDefinition<any>, T = DSCT<S>> {
   private updating: Promise<T> | undefined
 
   public constructor(
@@ -77,7 +77,7 @@ class DataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>> {
 
   public getRecentContent(): T {
     if (!this.cacheEntry.isEmpty()) {
-      return this.cacheEntry.getSnapshot().content()
+      return this.cacheEntry.getSnapshot().getContent()
     } else {
       throw new Error('No recent content')
     }
@@ -89,7 +89,7 @@ class DataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>> {
     } else if (!forceRefresh && this.isCacheFresh()) {
       this.vent.emit('sys-log', 7, `Cache hit on data source <${this.definition.id}>`)
 
-      return this.cacheEntry.getSnapshot().content()
+      return this.cacheEntry.getSnapshot().getContent()
     } else {
       this.updating = new Promise((resolve, reject) => {
         this.definition

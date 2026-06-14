@@ -13,7 +13,7 @@ type InflationData = Array<{
 
 const fetchInflationData = async (): Promise<InflationData> => {
   return myFetch(inflationDataUrl, { accept: 'text/html' })
-    .then(response => response.toString('utf-8'))
+    .then(response => response.toString())
     .then(html => {
       const document = parseHTML(html).window.document
 

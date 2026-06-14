@@ -19,7 +19,7 @@ export const source: DataSourceDefinition<{ datetime: string; rates: EnergyRates
   cron: '0 0 * * *',
   id: 'energy-cost',
 
-  expired: snapshot => snapshot.content().datetime !== new DateTime().getDate(),
+  expired: snapshot => snapshot.getContent().datetime !== new DateTime().getDate(),
   script: async () => {
     const conn = await db.getConnection()
     try {
