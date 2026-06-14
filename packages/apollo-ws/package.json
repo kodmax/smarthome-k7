@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "bun build src/index.ts --target=node --format=cjs --outdir=./dist",
+    "build": "tsc && bun build src/index.ts --target=node --format=cjs --outdir=./dist",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "vitest"
   },

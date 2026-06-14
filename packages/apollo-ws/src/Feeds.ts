@@ -4,29 +4,21 @@ import { Cache } from './cache'
 
 import EventEmitter from 'events'
 
-type DS = DataSource<DataSourceDefinition<any>>
+type DS = DataSource<DataSourceDefinition<unknown>>
 
-type SourceDataTypes<S extends Record<string, DataSourceDefinition<any>>> = {
+type SourceDataTypes<S extends Record<string, DataSourceDefinition<unknown>>> = {
   [K in keyof S]: S[K] extends DataSourceDefinition<infer T> ? T : never
 }
 
-interface Feeds {
-  addFeed<R, S extends Record<string, DataSourceDefinition<any>>>(
-    feedId: string,
-    sourcesDefinitions: S,
-    cb?: (content: SourceDataTypes<S>) => R,
-  ): Promise<void>
-}
-
-type FeedSources = Map<string, DataSource<DataSourceDefinition<any>>>
+type FeedSources = Map<string, DataSource<DataSourceDefinition<unknown>>>
 type Feed = {
   sources: FeedSources
-  cb: (content: Record<string, any>) => any
+  cb: (content: SourceDataTypes<Record<string, DataSourceDefinition<unknown>>>) => unknown
   feedId: string
 }
 
-class Feeds implements Feeds {
-  private sources: Map<DataSourceDefinition<any>, DS> = new Map()
+export class Feeds implements Feeds {
+  private sources: Map<DataSourceDefinition<unknown>, DS> = new Map()
   private feeds: Map<string, Feed> = new Map()
 
   private chronos: Chronos
@@ -48,7 +40,7 @@ class Feeds implements Feeds {
     this.chronos = new Chronos(vent)
   }
 
-  private async addDataSource<S extends DataSourceDefinition<any>, T = DSCT<S>>(
+  private async addDataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>>(
     definition: S,
   ): Promise<DataSource<S, T>> {
     const dataSource = new DataSource(
@@ -74,8 +66,8 @@ class Feeds implements Feeds {
     return dataSource
   }
 
-  private async getData(feed: Feed, triggeredBy?: string): Promise<Record<string, any>> {
-    const contents: Record<string, any> = {}
+  private async getData(feed: Feed, triggeredBy?: string): Promise<Record<string, unknown>> {
+    const contents: Record<string, unknown> = {}
 
     await Promise.all(
       Array.from([...feed.sources.entries()]).map(async ([srcName, src]) => {
@@ -115,8 +107,10 @@ class Feeds implements Feeds {
     }
 
     const srcNames = Object.keys(sourcesDefinitions)
+    const callback = cb ?? ((content: SourceDataTypes<S>) => content[srcNames[0]])
+
     this.feeds.set(feedId, {
-      cb: cb ?? (srcNames.length === 1 ? contents => contents[srcNames[0]] : contents => contents),
+      cb: callback as unknown as (content: SourceDataTypes<Record<string, DataSourceDefinition<unknown>>>) => unknown,
       sources,
       feedId,
     })
@@ -133,5 +127,3 @@ class Feeds implements Feeds {
     })
   }
 }
-
-export { Feeds }

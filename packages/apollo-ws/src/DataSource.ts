@@ -2,7 +2,7 @@ import EventEmitter from 'events'
 import { CacheEntry, Snapshot } from './cache'
 
 type DSCT<S> = S extends DataSourceDefinition<infer T> ? T : never
-type DSM<S extends Record<string, DataSourceDefinition<any>>> = {
+type DSM<S extends Record<string, DataSourceDefinition<unknown>>> = {
   [K in keyof S]: DSCT<S[K]>
 }
 
@@ -24,7 +24,7 @@ export type DataSourceCommand = {
   args: string
 }
 
-class DataSource<S extends DataSourceDefinition<any>, T = DSCT<S>> {
+class DataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>> {
   private updating: Promise<T> | undefined
 
   public constructor(
@@ -51,7 +51,7 @@ class DataSource<S extends DataSourceDefinition<any>, T = DSCT<S>> {
       })
 
       definition.push(
-        (content: T) => this.push(content),
+        content => this.push(content as T),
         command,
         e => {
           this.vent.emit('sys-log', 4, `Push data source <${this.definition.id}> update error: ${e}`, e)
@@ -95,8 +95,8 @@ class DataSource<S extends DataSourceDefinition<any>, T = DSCT<S>> {
         this.definition
           .script()
           .then(async content => {
-            await this.cacheEntry.write(content)
-            resolve(content)
+            await this.cacheEntry.write(content as T)
+            resolve(content as T)
 
             this.vent.emit('sys-log', 4, `Data source <${this.definition.id}> content refreshed`)
             this.vent.emit('data-update', this.definition.id)
