@@ -12,7 +12,7 @@ const Day: FC<{ forecast?: DayWeatherForecast }> = ({ forecast }) => {
   return (
     <DayWrapper>
       <div>
-        <div style={{ display: 'flex', justifyContent: 'left', padding: '0.666em 0.666em 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '0.666em 0.666em 0' }}>
           <div style={{ paddingRight: '1em' }}>
             <Icon
               style={
@@ -26,7 +26,7 @@ const Day: FC<{ forecast?: DayWeatherForecast }> = ({ forecast }) => {
             {forecast ? (
               <>
                 <div>
-                  {Number(forecast.temp.high).toFixed(0)} / {Number(forecast.temp.low).toFixed(0)} °C
+                  {Number(forecast.temp.low).toFixed(0)} – {Number(forecast.temp.high).toFixed(0)} °C
                 </div>
                 <div style={{ fontSize: '0.7em' }}>
                   {forecast.dow} {forecast.date}
