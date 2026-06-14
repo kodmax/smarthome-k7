@@ -53,7 +53,7 @@ class Feeds implements Feeds {
   ): Promise<DataSource<S, T>> {
     const dataSource = new DataSource(
       definition,
-      await this.cache.getEntry<T>(definition.volatile ? null : definition.id),
+      await this.cache.getEntry<T>(definition.volatile === true ? undefined : definition.id),
       this.vent,
     )
 
@@ -78,9 +78,7 @@ class Feeds implements Feeds {
     const contents: Record<string, any> = {}
 
     await Promise.all(
-      Array.from(feed.sources.keys()).map(async srcName => {
-        const src = feed.sources.get(srcName)
-
+      Array.from([...feed.sources.entries()]).map(async ([srcName, src]) => {
         contents[srcName] = triggeredBy === src.getId() ? src.getRecentContent() : await src.getData()
       }),
     )
@@ -89,19 +87,18 @@ class Feeds implements Feeds {
   }
 
   private async feed(feedId: string, triggeredBy?: string): Promise<void> {
-    if (this.feeds.has(feedId)) {
-      const feed = this.feeds.get(feedId)
-
-      try {
-        const content = feed.cb(await this.getData(feed, triggeredBy))
-
-        this.vent.emit('sys-log', 7, `Feed <${feedId}> update successful.`)
-        this.vent.emit('feed', feedId, content)
-      } catch (e) {
-        this.vent.emit('sys-log', 4, `Feed <${feedId}> callback error.`, e)
-      }
-    } else {
+    const feed = this.feeds.get(feedId)
+    if (feed === undefined) {
       throw new Error(`Feed <${feedId}> not registered.`)
+    }
+
+    try {
+      const content = feed.cb(await this.getData(feed, triggeredBy))
+
+      this.vent.emit('sys-log', 7, `Feed <${feedId}> update successful.`)
+      this.vent.emit('feed', feedId, content)
+    } catch (e) {
+      this.vent.emit('sys-log', 4, `Feed <${feedId}> callback error.`, e)
     }
   }
 
@@ -114,10 +111,7 @@ class Feeds implements Feeds {
     for (const contentName of Object.keys(sourcesDefinitions)) {
       const definition = sourcesDefinitions[contentName]
 
-      sources.set(
-        contentName,
-        this.sources.has(definition) ? this.sources.get(definition) : await this.addDataSource(definition),
-      )
+      sources.set(contentName, this.sources.get(definition) ?? (await this.addDataSource(definition)))
     }
 
     const srcNames = Object.keys(sourcesDefinitions)

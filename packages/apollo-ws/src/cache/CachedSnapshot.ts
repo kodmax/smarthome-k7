@@ -6,7 +6,7 @@ enum CacheAgeUnit {
 }
 
 type ContentSnapshot<T> = {
-  timestamp?: number
+  timestamp: number
   content?: T
 }
 
@@ -19,7 +19,7 @@ class CachedSnapshot<T> {
     return (new Date().getTime() - this.entry.timestamp) / 1000 / unit
   }
 
-  public content(): T {
+  public content(): T | undefined {
     return this.entry.content
   }
 }

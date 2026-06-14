@@ -9,7 +9,7 @@ class CacheEntry<T> {
   public constructor(
     private readonly path: string,
     private readonly snapshot: ContentSnapshot<T>,
-    private key?: string,
+    private fileName?: string,
   ) {
     this.content = new CachedSnapshot<T>(this.snapshot)
   }
@@ -18,8 +18,8 @@ class CacheEntry<T> {
     this.snapshot.timestamp = new Date().getTime()
     this.snapshot.content = data
 
-    if (this.key) {
-      await fs.promises.writeFile(path.resolve(this.path, `${this.key}.json`), JSON.stringify(data, null, 4))
+    if (this.fileName) {
+      await fs.promises.writeFile(path.resolve(this.path, `${this.fileName}.json`), JSON.stringify(data, null, 4))
     }
 
     return data
