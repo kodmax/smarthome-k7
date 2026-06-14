@@ -4,30 +4,14 @@ import DateTime from '../DateTime'
 import db from '../db'
 import { myFetch } from '../fetch'
 import { getTextContent } from './utils/get-text-context'
-
-enum INTEREST_RATES {
-  'NBP Ref.' = 'Stopa referencyjna 1)',
-  'WIBOR 1M' = 'WIBOR 1M',
-  'WIBOR 3M' = 'WIBOR 3M',
-  'WIBOR 6M' = 'WIBOR 6M',
-}
-
-type IRS = {
-  -readonly [K in keyof typeof INTEREST_RATES]?: {
-    current: string
-    history: Array<{
-      datetime: string
-      rate: string
-    }>
-  }
-}
+import { INTEREST_RATES, InterestRateData, InterestRatesFeed } from '@repo/types'
 
 // eslint-disable-next-line max-len
 const irPattern =
   /<tr>\s*<td><a href="wibor\?rateDate=&rateChartType=..">(WIBOR ..)[<>/a-z ]+\s*<\/td>\s*<td class="[a-zA-Z -]+">\s*(-?\d+,\d+)%\s*\((-?\d+,\d+)\)/g
 const datePattern = /<td>Data<\/td>\s*<td class="textBold">(\d\d\d\d-\d\d-\d\d)<\/td>/
 
-export const source: DataSourceDefinition<IRS> = {
+export const source: DataSourceDefinition<InterestRatesFeed> = {
   cron: '5 11,17 * * 1-5',
   id: 'interest-rates',
 
@@ -73,7 +57,7 @@ export const source: DataSourceDefinition<IRS> = {
     const conn = await db.getConnection()
 
     try {
-      const irs: IRS = {}
+      const irs: Record<string, InterestRateData> = {}
       const data = { ...wibor, ...nbp }
       for (const name of Object.keys(INTEREST_RATES) as Array<keyof typeof INTEREST_RATES>) {
         await conn.query('insert into interest_rates (datetime, name, rate) values (?, ?, ?)', [
@@ -91,7 +75,7 @@ export const source: DataSourceDefinition<IRS> = {
         }
       }
 
-      return irs
+      return irs as InterestRatesFeed
     } finally {
       await conn.end()
     }

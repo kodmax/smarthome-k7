@@ -4,33 +4,9 @@ import db from '../db'
 import DateTime from '../DateTime'
 import { parseHTML } from 'linkedom'
 import { getTextContent } from './utils/get-text-context'
+import { FXFeed, FXRateHistory, FXRates } from '@repo/types'
 
-type FXRates = {
-  'EUR/USD': string
-  'EUR/PLN': string
-  'USD/PLN': string
-  'CHF/PLN': string
-  'GBP/PLN': string
-  'PLN/UAH': string
-  'PLN/RUB': string
-  'EUR/UAH': string
-}
-
-type FXRate = {
-  datetime: string
-  exchange_rate: string
-}
-
-type FXHistory<T extends Record<string, string>> = {
-  [K in keyof T]: Array<FXRate>
-}
-
-type FX = {
-  history: FXHistory<FXRates>
-  rates: FXRates
-}
-
-export const source: DataSourceDefinition<FX> = {
+export const source: DataSourceDefinition<FXFeed> = {
   cron: '0 */3 * * *',
   id: 'fx',
 
@@ -89,7 +65,7 @@ export const source: DataSourceDefinition<FX> = {
     const now = new DateTime().getDateTime()
     const conn = await db.getConnection()
 
-    const history: FXHistory<FXRates> = {
+    const history: FXRateHistory<FXRates> = {
       'EUR/USD': [],
       'EUR/UAH': [],
       'EUR/PLN': [],
@@ -123,5 +99,3 @@ export const source: DataSourceDefinition<FX> = {
     }
   },
 }
-
-export type { FXRates, FX }

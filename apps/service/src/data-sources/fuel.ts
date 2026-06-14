@@ -4,20 +4,9 @@ import DateTime from '../DateTime'
 import db from '../db'
 import { myFetch } from '../fetch'
 import { getTextContent } from './utils/get-text-context'
+import { FuelPricesFeed } from '@repo/types'
 
-type Price = {
-  current: number
-  history: Array<{
-    datetime: string
-    price: string
-  }>
-}
-
-type FuelPrices = {
-  [k: string]: Price
-}
-
-export const source: DataSourceDefinition<FuelPrices> = {
+export const source: DataSourceDefinition<FuelPricesFeed> = {
   cron: '0 10 * * *',
   id: 'fossil-fuels',
 
@@ -42,7 +31,7 @@ export const source: DataSourceDefinition<FuelPrices> = {
         const now = new DateTime().getDateTime()
         const conn = await db.getConnection()
 
-        const prices: FuelPrices = {}
+        const prices: FuelPricesFeed = {}
         try {
           for (const type of Object.keys(current)) {
             await conn.query('insert into commodities (datetime, name, price) values (?, ?, ?)', [
@@ -67,5 +56,3 @@ export const source: DataSourceDefinition<FuelPrices> = {
       })
   },
 }
-
-export type { FuelPrices }

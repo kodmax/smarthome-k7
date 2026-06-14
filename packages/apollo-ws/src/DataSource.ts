@@ -2,23 +2,17 @@ import EventEmitter from 'events'
 import { CachedSnapshot, CacheEntry } from './cache'
 
 type DSCT<S> = S extends DataSourceDefinition<infer T> ? T : never
-type DSM<S extends Record<string, DataSourceDefinition<any>>> = {
+type DSM<S extends Record<string, DataSourceDefinition<unknown>>> = {
   [K in keyof S]: DSCT<S[K]>
 }
 
-type CommandArguments = string
-export interface CommandEventEmitter extends EventEmitter {
-  on(command: string, listener: (args: CommandArguments) => void)
-  emit(command: string, args: CommandArguments)
-}
-
-type DD = DataSourceDefinition<any>
+type DD = DataSourceDefinition<unknown>
 type DataSourceDefinition<T> = {
   expired: (cache: CachedSnapshot<T>) => boolean
   script: () => Promise<T>
   id: string
 
-  push?: (push: (content: T) => void, command: CommandEventEmitter, err: (e: Error) => void) => void
+  push?: (push: (content: T) => void, command: EventEmitter, err: (e: Error) => void) => void
   dependencies?: string[]
   volatile?: boolean
   cron?: string
@@ -30,7 +24,7 @@ export type DataSourceCommand = {
   args: string
 }
 
-class DataSource<S extends DataSourceDefinition<any>, T = DSCT<S>> {
+class DataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>> {
   private updating: Promise<T> | undefined
 
   public constructor(
@@ -38,7 +32,7 @@ class DataSource<S extends DataSourceDefinition<any>, T = DSCT<S>> {
     private cacheEntry: CacheEntry<T>,
     private vent: EventEmitter,
   ) {
-    const command = new EventEmitter() as CommandEventEmitter
+    const command = new EventEmitter()
 
     if (definition.push) {
       this.vent.on('command', (ev: DataSourceCommand) => {

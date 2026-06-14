@@ -92,7 +92,7 @@ export class Server {
       })
     })
 
-    this.vent.addListener('feed', (id: string, value: any) => {
+    this.vent.addListener('feed', (id: string, value: unknown) => {
       const content = JSON.stringify(value)
 
       const outbox: Promise<Client>[] = []

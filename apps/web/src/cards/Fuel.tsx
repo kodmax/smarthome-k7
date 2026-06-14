@@ -5,9 +5,10 @@ import TablePlaceholder from './components/TablePlaceholder'
 import { useFeed } from '@repo/feed-client'
 
 import { type FC } from 'react'
+import { FuelPricesFeed } from '@repo/types'
 
 export const Fuel: FC<Record<string, never>> = () => {
-  const reading = useFeed<any>('fuel')
+  const reading = useFeed<FuelPricesFeed>('fuel')
 
   return (
     <ApolloCard cardId='fuel' banner={banner}>

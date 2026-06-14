@@ -4,12 +4,13 @@ import banner from './card-banners/fx.jpg'
 import { Graph } from './components/Graph'
 import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
 import TablePlaceholder from './components/TablePlaceholder'
+import { FXFeed, FXRates } from '@repo/types'
 
-const moreFx = ['EUR/PLN', 'USD/PLN', 'CHF/PLN', 'EUR/UAH', 'GBP/PLN', 'PLN/UAH', 'PLN/RUB']
-const mainFx = ['EUR/PLN', 'USD/PLN', 'CHF/PLN', 'EUR/UAH']
+const moreFx: Array<keyof FXRates> = ['EUR/PLN', 'USD/PLN', 'CHF/PLN', 'EUR/UAH', 'GBP/PLN', 'PLN/UAH', 'PLN/RUB']
+const mainFx: Array<keyof FXRates> = ['EUR/PLN', 'USD/PLN', 'CHF/PLN', 'EUR/UAH']
 
 export const FX: FC<Record<string, never>> = () => {
-  const fx = useFeed<any>('fx')
+  const fx = useFeed<FXFeed>('fx')
 
   const onZoom = useCallback(() => {
     refreshFeeds(['fx'])
@@ -31,11 +32,11 @@ export const FX: FC<Record<string, never>> = () => {
                       <tr key={pair}>
                         <td>{pair}</td>
                         <td style={{ padding: 0, width: '4em' }}>
-                          <Graph scaleX={30} scaleY={fx.rates[pair] / 10} data={fx.history[pair]} />
+                          <Graph scaleX={30} scaleY={+fx.rates[pair] / 10} data={fx.history[pair]} />
                         </td>
                         {zoom.active ? (
                           <td>
-                            {Number(fx.rates[pair]).toFixed(2)} ({Number(1 / fx.rates[pair]).toFixed(4)})
+                            {Number(fx.rates[pair]).toFixed(2)} ({Number(1 / +fx.rates[pair]).toFixed(4)})
                           </td>
                         ) : (
                           <td>{Number(fx.rates[pair]).toFixed(2)}</td>

@@ -256,3 +256,60 @@ export type AllergenData = {
 export type AllergensFeed = {
   allergens: AllergenData[]
 }
+
+export type FuelPrice = {
+  current: number
+  history: Array<{
+    datetime: string
+    price: string
+  }>
+}
+
+export type FuelPricesFeed = {
+  [k: string]: FuelPrice
+}
+
+export type FXRates = {
+  'EUR/USD': string
+  'EUR/PLN': string
+  'USD/PLN': string
+  'CHF/PLN': string
+  'GBP/PLN': string
+  'PLN/UAH': string
+  'PLN/RUB': string
+  'EUR/UAH': string
+}
+
+export type FXRate = {
+  datetime: string
+  exchange_rate: string
+}
+
+export type FXRateHistory<T extends Record<string, string>> = {
+  [K in keyof T]: Array<FXRate>
+}
+
+export type FXFeed = {
+  history: FXRateHistory<FXRates>
+  rates: FXRates
+}
+
+export enum INTEREST_RATES {
+  'NBP Ref.' = 'Stopa referencyjna 1)',
+  'WIBOR 1M' = 'WIBOR 1M',
+  'WIBOR 3M' = 'WIBOR 3M',
+  'WIBOR 6M' = 'WIBOR 6M',
+}
+
+export type InterestRatesKeys = keyof typeof INTEREST_RATES
+export type InterestRateData = {
+  current: string
+  history: Array<{
+    datetime: string
+    rate: string
+  }>
+}
+
+export type InterestRatesFeed = {
+  readonly [K in InterestRatesKeys]: InterestRateData
+}
