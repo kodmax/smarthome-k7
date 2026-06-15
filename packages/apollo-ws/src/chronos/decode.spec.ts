@@ -35,7 +35,7 @@ describe('Chronos decode', () => {
   })
 
   it('range with step', () => {
-    expect(decode(`1-5/2`, 0, 6)).toStrictEqual([1, 3, 5])
+    expect(decode(`1-59/5`, 0, 59)).toStrictEqual([1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56])
   })
 
   it('number with step', () => {
