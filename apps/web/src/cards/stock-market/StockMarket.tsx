@@ -1,5 +1,5 @@
-import zoomBanner from './commodities-zoom.jpg'
-import banner from './commodities.jpg'
+import zoomBanner from './stock-market-zoom.webp'
+import banner from './stock-market.webp'
 import { type FC, useCallback, useMemo } from 'react'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../../apollo-card/ApolloCard'
@@ -20,9 +20,9 @@ export const StockMarket: FC<Record<string, never>> = () => {
       feed !== undefined
         ? feed.tickers
             .map((data): TickerDetails => {
-              const price = data.lastTradePrice
+              const price = data.price.lastTradePrice
 
-              const eg = (+data.priceTarget / +data.lastTradePrice - 1) * 100
+              const eg = (+data.price.oneYearTarget / +data.price.lastTradePrice - 1) * 100
               return {
                 price,
                 eg,
@@ -50,8 +50,8 @@ export const StockMarket: FC<Record<string, never>> = () => {
             {zoom.active ? (
               <thead>
                 <th>Ticker</th>
-                <th>PE</th>
                 <th>EG</th>
+                <th></th>
                 <th>Price</th>
               </thead>
             ) : null}

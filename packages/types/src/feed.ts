@@ -14,13 +14,20 @@ export type EnergyHourConsumption = {
   hour: string
 }
 
+export type StockMarketStatus = 'Open' | 'After-Hours' | 'Closed' | 'Pre-Market'
+
 export type TickerData = {
   ticker: string
   title: string
-  lastTradeTimestamp: string
-  lastTradePrice: string
-  priceTarget: string
-  marketStatus: 'Open'
+  exchange: 'NASDAQ-GS' | 'NYSE'
+  marketStatus: StockMarketStatus
+  price: {
+    lastTradeTimestamp: string
+    lastTradePrice: string
+    netChange: string
+    percentageChange: string
+    oneYearTarget: string
+  }
 }
 
 export type StockMarketFeed = {

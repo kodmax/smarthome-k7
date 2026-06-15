@@ -9,20 +9,20 @@ export type NasdaqApiResponse<T> = {
 }
 
 export type NasdaqApiQuoteInfo = {
-  symbol: 'NVDA'
-  companyName: 'NVIDIA Corporation Common Stock'
+  symbol: string
+  companyName: string
   stockType: 'Common Stock'
-  exchange: 'NASDAQ-GS'
-  isNasdaqListed: true
-  isNasdaq100: true
-  isHeld: false
+  exchange: 'NASDAQ-GS' | 'NYSE'
+  isNasdaqListed: boolean
+  isNasdaq100: boolean
+  isHeld: boolean
   primaryData: {
     lastSalePrice: '$209.70'
     netChange: '+4.51'
     percentageChange: '+2.20%'
     deltaIndicator: 'up'
     lastTradeTimestamp: 'Jun 15, 2026 10:48 AM ET'
-    isRealTime: true
+    isRealTime: boolean
     bidPrice: '$209.70'
     askPrice: '$209.72'
     bidSize: '20'
@@ -30,8 +30,21 @@ export type NasdaqApiQuoteInfo = {
     volume: '40,944,979.092621'
     currency: null
   }
-  secondaryData: null
-  marketStatus: 'Open'
+  secondaryData: null | {
+    lastSalePrice: '$212.45'
+    netChange: '+7.26'
+    percentageChange: '+3.54%'
+    deltaIndicator: 'up'
+    lastTradeTimestamp: 'Closed at Jun 15, 2026 4:00 PM ET'
+    isRealTime: false
+    bidPrice: ''
+    askPrice: ''
+    bidSize: ''
+    askSize: ''
+    volume: ''
+    currency: null
+  }
+  marketStatus: 'Open' | 'After-Hours'
   assetClass: 'STOCKS'
   keyStats: {
     fiftyTwoWeekHighLow: {
