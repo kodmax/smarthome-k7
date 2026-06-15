@@ -2,10 +2,11 @@ import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { myFetch } from '../fetch'
 import { parseHTML } from 'linkedom'
 import { Article, NewsFeed } from '@repo/types'
+import { config } from '../config'
 
 const FEED_URL =
   'https://news.google.com/topics/CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE/sections/CAQiTkNCSVNORG9JYkc5allXeGZkakpDRUd4dlkyRnNYM1l5WDNObFkzUnBiMjV5Q2hJSUwyMHZNRGd4YlY5NkNnb0lMMjB2TURneGJWOG9BQSowCAAqLAgKIiZDQklTRmpvSWJHOWpZV3hmZGpKNkNnb0lMMjB2TURneGJWOG9BQVABUAE?hl=pl&gl=PL&ceid=PL%3Apl'
-const COOKIES = `SOCS=foo`
+const COOKIES = `SOCS=${config.google.socs_cookie}`
 
 export const source: DataSourceDefinition<NewsFeed> = {
   cron: '*/15 * * * *',
