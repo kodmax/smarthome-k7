@@ -16,9 +16,7 @@ export async function myFetch(url: string, extraHeaders?: Record<string, string>
     method,
     headers: {
       accept: 'application/json, */*',
-      'accept-encoding': 'identity',
-      'user-agent': 'Apollo/ws',
-      connection: 'close',
+      'user-agent': 'smarthome-k7',
       host: purl.host,
       ...extraHeaders,
     },
