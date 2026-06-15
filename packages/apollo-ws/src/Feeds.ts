@@ -27,6 +27,8 @@ export class Feeds implements Feeds {
     private cache: Cache,
     private vent: EventEmitter,
   ) {
+    this.chronos = new Chronos(vent)
+
     this.vent.on('feeds-request', feedsIds => {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
@@ -37,7 +39,18 @@ export class Feeds implements Feeds {
       }
     })
 
-    this.chronos = new Chronos(vent)
+    this.vent.addListener('data-update', async (sourceId: string) => {
+      for (const feed of this.feeds.values()) {
+        if (Array.from(feed.sources.values()).find(source => source.getId() === sourceId)) {
+          try {
+            this.vent.emit('sys-log', 7, `Refreshing feed <${feed.feedId}> due to source <${sourceId}> update`)
+            await this.feed(feed.feedId, sourceId)
+          } catch (e) {
+            this.vent.emit('sys-log', 4, `Feed <${feed.feedId}> update error: ${e}`, e)
+          }
+        }
+      }
+    })
   }
 
   private async addDataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>>(
@@ -53,8 +66,6 @@ export class Feeds implements Feeds {
       this.chronos.addJob(definition.cron, definition.id, async () => {
         try {
           await dataSource.getData(true)
-          this.vent.emit('sys-log', 5, `Crontab data source <${definition.id}> update successful`)
-          this.vent.emit('data-update', definition.id)
         } catch (e) {
           this.vent.emit('sys-log', 4, `Crontab data source <${definition.id}> update error: ${e}`, e)
           throw e
@@ -71,7 +82,7 @@ export class Feeds implements Feeds {
 
     await Promise.all(
       Array.from([...feed.sources.entries()]).map(async ([srcName, src]) => {
-        contents[srcName] = triggeredBy === src.getId() ? src.getRecentContent() : await src.getData()
+        contents[srcName] = triggeredBy !== undefined ? src.getRecentContent() : await src.getData()
       }),
     )
 
@@ -113,17 +124,6 @@ export class Feeds implements Feeds {
       cb: callback as unknown as (content: SourceDataTypes<Record<string, DataSourceDefinition<unknown>>>) => unknown,
       sources,
       feedId,
-    })
-
-    this.vent.addListener('data-update', async (sourceId: string) => {
-      if (Array.from(sources.values()).find(source => source.getId() === sourceId)) {
-        try {
-          this.vent.emit('sys-log', 7, `Refreshing feed <${feedId}> due to source <${sourceId}> update`)
-          await this.feed(feedId, sourceId)
-        } catch (e) {
-          this.vent.emit('sys-log', 4, `Feed <${feedId}> update error: ${e}`, e)
-        }
-      }
     })
   }
 }

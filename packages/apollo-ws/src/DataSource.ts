@@ -76,11 +76,11 @@ class DataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>> {
   }
 
   public getRecentContent(): T {
-    if (!this.cacheEntry.isEmpty()) {
-      return this.cacheEntry.getSnapshot().getContent()
-    } else {
+    if (this.cacheEntry.isEmpty()) {
       throw new Error('No recent content')
     }
+
+    return this.cacheEntry.getSnapshot().getContent()
   }
 
   public async getData(forceRefresh = false): Promise<T> {
