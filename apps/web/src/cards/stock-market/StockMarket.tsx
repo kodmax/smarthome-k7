@@ -16,9 +16,9 @@ export const StockMarket: FC<Record<string, never>> = () => {
       feed !== undefined
         ? feed.tickers
             .map((data): TickerDetails => {
-              const price = data.price.spot ?? data.price.overnight ?? data.price.preMarket ?? data.price.atClose
+              const price = data.lastTradePrice
 
-              const eg = (+data.daily.priceTarget.replaceAll(',', '') / +price.replaceAll(',', '') - 1) * 100
+              const eg = (+data.priceTarget / +data.lastTradePrice - 1) * 100
               return {
                 price,
                 eg,
@@ -33,7 +33,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
   if (feed === undefined || tickers === undefined) {
     return (
       <ApolloCard cardId='stock-market' banner={banner} zoomBanner={zoomBanner} height={10}>
-        <TablePlaceholder rows={6} graph={false} value={true} />
+        <TablePlaceholder rows={12} graph={false} value={true} />
       </ApolloCard>
     )
   }
