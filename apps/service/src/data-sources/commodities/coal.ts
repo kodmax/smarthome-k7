@@ -7,15 +7,13 @@ type CoalPrice = {
 }
 
 const fetchCoalPrice = async (): Promise<CoalPrice> => {
-  return myFetch('https://markets.businessinsider.com/commodities/coal-price', { accept: 'text/html' })
-    .then(response => response.toString())
-    .then(html => {
-      const document = parseHTML(html).window.document
+  return myFetch('https://markets.businessinsider.com/commodities/coal-price', { accept: 'text/html' }).then(html => {
+    const document = parseHTML(html).window.document
 
-      return {
-        ton: getNumberContent(document.body, '.price-section__current-value').toFixed(0),
-      }
-    })
+    return {
+      ton: getNumberContent(document.body, '.price-section__current-value').toFixed(0),
+    }
+  })
 }
 
 export type { CoalPrice }

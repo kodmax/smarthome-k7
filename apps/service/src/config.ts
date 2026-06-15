@@ -15,4 +15,7 @@ export const config = {
   cache: {
     dir: process.env.CACHE_DIR,
   },
+  google: {
+    socs_cookie: process.env.GLOOGLE_SOCS_COOKIE,
+  },
 }

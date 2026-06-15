@@ -17,40 +17,38 @@ export const source: DataSourceDefinition<InterestRatesFeed> = {
 
   expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 12,
   script: async () => {
-    const wibor = await myFetch('https://www.bankier.pl/mieszkaniowe/stopy-procentowe/wibor', { accept: 'text/html' })
-      .then(resp => resp.toString())
-      .then(async html => {
-        const rates = [...html.matchAll(irPattern)].map(match => ({
-          period: match[1],
-          interestRate: match[2].replace(',', '.'),
-          delta: match[3].replace(',', '.'),
-        }))
-        const dateMatch = html.match(datePattern)
+    const wibor = await myFetch('https://www.bankier.pl/mieszkaniowe/stopy-procentowe/wibor', {
+      accept: 'text/html',
+    }).then(async html => {
+      const rates = [...html.matchAll(irPattern)].map(match => ({
+        period: match[1],
+        interestRate: match[2].replace(',', '.'),
+        delta: match[3].replace(',', '.'),
+      }))
+      const dateMatch = html.match(datePattern)
 
-        const date = dateMatch === null ? '' : dateMatch[1]
-        return {
-          ...Object.fromEntries(rates.map(rate => [rate.period, { ir: rate.interestRate, delta: rate.delta, date }])),
-        }
-      })
+      const date = dateMatch === null ? '' : dateMatch[1]
+      return {
+        ...Object.fromEntries(rates.map(rate => [rate.period, { ir: rate.interestRate, delta: rate.delta, date }])),
+      }
+    })
 
     const nbp = await myFetch('https://nbp.pl/polityka-pieniezna/decyzje-rpp/podstawowe-stopy-procentowe-nbp/', {
       accept: 'text/html',
+    }).then(async html => {
+      const document = parseHTML(html).window.document
+      return Object.fromEntries(
+        Array.from(document.querySelectorAll('table.nbptable tr'))
+          .map(tr => Array.from(tr.children))
+          .map(([name, value, date]) => [
+            getTextContent(name).trim(),
+            {
+              ir: getTextContent(value).trim().replace(',', '.'),
+              date: getTextContent(date).trim(),
+            },
+          ]),
+      )
     })
-      .then(resp => resp.toString())
-      .then(async html => {
-        const document = parseHTML(html).window.document
-        return Object.fromEntries(
-          Array.from(document.querySelectorAll('table.nbptable tr'))
-            .map(tr => Array.from(tr.children))
-            .map(([name, value, date]) => [
-              getTextContent(name).trim(),
-              {
-                ir: getTextContent(value).trim().replace(',', '.'),
-                date: getTextContent(date).trim(),
-              },
-            ]),
-        )
-      })
 
     const timeWindow = new DateTime(-30, CacheAgeUnit.DAYS).getDateTime()
     const now = new DateTime().getDateTime()

@@ -7,15 +7,13 @@ type OilPrice = {
 }
 
 const fetchOilPrice = async (): Promise<OilPrice> => {
-  return myFetch('https://www.cnbc.com/quotes/@CL.1', { accept: 'text/html' })
-    .then(response => response.toString())
-    .then(html => {
-      const document = parseHTML(html).window.document
+  return myFetch('https://www.cnbc.com/quotes/@CL.1', { accept: 'text/html' }).then(html => {
+    const document = parseHTML(html).window.document
 
-      return {
-        l: (getNumberContent(document.body, '.QuoteStrip-lastPrice') / 159).toFixed(2),
-      }
-    })
+    return {
+      l: (getNumberContent(document.body, '.QuoteStrip-lastPrice') / 159).toFixed(2),
+    }
+  })
 }
 
 export type { OilPrice }

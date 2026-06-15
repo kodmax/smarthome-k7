@@ -11,6 +11,8 @@ declare module 'process' {
 
         readonly LOCATION_LONG: string
         readonly LOCATION_LAT: string
+
+        readonly GLOOGLE_SOCS_COOKIE: string
       }
     }
   }

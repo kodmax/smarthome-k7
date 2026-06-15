@@ -1,5 +1,5 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { jjit } from './jjit'
+import { jjit } from './jjit/jjit'
 import { isRemote, isSalaryAcceptable, noManager, noUwantedSkills } from './filters'
 import { JobAd, JobsFeed } from '@repo/types'
 import { nfj } from './nfj/nfj'

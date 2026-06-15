@@ -10,11 +10,7 @@ export class FetchError<T> extends Error {
   }
 }
 
-export async function myFetch(
-  url: string,
-  extraHeaders?: Record<string, string>,
-  method = 'GET',
-): Promise<Uint8Array<ArrayBuffer>> {
+export async function myFetch(url: string, extraHeaders?: Record<string, string>, method = 'GET'): Promise<string> {
   const purl = new URL(url)
   const req = await fetch(url, {
     method,
@@ -31,5 +27,6 @@ export async function myFetch(
   if (!req.ok) {
     throw new FetchError(req.statusText, req.status, await req.text())
   }
-  return req.bytes()
+
+  return req.text()
 }

@@ -8,16 +8,13 @@ export const source: DataSourceDefinition<Torrent[]> = {
 
   expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 12,
   script: async () => {
-    return await myFetch('https://apibay.org/precompiled/data_top100_207.json').then(async resp =>
-      JSON.parse(resp.toString()),
-    )
+    return await myFetch('https://apibay.org/precompiled/data_top100_207.json').then(async resp => JSON.parse(resp))
   },
 
   push: (push, command) => {
     command.on('search', args => {
       myFetch(`https://apibay.org/q.php?q=${encodeURIComponent(args)}&cat=207`).then(async resp => {
-        const results = JSON.parse(resp.toString())
-        push(results)
+        push(JSON.parse(resp))
       })
     })
   },

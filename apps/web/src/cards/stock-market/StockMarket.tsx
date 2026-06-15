@@ -32,7 +32,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
 
   if (feed === undefined || tickers === undefined) {
     return (
-      <ApolloCard cardId='stock-market' banner={banner} zoomBanner={zoomBanner} height={6}>
+      <ApolloCard cardId='stock-market' banner={banner} zoomBanner={zoomBanner} height={10}>
         <TablePlaceholder rows={6} graph={false} value={true} />
       </ApolloCard>
     )
