@@ -19,7 +19,7 @@ export const source: DataSourceDefinition<NewsFeed> = {
       const articles: Article[] = Array.from(document.querySelectorAll('a[href^="./read"][aria-label]')).map(anchor => {
         return {
           href: new URL(anchor.getAttribute('href') ?? '', 'https://news.google.com').toString(),
-          title: anchor.textContent,
+          title: anchor.textContent ?? '',
         }
       })
 

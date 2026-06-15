@@ -39,8 +39,22 @@ export class Feeds implements Feeds {
       }
     })
 
+    this.vent.on('feeds-refresh', feedsIds => {
+      for (const id of feedsIds) {
+        if (this.feeds.has(id)) {
+          this.refresh(id).catch(e => {
+            this.vent.emit('sys-log', 4, `Feed request error <${id}> update error: ${e}`, e)
+          })
+        }
+      }
+    })
+
     this.vent.addListener('data-update', async (sourceId: string) => {
       for (const feed of this.feeds.values()) {
+        if (feed.sources.size <= 1) {
+          continue
+        }
+
         if (Array.from(feed.sources.values()).find(source => source.getId() === sourceId)) {
           try {
             this.vent.emit('sys-log', 7, `Refreshing feed <${feed.feedId}> due to source <${sourceId}> update`)
@@ -87,6 +101,34 @@ export class Feeds implements Feeds {
     )
 
     return contents
+  }
+
+  private async refreshData(feed: Feed): Promise<Record<string, unknown>> {
+    const contents: Record<string, unknown> = {}
+
+    await Promise.all(
+      Array.from([...feed.sources.entries()]).map(async ([srcName, src]) => {
+        contents[srcName] = await src.getData(true)
+      }),
+    )
+
+    return contents
+  }
+
+  private async refresh(feedId: string): Promise<void> {
+    const feed = this.feeds.get(feedId)
+    if (feed === undefined) {
+      throw new Error(`Feed <${feedId}> not registered.`)
+    }
+
+    try {
+      const content = feed.cb(await this.refreshData(feed))
+
+      this.vent.emit('sys-log', 7, `Feed <${feedId}> update successful.`)
+      this.vent.emit('feed', feedId, content)
+    } catch (e) {
+      this.vent.emit('sys-log', 4, `Feed <${feedId}> callback error.`, e)
+    }
   }
 
   private async feed(feedId: string, triggeredBy?: string): Promise<void> {

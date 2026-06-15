@@ -53,9 +53,9 @@ export class Server {
           this.vent.emit(
             'sys-log',
             6,
-            `Client <${client.socket.remoteAddress}> requests subscription of [ ${[...client.subscriptions.values()]} ].`,
+            `Client <${client.socket.remoteAddress}> requests subscription of [ ${params} ].`,
           )
-          this.vent.emit('feeds-request', client.subscriptions.values())
+          this.vent.emit('feeds-request', params)
         } else if (cmd === 'refresh') {
           const feeds = new Set<string>(params)
 
@@ -64,7 +64,7 @@ export class Server {
             6,
             `Client <${client.socket.remoteAddress}> requests refresh of [ ${[...feeds.values()]} ].`,
           )
-          this.vent.emit('feeds-request', feeds.values())
+          this.vent.emit('feeds-refresh', feeds.values())
         } else if (cmd === 'command') {
           const [sourceId, name, ...args] = params
           const command: DataSourceCommand = {
