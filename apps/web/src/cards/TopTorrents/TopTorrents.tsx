@@ -17,7 +17,11 @@ export const TopTorrents: FC<Record<string, never>> = () => {
   const feed = useFeed<Torrent[]>('top-torrents')
 
   if (feed === undefined) {
-    return <TablePlaceholder rows={4} graph={false} value={false} />
+    return (
+      <ApolloCard cardId='the-pirate' banner={banner} zoomBanner={zoomBanner} height={4}>
+        <TablePlaceholder rows={4} graph={false} value={false} />
+      </ApolloCard>
+    )
   }
 
   return (
