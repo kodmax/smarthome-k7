@@ -12,8 +12,12 @@ export const source: DataSourceDefinition<Torrent[]> = {
   },
 
   push: (push, command) => {
-    command.on('search', args => {
-      myFetch(`https://apibay.org/q.php?q=${encodeURIComponent(args)}&cat=207`).then(async resp => {
+    command.on('search', (query: string) => {
+      myFetch(
+        query !== ''
+          ? `https://apibay.org/q.php?q=${encodeURIComponent(query)}&cat=207`
+          : 'https://apibay.org/precompiled/data_top100_207.json',
+      ).then(async resp => {
         push(JSON.parse(resp))
       })
     })

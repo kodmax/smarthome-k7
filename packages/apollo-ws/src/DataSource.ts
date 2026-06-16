@@ -1,5 +1,6 @@
 import EventEmitter from 'events'
 import { CacheEntry, Snapshot } from './cache'
+import { NoRecentContent } from './Errors'
 
 type DSCT<S> = S extends DataSourceDefinition<infer T> ? T : never
 type DSM<S extends Record<string, DataSourceDefinition<unknown>>> = {
@@ -77,7 +78,7 @@ class DataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>> {
 
   public getRecentContent(): T {
     if (this.cacheEntry.isEmpty()) {
-      throw new Error('No recent content')
+      throw new NoRecentContent()
     }
 
     return this.cacheEntry.getSnapshot().getContent()

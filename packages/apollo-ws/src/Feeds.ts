@@ -3,6 +3,7 @@ import { Chronos } from './chronos'
 import { Cache } from './cache'
 
 import EventEmitter from 'events'
+import { NonErrorException } from './Errors'
 
 type DS = DataSource<DataSourceDefinition<unknown>>
 
@@ -123,6 +124,10 @@ export class Feeds implements Feeds {
       this.vent.emit('sys-log', 7, `Feed <${feedId}> update successful.`)
       this.vent.emit('feed', feedId, content)
     } catch (e) {
+      if (e instanceof NonErrorException) {
+        return
+      }
+
       this.vent.emit('sys-log', 4, `Feed <${feedId}> callback error.`, e)
     }
   }
@@ -139,6 +144,10 @@ export class Feeds implements Feeds {
       this.vent.emit('sys-log', 7, `Feed <${feedId}> update successful.`)
       this.vent.emit('feed', feedId, content)
     } catch (e) {
+      if (e instanceof NonErrorException) {
+        return
+      }
+
       this.vent.emit('sys-log', 4, `Feed <${feedId}> callback error.`, e)
     }
   }
