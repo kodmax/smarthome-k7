@@ -28,6 +28,10 @@ export type TickerData = {
     percentageChange: string
     oneYearTarget: string
   }
+  earningsDate: {
+    confirmed?: string
+    estimated?: string
+  }
 }
 
 export type StockMarketFeed = {

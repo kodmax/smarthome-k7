@@ -1,7 +1,7 @@
 import zoomBanner from './stock-market-zoom.webp'
 import banner from './stock-market.webp'
-import { type FC, useCallback, useMemo } from 'react'
-import { refreshFeeds, useFeed } from '@repo/feed-client'
+import { type FC, useMemo } from 'react'
+import { useFeed } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../../apollo-card/ApolloCard'
 import TablePlaceholder from '../components/TablePlaceholder'
 import { StockMarketFeed } from '@repo/types'
@@ -10,10 +10,6 @@ import { TickerDetails } from './types'
 
 export const StockMarket: FC<Record<string, never>> = () => {
   const feed = useFeed<StockMarketFeed>('stock-market')
-
-  const onZoom = useCallback(() => {
-    refreshFeeds(['stock-market'])
-  }, [])
 
   const tickers = useMemo<TickerDetails[] | undefined>(
     () =>
@@ -43,7 +39,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
   }
 
   return (
-    <ApolloCard cardId='stock-market' banner={banner} zoomBanner={zoomBanner} height={10} onZoom={onZoom}>
+    <ApolloCard cardId='stock-market' banner={banner} zoomBanner={zoomBanner} height={10}>
       <ZoomContext.Consumer>
         {zoom => (
           <table className='apollo-data-table'>

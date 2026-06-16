@@ -9,8 +9,9 @@ import {
   co2Hourly,
   indoorTempHistory,
   jobs,
-  stockMarket,
   news,
+  yahooMarketData,
+  nasdaqMarketData,
 } from './data-sources'
 import { Server, Cache, sysLog, Feeds } from '@repo/apollo-ws'
 import { DPT_Alarm, DPT_HVACMode, DPT_Value_Temp, KnxLink } from 'js-knx'
@@ -25,9 +26,10 @@ import knxTemp from './data-sources/knx/temp'
 import knxCo2 from './data-sources/knx/co2'
 import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
-import { EnergyFeed, JobsFeed, TemperatureData } from '@repo/types'
+import { EnergyFeed, JobsFeed, StockMarketFeed, TemperatureData, TickerData } from '@repo/types'
 import { config } from './config'
 import path from 'node:path'
+import { YahooTickerData } from './data-sources/stock-market/yahoo/types'
 
 Server.listen({}, async apollo => {
   console.log('Feed cache directory:', path.resolve(config.cache.dir))
@@ -43,7 +45,44 @@ Server.listen({}, async apollo => {
   // feeds.addFeed('irs', { irs })
   // feeds.addFeed('fuel', { fuel })
   feeds.addFeed('weather', { weather })
-  feeds.addFeed('stock-market', { stockMarket })
+  feeds.addFeed(
+    'stock-market',
+    { nasdaqMarketData, yahooMarketData },
+    ({ nasdaqMarketData, yahooMarketData }): StockMarketFeed => {
+      const yahooData: Map<string, YahooTickerData> = new Map()
+      for (const tickerData of yahooMarketData) {
+        yahooData.set(tickerData.ticker, tickerData)
+      }
+
+      const tickers: TickerData[] = []
+      for (const nasdaq of nasdaqMarketData) {
+        const yahoo = yahooData.get(nasdaq.ticker)
+        if (yahoo === undefined) {
+          throw new Error('Missing Yahoo ticker data')
+        }
+
+        tickers.push({
+          ticker: nasdaq.ticker,
+          title: nasdaq.title,
+          exchange: nasdaq.exchange,
+          marketStatus: nasdaq.marketStatus,
+          price: {
+            lastTradeTimestamp: nasdaq.price.lastTradeTimestamp,
+            lastTradePrice: nasdaq.price.lastTradePrice,
+            netChange: nasdaq.price.netChange,
+            percentageChange: nasdaq.price.percentageChange,
+            oneYearTarget: yahoo.oneYearPriceTarget,
+          },
+          earningsDate: {
+            confirmed: yahoo.earningsDate.confirmed,
+            estimated: yahoo.earningsDate.estimated,
+          },
+        })
+      }
+      return { tickers }
+    },
+  )
+
   feeds.addFeed('news', { news })
   // feeds.addFeed('fx', { fx })
 

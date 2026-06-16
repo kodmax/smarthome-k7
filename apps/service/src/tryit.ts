@@ -1,7 +1,7 @@
-import { source } from './data-sources/stock-market'
+import { nasdaqMarketData } from './data-sources/stock-market/nasdaq'
 
-source.script().then(stockMarket => {
-  for (const ticker of stockMarket.tickers) {
+nasdaqMarketData.script().then(stockMarket => {
+  for (const ticker of stockMarket) {
     console.log(ticker)
   }
 })
