@@ -51,10 +51,6 @@ export class Feeds implements Feeds {
 
     this.vent.addListener('data-update', async (sourceId: string) => {
       for (const feed of this.feeds.values()) {
-        if (feed.sources.size <= 1) {
-          continue
-        }
-
         if (Array.from(feed.sources.values()).find(source => source.getId() === sourceId)) {
           try {
             this.vent.emit('sys-log', 7, `Refreshing feed <${feed.feedId}> due to source <${sourceId}> update`)

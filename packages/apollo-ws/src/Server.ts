@@ -18,6 +18,8 @@ type Client = {
 
 export class Server {
   public vent: EventEmitter = new EventEmitter()
+  private readonly clients: Set<Client> = new Set<Client>()
+  private readonly feedDebounceTimeout: Map<string, NodeJS.Timeout> = new Map()
 
   public static async listen<T>(
     { port = 3678 }: ApolloWebSocketOptions,
@@ -31,9 +33,34 @@ export class Server {
   }
 
   private constructor(private readonly options: Required<ApolloWebSocketOptions>) {}
+  private feed(id: string, value: unknown): void {
+    const content = JSON.stringify(value)
+
+    const outbox: Promise<Client>[] = []
+    for (const client of this.clients) {
+      if (client.subscriptions.has('*') || client.subscriptions.has(id)) {
+        outbox.push(
+          new Promise((resolve, reject) => {
+            this.vent.emit('sys-log', 7, `Feed Client <${client.socket.remoteAddress}> with <${id}>`)
+            client.ws.send(`FEED ${id} ${content}`, e => (e ? reject(e) : resolve(client)))
+          }),
+        )
+      } else {
+        this.vent.emit('sys-log', 7, `Skip Feed Client <${client.socket.remoteAddress}> with <${id}>`)
+      }
+    }
+
+    Promise.all(outbox)
+      .then(() => {
+        // this.vent.emit('sys-log', 6, `Feed <${id}> broadcast successful. [ ${clients.map(client => `<${client.socket.remoteAddress}>`)} ]`)
+      })
+      .catch(e => {
+        this.vent.emit('sys-log', 4, `Feed <${id}> broadcast error: ${e}`)
+      })
+  }
+
   private connect(): Promise<void> {
     const server = new WebSocketServer({ port: this.options.port })
-    const clients: Set<Client> = new Set<Client>()
 
     server.on('connection', (ws, req) => {
       const client: Client = {
@@ -81,41 +108,29 @@ export class Server {
         }
       })
 
-      clients.add(client)
+      this.clients.add(client)
       ws.on('error', e => {
         this.vent.emit('sys-log', 5, `Client <${client.socket.remoteAddress}> socket error: ` + e.toString(), e)
       })
 
       ws.on('close', () => {
         this.vent.emit('sys-log', 6, `Client <${client.socket.remoteAddress}> disconnected.`)
-        clients.delete(client)
+        this.clients.delete(client)
       })
     })
 
     this.vent.addListener('feed', (id: string, value: unknown) => {
-      const content = JSON.stringify(value)
-
-      const outbox: Promise<Client>[] = []
-      for (const client of clients) {
-        if (client.subscriptions.has('*') || client.subscriptions.has(id)) {
-          outbox.push(
-            new Promise((resolve, reject) => {
-              this.vent.emit('sys-log', 7, `Feed Client <${client.socket.remoteAddress}> with <${id}>`)
-              client.ws.send(`FEED ${id} ${content}`, e => (e ? reject(e) : resolve(client)))
-            }),
-          )
-        } else {
-          this.vent.emit('sys-log', 7, `Skip Feed Client <${client.socket.remoteAddress}> with <${id}>`)
-        }
+      const previousTimeoutId = this.feedDebounceTimeout.get(id)
+      if (previousTimeoutId !== undefined) {
+        clearTimeout(previousTimeoutId)
       }
 
-      Promise.all(outbox)
-        .then(() => {
-          // this.vent.emit('sys-log', 6, `Feed <${id}> broadcast successful. [ ${clients.map(client => `<${client.socket.remoteAddress}>`)} ]`)
-        })
-        .catch(e => {
-          this.vent.emit('sys-log', 4, `Feed <${id}> broadcast error: ${e}`)
-        })
+      this.feedDebounceTimeout.set(
+        id,
+        setTimeout(() => {
+          this.feed(id, value)
+        }, 1000),
+      )
     })
 
     return new Promise((resolve, reject) => {
