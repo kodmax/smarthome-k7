@@ -3,21 +3,31 @@ import { FC } from 'react'
 import { TickerDetails } from '../types'
 import { MarketStatusIcon } from './MarketStatusIcon'
 import { Price } from './Price'
+import { Data } from './styled'
 
 export const Ticker: FC<{ item: TickerDetails; zoom: boolean }> = ({ item, zoom }) => {
+  const earningsDate = new Date(item.data.earningsDate.confirmed ?? item.data.earningsDate.estimated ?? '')
+  const earningsDaysLeft = Math.ceil((earningsDate.getTime() - new Date().getTime()) / 86400000)
+
   return (
     <tr>
-      <td>
+      <Data>
         {item.data.ticker}
         {zoom ? <LinkOpen href={`https://finance.yahoo.com/quote/${item.data.ticker}/`} /> : null}
-      </td>
-      <td style={{ width: '2em' }}>{item.eg.toFixed(0)}%</td>
-      <td style={{ width: '1em', textAlign: 'right' }}>
+      </Data>
+      {zoom ? (
+        <Data sx={{ width: '10em' }}>
+          {earningsDaysLeft > 0 ? earningsDate.toLocaleDateString() : null}
+          {earningsDaysLeft > 0 && earningsDaysLeft <= 30 ? <> ({earningsDaysLeft}d)</> : null}
+        </Data>
+      ) : null}
+      <Data sx={{ width: '4em' }}>{item.eg.toFixed(0)}%</Data>
+      <Data sx={{ width: '1em', textAlign: 'right' }}>
         <MarketStatusIcon marketStatus={item.data.marketStatus} />
-      </td>
-      <td style={{ width: '3em' }}>
+      </Data>
+      <Data sx={{ width: '3em' }}>
         <Price price={item.data.price} />
-      </td>
+      </Data>
     </tr>
   )
 }

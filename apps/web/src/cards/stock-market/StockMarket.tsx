@@ -7,6 +7,8 @@ import TablePlaceholder from '../components/TablePlaceholder'
 import { StockMarketFeed } from '@repo/types'
 import { Ticker } from './Ticker'
 import { TickerDetails } from './types'
+import { TableBody, TableHead } from '@mui/material'
+import { Header } from './Ticker/styled'
 
 export const StockMarket: FC<Record<string, never>> = () => {
   const feed = useFeed<StockMarketFeed>('stock-market')
@@ -44,18 +46,19 @@ export const StockMarket: FC<Record<string, never>> = () => {
         {zoom => (
           <table className='apollo-data-table'>
             {zoom.active ? (
-              <thead>
-                <th>Ticker</th>
-                <th>EG</th>
-                <th></th>
-                <th>Price</th>
-              </thead>
+              <TableHead>
+                <Header>Ticker</Header>
+                <Header>Earnings Date</Header>
+                <Header>EG</Header>
+                <Header></Header>
+                <Header>Price</Header>
+              </TableHead>
             ) : null}
-            <tbody>
+            <TableBody>
               {tickers.map(item => (
                 <Ticker key={item.data.ticker} item={item} zoom={zoom.active} />
               ))}
-            </tbody>
+            </TableBody>
           </table>
         )}
       </ZoomContext.Consumer>
