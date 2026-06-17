@@ -25,6 +25,7 @@ export const Ticker: FC<{ item: TickerDetails; zoom: boolean }> = ({ item, zoom 
       </Data>
       {zoom ? (
         <>
+          <Data sx={{ width: '7em' }}>{item.data.marketCap}</Data>
           <Data sx={{ width: '10em' }}>
             {earningsDaysLeft > 0 ? earningsDate.toLocaleDateString() : null}
             {earningsDaysLeft > 0 && earningsDaysLeft <= 30 ? <> ({earningsDaysLeft}d)</> : null}
@@ -37,7 +38,7 @@ export const Ticker: FC<{ item: TickerDetails; zoom: boolean }> = ({ item, zoom 
       ) : null}
       <Data sx={{ width: '4em' }}>{item.eg.toFixed(0)}%</Data>
       <Data sx={{ width: '1em', textAlign: 'right' }}>
-        <MarketStatusIcon marketStatus={item.data.marketStatus} />
+        <MarketStatusIcon marketStatus={item.data.exchange.status} />
       </Data>
       <Data sx={{ width: '3em' }}>
         <Price price={item.data.price} />

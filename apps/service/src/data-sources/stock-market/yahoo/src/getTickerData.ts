@@ -12,14 +12,17 @@ export const getTickerData = async (ticker: string): Promise<YahooTickerData> =>
   const confirmedEarningsDate = getOptionalStatisticText(mainPage, 'Earnings Date')
   const estimatedEarningsDate = getOptionalStatisticText(mainPage, 'Earnings Date (est.)')
 
-  const trailingPE = toNumber(getText(mainPage, '[data-testid="valuation-measures"] li:nth-child(3) p:nth-child(2)'))
   const forwardPE = toNumber(getText(mainPage, '[data-testid="valuation-measures"] li:nth-child(4) p:nth-child(2)'))
+  const previousClosePrice = toNumber(getStatisticText(mainPage, 'Previous Close'))
   const eps = toNumber(getStatisticText(mainPage, 'EPS (TTM)'))
+
+  const marketCap = getStatisticText(mainPage, 'Market Cap (intraday)')
 
   return {
     ticker,
     oneYearPriceTarget,
-    forwardEPS: !isNaN(forwardPE) && !isNaN(trailingPE) ? +((eps * trailingPE) / forwardPE).toFixed(2) : null,
+    marketCap,
+    forwardEPS: !isNaN(forwardPE) ? previousClosePrice / forwardPE : null,
     trailingEPS: eps,
     earningsDate: {
       confirmed: confirmedEarningsDate,

@@ -14,7 +14,7 @@ export const Jobs: FC<Record<string, never>> = () => {
       <ZoomContext.Consumer>
         {zoom =>
           !feed ? (
-            <TablePlaceholder rows={6} graph={true} value={true} />
+            <TablePlaceholder rows={12} graph={true} value={true} />
           ) : (
             <>
               <table

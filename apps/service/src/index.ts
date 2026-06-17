@@ -66,8 +66,11 @@ Server.listen({}, async apollo => {
         tickers.push({
           ticker: nasdaq.ticker,
           title: nasdaq.title,
-          exchange: nasdaq.exchange,
-          marketStatus: nasdaq.marketStatus,
+          marketCap: yahoo.marketCap,
+          exchange: {
+            name: nasdaq.exchange,
+            status: nasdaq.marketStatus,
+          },
           price: {
             lastTradeTimestamp: nasdaq.price.lastTradeTimestamp,
             lastTradePrice: nasdaq.price.lastTradePrice,
