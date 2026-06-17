@@ -1,6 +1,6 @@
 import { JobAd } from '@repo/types'
 
-export const isRemote: (offer: JobAd) => boolean = offer =>
+export const isHybridOrRemote: (offer: JobAd) => boolean = offer =>
   offer.workplaceType === 'hybrid' || offer.workplaceType === 'remote'
 
 const MIN_SALARY = 25_000
@@ -68,4 +68,8 @@ export const noUwantedSkills: (ad: JobAd) => boolean = ({ requiredSkills }) => {
 
 export const noManager: (ad: JobAd) => boolean = ({ title }) => {
   return !/\bmanager\b/i.test(title)
+}
+
+export const withReact: (ad: JobAd) => boolean = ({ requiredSkills }) => {
+  return requiredSkills.includes('React')
 }
