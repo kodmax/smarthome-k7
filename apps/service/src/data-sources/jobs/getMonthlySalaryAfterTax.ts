@@ -12,7 +12,7 @@ export const getMonthlySalaryAfterTax = (
   unit: SalaryUnit,
   from: number,
   to: number,
-): SalaryRange | undefined => {
+): SalaryRange => {
   switch (contractType) {
     case 'permanent':
       return {

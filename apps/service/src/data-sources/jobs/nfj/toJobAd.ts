@@ -1,6 +1,6 @@
 import { JobAd } from '@repo/types'
 import { NoFluffJobsAd } from './types'
-import { isUnwantedCompany } from '../filters'
+import { isUnwantedCompany } from '../filters/filters'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
 
 export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {

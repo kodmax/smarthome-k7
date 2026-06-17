@@ -1,7 +1,3 @@
-import { nasdaqMarketData } from './data-sources/stock-market/nasdaq'
+import { theprotocol } from './data-sources/jobs/theprotocol'
 
-nasdaqMarketData.script().then(stockMarket => {
-  for (const ticker of stockMarket) {
-    console.log(ticker)
-  }
-})
+theprotocol().then(ads => console.log(ads))

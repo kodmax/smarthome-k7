@@ -1,6 +1,6 @@
 import { JobAd } from '@repo/types'
 import { JustJoinAd } from './types'
-import { isUnwantedCompany } from '../filters'
+import { isUnwantedCompany } from '../filters/filters'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
 
 export const toJobAd = (jjAd: JustJoinAd): JobAd => {

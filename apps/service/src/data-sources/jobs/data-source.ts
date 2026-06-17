@@ -1,8 +1,8 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { jjit } from './jjit/jjit'
-import { isHybridOrRemote, isSalaryAcceptable, noManager, noUwantedSkills, withReact } from './filters'
 import { JobAd, JobsFeed } from '@repo/types'
 import { nfj } from './nfj/nfj'
+import { addAds } from './filters'
 
 export const source: DataSourceDefinition<JobsFeed> = {
   cron: '0 8 * * *',
@@ -11,34 +11,10 @@ export const source: DataSourceDefinition<JobsFeed> = {
   expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 15,
   script: async () => {
     const allAds = new Map<string, JobAd>()
-
-    const jjAds = (await jjit())
-      .filter(noUwantedSkills)
-      .filter(isSalaryAcceptable)
-      .filter(isHybridOrRemote)
-      .filter(noManager)
-      .filter(withReact)
     
-    for (const ad of jjAds) {
-      const uid = `${ad.companyName.toLocaleLowerCase()} -- ${ad.title.toLocaleUpperCase()}`
-      if (!allAds.has(uid)) {
-        allAds.set(uid, ad)
-      }
-    }
-
-    const nfjAds = (await nfj())
-      .filter(noUwantedSkills)
-      .filter(isSalaryAcceptable)
-      .filter(isHybridOrRemote)
-      .filter(noManager)
-      .filter(withReact)
-    
-    for (const ad of nfjAds) {
-      const uid = `${ad.companyName.toLocaleLowerCase()} -- ${ad.title.toLocaleUpperCase()}`
-      if (!allAds.has(uid)) {
-        allAds.set(uid, ad)
-      }
-    }
+    addAds(allAds, await jjit())
+    addAds(allAds, await nfj())
+    // addAds(allAds, await theprotocol())
 
     return {
       ads: [...allAds.values()].sort(

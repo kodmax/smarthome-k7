@@ -211,6 +211,8 @@ export type TemperatureData = {
 export type SalaryUnit = 'Year' | 'Month' | 'Day' | 'Hour'
 export type ContractType = 'permanent' | 'b2b'
 
+export type WorkplaceType = 'office' | 'remote' | 'hybrid'
+export type EmploymentType = 'permanent' | 'b2b'
 export type SalaryRange = {
   from: number
   to: number
@@ -223,11 +225,11 @@ export type JobAd = {
   companyLogoUrl: string
   companyName: string
   requiredSkills: string[]
-  workplaceType: 'office' | 'remote' | 'hybrid'
-  employmentType: 'permanent' | 'b2b'
+  workplaceType: WorkplaceType
+  employmentType: EmploymentType
   monthlySalaryRangeAfterTaxes?: SalaryRange
   isUnwantedCompany: boolean
-  origin: 'jj' | 'nfj'
+  origin: 'jj' | 'nfj' | 'theprotocol'
 }
 
 export type JobsFeed = {
