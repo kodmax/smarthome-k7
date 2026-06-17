@@ -8,7 +8,11 @@ export const Price: FC<{ price: TickerData['price'] }> = ({ price }) => {
 
   return (
     <Box sx={{ fontFamily: 'monospace ' }}>
-      {price.lastTradePrice} <PriceChange dir={priceChangeDirection}>{price.percentageChange}</PriceChange>
+      {price.lastTradePrice.toFixed(2)}{' '}
+      <PriceChange dir={priceChangeDirection}>
+        {priceChangeDirection === 'up' ? '+' : ''}
+        {price.percentageChange.toFixed(2)}%
+      </PriceChange>
     </Box>
   )
 }

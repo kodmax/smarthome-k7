@@ -11,9 +11,9 @@ export const getTickerData = async (ticker: string): Promise<NasdaqTickerData> =
     marketStatus: info.marketStatus,
     price: {
       lastTradeTimestamp: info.primaryData.lastTradeTimestamp,
-      lastTradePrice: (+info.primaryData.lastSalePrice.replaceAll(/^\$|,/g, '')).toFixed(2),
-      percentageChange: info.primaryData.percentageChange,
-      netChange: info.primaryData.netChange,
+      lastTradePrice: +info.primaryData.lastSalePrice.replaceAll(/^\$|,/g, ''),
+      percentageChange: +info.primaryData.percentageChange.replace('%', ''),
+      netChange: +info.primaryData.netChange,
     },
   }
 }

@@ -11,7 +11,7 @@ export const source: DataSourceDefinition<JobsFeed> = {
   expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 15,
   script: async () => {
     const allAds = new Map<string, JobAd>()
-    
+
     addAds(allAds, await jjit())
     addAds(allAds, await nfj())
     // addAds(allAds, await theprotocol())

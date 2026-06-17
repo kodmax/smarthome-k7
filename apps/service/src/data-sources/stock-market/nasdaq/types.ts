@@ -7,8 +7,8 @@ export type NasdaqTickerData = {
   marketStatus: StockMarketStatus
   price: {
     lastTradeTimestamp: string
-    lastTradePrice: string
-    netChange: string
-    percentageChange: string
+    lastTradePrice: number
+    netChange: number
+    percentageChange: number
   }
 }

@@ -23,10 +23,14 @@ export type TickerData = {
   marketStatus: StockMarketStatus
   price: {
     lastTradeTimestamp: string
-    lastTradePrice: string
-    netChange: string
-    percentageChange: string
-    oneYearTarget: string
+    lastTradePrice: number
+    netChange: number
+    percentageChange: number
+    oneYearTarget: number
+  }
+  statistics: {
+    trailingEPS: number
+    forwardEPS: number | null
   }
   earningsDate: {
     confirmed?: string

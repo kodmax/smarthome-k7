@@ -44,7 +44,9 @@ Server.listen({}, async apollo => {
 
   // feeds.addFeed('irs', { irs })
   // feeds.addFeed('fuel', { fuel })
+
   feeds.addFeed('weather', { weather })
+
   feeds.addFeed(
     'stock-market',
     { nasdaqMarketData, yahooMarketData },
@@ -73,12 +75,17 @@ Server.listen({}, async apollo => {
             percentageChange: nasdaq.price.percentageChange,
             oneYearTarget: yahoo.oneYearPriceTarget,
           },
+          statistics: {
+            trailingEPS: yahoo.trailingEPS,
+            forwardEPS: yahoo.forwardEPS,
+          },
           earningsDate: {
             confirmed: yahoo.earningsDate.confirmed,
             estimated: yahoo.earningsDate.estimated,
           },
         })
       }
+
       return { tickers }
     },
   )

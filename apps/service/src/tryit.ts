@@ -1,3 +1,3 @@
-import { theprotocol } from './data-sources/jobs/theprotocol'
+import { getTickerData } from './data-sources/stock-market/yahoo/src'
 
-theprotocol().then(ads => console.log(ads))
+getTickerData('MU').then(data => console.log(data))

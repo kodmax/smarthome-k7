@@ -18,11 +18,8 @@ export const StockMarket: FC<Record<string, never>> = () => {
       feed !== undefined
         ? feed.tickers
             .map((data): TickerDetails => {
-              const price = data.price.lastTradePrice
-
-              const eg = (+data.price.oneYearTarget / +data.price.lastTradePrice - 1) * 100
+              const eg = (data.price.oneYearTarget / data.price.lastTradePrice - 1) * 100
               return {
-                price,
                 eg,
                 data,
               }
@@ -49,6 +46,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
               <TableHead>
                 <Header>Ticker</Header>
                 <Header>Earnings Date</Header>
+                <Header>PE</Header>
                 <Header>EG</Header>
                 <Header></Header>
                 <Header>Price</Header>
