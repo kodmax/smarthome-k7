@@ -1,4 +1,4 @@
-import { CloudflareDNS } from './src/CloudflareDNS'
+import { CloudflareDNS } from './CloudflareDNS'
 
 const TOKEN = process.env.CLOUDFLARE_API_TOKEN ?? ''
 const ZONE_ID = process.env.CLOUDFLARE_ZONE_ID ?? ''
