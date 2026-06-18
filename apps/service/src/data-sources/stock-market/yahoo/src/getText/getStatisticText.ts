@@ -4,7 +4,7 @@ export const getStatisticText = (document: Document, title: string): string => {
     throw new Error('Statistics section not found')
   }
 
-  const value = container.querySelector(`.label[title="${title}"]`)?.nextElementSibling
+  const value = container.querySelector(`.label[title^="${title}"]`)?.nextElementSibling
   if (value === undefined || value === null) {
     throw new Error('Statistic not found: ' + title)
   }

@@ -19,7 +19,7 @@ export type StockMarketStatus = 'Open' | 'After-Hours' | 'Closed' | 'Pre-Market'
 export type TickerData = {
   ticker: string
   title: string
-  marketCap: string
+  marketCap: number
   exchange: {
     name: 'NASDAQ-GS' | 'NYSE'
     status: StockMarketStatus

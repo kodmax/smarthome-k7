@@ -45,12 +45,12 @@ export const StockMarket: FC<Record<string, never>> = () => {
             {zoom.active ? (
               <TableHead>
                 <Header>Ticker</Header>
-                <Header>Market Cap.</Header>
+                <Header>M. Cap. (B)</Header>
                 <Header>Earnings Date</Header>
                 <Header>PE</Header>
                 <Header>EG</Header>
                 <Header></Header>
-                <Header>Price</Header>
+                <Header sx={{ textAlign: 'center' }}>Price</Header>
               </TableHead>
             ) : null}
             <TableBody>

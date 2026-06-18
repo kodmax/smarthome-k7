@@ -3,6 +3,7 @@ import { getOptionalStatisticText } from './getText/getOptionalStatisticText'
 import { toNumber } from './toNumber'
 import { getDocument } from './getDocument'
 import { YahooTickerData } from '../types'
+import { convertMarketCap } from './convertToBillions'
 
 export const getTickerData = async (ticker: string): Promise<YahooTickerData> => {
   const mainPage = await getDocument(ticker)
@@ -16,12 +17,12 @@ export const getTickerData = async (ticker: string): Promise<YahooTickerData> =>
   const previousClosePrice = toNumber(getStatisticText(mainPage, 'Previous Close'))
   const eps = toNumber(getStatisticText(mainPage, 'EPS (TTM)'))
 
-  const marketCap = getStatisticText(mainPage, 'Market Cap (intraday)')
+  const marketCap = getStatisticText(mainPage, 'Market Cap')
 
   return {
     ticker,
     oneYearPriceTarget,
-    marketCap,
+    marketCap: convertMarketCap(marketCap),
     forwardEPS: !isNaN(forwardPE) ? previousClosePrice / forwardPE : null,
     trailingEPS: eps,
     earningsDate: {

@@ -3,7 +3,7 @@ export type YahooTickerData = {
   oneYearPriceTarget: number
   trailingEPS: number
   forwardEPS: number | null
-  marketCap: string
+  marketCap: number
   earningsDate: {
     confirmed?: string
     estimated?: string
