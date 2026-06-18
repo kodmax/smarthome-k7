@@ -41,7 +41,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
     <ApolloCard cardId='stock-market' banner={banner} zoomBanner={zoomBanner} height={10}>
       <ZoomContext.Consumer>
         {zoom => (
-          <table className='apollo-data-table' style={zoom.active ? { fontSize: '0.8em', lineHeight: 1.2 } : undefined}>
+          <table className='apollo-data-table' style={zoom.active ? { fontSize: '0.6em', lineHeight: 1.2 } : undefined}>
             {zoom.active ? (
               <TableHead>
                 <Header>Ticker</Header>
