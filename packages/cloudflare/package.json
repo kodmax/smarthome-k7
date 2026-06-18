@@ -1,0 +1,15 @@
+{
+  "name": "cloudflare",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc && bun build src/index.ts --target=node --format=cjs --outdir=./dist",
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3"
+  }
+}

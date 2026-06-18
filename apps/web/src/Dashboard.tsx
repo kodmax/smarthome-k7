@@ -30,10 +30,10 @@ export const Dashboard: FC<Record<string, never>> = () => {
         <Grid item xs={12} sm={12} md={12} xl={12}>
           <WeatherForecast />
         </Grid>
-        <Grid item xs={12} sm={12} md={3} xl={3}>
+        <Grid item xs={12} sm={12} md={4} xl={4}>
           <TopTorrents />
         </Grid>
-        <Grid item xs={12} sm={12} md={9} xl={9}>
+        <Grid item xs={12} sm={12} md={8} xl={8}>
           <HourlyWeatherForecast />
         </Grid>
         <Grid item xs={12} sm={12} md={4} xl={4}>
