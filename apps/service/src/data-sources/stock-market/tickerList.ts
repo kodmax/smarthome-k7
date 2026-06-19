@@ -45,4 +45,9 @@ export const tickerList = [
   'UBER',
   'V',
   'WDC',
+  'IONQ',
+  'QBTS',
+  'RGTI',
+  'IBM',
+  'GFS',
 ]
