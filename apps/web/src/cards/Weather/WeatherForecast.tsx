@@ -1,10 +1,10 @@
 import banner from './card-banners/weather-forecast-long.jpg'
-import { Day, DayPlaceholder } from './Day'
+import { Day, WeekContainer } from './Day'
 import ApolloCard from '../../apollo-card/ApolloCard'
 import { useFeed } from '@repo/feed-client'
 import { type FC } from 'react'
-import { DayWrapper, WeekContainer } from './WeekView'
 import { DayWeatherForecast, WeatherFeed } from '@repo/types'
+import {} from './Day/styled'
 
 const dows = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'niedz.']
 
@@ -18,7 +18,7 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
         <div style={{ paddingTop: '0.5em', paddingBottom: '1em' }}>
           <WeekContainer>
             {placeholders.map((_, i) => (
-              <DayPlaceholder key={i} />
+              <Day key={i} />
             ))}
           </WeekContainer>
         </div>
@@ -33,7 +33,7 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
       <div style={{ paddingTop: '0.5em', paddingBottom: '1em' }}>
         <WeekContainer>
           {passedDays.map((_, i) => (
-            <DayWrapper key={i} />
+            <Day key={i} />
           ))}
           {feed.forecast.map((day: DayWeatherForecast) => (
             <Day key={day.date} forecast={day} />

@@ -48,6 +48,5 @@ export const tickerList = [
   'IONQ',
   'QBTS',
   'RGTI',
-  'IBM',
   'GFS',
 ]
