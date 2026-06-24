@@ -38,7 +38,9 @@ export const Ticker: FC<{ item: TickerDetails; zoom: boolean }> = ({ item, zoom 
           </Data>
         </>
       ) : null}
-      <Data sx={{ width: '4em' }}>{item.eg.toFixed(0)}%</Data>
+      <Data sx={{ width: '4em' }}>
+        {item.eg.toFixed(0)}% ({item.priceTarget.toFixed(2)})
+      </Data>
       <Data sx={{ width: '1em', textAlign: 'center', paddingRight: 0 }}>
         <MarketStatusIcon marketStatus={item.data.exchange.status} />
       </Data>

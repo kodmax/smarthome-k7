@@ -17,10 +17,20 @@ export type EnergyHourConsumption = {
 export type StockMarketStatus = 'Open' | 'After-Hours' | 'Closed' | 'Pre-Market'
 
 export type QuoteSummary = {
-  priceTargetChange: {
+  ratingsCount: {
     last90days: number
     last30days: number
     last7days: number
+  }
+  priceTarget: {
+    last90days: number | null
+    last30days: number | null
+    last7days: number | null
+  }
+  priceTargetChange: {
+    last90days: number | null
+    last30days: number | null
+    last7days: number | null
   }
 }
 

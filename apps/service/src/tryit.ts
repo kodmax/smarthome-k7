@@ -1,3 +1,3 @@
 import { getTickerData } from './data-sources/stock-market/yahoo/src'
 
-getTickerData('WDC').then(data => console.log(data))
+getTickerData('MU').then(data => console.log(data))

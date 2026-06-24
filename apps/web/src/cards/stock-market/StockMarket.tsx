@@ -6,28 +6,13 @@ import ApolloCard, { ZoomContext } from '../../apollo-card/ApolloCard'
 import TablePlaceholder from '../components/TablePlaceholder'
 import { StockMarketFeed } from '@repo/types'
 import { Ticker } from './Ticker'
-import { TickerDetails } from './types'
 import { TableBody, TableHead } from '@mui/material'
 import { Header } from './Ticker/styled'
+import { useTickers } from './useTickers'
 
 export const StockMarket: FC<Record<string, never>> = () => {
   const feed = useFeed<StockMarketFeed>('stock-market')
-
-  const tickers = useMemo<TickerDetails[] | undefined>(
-    () =>
-      feed !== undefined
-        ? feed.tickers
-            .map((data): TickerDetails => {
-              const eg = (data.price.oneYearTarget / data.price.lastTradePrice - 1) * 100
-              return {
-                eg,
-                data,
-              }
-            })
-            .sort((a, b) => +b.eg - +a.eg)
-        : undefined,
-    [feed],
-  )
+  const tickers = useTickers(feed)
 
   if (feed === undefined || tickers === undefined) {
     return (

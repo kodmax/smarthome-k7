@@ -1,15 +1,14 @@
 import { Rating } from './types'
 
-export const getPriceTargetChange = (ratingHistory: Rating[], days: number): number => {
-  const minTimestamp = new Date().getTime() / 1000 - days * 24 * 3_600
-  const inRangeRatings = ratingHistory.filter(
-    item => item.epochGradeDate >= minTimestamp && item.priceTargetAction !== 'Announces',
-  )
+const MIN_LENGTH = 5
 
-  if (inRangeRatings.length === 0) {
-    return 0
+export const getPriceTargetChange = (ratingHistory: Rating[]): number | null => {
+  const validRatings = ratingHistory.filter(item => item.currentPriceTarget > 0 && item.priorPriceTarget > 0)
+
+  if (validRatings.length <= MIN_LENGTH) {
+    return null
   }
 
-  const s = inRangeRatings.reduce((a, c) => a + c.currentPriceTarget / c.priorPriceTarget, 0)
-  return s / inRangeRatings.length - 1
+  const s = validRatings.reduce((a, c) => a + c.currentPriceTarget / c.priorPriceTarget, 0)
+  return s / validRatings.length - 1
 }
