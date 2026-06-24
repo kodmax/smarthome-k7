@@ -1,51 +1,48 @@
 import LinkOpen from '../../components/LinkOpen'
 import { FC } from 'react'
-import { TickerDetails } from '../types'
 import { MarketStatusIcon } from './MarketStatusIcon'
 import { Price } from './Price'
 import { Data } from './styled'
+import { TickerData } from '@repo/types'
+import { useTickerDetails } from './useTickerDetails'
 
-export const Ticker: FC<{ item: TickerDetails; zoom: boolean }> = ({ item, zoom }) => {
-  const earningsDate = new Date(item.data.earningsDate.confirmed ?? item.data.earningsDate.estimated ?? '')
-  const earningsDaysLeft = Math.ceil((earningsDate.getTime() - new Date().getTime()) / 86400000)
-
-  const trailingPE =
-    item.data.statistics.trailingEPS > 0 ? item.data.price.lastTradePrice / item.data.statistics.trailingEPS : undefined
-
-  const forwardPE =
-    item.data.statistics.forwardEPS !== null && item.data.statistics.forwardEPS > 0
-      ? item.data.price.lastTradePrice / item.data.statistics.forwardEPS
-      : undefined
+export const Ticker: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
+  const details = useTickerDetails(ticker)
 
   return (
     <tr>
       <Data>
-        {item.data.ticker}
-        {zoom ? <LinkOpen href={`https://finance.yahoo.com/quote/${item.data.ticker}/`} /> : null}
+        {ticker.symbol}
+        {zoom ? <LinkOpen href={`https://finance.yahoo.com/quote/${ticker.symbol}/`} /> : null}
       </Data>
       {zoom ? (
         <>
           <Data sx={{ width: '4em', fontFamily: 'monospace', textAlign: 'right', padding: '0 32px' }}>
-            {Math.round(item.data.marketCap)}
+            {Math.round(ticker.marketCap)}
           </Data>
           <Data sx={{ width: '10em' }}>
-            {earningsDaysLeft > 0 ? earningsDate.toLocaleDateString() : null}
-            {earningsDaysLeft > 0 && earningsDaysLeft <= 30 ? <> ({earningsDaysLeft}d)</> : null}
+            {details.earningsDaysLeft > 0 ? details.earningsDate.toLocaleDateString() : null}
+            {details.earningsDaysLeft > 0 && details.earningsDaysLeft <= 30 ? (
+              <> ({details.earningsDaysLeft}d)</>
+            ) : null}
           </Data>
           <Data sx={{ width: '7em' }}>
-            {trailingPE !== undefined ? trailingPE.toFixed(0) : '--'} →{' '}
-            {forwardPE !== undefined ? forwardPE.toFixed(0) : '--'}
+            {details.trailingPE !== null ? details.trailingPE.toFixed(0) : '--'} →{' '}
+            {details.forwardPEAtPriceTarget !== null ? details.forwardPEAtPriceTarget.toFixed(0) : '--'}{' '}
           </Data>
         </>
       ) : null}
       <Data sx={{ width: '4em' }}>
-        {item.eg.toFixed(0)}% ({item.priceTarget.toFixed(2)})
+        {ticker.price.eg !== null ? ticker.price.eg.toFixed(0) : '--'}% (
+        {ticker.price.priceTarget !== null ? ticker.price.priceTarget.toFixed(2) : '--'}
+        {' / '}
+        {details.trailingPEAtPriceTarget !== null ? details.trailingPEAtPriceTarget.toFixed(0) : '--'})
       </Data>
       <Data sx={{ width: '1em', textAlign: 'center', paddingRight: 0 }}>
-        <MarketStatusIcon marketStatus={item.data.exchange.status} />
+        <MarketStatusIcon marketStatus={ticker.exchange.status} />
       </Data>
       <Data sx={{ width: '8em' }}>
-        <Price price={item.data.price} />
+        <Price price={ticker.price} />
       </Data>
     </tr>
   )

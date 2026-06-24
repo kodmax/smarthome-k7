@@ -2,7 +2,7 @@ import { QuoteSummary } from '@repo/types'
 
 export type YahooTickerData = {
   ticker: string
-  oneYearPriceTarget: number
+  oneYearPriceTarget: number | null
   trailingEPS: number
   forwardEPS: number | null
   marketCap: number

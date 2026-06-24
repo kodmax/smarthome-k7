@@ -12,7 +12,7 @@ export type Rating = {
 export type RatingPeriod = '7d' | '30d' | '90d'
 
 export type YahooQuoteSummary = {
-  upgradeDowngradeHistory: {
+  upgradeDowngradeHistory?: {
     history: Rating[]
   }
 }

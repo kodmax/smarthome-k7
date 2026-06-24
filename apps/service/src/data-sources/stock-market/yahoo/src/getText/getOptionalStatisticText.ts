@@ -10,8 +10,8 @@ export const getOptionalStatisticText = (document: Document, title: string): str
   }
 
   const text = value.textContent
-  if (text === null) {
-    throw new Error('Statistic has no text content: ' + title)
+  if (text === null || text === '--') {
+    return undefined
   }
 
   return text.trim()

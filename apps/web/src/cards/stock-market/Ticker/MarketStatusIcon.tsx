@@ -1,8 +1,8 @@
 import { Bedtime, Circle, WbSunny } from '@mui/icons-material'
-import { StockMarketStatus } from '@repo/types'
+import { ExchangeStatus } from '@repo/types'
 import { FC } from 'react'
 
-export const MarketStatusIcon: FC<{ marketStatus: StockMarketStatus }> = ({ marketStatus }) => {
+export const MarketStatusIcon: FC<{ marketStatus: ExchangeStatus }> = ({ marketStatus }) => {
   switch (marketStatus) {
     case 'Open':
       return <Circle sx={{ fontSize: '1em', color: 'green' }} />

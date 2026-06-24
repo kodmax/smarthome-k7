@@ -11,7 +11,7 @@ export const getQuoteSumary = (document: Document, ticker: string): QuoteSummary
     `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${ticker}`,
   )
   const quoteSummary = financials.quoteSummary.result[0]
-  const ratingHistory = quoteSummary.upgradeDowngradeHistory.history
+  const ratingHistory = quoteSummary.upgradeDowngradeHistory?.history ?? []
 
   const last90daysRatings = getLastRatings(ratingHistory, 90)
   const last30daysRatings = getLastRatings(last90daysRatings, 30)

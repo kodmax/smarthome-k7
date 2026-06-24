@@ -14,7 +14,7 @@ export type EnergyHourConsumption = {
   hour: string
 }
 
-export type StockMarketStatus = 'Open' | 'After-Hours' | 'Closed' | 'Pre-Market'
+export type ExchangeStatus = 'Open' | 'After-Hours' | 'Closed' | 'Pre-Market'
 
 export type QuoteSummary = {
   ratingsCount: {
@@ -35,19 +35,21 @@ export type QuoteSummary = {
 }
 
 export type TickerData = {
-  ticker: string
+  symbol: string
   title: string
   marketCap: number
   exchange: {
     name: 'NASDAQ-GS' | 'NYSE'
-    status: StockMarketStatus
+    status: ExchangeStatus
   }
   price: {
     lastTradeTimestamp: string
     lastTradePrice: number
     netChange: number
     percentageChange: number
-    oneYearTarget: number
+    oneYearTarget: number | null
+    priceTarget: number | null
+    eg: number | null
   }
   statistics: {
     trailingEPS: number

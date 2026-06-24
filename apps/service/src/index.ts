@@ -26,10 +26,10 @@ import knxTemp from './data-sources/knx/temp'
 import knxCo2 from './data-sources/knx/co2'
 import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
-import { EnergyFeed, JobsFeed, StockMarketFeed, TemperatureData, TickerData } from '@repo/types'
+import { EnergyFeed, JobsFeed, TemperatureData } from '@repo/types'
 import { config } from './config'
 import path from 'node:path'
-import { YahooTickerData } from './data-sources/stock-market/yahoo/types'
+import { addStockMarketFeed } from './feeds'
 
 Server.listen({}, async apollo => {
   console.log('Feed cache directory:', path.resolve(config.cache.dir))
@@ -47,203 +47,10 @@ Server.listen({}, async apollo => {
 
   feeds.addFeed('weather', { weather })
 
-  feeds.addFeed(
-    'stock-market',
-    { nasdaqMarketData, yahooMarketData },
-    ({ nasdaqMarketData, yahooMarketData }): StockMarketFeed => {
-      const yahooData: Map<string, YahooTickerData> = new Map()
-      for (const tickerData of yahooMarketData) {
-        yahooData.set(tickerData.ticker, tickerData)
-      }
-
-      const tickers: TickerData[] = []
-      for (const nasdaq of nasdaqMarketData) {
-        const yahoo = yahooData.get(nasdaq.ticker)
-        if (yahoo === undefined) {
-          throw new Error('Missing Yahoo ticker data')
-        }
-
-        tickers.push({
-          ticker: nasdaq.ticker,
-          title: nasdaq.title,
-          marketCap: yahoo.marketCap,
-          exchange: {
-            name: nasdaq.exchange,
-            status: nasdaq.marketStatus,
-          },
-          price: {
-            lastTradeTimestamp: nasdaq.price.lastTradeTimestamp,
-            lastTradePrice: nasdaq.price.lastTradePrice,
-            netChange: nasdaq.price.netChange,
-            percentageChange: nasdaq.price.percentageChange,
-            oneYearTarget: yahoo.oneYearPriceTarget,
-          },
-          statistics: {
-            trailingEPS: yahoo.trailingEPS,
-            forwardEPS: yahoo.forwardEPS,
-          },
-          earningsDate: {
-            confirmed: yahoo.earningsDate.confirmed,
-            estimated: yahoo.earningsDate.estimated,
-          },
-          quoteSummary: yahoo.quoteSummary,
-        })
-      }
-
-      return { tickers }
-    },
-  )
+  addStockMarketFeed(feeds)
 
   feeds.addFeed('news', { news })
   // feeds.addFeed('fx', { fx })
-
-  console.log('Establishing KNX connection ...')
-  await KnxLink.connect('192.168.1.8', { events: knxEvents }).then(async knx => {
-    console.log('KNX connection established.')
-    process.on('SIGTERM', () => {
-      knx.disconnect().then(() => process.exit(0))
-      console.log('SIGTERM. Exiting.')
-    })
-
-    const heatersReadings = {
-      bathroomState: knxB1(
-        'home.heating.lazienka.water-heating',
-        knx.getDatapoint(heating['Grzejniki wodne']['Lazienka stan']),
-      ),
-      bathroomFloorState: knxB1(
-        'home.heating.lazienka.floor-heating',
-        knx.getDatapoint(heating['Podłoga Łazienka'].state),
-      ),
-      livingRoomState: knxB1(
-        'home.heating.salon.water-heating',
-        knx.getDatapoint(heating['Grzejniki wodne']['Salon stan']),
-      ),
-      bedroomState: knxB1(
-        'home.heating.sypialnia.water-heating',
-        knx.getDatapoint(heating['Grzejniki wodne']['Sypialnia stan']),
-      ),
-    }
-    const hvacModes = {
-      livingroomMode: KnxHVACMode(
-        'home.heating.hvacmode.living-room',
-        knx.getDatapoint({ DataType: DPT_HVACMode, address: '2/0/4' }),
-      ),
-      bathroomMode: KnxHVACMode(
-        'home.heating.hvacmode.living-room',
-        knx.getDatapoint({ DataType: DPT_HVACMode, address: '2/1/4' }),
-      ),
-      bedroomMode: KnxHVACMode(
-        'home.heating.hvacmode.living-room',
-        knx.getDatapoint({ DataType: DPT_HVACMode, address: '2/2/4' }),
-      ),
-    }
-    feeds.addFeed(
-      'heating',
-      { ...heatersReadings, ...hvacModes },
-      (readings): TemperatureData => ({
-        status: {
-          lazienka: readings.bathroomState,
-          lazienkaPodloga: readings.bathroomFloorState,
-          sypialnia: readings.bedroomState,
-          salon: readings.livingRoomState,
-        },
-        mode: {
-          livingroom: readings.livingroomMode,
-          bathroom: readings.bathroomMode,
-          bedroom: readings.bedroomMode,
-        },
-      }),
-    )
-
-    const energyReadings = {
-      total: knxEnergy('home.energy-consumption.meter-total-reading', knx.getDatapoint(energy.Total.reading)),
-      instant: knxPower('home.power-draw', knx.getDatapoint(energy.InstantPowerDraw.reading)),
-      meter: knxEnergy('energy.meter', knx.getDatapoint(energy['Intermediate Consumption Meter'].Reading)),
-    }
-
-    feeds.addFeed(
-      'energy',
-      { energyCost, energyConsumption, ...energyReadings },
-      ({ energyCost, total, instant, energyConsumption, meter }): EnergyFeed => ({
-        total: { ...total, adjusted: total.value + 12307130 + 181000 },
-        today: {
-          value: total.value - energyConsumption.startOfDayValue,
-          bars: energyConsumption.bars,
-        },
-        cost: energyCost,
-        instant,
-        meter,
-      }),
-    )
-
-    const co2Level = knxCo2('home.air-quality.co2', knx.getDatapoint(airQuality.CO2.reading))
-    const co2Alert = knxB1('home.air-quality.co2-alert', knx.getDatapoint({ address: '2/5/1', DataType: DPT_Alarm }))
-    feeds.addFeed('home.air-quality.co2', { co2Hourly, co2Level, co2Alert }, ({ co2Level, co2Hourly, co2Alert }) => {
-      return {
-        alert: co2Alert,
-        ...co2Level,
-        ...co2Hourly,
-      }
-    })
-
-    feeds.addFeed('home.air-quality.humidity', {
-      humidityReading: knxHumidity('home.air-quality.humidity', knx.getDatapoint(airQuality.Wilgotność.reading)),
-    })
-
-    feeds.addFeed(
-      'home.temp.bathroom-floor',
-      {
-        bathroomFloor: knxTemp('temp.bathroom-floor', knx.getDatapoint(temp['Podloga lazienka temperatura'])),
-        indoorTempHistory,
-      },
-      ({ bathroomFloor, indoorTempHistory }) => ({
-        history: indoorTempHistory['bathroomFloor'],
-        ...bathroomFloor,
-      }),
-    )
-
-    feeds.addFeed(
-      'home.temp.bedroom',
-      {
-        bedroomHal: knxTemp('temp.bedroom', knx.getDatapoint(temp['Sypialnia hol'])),
-        setpoint: knxTemp('temp.bedroom.setpoint', knx.getDatapoint({ address: '2/2/0', DataType: DPT_Value_Temp })),
-        indoorTempHistory,
-      },
-      ({ bedroomHal, indoorTempHistory, setpoint }) => ({
-        history: indoorTempHistory['bedroom'],
-        setpoint: setpoint.value.toFixed(1),
-        ...bedroomHal,
-      }),
-    )
-
-    feeds.addFeed(
-      'home.temp.livingroom',
-      {
-        dining: knxTemp('temp.livingroom', knx.getDatapoint(temp['Jadalnia'])),
-        setpoint: knxTemp('temp.bedroom.setpoint', knx.getDatapoint({ address: '2/0/0', DataType: DPT_Value_Temp })),
-        indoorTempHistory,
-      },
-      ({ dining, indoorTempHistory, setpoint }) => ({
-        history: indoorTempHistory['livingroom'],
-        setpoint: setpoint.value.toFixed(1),
-        ...dining,
-      }),
-    )
-
-    feeds.addFeed(
-      'home.temp.bathroom',
-      {
-        bathroom: knxTemp('temp.bathroom', knx.getDatapoint(temp.Lazienka)),
-        setpoint: knxTemp('temp.bedroom.setpoint', knx.getDatapoint({ address: '2/1/0', DataType: DPT_Value_Temp })),
-        indoorTempHistory,
-      },
-      ({ bathroom, indoorTempHistory, setpoint }) => ({
-        history: indoorTempHistory['bathroom'],
-        setpoint: setpoint.value.toFixed(1),
-        ...bathroom,
-      }),
-    )
-  })
 
   feeds.addFeed('jobs', { jobs }, ({ jobs }): JobsFeed => {
     return jobs
@@ -279,4 +86,154 @@ Server.listen({}, async apollo => {
   //     },
   //   }
   // })
+
+  if (process.env.NO_KNX !== '1') {
+    console.log('Establishing KNX connection ...')
+    await KnxLink.connect('192.168.1.8', { events: knxEvents }).then(async knx => {
+      console.log('KNX connection established.')
+      process.on('SIGTERM', () => {
+        knx.disconnect().then(() => process.exit(0))
+        console.log('SIGTERM. Exiting.')
+      })
+
+      const heatersReadings = {
+        bathroomState: knxB1(
+          'home.heating.lazienka.water-heating',
+          knx.getDatapoint(heating['Grzejniki wodne']['Lazienka stan']),
+        ),
+        bathroomFloorState: knxB1(
+          'home.heating.lazienka.floor-heating',
+          knx.getDatapoint(heating['Podłoga Łazienka'].state),
+        ),
+        livingRoomState: knxB1(
+          'home.heating.salon.water-heating',
+          knx.getDatapoint(heating['Grzejniki wodne']['Salon stan']),
+        ),
+        bedroomState: knxB1(
+          'home.heating.sypialnia.water-heating',
+          knx.getDatapoint(heating['Grzejniki wodne']['Sypialnia stan']),
+        ),
+      }
+      const hvacModes = {
+        livingroomMode: KnxHVACMode(
+          'home.heating.hvacmode.living-room',
+          knx.getDatapoint({ DataType: DPT_HVACMode, address: '2/0/4' }),
+        ),
+        bathroomMode: KnxHVACMode(
+          'home.heating.hvacmode.living-room',
+          knx.getDatapoint({ DataType: DPT_HVACMode, address: '2/1/4' }),
+        ),
+        bedroomMode: KnxHVACMode(
+          'home.heating.hvacmode.living-room',
+          knx.getDatapoint({ DataType: DPT_HVACMode, address: '2/2/4' }),
+        ),
+      }
+      feeds.addFeed(
+        'heating',
+        { ...heatersReadings, ...hvacModes },
+        (readings): TemperatureData => ({
+          status: {
+            lazienka: readings.bathroomState,
+            lazienkaPodloga: readings.bathroomFloorState,
+            sypialnia: readings.bedroomState,
+            salon: readings.livingRoomState,
+          },
+          mode: {
+            livingroom: readings.livingroomMode,
+            bathroom: readings.bathroomMode,
+            bedroom: readings.bedroomMode,
+          },
+        }),
+      )
+
+      const energyReadings = {
+        total: knxEnergy('home.energy-consumption.meter-total-reading', knx.getDatapoint(energy.Total.reading)),
+        instant: knxPower('home.power-draw', knx.getDatapoint(energy.InstantPowerDraw.reading)),
+        meter: knxEnergy('energy.meter', knx.getDatapoint(energy['Intermediate Consumption Meter'].Reading)),
+      }
+
+      feeds.addFeed(
+        'energy',
+        { energyCost, energyConsumption, ...energyReadings },
+        ({ energyCost, total, instant, energyConsumption, meter }): EnergyFeed => ({
+          total: { ...total, adjusted: total.value + 12307130 + 181000 },
+          today: {
+            value: total.value - energyConsumption.startOfDayValue,
+            bars: energyConsumption.bars,
+          },
+          cost: energyCost,
+          instant,
+          meter,
+        }),
+      )
+
+      const co2Level = knxCo2('home.air-quality.co2', knx.getDatapoint(airQuality.CO2.reading))
+      const co2Alert = knxB1('home.air-quality.co2-alert', knx.getDatapoint({ address: '2/5/1', DataType: DPT_Alarm }))
+      feeds.addFeed('home.air-quality.co2', { co2Hourly, co2Level, co2Alert }, ({ co2Level, co2Hourly, co2Alert }) => {
+        return {
+          alert: co2Alert,
+          ...co2Level,
+          ...co2Hourly,
+        }
+      })
+
+      feeds.addFeed('home.air-quality.humidity', {
+        humidityReading: knxHumidity('home.air-quality.humidity', knx.getDatapoint(airQuality.Wilgotność.reading)),
+      })
+
+      feeds.addFeed(
+        'home.temp.bathroom-floor',
+        {
+          bathroomFloor: knxTemp('temp.bathroom-floor', knx.getDatapoint(temp['Podloga lazienka temperatura'])),
+          indoorTempHistory,
+        },
+        ({ bathroomFloor, indoorTempHistory }) => ({
+          history: indoorTempHistory['bathroomFloor'],
+          ...bathroomFloor,
+        }),
+      )
+
+      feeds.addFeed(
+        'home.temp.bedroom',
+        {
+          bedroomHal: knxTemp('temp.bedroom', knx.getDatapoint(temp['Sypialnia hol'])),
+          setpoint: knxTemp('temp.bedroom.setpoint', knx.getDatapoint({ address: '2/2/0', DataType: DPT_Value_Temp })),
+          indoorTempHistory,
+        },
+        ({ bedroomHal, indoorTempHistory, setpoint }) => ({
+          history: indoorTempHistory['bedroom'],
+          setpoint: setpoint.value.toFixed(1),
+          ...bedroomHal,
+        }),
+      )
+
+      feeds.addFeed(
+        'home.temp.livingroom',
+        {
+          dining: knxTemp('temp.livingroom', knx.getDatapoint(temp['Jadalnia'])),
+          setpoint: knxTemp('temp.bedroom.setpoint', knx.getDatapoint({ address: '2/0/0', DataType: DPT_Value_Temp })),
+          indoorTempHistory,
+        },
+        ({ dining, indoorTempHistory, setpoint }) => ({
+          history: indoorTempHistory['livingroom'],
+          setpoint: setpoint.value.toFixed(1),
+          ...dining,
+        }),
+      )
+
+      feeds.addFeed(
+        'home.temp.bathroom',
+        {
+          bathroom: knxTemp('temp.bathroom', knx.getDatapoint(temp.Lazienka)),
+          setpoint: knxTemp('temp.bedroom.setpoint', knx.getDatapoint({ address: '2/1/0', DataType: DPT_Value_Temp })),
+          indoorTempHistory,
+        },
+        ({ bathroom, indoorTempHistory, setpoint }) => ({
+          history: indoorTempHistory['bathroom'],
+          setpoint: setpoint.value.toFixed(1),
+          ...bathroom,
+        }),
+      )
+    })
+  }
 })

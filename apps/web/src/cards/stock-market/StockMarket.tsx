@@ -6,13 +6,13 @@ import ApolloCard, { ZoomContext } from '../../apollo-card/ApolloCard'
 import TablePlaceholder from '../components/TablePlaceholder'
 import { StockMarketFeed } from '@repo/types'
 import { Ticker } from './Ticker'
-import { TableBody, TableHead } from '@mui/material'
+import { TableBody, TableHead, TableRow } from '@mui/material'
 import { Header } from './Ticker/styled'
-import { useTickers } from './useTickers'
+import { useSortedTickers } from './useSortedTickers'
 
 export const StockMarket: FC<Record<string, never>> = () => {
   const feed = useFeed<StockMarketFeed>('stock-market')
-  const tickers = useTickers(feed)
+  const tickers = useSortedTickers(feed)
 
   if (feed === undefined || tickers === undefined) {
     return (
@@ -29,18 +29,20 @@ export const StockMarket: FC<Record<string, never>> = () => {
           <table className='apollo-data-table' style={zoom.active ? { fontSize: '0.6em', lineHeight: 1.2 } : undefined}>
             {zoom.active ? (
               <TableHead>
-                <Header>Ticker</Header>
-                <Header>M. Cap. (B)</Header>
-                <Header>Earnings Date</Header>
-                <Header>PE</Header>
-                <Header>EG</Header>
-                <Header></Header>
-                <Header sx={{ textAlign: 'center' }}>Price</Header>
+                <TableRow>
+                  <Header>Ticker</Header>
+                  <Header>M. Cap. (B)</Header>
+                  <Header>Earnings Date</Header>
+                  <Header>PE</Header>
+                  <Header>EG</Header>
+                  <Header></Header>
+                  <Header sx={{ textAlign: 'center' }}>Price</Header>
+                </TableRow>
               </TableHead>
             ) : null}
             <TableBody>
               {tickers.map(item => (
-                <Ticker key={item.data.ticker} item={item} zoom={zoom.active} />
+                <Ticker key={item.symbol} ticker={item} zoom={zoom.active} />
               ))}
             </TableBody>
           </table>

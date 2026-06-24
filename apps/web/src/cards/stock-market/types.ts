@@ -1,7 +1,8 @@
-import { TickerData } from '@repo/types'
-
 export type TickerDetails = {
-  data: TickerData
-  priceTarget: number
-  eg: number
+  forwardPEAtPriceTarget: number | null
+  trailingPEAtPriceTarget: number | null
+  trailingPE: number | null
+  forwardPE: number | null
+  earningsDaysLeft: number
+  earningsDate: Date
 }

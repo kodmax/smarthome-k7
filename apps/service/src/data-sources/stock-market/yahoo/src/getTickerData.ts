@@ -22,9 +22,9 @@ export const getTickerData = async (ticker: string): Promise<YahooTickerData> =>
 
   const quoteSummary = getQuoteSumary(mainPage, ticker)
 
-  return {
+  const tickerData: YahooTickerData = {
     ticker,
-    oneYearPriceTarget,
+    oneYearPriceTarget: isNaN(oneYearPriceTarget) ? null : oneYearPriceTarget,
     marketCap: convertMarketCap(marketCap),
     forwardEPS: !isNaN(forwardPE) ? previousClosePrice / forwardPE : null,
     trailingEPS: eps,
@@ -34,4 +34,6 @@ export const getTickerData = async (ticker: string): Promise<YahooTickerData> =>
     },
     quoteSummary,
   }
+
+  return tickerData
 }
