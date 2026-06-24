@@ -7,6 +7,6 @@
     "access": "public"
   },
   "exports": {
-    ".": "./v1/index.ts"
+    ".": "./v2/index.ts"
   }
 }
