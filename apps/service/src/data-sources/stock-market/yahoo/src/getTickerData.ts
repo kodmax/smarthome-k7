@@ -4,6 +4,7 @@ import { toNumber } from './toNumber'
 import { getDocument } from './getDocument'
 import { YahooTickerData } from '../types'
 import { convertMarketCap } from './convertToBillions'
+import { getQuoteSumary } from './getQuoteSummary'
 
 export const getTickerData = async (ticker: string): Promise<YahooTickerData> => {
   const mainPage = await getDocument(ticker)
@@ -19,6 +20,8 @@ export const getTickerData = async (ticker: string): Promise<YahooTickerData> =>
 
   const marketCap = getStatisticText(mainPage, 'Market Cap')
 
+  const quoteSummary = getQuoteSumary(mainPage, ticker)
+
   return {
     ticker,
     oneYearPriceTarget,
@@ -29,5 +32,6 @@ export const getTickerData = async (ticker: string): Promise<YahooTickerData> =>
       confirmed: confirmedEarningsDate,
       estimated: estimatedEarningsDate,
     },
+    quoteSummary,
   }
 }

@@ -16,6 +16,14 @@ export type EnergyHourConsumption = {
 
 export type StockMarketStatus = 'Open' | 'After-Hours' | 'Closed' | 'Pre-Market'
 
+export type QuoteSummary = {
+  priceTargetChange: {
+    last90days: number
+    last30days: number
+    last7days: number
+  }
+}
+
 export type TickerData = {
   ticker: string
   title: string
@@ -39,6 +47,7 @@ export type TickerData = {
     confirmed?: string
     estimated?: string
   }
+  quoteSummary: QuoteSummary
 }
 
 export type StockMarketFeed = {

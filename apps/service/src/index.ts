@@ -86,6 +86,7 @@ Server.listen({}, async apollo => {
             confirmed: yahoo.earningsDate.confirmed,
             estimated: yahoo.earningsDate.estimated,
           },
+          quoteSummary: yahoo.quoteSummary,
         })
       }
 
