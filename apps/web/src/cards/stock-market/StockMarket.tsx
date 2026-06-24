@@ -1,6 +1,6 @@
 import zoomBanner from './stock-market-zoom.webp'
 import banner from './stock-market.webp'
-import { type FC, useMemo } from 'react'
+import { type FC } from 'react'
 import { useFeed } from '@repo/feed-client'
 import ApolloCard, { ZoomContext } from '../../apollo-card/ApolloCard'
 import TablePlaceholder from '../components/TablePlaceholder'
