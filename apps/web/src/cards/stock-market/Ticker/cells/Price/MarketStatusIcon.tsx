@@ -5,16 +5,16 @@ import { FC } from 'react'
 export const MarketStatusIcon: FC<{ marketStatus: ExchangeStatus }> = ({ marketStatus }) => {
   switch (marketStatus) {
     case 'Open':
-      return <Circle sx={{ fontSize: '1em', color: 'green' }} />
+      return <Circle sx={{ fontSize: '1em', color: 'green', verticalAlign: 'middle' }} />
 
     case 'After-Hours':
-      return <Bedtime sx={{ fontSize: '1em' }} />
+      return <Bedtime sx={{ fontSize: '1em', verticalAlign: 'middle' }} />
 
     case 'Pre-Market':
-      return <WbSunny sx={{ fontSize: '1em' }} />
+      return <WbSunny sx={{ fontSize: '1em', verticalAlign: 'middle' }} />
 
     case 'Closed':
-      return <Circle sx={{ fontSize: '1em', color: 'gray' }} />
+      return <Circle sx={{ fontSize: '1em', color: 'gray', verticalAlign: 'middle' }} />
 
     default:
       return <>{marketStatus}</>

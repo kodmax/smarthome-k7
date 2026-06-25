@@ -31,18 +31,16 @@ export const StockMarket: FC<Record<string, never>> = () => {
               <TableHead>
                 <TableRow>
                   <Header>Ticker</Header>
-                  <Header>M. Cap. (B)</Header>
                   <Header>Earnings Date</Header>
                   <Header>PE</Header>
                   <Header>EG</Header>
-                  <Header></Header>
                   <Header sx={{ textAlign: 'center' }}>Price</Header>
                 </TableRow>
               </TableHead>
             ) : null}
             <TableBody>
               {tickers.map(item => (
-                <Ticker key={item.symbol} ticker={item} zoom={zoom.active} />
+                <Ticker key={item.symbol} ticker={item} />
               ))}
             </TableBody>
           </table>
