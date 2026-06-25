@@ -51,6 +51,10 @@ export type TickerData = {
     priceTarget: number | null
     eg: number | null
   }
+  eps: {
+    forecast: EPSForecast[]
+    ttm: TrailingEPS[]
+  }
   statistics: {
     trailingEPS: number
     forwardEPS: number | null
