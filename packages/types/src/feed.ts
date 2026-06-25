@@ -339,3 +339,15 @@ export type InterestRateData = {
 export type InterestRatesFeed = {
   readonly [K in InterestRatesKeys]: InterestRateData
 }
+
+export type TrailingEPS = {
+  consensusForecast: number
+  dateReported: string
+  eps: number
+}
+
+export type EPSForecast = {
+  consensusEPSForecast: number
+  fiscalEnd: string
+  noOfEstimates: number
+}
