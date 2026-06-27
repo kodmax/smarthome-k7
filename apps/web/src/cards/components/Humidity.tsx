@@ -2,13 +2,12 @@ import { type FC } from 'react'
 import { ColorIndicator } from './ColorIndication'
 import { optimalHumidityRange } from '../../lib'
 import { useFeed } from '@repo/feed-client'
-import { KnxReading } from 'js-knx'
+import { KnxReadingType } from '@repo/types'
 
 const Humidity: FC<{ label: string }> = ({ label }) => {
-  const relativeHumidity = useFeed<KnxReading<number>>('home.air-quality.humidity')
-  const temp = useFeed<KnxReading<number>>('home.temp.bedroom')
+  const relativeHumidity = useFeed<KnxReadingType<number>>('home.air-quality.humidity')
 
-  if (relativeHumidity === undefined || temp === undefined) {
+  if (relativeHumidity === undefined) {
     return (
       <tr>
         <td>{label}</td>

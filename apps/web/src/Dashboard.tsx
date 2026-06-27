@@ -4,17 +4,15 @@ import { Energy } from './cards/Energy'
 import { Temperature } from './cards/Temperature'
 import { TopTorrents } from './cards/TopTorrents'
 import { Weather, WeatherForecast, HourlyWeatherForecast } from './cards/Weather'
-import { useRef, type FC } from 'react'
+import { type FC } from 'react'
 import { Jobs } from './cards/Jobs'
 import { StockMarket } from './cards/stock-market'
 import { News } from './cards/News'
 
 export const Dashboard: FC<Record<string, never>> = () => {
-  const div = useRef<HTMLDivElement>(null)
-
   return (
     <div>
-      <Grid container spacing={2} ref={div}>
+      <Grid container spacing={2}>
         <Grid item xs={12} sm={12} md={3} xl={3}>
           <Energy />
         </Grid>

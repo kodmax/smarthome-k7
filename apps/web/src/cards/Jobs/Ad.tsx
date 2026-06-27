@@ -35,7 +35,7 @@ export const Ad: FC<{ ad: JobAd; zoom: boolean }> = ({ ad, zoom }) => {
           <>
             {ad.title} {ad.employmentType === 'permanent' ? '[Perm]' : '[B2B]'} [{ad.workplaceType}]{' '}
             {favSkills.map(skillName => (
-              <>[{skillName}]</>
+              <span key={skillName}>[{skillName}]</span>
             ))}
           </>
         ) : (
