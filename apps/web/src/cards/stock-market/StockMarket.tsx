@@ -40,7 +40,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
             ) : null}
             <TableBody>
               {tickers.map(item => (
-                <Ticker key={item.symbol} ticker={item} />
+                <Ticker key={item.symbol} ticker={item} zoom={zoom.active} />
               ))}
             </TableBody>
           </table>

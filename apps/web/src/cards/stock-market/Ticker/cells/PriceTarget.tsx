@@ -1,12 +1,9 @@
-import { FC, useContext } from 'react'
+import { FC } from 'react'
 import { Data } from '../styled'
 import { TickerData } from '@repo/types'
-import { ZoomContext } from '@/apollo-card'
 
-export const PriceTarget: FC<{ ticker: TickerData }> = ({ ticker }) => {
-  const zoom = useContext(ZoomContext)
-
-  if (!zoom.active) {
+export const PriceTarget: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
+  if (!zoom) {
     return null
   }
 
