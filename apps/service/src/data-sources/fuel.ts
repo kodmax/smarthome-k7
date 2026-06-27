@@ -1,8 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { parseHTML } from 'linkedom'
 import DateTime from '../DateTime'
 import db from '../db'
-import { myFetch } from '../fetch'
+import { getHTML } from '../fetch'
 import { getTextContent } from './utils/get-text-context'
 import { FuelPricesFeed } from '@repo/types'
 
@@ -12,9 +11,8 @@ export const source: DataSourceDefinition<FuelPricesFeed> = {
 
   expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 24,
   script: async () => {
-    return await myFetch('https://www.autocentrum.pl/paliwa/ceny-paliw/mazowieckie/')
-      .then(content => parseHTML(content).window.document)
-      .then(async (document: Document) => {
+    return await getHTML('https://www.autocentrum.pl/paliwa/ceny-paliw/mazowieckie/').then(
+      async (document: Document) => {
         const current = Object.fromEntries(
           Array.from(document.querySelectorAll('.fuels-wrapper .station-detail-wrapper')).map(price => {
             return [
@@ -49,10 +47,11 @@ export const source: DataSourceDefinition<FuelPricesFeed> = {
             }
           }
         } finally {
-          await conn.end()
+          conn.release()
         }
 
         return prices
-      })
+      },
+    )
   },
 }

@@ -1,14 +1,10 @@
-import { parseHTML } from 'linkedom'
+import { getHTML } from '../../../../fetch'
 
 export const getDocument = async (ticker: string, section?: string): Promise<Document> => {
-  const req = fetch(
+  return getHTML(
     section !== undefined
       ? `https://finance.yahoo.com/quote/${ticker}/${section}/`
       : `https://finance.yahoo.com/quote/${ticker}/`,
+    { accept: 'text/html' },
   )
-
-  return req
-    .then(resp => resp.text())
-    .then(html => parseHTML(html))
-    .then(window => window.document)
 }

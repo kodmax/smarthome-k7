@@ -1,8 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { myFetch } from '../fetch'
+import { getHTML } from '../fetch'
 import db from '../db'
 import DateTime from '../DateTime'
-import { parseHTML } from 'linkedom'
 import * as suncalc from 'suncalc'
 import { basename } from 'path'
 import { getTextContent } from './utils/get-text-context'
@@ -40,9 +39,8 @@ export const source: DataSourceDefinition<WeatherFeed> = {
   script: async () => {
     const date = new DateTime().getDate()
     const [forecast, instant, allergens, hourly, aq] = await Promise.all([
-      myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/10-day-weather-forecast/274663')
-        .then(content => parseHTML(content).window.document)
-        .then((document: Document) => {
+      getHTML('https://www.accuweather.com/pl/pl/warsaw/274663/10-day-weather-forecast/274663').then(
+        (document: Document) => {
           const forecast = []
           for (const day of Array.from(document.querySelectorAll('.daily-wrapper'))) {
             const date = getTextContent(day, '.sub.date')
@@ -57,60 +55,52 @@ export const source: DataSourceDefinition<WeatherFeed> = {
           }
 
           return forecast
-        }),
+        },
+      ),
 
-      myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/current-weather/274663')
-        .then(content => parseHTML(content).window.document)
-        .then((document: Document) => {
-          const temp = Number(getTextContent(document.body, '.current-weather-card .display-temp').replace('°C', ''))
-          const details: Record<string, string> = Object.fromEntries(
-            Array.from(document.querySelectorAll('.current-weather-card .current-weather-details .detail-item')).map(
-              detail => [detail.children[0].textContent, detail.children[1].textContent],
-            ),
-          )
+      getHTML('https://www.accuweather.com/pl/pl/warsaw/274663/current-weather/274663').then((document: Document) => {
+        const temp = Number(getTextContent(document.body, '.current-weather-card .display-temp').replace('°C', ''))
+        const details: Record<string, string> = Object.fromEntries(
+          Array.from(document.querySelectorAll('.current-weather-card .current-weather-details .detail-item')).map(
+            detail => [detail.children[0].textContent, detail.children[1].textContent],
+          ),
+        )
 
-          const [windDirection, windSpeed, windSpeedUnit] = details['Wiatr'].split(' ')
-          return {
-            clouds: {
-              height: details['Pułap chmur'],
-              coverage: details['Zachmurzenie'],
-            },
-            wind: {
-              angle: Number(windDirectionCodes.indexOf(windDirection) * 22.5),
-              maxSpeed: Number(details['Porywy wiatru'].split(' ')[0]),
-              speedUnit: windSpeedUnit,
-              direction: windDirection,
-              speed: Number(windSpeed),
-            },
-            uv: details['Maksymalny wskaźnik UV']
-              ? Number(details['Maksymalny wskaźnik UV'].replace(/[^\d.]/g, ''))
-              : 0,
-            humidity: Number(details['Wilgotność'].replace(/[^\d]/g, '')),
-            pressure: Number(details['Ciśnienie'].replace(/[^\d]/g, '')),
-            details,
-            temp,
-          }
-        }),
+        const [windDirection, windSpeed, windSpeedUnit] = details['Wiatr'].split(' ')
+        return {
+          clouds: {
+            height: details['Pułap chmur'],
+            coverage: details['Zachmurzenie'],
+          },
+          wind: {
+            angle: Number(windDirectionCodes.indexOf(windDirection) * 22.5),
+            maxSpeed: Number(details['Porywy wiatru'].split(' ')[0]),
+            speedUnit: windSpeedUnit,
+            direction: windDirection,
+            speed: Number(windSpeed),
+          },
+          uv: details['Maksymalny wskaźnik UV'] ? Number(details['Maksymalny wskaźnik UV'].replace(/[^\d.]/g, '')) : 0,
+          humidity: Number(details['Wilgotność'].replace(/[^\d]/g, '')),
+          pressure: Number(details['Ciśnienie'].replace(/[^\d]/g, '')),
+          details,
+          temp,
+        }
+      }),
 
-      myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/weather-forecast/274663')
-        .then(content => parseHTML(content).window.document)
-        .then((document: Document) => {
-          return Array.from(document.querySelectorAll('.allergy-forecast .allergy') as NodeListOf<HTMLAnchorElement>)
-            .slice(0, 5)
-            .map(allergen => {
-              return {
-                id: new URL(allergen.getAttribute('href') ?? '', 'https://www.accuweather.com/').searchParams.get(
-                  'name',
-                ),
-                name: getTextContent(allergen, '.allergy-name'),
-                intensity: getTextContent(allergen, '.allergy-value'),
-              }
-            })
-        }),
+      getHTML('https://www.accuweather.com/pl/pl/warsaw/274663/weather-forecast/274663').then((document: Document) => {
+        return Array.from(document.querySelectorAll('.allergy-forecast .allergy') as NodeListOf<HTMLAnchorElement>)
+          .slice(0, 5)
+          .map(allergen => {
+            return {
+              id: new URL(allergen.getAttribute('href') ?? '', 'https://www.accuweather.com/').searchParams.get('name'),
+              name: getTextContent(allergen, '.allergy-name'),
+              intensity: getTextContent(allergen, '.allergy-value'),
+            }
+          })
+      }),
 
-      myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/hourly-weather-forecast/274663')
-        .then(content => parseHTML(content).window.document)
-        .then((document: Document) => {
+      getHTML('https://www.accuweather.com/pl/pl/warsaw/274663/hourly-weather-forecast/274663').then(
+        (document: Document) => {
           return Array.from(document.querySelectorAll('.hourly-wrapper .hour'))
             .map(hour => {
               return {
@@ -133,26 +123,25 @@ export const source: DataSourceDefinition<WeatherFeed> = {
                 ...forecast,
               }
             })
-        }),
+        },
+      ),
 
-      myFetch('https://www.accuweather.com/pl/pl/warsaw/274663/air-quality-index/274663')
-        .then(content => parseHTML(content).window.document)
-        .then((document: Document) => {
-          const aqi = +getTextContent(document.body, '.air-quality-content .aq-number')
-          const pollutants = Object.fromEntries(
-            Array.from(document.querySelectorAll('#pollutants .air-quality-pollutant')).map(pollutant => {
-              return [
-                getTextContent(pollutant, '.display-type'),
-                {
-                  concentration: getTextContent(pollutant, '.pollutant-concentration'),
-                  index: getTextContent(pollutant, '.pollutant-index'),
-                },
-              ]
-            }),
-          )
+      getHTML('https://www.accuweather.com/pl/pl/warsaw/274663/air-quality-index/274663').then((document: Document) => {
+        const aqi = +getTextContent(document.body, '.air-quality-content .aq-number')
+        const pollutants = Object.fromEntries(
+          Array.from(document.querySelectorAll('#pollutants .air-quality-pollutant')).map(pollutant => {
+            return [
+              getTextContent(pollutant, '.display-type'),
+              {
+                concentration: getTextContent(pollutant, '.pollutant-concentration'),
+                index: getTextContent(pollutant, '.pollutant-index'),
+              },
+            ]
+          }),
+        )
 
-          return { aqi, pollutants }
-        }),
+        return { aqi, pollutants }
+      }),
     ])
 
     const datetime = new DateTime()
@@ -194,7 +183,7 @@ export const source: DataSourceDefinition<WeatherFeed> = {
         aq,
       }
     } finally {
-      await conn.end()
+      conn.release()
     }
   },
 }

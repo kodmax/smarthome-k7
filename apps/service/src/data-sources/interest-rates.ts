@@ -1,8 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { parseHTML } from 'linkedom'
 import DateTime from '../DateTime'
 import db from '../db'
-import { myFetch } from '../fetch'
+import { getHTML } from '../fetch'
 import { getTextContent } from './utils/get-text-context'
 import { INTEREST_RATES, InterestRateData, InterestRatesFeed } from '@repo/types'
 
@@ -17,9 +16,10 @@ export const source: DataSourceDefinition<InterestRatesFeed> = {
 
   expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 12,
   script: async () => {
-    const wibor = await myFetch('https://www.bankier.pl/mieszkaniowe/stopy-procentowe/wibor', {
+    const wibor = await getHTML('https://www.bankier.pl/mieszkaniowe/stopy-procentowe/wibor', {
       accept: 'text/html',
-    }).then(async html => {
+    }).then(async document => {
+      const html = document.documentElement.outerHTML
       const rates = [...html.matchAll(irPattern)].map(match => ({
         period: match[1],
         interestRate: match[2].replace(',', '.'),
@@ -33,10 +33,9 @@ export const source: DataSourceDefinition<InterestRatesFeed> = {
       }
     })
 
-    const nbp = await myFetch('https://nbp.pl/polityka-pieniezna/decyzje-rpp/podstawowe-stopy-procentowe-nbp/', {
+    const nbp = await getHTML('https://nbp.pl/polityka-pieniezna/decyzje-rpp/podstawowe-stopy-procentowe-nbp/', {
       accept: 'text/html',
-    }).then(async html => {
-      const document = parseHTML(html).window.document
+    }).then(async document => {
       return Object.fromEntries(
         Array.from(document.querySelectorAll('table.nbptable tr'))
           .map(tr => Array.from(tr.children))
@@ -75,7 +74,7 @@ export const source: DataSourceDefinition<InterestRatesFeed> = {
 
       return irs as InterestRatesFeed
     } finally {
-      await conn.end()
+      conn.release()
     }
   },
 }

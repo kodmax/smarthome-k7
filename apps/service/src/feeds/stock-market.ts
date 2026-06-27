@@ -30,17 +30,17 @@ export const addStockMarketFeed = (feeds: Feeds): void => {
       for (const symbol of tickerList) {
         const yahoo = yahooMap.get(symbol)
         if (yahoo === undefined) {
-          throw new Error('Missing Yahoo ticker data')
+          throw new Error(`Missing Yahoo ticker data for ${symbol}`)
         }
 
         const nasdaq = nasdaqMap.get(symbol)
         if (nasdaq === undefined) {
-          throw new Error('Missing Nasdaq ticker data')
+          throw new Error(`Missing Nasdaq ticker data for ${symbol}`)
         }
 
         const nasdaqEPS = nasdaqEPSMap.get(symbol)
         if (nasdaqEPS === undefined) {
-          throw new Error('Missing Nasdaq EPS ticker data')
+          throw new Error(`Missing Nasdaq EPS ticker data for ${symbol}`)
         }
 
         const priceTarget =

@@ -14,7 +14,7 @@ export default (id: string, dp: DPT_Value_AirQuality) => {
       return await dp.read()
     },
 
-    push: (push, command, err) => {
+    push: (push, _command, err) => {
       dp.addValueListener(async reading => {
         push(reading)
 
@@ -25,7 +25,7 @@ export default (id: string, dp: DPT_Value_AirQuality) => {
           try {
             await conn.query('insert into co2 (datetime, ppm) values (?, ?)', [datetime.getDateTime(), reading.value])
           } finally {
-            await conn.end()
+            conn.release()
           }
         } catch (e) {
           err(e instanceof Error ? e : new Error('Unknown error'))

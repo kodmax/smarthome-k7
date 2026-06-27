@@ -70,7 +70,7 @@ export const source: DataSourceDefinition<TempHistory> = {
         })),
       }
     } finally {
-      await conn.end()
+      conn.release()
     }
   },
 }

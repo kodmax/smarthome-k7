@@ -74,7 +74,7 @@ export const source: DataSourceDefinition<Commodities> = {
         },
       }
     } finally {
-      await conn.end()
+      conn.release()
     }
   },
 }

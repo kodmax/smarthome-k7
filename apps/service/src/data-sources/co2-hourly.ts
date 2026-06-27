@@ -22,7 +22,7 @@ export const source: DataSourceDefinition<{ date: string; today: Co2HistoryRecor
         date: new DateTime().getDate(),
       }
     } finally {
-      await conn.end()
+      conn.release()
     }
   },
 }

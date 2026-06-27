@@ -38,6 +38,9 @@ export const config = {
   google: {
     socs_cookie: getString('GOOGLE_SOCS_COOKIE'),
   },
+  jobs: {
+    nfjCookie: getString('NFJ_COOKIE'),
+  },
   knx: {
     disabled: knxDisabled,
     host: knxDisabled ? (process.env.KNX_HOST ?? '') : getString('KNX_HOST'),

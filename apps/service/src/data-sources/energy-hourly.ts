@@ -14,6 +14,7 @@ export const source: DataSourceDefinition<{ date: string; bars: EnergyHourConsum
       const startOfDayRecord = await conn.query(
         'select date, total_reading from daily_energy_readings order by date desc limit 1',
       )
+
       const bars = await conn.query(
         'SELECT hour, hourly_consumption FROM hourly_energy_readings WHERE Date(datetime) = ? and hourly_consumption is not null',
         [new DateTime().getDate()],
@@ -25,7 +26,7 @@ export const source: DataSourceDefinition<{ date: string; bars: EnergyHourConsum
         bars,
       }
     } finally {
-      await conn.end()
+      conn.release()
     }
   },
 }

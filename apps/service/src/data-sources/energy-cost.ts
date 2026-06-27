@@ -39,7 +39,7 @@ export const source: DataSourceDefinition<{ datetime: string; rates: EnergyRates
         avg,
       }
     } finally {
-      await conn.end()
+      conn.release()
     }
   },
 }

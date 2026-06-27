@@ -1,5 +1,4 @@
-import { myFetch } from '../../fetch'
-import { parseHTML } from 'linkedom'
+import { getHTML } from '../../fetch'
 
 // eslint-disable-next-line max-len
 const inflationDataUrl =
@@ -12,10 +11,8 @@ type InflationData = Array<{
 }>
 
 const fetchInflationData = async (): Promise<InflationData> => {
-  return myFetch(inflationDataUrl, { accept: 'text/html' })
-    .then(html => {
-      const document = parseHTML(html).window.document
-
+  return getHTML(inflationDataUrl, { accept: 'text/html' })
+    .then(document => {
       const data = Array.from(document.querySelectorAll('tr'))
         .map((tr): [number, number[]] => [
           Number(tr.querySelector('th:not([rowspan])')?.textContent),

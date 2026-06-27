@@ -1,6 +1,5 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { myFetch } from '../fetch'
-import { parseHTML } from 'linkedom'
+import { getHTML } from '../fetch'
 import { Article, NewsFeed } from '@repo/types'
 import { config } from '../config'
 
@@ -14,8 +13,7 @@ export const source: DataSourceDefinition<NewsFeed> = {
 
   expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 5,
   script: async () => {
-    const news = await myFetch(FEED_URL, { accept: 'text/html', cookie: COOKIES }).then(html => {
-      const document = parseHTML(html).window.document
+    const news = await getHTML(FEED_URL, { accept: 'text/html', cookie: COOKIES }).then(document => {
       const articles: Article[] = Array.from(document.querySelectorAll('a[href^="./read"][aria-label]')).map(anchor => {
         return {
           href: new URL(anchor.getAttribute('href') ?? '', 'https://news.google.com').toString(),

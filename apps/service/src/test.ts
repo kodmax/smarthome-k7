@@ -21,7 +21,7 @@ const test = async () => {
       avg,
     }
   } finally {
-    await conn.end()
+    conn.release()
   }
 }
 

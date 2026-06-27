@@ -1,15 +1,12 @@
 import { getNumberContent } from '../utils/get-number-content'
-import { myFetch } from '../../fetch'
-import { parseHTML } from 'linkedom'
+import { getHTML } from '../../fetch'
 
 type OilPrice = {
   l: string
 }
 
 const fetchOilPrice = async (): Promise<OilPrice> => {
-  return myFetch('https://www.cnbc.com/quotes/@CL.1', { accept: 'text/html' }).then(html => {
-    const document = parseHTML(html).window.document
-
+  return getHTML('https://www.cnbc.com/quotes/@CL.1', { accept: 'text/html' }).then(document => {
     return {
       l: (getNumberContent(document.body, '.QuoteStrip-lastPrice') / 159).toFixed(2),
     }

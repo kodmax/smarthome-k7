@@ -16,6 +16,7 @@ declare module 'process' {
         readonly LOCATION_LAT: string
 
         readonly GOOGLE_SOCS_COOKIE: string
+        readonly NFJ_COOKIE: string
       }
     }
   }

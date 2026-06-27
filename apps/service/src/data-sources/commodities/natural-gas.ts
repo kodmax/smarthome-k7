@@ -1,6 +1,5 @@
 import { getNumberContent } from '../utils/get-number-content'
-import { myFetch } from '../../fetch'
-import { parseHTML } from 'linkedom'
+import { getHTML } from '../../fetch'
 
 type NaturalGasPrice = {
   GJ: string
@@ -9,9 +8,7 @@ type NaturalGasPrice = {
 }
 
 const fetchNaturalGasPrice = async (): Promise<NaturalGasPrice> => {
-  return myFetch('https://www.cnbc.com/quotes/@NG.1', { accept: 'text/html' }).then(html => {
-    const document = parseHTML(html).window.document
-
+  return getHTML('https://www.cnbc.com/quotes/@NG.1', { accept: 'text/html' }).then(document => {
     // 1 MWh = 3.412142 MMBTU = 3.6 GJ
     const price = getNumberContent(document.body, '.QuoteStrip-lastPrice')
     return {

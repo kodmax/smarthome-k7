@@ -1,19 +1,18 @@
 import { getNumberContent } from '../utils/get-number-content'
-import { myFetch } from '../../fetch'
-import { parseHTML } from 'linkedom'
+import { getHTML } from '../../fetch'
 
 type CoalPrice = {
   ton: string
 }
 
 const fetchCoalPrice = async (): Promise<CoalPrice> => {
-  return myFetch('https://markets.businessinsider.com/commodities/coal-price', { accept: 'text/html' }).then(html => {
-    const document = parseHTML(html).window.document
-
-    return {
-      ton: getNumberContent(document.body, '.price-section__current-value').toFixed(0),
-    }
-  })
+  return getHTML('https://markets.businessinsider.com/commodities/coal-price', { accept: 'text/html' }).then(
+    document => {
+      return {
+        ton: getNumberContent(document.body, '.price-section__current-value').toFixed(0),
+      }
+    },
+  )
 }
 
 export type { CoalPrice }
