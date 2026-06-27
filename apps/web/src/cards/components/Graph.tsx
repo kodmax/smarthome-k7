@@ -1,6 +1,5 @@
 import { styled } from '@mui/material'
 import { type FC } from 'react'
-import { renderToString } from 'react-dom/server'
 
 export interface Record {
   datetime: string
@@ -16,9 +15,6 @@ export type DataPoint = {
 const baseFontSize = 12
 
 const Vector = styled('span')({
-  backgroundRepeat: 'no-repeat',
-  backgroundPositionX: '0.75em',
-  backgroundSize: 'contain',
   display: 'inline-block',
   verticalAlign: 'top',
   position: 'relative',
@@ -26,6 +22,12 @@ const Vector = styled('span')({
 
   height: Number(12 / baseFontSize).toFixed(3) + 'em',
   width: Number(48 / baseFontSize).toFixed(3) + 'em',
+})
+
+const Svg = styled('svg')({
+  display: 'block',
+  height: '100%',
+  width: '100%',
 })
 
 const Min = styled('span')({
@@ -88,16 +90,16 @@ export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value'
         return Number(width - age).toFixed(4)
       })
 
-    const svg = renderToString(
-      <svg
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        strokeWidth={5}
-        version='1.1'
-        xmlns='http://www.w3.org/2000/svg'
-      >
-        <>
+    return (
+      <Vector>
+        <Svg
+          width={width}
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          strokeWidth={5}
+          version='1.1'
+          xmlns='http://www.w3.org/2000/svg'
+        >
           <polyline
             stroke={spread > scaleY ? 'hsl(0deg 100% 50%)' : 'hsl(0deg 0% 20%)'}
             fill='none'
@@ -106,12 +108,7 @@ export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value'
           {actives.map(x => (
             <circle key={x} cx={x} cy='98' r='0.2' strokeWidth='0' fill='red' />
           ))}
-        </>
-      </svg>,
-    )
-
-    return (
-      <Vector style={{ backgroundImage: `url("data:image/svg+xml;base64,${btoa(svg)}")` }}>
+        </Svg>
         <Max>{max.toFixed(2).replace('.00', '')}</Max>
         <Min>{min.toFixed(2).replace('.00', '')}</Min>
       </Vector>
