@@ -4,11 +4,11 @@ import { energyCost, energyConsumption } from '../data-sources'
 import knxEnergy from '../data-sources/knx/energy'
 import knxPower from '../data-sources/knx/power'
 import { energy } from '../home.knx-schema'
-import { KnxConnection } from './knx-connection'
+import type { KnxLink } from 'js-knx'
 
 const energyMeterOffset = 12307130 + 181000
 
-export const addEnergyFeed = (feeds: Feeds, knx: KnxConnection): void => {
+export const addEnergyFeed = (feeds: Feeds, knx: KnxLink): void => {
   const energyReadings = {
     total: knxEnergy('home.energy-consumption.meter-total-reading', knx.getDatapoint(energy.Total.reading)),
     instant: knxPower('home.power-draw', knx.getDatapoint(energy.InstantPowerDraw.reading)),

@@ -1,12 +1,11 @@
 import { Feeds } from '@repo/apollo-ws'
 import { TemperatureData } from '@repo/types'
-import { DPT_HVACMode } from 'js-knx'
+import { DPT_HVACMode, type KnxLink } from 'js-knx'
 import knxB1 from '../data-sources/knx/b1'
 import KnxHVACMode from '../data-sources/knx/hvac-mode'
 import { heating } from '../home.knx-schema'
-import { KnxConnection } from './knx-connection'
 
-export const addHeatingFeed = (feeds: Feeds, knx: KnxConnection): void => {
+export const addHeatingFeed = (feeds: Feeds, knx: KnxLink): void => {
   const heatersReadings = {
     bathroomState: knxB1(
       'home.heating.lazienka.water-heating',

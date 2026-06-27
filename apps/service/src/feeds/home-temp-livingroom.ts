@@ -1,11 +1,10 @@
 import { Feeds } from '@repo/apollo-ws'
-import { DPT_Value_Temp } from 'js-knx'
+import { DPT_Value_Temp, type KnxLink } from 'js-knx'
 import { indoorTempHistory } from '../data-sources'
 import knxTemp from '../data-sources/knx/temp'
 import { temp } from '../home.knx-schema'
-import { KnxConnection } from './knx-connection'
 
-export const addHomeTempLivingroomFeed = (feeds: Feeds, knx: KnxConnection): void => {
+export const addHomeTempLivingroomFeed = (feeds: Feeds, knx: KnxLink): void => {
   feeds.addFeed(
     'home.temp.livingroom',
     {
