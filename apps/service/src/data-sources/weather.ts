@@ -1,5 +1,5 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { getHTML } from '../fetch'
+import { getHTML } from '@/fetch'
 import db from '../db'
 import DateTime from '../DateTime'
 import * as suncalc from 'suncalc'

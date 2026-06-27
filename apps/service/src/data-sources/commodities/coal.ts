@@ -1,5 +1,5 @@
 import { getNumberContent } from '../utils/get-number-content'
-import { getHTML } from '../../fetch'
+import { getHTML } from '@/fetch'
 
 type CoalPrice = {
   ton: string

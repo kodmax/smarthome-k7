@@ -1,7 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../DateTime'
 import db from '../db'
-import { getHTML } from '../fetch'
+import { getHTML } from '@/fetch'
 import { getTextContent } from './utils/get-text-context'
 import { FuelPricesFeed } from '@repo/types'
 

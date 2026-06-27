@@ -1,4 +1,4 @@
-import { getHTML } from '../../fetch'
+import { getHTML } from '@/fetch'
 
 // eslint-disable-next-line max-len
 const inflationDataUrl =

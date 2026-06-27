@@ -1,4 +1,4 @@
-import { getHTML } from '../../../../fetch'
+import { getHTML } from '@/fetch'
 
 export const getDocument = async (ticker: string, section?: string): Promise<Document> => {
   return getHTML(

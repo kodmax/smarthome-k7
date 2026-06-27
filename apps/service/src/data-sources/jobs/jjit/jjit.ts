@@ -1,4 +1,4 @@
-import { getJSON } from '../../../fetch'
+import { getJSON } from '@/fetch'
 import { JobAd } from '@repo/types'
 import { toJobAd } from './toJobAd'
 import { JustJoinAd } from './types'

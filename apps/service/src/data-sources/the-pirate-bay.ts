@@ -1,5 +1,5 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { getJSON } from '../fetch'
+import { getJSON } from '@/fetch'
 import { Torrent } from '@repo/types'
 
 export const source: DataSourceDefinition<Torrent[]> = {

@@ -1,5 +1,5 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { getHTML } from '../fetch'
+import { getHTML } from '@/fetch'
 import { Article, NewsFeed } from '@repo/types'
 import { config } from '../config'
 
