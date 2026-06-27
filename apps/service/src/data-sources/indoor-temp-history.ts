@@ -36,17 +36,17 @@ export const source: DataSourceDefinition<TempHistory> = {
 
   script: async () => {
     const conn = await db.getConnection()
-    const history = (await conn.query(
-      `select 
-            timestamp, 
-            bathroom_floor_temp, bedroom_temp, livingroom_temp, bathroom_temp,
-            bathroom_floor_heating, bedroom_heating, livingroom_heating, bathroom_heating
-            from indoor_air_condition where timestamp >= ?
-            order by timestamp ASC`,
-      [new DateTime().getDate()],
-    )) as HistoryRecord[]
-
     try {
+      const history = (await conn.query(
+        `select 
+              timestamp, 
+              bathroom_floor_temp, bedroom_temp, livingroom_temp, bathroom_temp,
+              bathroom_floor_heating, bedroom_heating, livingroom_heating, bathroom_heating
+              from indoor_air_condition where timestamp >= ?
+              order by timestamp ASC`,
+        [new DateTime().getDate()],
+      )) as HistoryRecord[]
+
       return {
         bathroomFloor: history.map(record => ({
           datetime: record.timestamp,

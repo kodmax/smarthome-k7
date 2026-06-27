@@ -113,7 +113,7 @@ describe('toJobAd', () => {
       companyLogoUrl:
         'https://imgproxy.justjoinit.tech/sQgzpDduSI0zS-UcDOGzDZTxJKQkAHYIujhI4twV9QE/h:200/w:200/plain/https://public.justjoin.it/companies/logos/original/02cc7c8b1d0284ab57c9626729673434e5197f24.png',
       companyName: 'monday.com',
-      requiredSkills: ['AWS', 'TypeScript', 'Node.js', 'React', 'SQL', 'SQS/SNS/Kafka', 'NoSQL'],
+      requiredSkills: ['AWS', 'TypeScript', 'Node.js', 'React', 'SQL'],
       workplaceType: 'hybrid',
       employmentType: 'permanent',
       origin: 'jj',
