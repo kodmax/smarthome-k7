@@ -1,21 +1,45 @@
 import { configDotenv } from 'dotenv'
 configDotenv()
 
+const getString = (name: string): string => {
+  const value = process.env[name]
+  if (value === undefined || value === '') {
+    throw new Error(`Missing required environment variable: ${name}`)
+  }
+
+  return value
+}
+
+const getNumber = (name: string): number => {
+  const value = Number(getString(name))
+  if (Number.isNaN(value)) {
+    throw new Error(`Environment variable ${name} must be a number`)
+  }
+
+  return value
+}
+
+const knxDisabled = process.env.NO_KNX === '1'
+
 export const config = {
   db: {
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_SCHEMA,
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
+    password: getString('DB_PASSWORD'),
+    database: getString('DB_SCHEMA'),
+    host: getString('DB_HOST'),
+    user: getString('DB_USER'),
   },
   geoLocation: {
-    long: +process.env.LOCATION_LONG,
-    lat: +process.env.LOCATION_LAT,
+    long: getNumber('LOCATION_LONG'),
+    lat: getNumber('LOCATION_LAT'),
   },
   cache: {
-    dir: process.env.CACHE_DIR,
+    dir: getString('CACHE_DIR'),
   },
   google: {
-    socs_cookie: process.env.GOOGLE_SOCS_COOKIE,
+    socs_cookie: getString('GOOGLE_SOCS_COOKIE'),
+  },
+  knx: {
+    disabled: knxDisabled,
+    host: knxDisabled ? (process.env.KNX_HOST ?? '') : getString('KNX_HOST'),
   },
 }

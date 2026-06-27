@@ -33,7 +33,7 @@ Server.listen({}, async apollo => {
   addJobsFeed(feeds)
   addTopTorrentsFeed(feeds)
 
-  if (process.env.NO_KNX === '1') {
+  if (config.knx.disabled) {
     return
   }
 

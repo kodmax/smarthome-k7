@@ -1,8 +1,7 @@
 import { KnxLink } from 'js-knx'
 import { EventEmitter } from 'node:events'
 import { KnxEventEmitter } from 'js-knx/dist/connection/link/LinkOptions'
-
-const knxHost = '192.168.1.8'
+import { config } from './config'
 
 export const knxInit = async (): Promise<KnxLink> => {
   const knxEvents: KnxEventEmitter = new EventEmitter()
@@ -13,7 +12,7 @@ export const knxInit = async (): Promise<KnxLink> => {
   })
 
   console.log('Establishing KNX connection ...')
-  const link = await KnxLink.connect(knxHost, { events: knxEvents })
+  const link = await KnxLink.connect(config.knx.host, { events: knxEvents })
   console.log('KNX connection established.')
 
   process.on('SIGTERM', () => {
