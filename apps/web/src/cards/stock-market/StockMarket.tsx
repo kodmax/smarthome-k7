@@ -32,8 +32,8 @@ export const StockMarket: FC<Record<string, never>> = () => {
                 <TableRow>
                   <Header>Ticker</Header>
                   <Header>Earnings Date</Header>
-                  <Header>PE</Header>
                   <Header>EG</Header>
+                  <Header>PE@PT</Header>
                   <Header sx={{ textAlign: 'center' }}>Price</Header>
                 </TableRow>
               </TableHead>

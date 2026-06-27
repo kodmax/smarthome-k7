@@ -10,8 +10,6 @@ import {
   indoorTempHistory,
   jobs,
   news,
-  yahooMarketData,
-  nasdaqMarketData,
 } from './data-sources'
 import { Server, Cache, sysLog, Feeds } from '@repo/apollo-ws'
 import { DPT_Alarm, DPT_HVACMode, DPT_Value_Temp, KnxLink } from 'js-knx'

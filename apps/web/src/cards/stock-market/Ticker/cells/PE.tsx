@@ -11,7 +11,7 @@ export const PE: FC<{ ticker: TickerData }> = ({ ticker }) => {
   }
 
   const forwardPE =
-    ticker.statistics.forwardEPS !== null && ticker.statistics.forwardEPS > 0 && ticker.price.priceTarget !== null
+    ticker.statistics.forwardEPS !== null && ticker.statistics.forwardEPS > 0
       ? ticker.price.lastTradePrice / ticker.statistics.forwardEPS
       : null
 
@@ -19,7 +19,7 @@ export const PE: FC<{ ticker: TickerData }> = ({ ticker }) => {
     ticker.statistics.trailingEPS > 0 ? ticker.price.lastTradePrice / ticker.statistics.trailingEPS : null
 
   return (
-    <Data>
+    <Data sx={{ fontFamily: 'monospace', textAlign: 'right' }}>
       {trailingPE !== null ? trailingPE.toFixed(0) : '--'} → {forwardPE !== null ? forwardPE.toFixed(0) : '--'}{' '}
     </Data>
   )
