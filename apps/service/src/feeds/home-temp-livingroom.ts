@@ -1,15 +1,17 @@
 import { Feeds } from '@repo/apollo-ws'
-import { DPT_Value_Temp, type KnxLink } from 'js-knx'
+import type { KnxLink } from 'js-knx'
 import { indoorTempHistory } from '../data-sources'
 import knxTemp from '../data-sources/knx/temp'
-import { temp } from '../home.knx-schema'
+import { knxSchema } from '../home.knx-schema'
 
 export const addHomeTempLivingroomFeed = (feeds: Feeds, knx: KnxLink): void => {
+  const schema = knxSchema.home.temp.livingRoom
+
   feeds.addFeed(
     'home.temp.livingroom',
     {
-      dining: knxTemp('temp.livingroom', knx.getDatapoint(temp['Jadalnia'])),
-      setpoint: knxTemp('temp.livingroom.setpoint', knx.getDatapoint({ address: '2/0/0', DataType: DPT_Value_Temp })),
+      dining: knxTemp('temp.livingroom', knx.getDatapoint(schema.reading)),
+      setpoint: knxTemp('temp.livingroom.setpoint', knx.getDatapoint(schema.setpoint)),
       indoorTempHistory,
     },
     ({ dining, indoorTempHistory, setpoint }) => ({
