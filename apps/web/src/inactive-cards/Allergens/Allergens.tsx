@@ -1,9 +1,9 @@
 import { type FC } from 'react'
-import zoomBanner from './card-banners/pollen-zoom.jpg'
-import banner from './card-banners/pollen.jpg'
+import zoomBanner from '../../cards/card-banners/pollen-zoom.jpg'
+import banner from '../../cards/card-banners/pollen.jpg'
 import { Allergen } from './Allergen'
 import { ApolloCard } from '@/apollo-card'
-import TablePlaceholder from '../components/TablePlaceholder'
+import TablePlaceholder from '../../cards/components/TablePlaceholder'
 import { useFeed } from '@repo/feed-client'
 import { AllergensFeed } from '@repo/types'
 

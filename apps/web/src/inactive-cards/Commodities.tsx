@@ -1,10 +1,10 @@
-import zoomBanner from './card-banners/commodities-zoom.jpg'
-import banner from './card-banners/commodities.jpg'
+import zoomBanner from '../cards/card-banners/commodities-zoom.jpg'
+import banner from '../cards/card-banners/commodities.jpg'
 import { type FC, useCallback } from 'react'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import { Graph } from './components/Graph'
-import TablePlaceholder from './components/TablePlaceholder'
+import { Graph } from '../cards/components/Graph'
+import TablePlaceholder from '../cards/components/TablePlaceholder'
 import { CommoditiesFeed } from '@repo/types'
 
 type Salaries = {

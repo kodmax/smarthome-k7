@@ -1,9 +1,9 @@
 import { useCallback, type FC } from 'react'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
-import banner from './card-banners/fx.jpg'
-import { Graph } from './components/Graph'
+import banner from '../cards/card-banners/fx.jpg'
+import { Graph } from '../cards/components/Graph'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import TablePlaceholder from './components/TablePlaceholder'
+import TablePlaceholder from '../cards/components/TablePlaceholder'
 import { FXFeed, FXRates } from '@repo/types'
 
 const moreFx: Array<keyof FXRates> = ['EUR/PLN', 'USD/PLN', 'CHF/PLN', 'EUR/UAH', 'GBP/PLN', 'PLN/UAH', 'PLN/RUB']
