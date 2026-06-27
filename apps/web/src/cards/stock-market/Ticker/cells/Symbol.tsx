@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { Data } from '../styled'
 import LinkOpen from '../../../components/LinkOpen'
-import { ZoomContext } from '../../../../apollo-card/ZoomCurtain'
+import { ZoomContext } from '@/apollo-card'
 import { TickerData } from '@repo/types'
 
 export const Symbol: FC<{ ticker: TickerData }> = ({ ticker }) => {

@@ -1,7 +1,7 @@
 import { FC, useContext } from 'react'
 import { Data } from '../styled'
 import { TickerData } from '@repo/types'
-import { ZoomContext } from '../../../../apollo-card/ZoomCurtain'
+import { ZoomContext } from '@/apollo-card'
 
 export const PriceTarget: FC<{ ticker: TickerData }> = ({ ticker }) => {
   const zoom = useContext(ZoomContext)

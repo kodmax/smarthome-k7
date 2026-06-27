@@ -1,6 +1,6 @@
 import banner from './card-banners/weather-forecast-long.jpg'
 import { Day, WeekContainer } from './Day'
-import ApolloCard from '../../apollo-card/ApolloCard'
+import { ApolloCard } from '@/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { type FC } from 'react'
 import { DayWeatherForecast, WeatherFeed } from '@repo/types'

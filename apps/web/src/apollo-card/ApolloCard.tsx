@@ -51,4 +51,3 @@ const ApolloCard: FC<ApolloCardProps> = ({
 }
 
 export default ApolloCard
-export { ZoomContext }

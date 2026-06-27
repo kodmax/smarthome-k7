@@ -1,5 +1,5 @@
 import banner from './card-banners/fuel.jpg'
-import ApolloCard from '../apollo-card/ApolloCard'
+import { ApolloCard } from '@/apollo-card'
 import { Graph } from './components/Graph'
 import TablePlaceholder from './components/TablePlaceholder'
 import { useFeed } from '@repo/feed-client'

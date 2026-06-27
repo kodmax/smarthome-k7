@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import ApolloCard, { ZoomContext } from '../../apollo-card/ApolloCard'
+import { ApolloCard, ZoomContext } from '@/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import banner from './job.jpg'
 import TablePlaceholder from '../components/TablePlaceholder'

@@ -2,7 +2,7 @@ import { useCallback, type FC } from 'react'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import banner from './card-banners/fx.jpg'
 import { Graph } from './components/Graph'
-import ApolloCard, { ZoomContext } from '../apollo-card/ApolloCard'
+import { ApolloCard, ZoomContext } from '@/apollo-card'
 import TablePlaceholder from './components/TablePlaceholder'
 import { FXFeed, FXRates } from '@repo/types'
 

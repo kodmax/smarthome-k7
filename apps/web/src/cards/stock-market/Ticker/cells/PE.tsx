@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react'
 import { Data } from '../styled'
-import { ZoomContext } from '../../../../apollo-card/ZoomCurtain'
+import { ZoomContext } from '@/apollo-card'
 import { TickerData } from '@repo/types'
 
 export const PE: FC<{ ticker: TickerData }> = ({ ticker }) => {

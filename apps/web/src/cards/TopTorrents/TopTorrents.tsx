@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import zoomBanner from './torrents-zoom.jpg'
 import banner from './torrents.jpg'
-import ApolloCard, { ZoomContext } from '../../apollo-card/ApolloCard'
+import { ApolloCard, ZoomContext } from '@/apollo-card'
 import TablePlaceholder from '../components/TablePlaceholder'
 import Copy from '../components/Copy'
 import { useFeed } from '@repo/feed-client'
