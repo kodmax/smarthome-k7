@@ -6,8 +6,7 @@ module.exports = {
     project: "./tsconfig.json"
   },
   ignorePatterns: [
-    "src/test.ts",
-    "src/tryit.ts",
+    "scripts/**",
     "**/*.test.ts",
     "**/*.spec.ts"
   ]

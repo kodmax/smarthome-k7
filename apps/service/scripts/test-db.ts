@@ -1,6 +1,6 @@
 import { CacheAgeUnit } from '@repo/apollo-ws'
-import DateTime from './DateTime'
-import db from './db'
+import DateTime from '../src/DateTime'
+import db from '../src/db'
 
 const test = async () => {
   const conn = await db.getConnection()
@@ -15,7 +15,6 @@ const test = async () => {
     ).toFixed(0)
 
     return {
-      // bill: Number((+cost.distribution + +cost.energy) * +avg).toFixed(2),
       datetime: new DateTime().getDate(),
       from: from.getDate(),
       avg,

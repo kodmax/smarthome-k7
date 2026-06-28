@@ -1,5 +1,5 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { getJSON } from '@/fetch'
+import { fetchJSON } from '@/fetch'
 import { Torrent } from '@repo/types'
 
 export const source: DataSourceDefinition<Torrent[]> = {
@@ -8,12 +8,12 @@ export const source: DataSourceDefinition<Torrent[]> = {
 
   expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 12,
   script: async () => {
-    return await getJSON<Torrent[]>('https://apibay.org/precompiled/data_top100_207.json')
+    return await fetchJSON<Torrent[]>('https://apibay.org/precompiled/data_top100_207.json')
   },
 
   push: (push, command, err) => {
     command.on('search', (query: string) => {
-      getJSON<Torrent[]>(
+      fetchJSON<Torrent[]>(
         query !== ''
           ? `https://apibay.org/q.php?q=${encodeURIComponent(query)}&cat=207`
           : 'https://apibay.org/precompiled/data_top100_207.json',

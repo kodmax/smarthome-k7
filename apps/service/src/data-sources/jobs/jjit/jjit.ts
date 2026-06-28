@@ -1,4 +1,4 @@
-import { getJSON } from '@/fetch'
+import { fetchJSON } from '@/fetch'
 import { JobAd } from '@repo/types'
 import { toJobAd } from './toJobAd'
 import { JustJoinAd } from './types'
@@ -11,7 +11,7 @@ type JustJoinResponse = {
 }
 
 const jjit = async (): Promise<JobAd[]> => {
-  return getJSON<JustJoinResponse>(API_ENDPOINT_URL, { accept: 'application/json' }).then(resp =>
+  return fetchJSON<JustJoinResponse>(API_ENDPOINT_URL, { accept: 'application/json' }).then(resp =>
     resp.data.map(toJobAd),
   )
 }

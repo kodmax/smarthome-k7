@@ -1,4 +1,4 @@
-import { getHTML } from '@/fetch'
+import { fetchDocument } from '@/fetch'
 
 // eslint-disable-next-line max-len
 const inflationDataUrl =
@@ -11,7 +11,7 @@ type InflationData = Array<{
 }>
 
 const fetchInflationData = async (): Promise<InflationData> => {
-  return getHTML(inflationDataUrl, { accept: 'text/html' })
+  return fetchDocument(inflationDataUrl, { accept: 'text/html' })
     .then(document => {
       const data = Array.from(document.querySelectorAll('tr'))
         .map((tr): [number, number[]] => [

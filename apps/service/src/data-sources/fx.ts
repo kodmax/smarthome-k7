@@ -1,5 +1,5 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { getHTML } from '@/fetch'
+import { fetchDocument } from '@/fetch'
 import db from '../db'
 import DateTime from '../DateTime'
 import { getTextContent } from './utils/get-text-context'
@@ -12,27 +12,27 @@ export const source: DataSourceDefinition<FXFeed> = {
   expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 1,
   script: async () => {
     const [eur, usd, chf, gbp, uah, rub] = await Promise.all([
-      getHTML('https://pl.investing.com/currencies/eur-pln', { accept: 'text/html' }).then(document => {
+      fetchDocument('https://pl.investing.com/currencies/eur-pln', { accept: 'text/html' }).then(document => {
         return getTextContent(document.body, '.text-2xl[data-test=instrument-price-last]')
       }),
 
-      getHTML('https://pl.investing.com/currencies/usd-pln', { accept: 'text/html' }).then(document => {
+      fetchDocument('https://pl.investing.com/currencies/usd-pln', { accept: 'text/html' }).then(document => {
         return getTextContent(document.body, '.text-2xl[data-test=instrument-price-last]')
       }),
 
-      getHTML('https://pl.investing.com/currencies/chf-pln', { accept: 'text/html' }).then(document => {
+      fetchDocument('https://pl.investing.com/currencies/chf-pln', { accept: 'text/html' }).then(document => {
         return getTextContent(document.body, '.text-2xl[data-test=instrument-price-last]')
       }),
 
-      getHTML('https://pl.investing.com/currencies/gbp-pln', { accept: 'text/html' }).then(document => {
+      fetchDocument('https://pl.investing.com/currencies/gbp-pln', { accept: 'text/html' }).then(document => {
         return getTextContent(document.body, '.text-2xl[data-test=instrument-price-last]')
       }),
 
-      getHTML('https://pl.investing.com/currencies/pln-uah', { accept: 'text/html' }).then(document => {
+      fetchDocument('https://pl.investing.com/currencies/pln-uah', { accept: 'text/html' }).then(document => {
         return getTextContent(document.body, '.text-2xl[data-test=instrument-price-last]')
       }),
 
-      getHTML('https://pl.investing.com/currencies/pln-rub', { accept: 'text/html' }).then(document => {
+      fetchDocument('https://pl.investing.com/currencies/pln-rub', { accept: 'text/html' }).then(document => {
         return getTextContent(document.body, '.text-2xl[data-test=instrument-price-last]')
       }),
     ])

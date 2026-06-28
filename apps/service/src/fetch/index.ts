@@ -1,4 +1,5 @@
 export { FetchError } from './FetchError'
-export { getHTML } from './getHTML'
-export { getJSON } from './getJSON'
+export { fetchDocument } from './fetchDocument'
+export { fetchJSON } from './fetchJSON'
+export { fetchText } from './fetchText'
 export { yahooFetch } from './yahooFetch'

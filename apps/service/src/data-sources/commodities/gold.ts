@@ -1,5 +1,5 @@
 import { getNumberContent } from '../utils/get-number-content'
-import { getHTML } from '@/fetch'
+import { fetchDocument } from '@/fetch'
 
 type GoldPrice = {
   g: string
@@ -7,7 +7,7 @@ type GoldPrice = {
 }
 
 const fetchGoldPrice = (): Promise<GoldPrice> => {
-  return getHTML('https://markets.businessinsider.com/commodities/gold-price', { accept: 'text/html' }).then(
+  return fetchDocument('https://markets.businessinsider.com/commodities/gold-price', { accept: 'text/html' }).then(
     document => {
       // 1 ounce = 28.3495231 grams
       const price = getNumberContent(document.body, '.price-section__current-value')
