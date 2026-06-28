@@ -1,5 +1,5 @@
 import { Feeds } from '@repo/apollo-ws'
-import { knxSchema } from '../../home.knx-schema'
+import { knxSchema } from '@repo/knx-schema'
 import { knxInit } from '../../knx-init'
 import { addEnergyFeed } from './energy'
 import { addHeatingFeed } from './heating'

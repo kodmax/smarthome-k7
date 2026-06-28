@@ -1,6 +1,6 @@
 import { Feeds } from '@repo/apollo-ws'
+import { knxSchema } from '@repo/knx-schema'
 import knxHumidity from '@/data-sources/knx/humidity'
-import { knxSchema } from '../../home.knx-schema'
 import type { KnxLink } from 'js-knx'
 
 export const addHomeAirQualityHumidityFeed = (feeds: Feeds, knx: KnxLink): void => {

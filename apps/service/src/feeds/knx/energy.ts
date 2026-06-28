@@ -1,9 +1,9 @@
 import { Feeds } from '@repo/apollo-ws'
+import { knxSchema } from '@repo/knx-schema'
 import { EnergyFeed } from '@repo/types'
 import { energyCost, energyConsumption } from '@/data-sources'
 import knxEnergy from '@/data-sources/knx/energy'
 import knxPower from '@/data-sources/knx/power'
-import { knxSchema } from '../../home.knx-schema'
 import type { KnxLink } from 'js-knx'
 
 const energyMeterOffset = 12307130 + 181000

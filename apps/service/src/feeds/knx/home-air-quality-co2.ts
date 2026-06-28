@@ -1,9 +1,9 @@
 import { Feeds } from '@repo/apollo-ws'
+import { knxSchema } from '@repo/knx-schema'
 import type { KnxLink } from 'js-knx'
 import { co2Hourly } from '@/data-sources'
 import knxB1 from '@/data-sources/knx/b1'
 import knxCo2 from '@/data-sources/knx/co2'
-import { knxSchema } from '../../home.knx-schema'
 
 export const addHomeAirQualityCo2Feed = (feeds: Feeds, knx: KnxLink): void => {
   const schema = knxSchema.home.airQuality.co2
