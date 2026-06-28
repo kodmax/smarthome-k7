@@ -6,6 +6,7 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc && bun build src/index.ts --target=node --format=cjs --outdir=./dist",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\""
   },
   "devDependencies": {

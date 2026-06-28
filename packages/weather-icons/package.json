@@ -8,5 +8,8 @@
   },
   "exports": {
     ".": "./v2/index.ts"
+  },
+  "scripts": {
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   }
 }

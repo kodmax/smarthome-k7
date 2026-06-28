@@ -6,6 +6,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\""
   },
   "dependencies": {
