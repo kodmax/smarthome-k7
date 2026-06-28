@@ -27,8 +27,8 @@ describe('getApiData', () => {
   it('throws when script is missing', () => {
     const document = parseHTML('<div></div>').window.document
 
-    expect(() =>
-      getApiData(document, 'https://query1.finance.yahoo.com/v10/finance/quoteSummary/AAPL'),
-    ).toThrow('API Data script not found')
+    expect(() => getApiData(document, 'https://query1.finance.yahoo.com/v10/finance/quoteSummary/AAPL')).toThrow(
+      'API Data script not found',
+    )
   })
 })

@@ -67,9 +67,4 @@ const parseOilPriceFromDocument = (document: Document): OilPrice =>
     l: (getNumberContent(document, '.QuoteStrip-lastPrice') / 159).toFixed(2),
   }))
 
-export {
-  parseBtcPriceFromDocument,
-  parseGoldPriceFromDocument,
-  parseInflationFromDocument,
-  parseOilPriceFromDocument,
-}
+export { parseBtcPriceFromDocument, parseGoldPriceFromDocument, parseInflationFromDocument, parseOilPriceFromDocument }

@@ -53,7 +53,14 @@ const width = 300
 export type GraphProps = { data?: Record[]; scaleY: number; scaleX: number; valueKey?: string; activeKey?: string }
 export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value', activeKey = 'active' }) => {
   if (data) {
-    const { points, actives, min, max, stroke } = buildGraphSeries(data, scaleY, scaleX, new Date().getTime(), valueKey, activeKey)
+    const { points, actives, min, max, stroke } = buildGraphSeries(
+      data,
+      scaleY,
+      scaleX,
+      new Date().getTime(),
+      valueKey,
+      activeKey,
+    )
 
     return (
       <Vector>
@@ -65,11 +72,7 @@ export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value'
           version='1.1'
           xmlns='http://www.w3.org/2000/svg'
         >
-          <polyline
-            stroke={stroke}
-            fill='none'
-            points={points}
-          />
+          <polyline stroke={stroke} fill='none' points={points} />
           {actives.map(x => (
             <circle key={x} cx={x} cy='98' r='0.2' strokeWidth='0' fill='red' />
           ))}

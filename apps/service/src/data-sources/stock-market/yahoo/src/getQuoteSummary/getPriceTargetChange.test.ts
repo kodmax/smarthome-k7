@@ -20,11 +20,7 @@ describe('getPriceTargetChange', () => {
   })
 
   it('ignores ratings with zero current or prior target', () => {
-    const ratings = [
-      ...[1, 2, 3, 4, 5, 6].map(n => makeRating(110, 100)),
-      makeRating(0, 100),
-      makeRating(110, 0),
-    ]
+    const ratings = [...[1, 2, 3, 4, 5, 6].map(n => makeRating(110, 100)), makeRating(0, 100), makeRating(110, 0)]
     expect(getPriceTargetChange(ratings)).not.toBeNull()
   })
 

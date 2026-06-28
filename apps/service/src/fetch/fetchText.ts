@@ -5,11 +5,7 @@ import { FetchError } from './FetchError'
  * No request timeout is configured — requests to our data sources return quickly enough
  * that we don't need one for now.
  */
-export async function fetchText(
-  url: string,
-  extraHeaders?: Record<string, string>,
-  method = 'GET',
-): Promise<string> {
+export async function fetchText(url: string, extraHeaders?: Record<string, string>, method = 'GET'): Promise<string> {
   const purl = new URL(url)
   const req = await fetch(url, {
     method,

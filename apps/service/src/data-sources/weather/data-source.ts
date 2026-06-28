@@ -4,13 +4,7 @@ import DateTime from '../../DateTime'
 import * as suncalc from 'suncalc'
 import { WeatherFeed } from '@repo/types'
 import { config } from '../../config'
-import {
-  parseAirQuality,
-  parseAllergens,
-  parseForecast,
-  parseHourly,
-  parseInstant,
-} from './parsers'
+import { parseAirQuality, parseAllergens, parseForecast, parseHourly, parseInstant } from './parsers'
 
 const { long, lat } = config.geoLocation
 

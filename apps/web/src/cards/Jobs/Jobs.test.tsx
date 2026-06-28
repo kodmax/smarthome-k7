@@ -24,10 +24,7 @@ describe('Jobs', () => {
 
   it('renders job ads from the feed', () => {
     mockedUseFeed.mockReturnValue(
-      jobsFeed(
-        jobAd({ id: '1', title: 'Backend Engineer' }),
-        jobAd({ id: '2', title: 'Frontend Engineer' }),
-      ),
+      jobsFeed(jobAd({ id: '1', title: 'Backend Engineer' }), jobAd({ id: '2', title: 'Frontend Engineer' })),
     )
 
     render(<Jobs />)

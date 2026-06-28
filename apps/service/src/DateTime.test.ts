@@ -29,9 +29,7 @@ describe('DateTime', () => {
 
   it('shifts back by hours', () => {
     const dt = new DateTime(-2, CacheAgeUnit.HOURS)
-    const expected = new Date(
-      fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 2 * CacheAgeUnit.HOURS * 1000,
-    )
+    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 2 * CacheAgeUnit.HOURS * 1000)
       .toISOString()
       .substring(0, 10)
 
@@ -40,9 +38,7 @@ describe('DateTime', () => {
 
   it('shifts back by days', () => {
     const dt = new DateTime(-7, CacheAgeUnit.DAYS)
-    const expected = new Date(
-      fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 7 * CacheAgeUnit.DAYS * 1000,
-    )
+    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 7 * CacheAgeUnit.DAYS * 1000)
       .toISOString()
       .substring(0, 10)
 
