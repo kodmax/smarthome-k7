@@ -12,6 +12,7 @@ export default defineConfig({
     ],
   },
   test: {
+    setupFiles: ['./src/test/setupEnv.ts'],
     exclude: [...configDefaults.exclude, 'dist/**'],
   },
 })

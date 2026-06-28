@@ -35,7 +35,7 @@ export const source: DataSourceDefinition<WeatherFeed> = {
         instant.pressure,
       ])
 
-      const sunTimesResult = suncalc.getTimes(new Date(), 52.2283698, 20.973194)
+      const sunTimesResult = suncalc.getTimes(new Date(), lat, long)
       const sunTimes: WeatherFeed['sunTimes'] = {
         sunrise: sunTimesResult.sunrise.toISOString(),
         sunset: sunTimesResult.sunset.toISOString(),

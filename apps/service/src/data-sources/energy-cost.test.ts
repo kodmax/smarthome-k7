@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateCost } from './energy-cost'
+import { calculateCost } from './calculate-cost'
 
 describe('calculateCost', () => {
   it('calculates energy cost from consumption', () => {

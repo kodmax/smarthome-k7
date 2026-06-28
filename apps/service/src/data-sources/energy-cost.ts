@@ -1,21 +1,10 @@
 import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
 import DateTime from '../DateTime'
 import db from '../db'
-import { EnergyRates } from '@repo/types'
-
-const rates: EnergyRates = {
-  added: 33.8,
-  distribution: '0.16036',
-  energy: '0.5376',
-  vat: 1.23,
-}
-
-export const calculateCost = (energy: number): string => {
-  return (energy * (+rates.distribution + +rates.energy)).toFixed(2)
-}
+import { energyRates } from './calculate-cost'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const source: DataSourceDefinition<{ datetime: string; rates: EnergyRates; avg: number }> = {
+export const source: DataSourceDefinition<{ datetime: string; rates: typeof energyRates; avg: number }> = {
   cron: '0 0 * * *',
   id: 'energy-cost',
 
@@ -35,7 +24,7 @@ export const source: DataSourceDefinition<{ datetime: string; rates: EnergyRates
       return {
         // bill: Number((+cost.distribution + +cost.energy) * +avg).toFixed(2),
         datetime: new DateTime().getDate(),
-        rates,
+        rates: energyRates,
         avg,
       }
     } finally {

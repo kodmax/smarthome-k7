@@ -1,5 +1,8 @@
 import { configDotenv } from 'dotenv'
-configDotenv()
+
+if (process.env.VITEST !== 'true') {
+  configDotenv()
+}
 
 const getString = (name: string): string => {
   const value = process.env[name]
