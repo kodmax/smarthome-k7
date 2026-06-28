@@ -23,9 +23,7 @@ export const Jobs: FC<Record<string, never>> = () => {
               >
                 <tbody>
                   {feed.ads.map(ad => (
-                    <tr key={ad.id}>
-                      <Ad ad={ad} zoom={zoom.active} />
-                    </tr>
+                    <Ad key={ad.id} ad={ad} zoom={zoom.active} />
                   ))}
                 </tbody>
               </table>

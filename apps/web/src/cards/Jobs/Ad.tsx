@@ -2,24 +2,15 @@ import { JobAd } from '@repo/types'
 import { FC, useMemo } from 'react'
 import { Company, JobTitle, Logo, Open, Salary } from './styled'
 import LinkOpen from '../components/LinkOpen'
+import { formatJobSalary } from './formatJobSalary'
 import { isFavSkill } from './isFavSkill'
 
 export const Ad: FC<{ ad: JobAd; zoom: boolean }> = ({ ad, zoom }) => {
   const favSkills = useMemo(() => ad.requiredSkills.filter(isFavSkill), [ad])
-
-  const [monthlySalaryFrom, monthlySalaryTo, b2bHourlyRateEquivalent] = useMemo(
-    () => [
-      ad.monthlySalaryRangeAfterTaxes !== undefined ? Math.round(ad.monthlySalaryRangeAfterTaxes.from / 1000) : null,
-      ad.monthlySalaryRangeAfterTaxes !== undefined ? Math.round(ad.monthlySalaryRangeAfterTaxes.to / 1000) : null,
-      ad.monthlySalaryRangeAfterTaxes !== undefined
-        ? Math.round((ad.monthlySalaryRangeAfterTaxes.to / 0.88 + 1000) / 150)
-        : null,
-    ],
-    [ad],
-  )
+  const { monthlySalaryFrom, monthlySalaryTo, b2bHourlyRateEquivalent } = useMemo(() => formatJobSalary(ad), [ad])
 
   return (
-    <>
+    <tr>
       <Company>
         {' '}
         {ad.companyLogoUrl ? <Logo src={ad.companyLogoUrl} isUnwanted={ad.isUnwantedCompany} /> : ad.companyName}{' '}
@@ -50,6 +41,6 @@ export const Ad: FC<{ ad: JobAd; zoom: boolean }> = ({ ad, zoom }) => {
           </>
         ) : null}
       </Salary>
-    </>
+    </tr>
   )
 }

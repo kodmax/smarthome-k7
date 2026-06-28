@@ -1,20 +1,10 @@
 import { FC } from 'react'
 import { Data } from '../styled'
 import { TickerData } from '@repo/types'
+import { calcPEAtPT } from './calcPEAtPT'
 
 export const PEAtPT: FC<{ ticker: TickerData }> = ({ ticker }) => {
-  const trailingPE =
-    ticker.statistics.trailingEPS > 0 ? ticker.price.lastTradePrice / ticker.statistics.trailingEPS : null
-
-  const trailingPEAtPriceTarget =
-    trailingPE !== null && ticker.price.priceTarget !== null
-      ? (trailingPE * ticker.price.priceTarget) / ticker.price.lastTradePrice
-      : null
-
-  const forwardPEAtPriceTarget =
-    ticker.statistics.forwardEPS !== null && ticker.statistics.forwardEPS > 0 && ticker.price.priceTarget !== null
-      ? ticker.price.priceTarget / ticker.statistics.forwardEPS
-      : null
+  const { trailingPEAtPriceTarget, forwardPEAtPriceTarget } = calcPEAtPT(ticker)
 
   return (
     <Data sx={{ fontFamily: 'monospace', textAlign: 'center' }}>

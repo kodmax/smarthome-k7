@@ -21,7 +21,7 @@ const Indicator = styled('span')({
   width: '0.333em',
 })
 
-function chooseColor(
+export function chooseColor(
   instant: number,
   { lowest, below, optimal, above, highest, reverse }: ColorIndicationRange,
 ): string {
