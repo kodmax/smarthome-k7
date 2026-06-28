@@ -1,13 +1,13 @@
+import { yahooFetch } from '@/fetch'
 import { getFinStreamerText, getStatisticText, getText } from './getText'
 import { getOptionalStatisticText } from './getText/getOptionalStatisticText'
 import { toNumber } from './toNumber'
-import { getDocument } from './getDocument'
 import { YahooTickerData } from '../types'
 import { convertMarketCap } from './convertToBillions'
 import { getQuoteSumary } from './getQuoteSummary'
 
 export const getTickerData = async (ticker: string): Promise<YahooTickerData> => {
-  const mainPage = await getDocument(ticker)
+  const mainPage = await yahooFetch(`https://finance.yahoo.com/quote/${ticker}/`)
 
   const oneYearPriceTarget = toNumber(getFinStreamerText(mainPage, 'targetMeanPrice'))
 
