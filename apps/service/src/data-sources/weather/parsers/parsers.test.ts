@@ -61,26 +61,29 @@ describe('weather parsers', () => {
 
   it('parseAllergens reads allergen cards', () => {
     expect(parseAllergensFromDocument(loadDocument('allergens.html'))).toEqual([
-      { id: 'tree', name: 'Drzewa', intensity: 'Wysoki' },
-      { id: 'grass', name: 'Trawy', intensity: 'Niski' },
+      { id: 'tree-pollen', name: 'Pyłki drzew', intensity: 'Niskie' },
+      { id: 'ragweed-pollen', name: 'Pyłki ambrozji', intensity: 'Niskie' },
+      { id: 'mold', name: 'Pleśń', intensity: 'Niskie' },
+      { id: 'grass-pollen', name: 'Pyłki traw', intensity: 'Niskie' },
+      { id: 'dust-dander', name: 'Pyłki i alergeny', intensity: 'Wysokie' },
     ])
   })
 
   it('parseAllergens throws when allergen cards are missing', () => {
-    const document = parseHTML('<div class="allergy-forecast"></div>').window.document
+    const document = parseHTML('<div class="health-activities"></div>').window.document
 
     expect(() => parseAllergensFromDocument(document)).toThrow(
-      'weather: no elements matched ".allergy-forecast .allergy" in allergen forecast',
+      'weather: no elements matched ".health-activities .health-activities__item" in allergen forecast',
     )
   })
 
   it('parseAllergens throws when allergen name is missing', () => {
     const document = parseHTML(
-      '<div class="allergy-forecast"><a class="allergy" href="?name=tree"><span class="allergy-value">Wysoki</span></a></div>',
+      '<div class="health-activities"><a class="health-activities__item" href="?name=tree-pollen"><span class="health-activities__item__category">Niskie</span></a></div>',
     ).window.document
 
     expect(() => parseAllergensFromDocument(document)).toThrow(
-      'weather: missing ".allergy-name" in allergen forecast item',
+      'weather: missing ".health-activities__item__name" in allergen forecast item',
     )
   })
 

@@ -10,12 +10,12 @@ export type AllergenForecast = {
 
 export const parseAllergensFromDocument = (document: Document): AllergenForecast[] =>
   withScraperSource('weather', () => {
-    const allergens = requireElements(document, '.allergy-forecast .allergy', 'allergen forecast')
+    const allergens = requireElements(document, '.health-activities .health-activities__item', 'allergen forecast')
 
     return allergens.slice(0, 5).map(allergen => ({
       id: new URL(allergen.getAttribute('href') ?? '', 'https://www.accuweather.com/').searchParams.get('name'),
-      name: requireText(allergen, '.allergy-name', 'allergen forecast item'),
-      intensity: requireText(allergen, '.allergy-value', 'allergen forecast item'),
+      name: requireText(allergen, '.health-activities__item__name', 'allergen forecast item'),
+      intensity: requireText(allergen, '.health-activities__item__category', 'allergen forecast item'),
     }))
   })
 
