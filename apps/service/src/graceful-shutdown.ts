@@ -1,10 +1,18 @@
 import type { KnxLink } from 'js-knx'
+import pool from './db'
 
 let knxLink: KnxLink | undefined
 let shuttingDown = false
 
 export const registerKnxLink = (link: KnxLink): void => {
   knxLink = link
+}
+
+const closeConnections = async (): Promise<void> => {
+  if (knxLink !== undefined) {
+    await knxLink.disconnect()
+  }
+  await pool.end()
 }
 
 export const setupGracefulShutdown = (): void => {
@@ -17,16 +25,10 @@ export const setupGracefulShutdown = (): void => {
 
     console.log(`${signal}. Exiting.`)
 
-    if (knxLink === undefined) {
-      process.exit(0)
-      return
-    }
-
-    knxLink
-      .disconnect()
+    closeConnections()
       .then(() => process.exit(0))
       .catch(err => {
-        console.error('Failed to disconnect KNX:', err)
+        console.error('Failed during shutdown:', err)
         process.exit(1)
       })
   }

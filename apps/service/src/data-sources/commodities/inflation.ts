@@ -1,3 +1,4 @@
+import { requireElements, withScraperSource } from '../utils/require-scraper'
 import { fetchDocument } from '@/fetch'
 
 // eslint-disable-next-line max-len
@@ -12,26 +13,33 @@ type InflationData = Array<{
 
 const fetchInflationData = async (): Promise<InflationData> => {
   return fetchDocument(inflationDataUrl, { accept: 'text/html' })
-    .then(document => {
-      const data = Array.from(document.querySelectorAll('tr'))
-        .map((tr): [number, number[]] => [
-          Number(tr.querySelector('th:not([rowspan])')?.textContent),
-          Array.from(tr.querySelectorAll('td')).map(td => Number(td.textContent?.replace(',', '.'))),
-        ])
-        .filter(([year, months]) => !isNaN(year) && months.length === 12)
-        .filter(([year]) => year >= 2015)
-      const years = new Set<number>(data.map(year => year[0]))
+    .then(document =>
+      withScraperSource('inflation', () => {
+        const rows = requireElements(document, 'tr', 'monthly CPI table')
+        const data = rows
+          .map((tr): [number, number[]] => [
+            Number(tr.querySelector('th:not([rowspan])')?.textContent),
+            Array.from(tr.querySelectorAll('td')).map(td => Number(td.textContent?.replace(',', '.'))),
+          ])
+          .filter(([year, months]) => !isNaN(year) && months.length === 12)
+          .filter(([year]) => year >= 2015)
 
-      const history: InflationRawData = {}
-      for (const year of years) {
-        history[year] = []
-      }
-      for (const [year, months] of data) {
-        history[year].push(months)
-      }
+        if (data.length === 0) {
+          throw new Error('no yearly rows with 12 monthly values found in monthly CPI table')
+        }
+        const years = new Set<number>(data.map(year => year[0]))
 
-      return history
-    })
+        const history: InflationRawData = {}
+        for (const year of years) {
+          history[year] = []
+        }
+        for (const [year, months] of data) {
+          history[year].push(months)
+        }
+
+        return history
+      }),
+    )
     .then(inflationData => {
       const inflation: InflationData = []
       for (const year of Object.keys(inflationData).sort((a, b) => +a - +b)) {

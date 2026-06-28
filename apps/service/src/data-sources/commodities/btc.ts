@@ -1,4 +1,5 @@
 import { getNumberContent } from '../utils/get-number-content'
+import { withScraperSource } from '../utils/require-scraper'
 import { fetchDocument } from '@/fetch'
 
 type BtcPrice = {
@@ -6,13 +7,13 @@ type BtcPrice = {
 }
 
 const fetchBtcPrice = async (): Promise<BtcPrice> => {
-  return fetchDocument('https://www.cnbc.com/quotes/BTC.BS=', { accept: 'text/html' }).then(document => {
-    const usd = getNumberContent(document.body, '.QuoteStrip-lastPrice').toFixed(2)
+  return fetchDocument('https://www.cnbc.com/quotes/BTC.BS=', { accept: 'text/html' }).then(document =>
+    withScraperSource('btc', () => {
+      const usd = getNumberContent(document.body, '.QuoteStrip-lastPrice').toFixed(2)
 
-    return {
-      usd,
-    }
-  })
+      return { usd }
+    }),
+  )
 }
 
 export type { BtcPrice }

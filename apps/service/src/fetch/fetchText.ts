@@ -1,6 +1,10 @@
 import { URL } from 'url'
 import { FetchError } from './FetchError'
 
+/**
+ * No request timeout is configured — requests to our data sources return quickly enough
+ * that we don't need one for now.
+ */
 export async function fetchText(
   url: string,
   extraHeaders?: Record<string, string>,

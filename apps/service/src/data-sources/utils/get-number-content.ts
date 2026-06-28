@@ -1,11 +1,6 @@
-const getNumberContent: (element: Element, selector: string) => number = (element, selector) => {
-  const target = selector ? element.querySelector(selector) : element
+import { requireNumber } from './require-scraper'
 
-  if (target && typeof target.textContent === 'string') {
-    return Number(target.textContent.replace(/,/g, '').trim())
-  }
-
-  throw new Error('HTML Node textContent not found')
-}
+const getNumberContent: (element: Element, selector: string) => number = (element, selector) =>
+  requireNumber(element, selector)
 
 export { getNumberContent }
