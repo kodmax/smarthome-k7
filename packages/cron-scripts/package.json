@@ -1,0 +1,15 @@
+{
+  "name": "@repo/cron-scripts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "imports": {
+    "#config/*": "./src/config/*.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "js-knx": "2.16.0",
+    "mariadb": "^3.0.0",
+    "sony-bravia-ip-control": "^1.1.0"
+  }
+}
