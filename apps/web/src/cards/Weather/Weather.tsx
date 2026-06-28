@@ -11,6 +11,7 @@ import { getPosition, getMoonPosition } from 'suncalc'
 import { useFeed } from '@repo/feed-client'
 import { WeatherFeed } from '@repo/types'
 import { sunTimes } from './sunTimes'
+import { toMetersPerSecond } from './windSpeed'
 
 export const Weather: FC<Record<string, never>> = () => {
   const feed = useFeed<WeatherFeed>('weather')
@@ -28,11 +29,8 @@ export const Weather: FC<Record<string, never>> = () => {
   const hum = feed.instant.humidity
   const sun = sunTimes(feed)
 
-  const windMaxSpeed =
-    feed.instant.wind.speedUnit === 'km/h' ? Math.round(feed.instant.wind.maxSpeed / 3.6) : feed.instant.wind.maxSpeed
-
-  const windSpeed =
-    feed.instant.wind.speedUnit === 'km/h' ? Math.round(feed.instant.wind.speed / 3.6) : feed.instant.wind.speed
+  const windMaxSpeed = toMetersPerSecond(feed.instant.wind.maxSpeed, feed.instant.wind.speedUnit)
+  const windSpeed = toMetersPerSecond(feed.instant.wind.speed, feed.instant.wind.speedUnit)
 
   return (
     <ApolloCard cardId='current-weather' banner={banner} zoomBanner={zoomBanner}>

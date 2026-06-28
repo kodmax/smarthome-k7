@@ -8,24 +8,9 @@ import {
   useEffect,
   useReducer,
 } from 'react'
+import { type ZoomSetup, zoomReducer } from './zoomReducer'
 
-type ZoomStyle = {
-  transition: string
-  bottom: number | string
-  right: number | string
-  left: number | string
-  top: number | string
-
-  fontSize: number
-  lineHeight: number
-}
-
-type ZoomSetup =
-  | { active: false }
-  | {
-      style: ZoomStyle
-      active: true
-    }
+export type { ZoomSetup } from './zoomReducer'
 
 const ZoomContext = createContext<ZoomSetup>({
   active: false,
@@ -44,46 +29,12 @@ const Curtain = styled('div')({
 const zoomCardTransition = 'left 0.7s ease-out, right 0.7s ease-out, top 0.7s ease-out, bottom 0.7s ease-out'
 const zoomIgnoreClicksOnTags = ['A', 'BUTTON', 'INPUT']
 
-type ZoomAction =
-  | {
-      method: 'zoom-out'
-    }
-  | {
-      method: 'focus' | 'expand'
-      style: ZoomStyle
-    }
-
 const ZoomCurtain: FC<{ children: ReactNode; cardId: string; allowZoom: boolean; onZoom?: () => void }> = ({
   children,
   allowZoom,
   onZoom,
 }) => {
-  const [zoom, dispatch] = useReducer(
-    (state: ZoomSetup, action: ZoomAction): ZoomSetup => {
-      switch (action.method) {
-        case 'expand':
-          return {
-            ...state,
-            active: true,
-            style: action.style,
-          }
-
-        case 'focus':
-          return {
-            ...state,
-            active: true,
-            style: action.style,
-          }
-
-        case 'zoom-out':
-          return {
-            ...state,
-            active: false,
-          }
-      }
-    },
-    { active: false },
-  )
+  const [zoom, dispatch] = useReducer(zoomReducer, { active: false })
 
   useEffect(() => {
     if (zoom.active && onZoom !== undefined) {
