@@ -1,0 +1,1 @@
+export { initWebFeeds } from './init'

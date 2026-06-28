@@ -1,8 +1,8 @@
 import { Feeds } from '@repo/apollo-ws'
 import type { KnxLink } from 'js-knx'
 import { DPT_Value_Temp } from 'js-knx'
-import { indoorTempHistory, type TempHistory } from '../data-sources'
-import knxTemp from '../data-sources/knx/temp'
+import { indoorTempHistory, type TempHistory } from '@/data-sources'
+import knxTemp from '@/data-sources/knx/temp'
 
 export type HomeTempRoomSchema = {
   history: keyof TempHistory

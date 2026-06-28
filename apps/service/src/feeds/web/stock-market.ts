@@ -1,10 +1,10 @@
 import { Feeds } from '@repo/apollo-ws'
 import { StockMarketFeed, TickerData } from '@repo/types'
-import { YahooTickerData } from '../data-sources/stock-market/yahoo/types'
-import { nasdaqMarketData, yahooMarketData, nasdaqEPSData } from '../data-sources'
-import { NasdaqTickerData } from '../data-sources/stock-market/nasdaq/types'
-import { NasdaqEPSData } from '../data-sources/stock-market/nasdaq-eps/types'
-import { tickerList } from '../data-sources/stock-market/tickerList'
+import { YahooTickerData } from '@/data-sources/stock-market/yahoo/types'
+import { nasdaqMarketData, yahooMarketData, nasdaqEPSData } from '@/data-sources'
+import { NasdaqTickerData } from '@/data-sources/stock-market/nasdaq/types'
+import { NasdaqEPSData } from '@/data-sources/stock-market/nasdaq-eps/types'
+import { tickerList } from '@/data-sources/stock-market/tickerList'
 
 export const addStockMarketFeed = (feeds: Feeds): void => {
   feeds.addFeed(
