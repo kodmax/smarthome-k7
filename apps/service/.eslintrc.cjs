@@ -4,5 +4,11 @@ module.exports = {
   extends: ["@repo/eslint-config/index.js"],
   parserOptions: {
     project: "./tsconfig.json"
-  }
+  },
+  ignorePatterns: [
+    "src/test.ts",
+    "src/tryit.ts",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 };
