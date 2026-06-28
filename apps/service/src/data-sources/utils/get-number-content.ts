@@ -1,6 +1,6 @@
 import { requireNumber } from '@/utils/scraper'
 
-const getNumberContent: (element: Element, selector: string) => number = (element, selector) =>
-  requireNumber(element, selector)
+const getNumberContent: (root: ParentNode, selector: string) => number = (root, selector) =>
+  requireNumber(root, selector)
 
 export { getNumberContent }

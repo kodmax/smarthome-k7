@@ -66,6 +66,24 @@ describe('weather parsers', () => {
     ])
   })
 
+  it('parseAllergens throws when allergen cards are missing', () => {
+    const document = parseHTML('<div class="allergy-forecast"></div>').window.document
+
+    expect(() => parseAllergensFromDocument(document)).toThrow(
+      'weather: no elements matched ".allergy-forecast .allergy" in allergen forecast',
+    )
+  })
+
+  it('parseAllergens throws when allergen name is missing', () => {
+    const document = parseHTML(
+      '<div class="allergy-forecast"><a class="allergy" href="?name=tree"><span class="allergy-value">Wysoki</span></a></div>',
+    ).window.document
+
+    expect(() => parseAllergensFromDocument(document)).toThrow(
+      'weather: missing ".allergy-name" in allergen forecast item',
+    )
+  })
+
   it('parseHourly reads hourly rows and adds sun position', () => {
     const [hour] = parseHourlyFromDocument(loadDocument('hourly.html'), '2026-06-28', 52.23, 21.01)
 
@@ -80,6 +98,24 @@ describe('weather parsers', () => {
     expect(Number.isFinite(hour.sun.azimuth)).toBe(true)
   })
 
+  it('parseHourly throws when hourly wrapper is empty', () => {
+    const document = parseHTML('<div class="hourly-wrapper"></div>').window.document
+
+    expect(() => parseHourlyFromDocument(document, '2026-06-28', 52.23, 21.01)).toThrow(
+      'weather: no elements matched ".hourly-wrapper .hour" in hourly forecast',
+    )
+  })
+
+  it('parseHourly throws when hour icon is missing', () => {
+    const document = parseHTML(
+      '<div class="hourly-wrapper"><div class="hour"><span class="date">14</span><span class="temp metric">21°</span><span class="precip">10%</span></div></div>',
+    ).window.document
+
+    expect(() => parseHourlyFromDocument(document, '2026-06-28', 52.23, 21.01)).toThrow(
+      'weather: missing ".icon" src in hourly forecast hour',
+    )
+  })
+
   it('parseAirQuality reads AQI and pollutants', () => {
     expect(parseAirQualityFromDocument(loadDocument('air-quality.html'))).toEqual({
       aqi: 42,
@@ -87,5 +123,23 @@ describe('weather parsers', () => {
         'PM2.5': { concentration: '12 µg/m³', index: '42' },
       },
     })
+  })
+
+  it('parseAirQuality throws when AQI number is missing', () => {
+    const document = parseHTML('<div class="air-quality-content"></div>').window.document
+
+    expect(() => parseAirQualityFromDocument(document)).toThrow(
+      'weather: no elements matched ".air-quality-content .aq-number" in air quality',
+    )
+  })
+
+  it('parseAirQuality throws when pollutants are missing', () => {
+    const document = parseHTML(
+      '<div class="air-quality-content"><span class="aq-number">42</span></div><div id="pollutants"></div>',
+    ).window.document
+
+    expect(() => parseAirQualityFromDocument(document)).toThrow(
+      'weather: no elements matched "#pollutants .air-quality-pollutant" in air quality pollutants',
+    )
   })
 })
