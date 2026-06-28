@@ -1,5 +1,6 @@
 #!/usr/bin/node
-import { DPT_ActiveEnergy, KnxLink } from 'js-knx'
+import { knxSchema } from '@repo/knx-schema'
+import { KnxLink } from 'js-knx'
 import * as mariadb from 'mariadb'
 import { dbConfig } from '#config/db'
 import { requireEnv } from '#config/env'
@@ -15,7 +16,7 @@ KnxLink.connect(requireEnv('KNX_HOST'), { maxRetry: 3 }).then(async knx => {
   }
 
   try {
-    const total = await knx.getDatapoint({ address: '5/2/3', DataType: DPT_ActiveEnergy }).read()
+    const total = await knx.getDatapoint(knxSchema.home.energy.consumption.meterTotalReading).read()
     const prevHour = new Date(now - (now % 3_600_000) - 3_600_000)
     const thisHour = new Date(now - (now % 3_600_000))
 

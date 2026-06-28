@@ -1,5 +1,6 @@
 #!/usr/bin/node
-import { DPT_State, DPT_Value_AirQuality, DPT_Value_Humidity, DPT_Value_Temp, KnxLink } from 'js-knx'
+import { knxSchema } from '@repo/knx-schema'
+import { KnxLink } from 'js-knx'
 import * as mariadb from 'mariadb'
 import { dbConfig } from '#config/db'
 import { requireEnv } from '#config/env'
@@ -10,29 +11,30 @@ KnxLink.connect(requireEnv('KNX_HOST'), { maxRetry: 3 }).then(async knx => {
   const db = await pool.getConnection()
 
   try {
+    const schema = knxSchema.home
     const bathroomFloor = {
-      temp: await knx.getDatapoint({ address: '2/3/1', DataType: DPT_Value_Temp }).read(),
-      state: await knx.getDatapoint({ address: '2/7/10', DataType: DPT_State }).read(),
+      temp: await knx.getDatapoint(schema.temp.bathroomFloor.reading).read(),
+      state: await knx.getDatapoint(schema.heating.bathroom.floorHeating).read(),
     }
     const bathroom = {
-      setpoint: await knx.getDatapoint({ address: '2/1/0', DataType: DPT_Value_Temp }).read(),
-      temp: await knx.getDatapoint({ address: '2/3/8', DataType: DPT_Value_Temp }).read(),
-      state: await knx.getDatapoint({ address: '2/7/7', DataType: DPT_State }).read(),
+      setpoint: await knx.getDatapoint(schema.temp.bathroom.setpoint).read(),
+      temp: await knx.getDatapoint(schema.temp.bathroom.reading).read(),
+      state: await knx.getDatapoint(schema.heating.bathroom.waterHeating).read(),
     }
     const livingroom = {
-      setpoint: await knx.getDatapoint({ address: '2/0/0', DataType: DPT_Value_Temp }).read(),
-      temp: await knx.getDatapoint({ address: '2/3/11', DataType: DPT_Value_Temp }).read(),
-      state: await knx.getDatapoint({ address: '2/7/1', DataType: DPT_State }).read(),
+      setpoint: await knx.getDatapoint(schema.temp.livingRoom.setpoint).read(),
+      temp: await knx.getDatapoint(schema.temp.livingRoom.reading).read(),
+      state: await knx.getDatapoint(schema.heating.livingRoom.waterHeating).read(),
     }
     const bedroom = {
-      setpoint: await knx.getDatapoint({ address: '2/2/0', DataType: DPT_Value_Temp }).read(),
-      temp: await knx.getDatapoint({ address: '2/3/9', DataType: DPT_Value_Temp }).read(),
-      state: await knx.getDatapoint({ address: '2/7/5', DataType: DPT_State }).read(),
+      setpoint: await knx.getDatapoint(schema.temp.bedroom.setpoint).read(),
+      temp: await knx.getDatapoint(schema.temp.bedroom.reading).read(),
+      state: await knx.getDatapoint(schema.heating.bedroom.waterHeating).read(),
     }
 
-    const humidity = await knx.getDatapoint({ address: '2/3/5', DataType: DPT_Value_Humidity }).read()
-    const dewPoint = await knx.getDatapoint({ address: '2/3/10', DataType: DPT_Value_Temp }).read()
-    const co2 = await knx.getDatapoint({ address: '2/3/3', DataType: DPT_Value_AirQuality }).read()
+    const humidity = await knx.getDatapoint(schema.airQuality.humidity.reading).read()
+    const dewPoint = await knx.getDatapoint(schema.airQuality.dewPoint.reading).read()
+    const co2 = await knx.getDatapoint(schema.airQuality.co2.reading).read()
 
     await db.query(
       `insert into indoor_air_condition (

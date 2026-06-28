@@ -12,8 +12,9 @@
     "#config/*": "./dist/config/*.js"
   },
   "dependencies": {
+    "@repo/knx-schema": "*",
     "dotenv": "^17.4.2",
-    "js-knx": "2.16.0",
+    "js-knx": "^2.18.0",
     "mariadb": "^3.0.0",
     "sony-bravia-ip-control": "^1.1.0"
   },

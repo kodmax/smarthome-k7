@@ -1,5 +1,6 @@
 #!/usr/bin/node
-import { DPT_ActiveEnergy, KnxLink } from 'js-knx'
+import { knxSchema } from '@repo/knx-schema'
+import { KnxLink } from 'js-knx'
 import * as mariadb from 'mariadb'
 import { dbConfig } from '#config/db'
 import { requireEnv } from '#config/env'
@@ -16,7 +17,7 @@ KnxLink.connect(requireEnv('KNX_HOST'), { maxRetry: 5 }).then(async knx => {
       throw new Error('Missing yesterdays entry')
     }
 
-    const total = await knx.getDatapoint({ address: '5/2/3', DataType: DPT_ActiveEnergy }).read()
+    const total = await knx.getDatapoint(knxSchema.home.energy.consumption.meterTotalReading).read()
     const consumption = total.value - lastReading[0].total_reading
 
     await db.query('insert into daily_energy_readings (date, total_reading, daily_consumption) values (?, ?, ?)', [

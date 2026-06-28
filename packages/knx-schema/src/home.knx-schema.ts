@@ -1,7 +1,10 @@
 import {
   DPT_ActiveEnergy,
   DPT_Alarm,
+  DPT_Date,
+  DPT_DateTime,
   DPT_HVACMode,
+  DPT_Time,
   DPT_Value_AirQuality,
   DPT_Value_Humidity,
   DPT_Value_Power,
@@ -10,11 +13,21 @@ import {
 } from 'js-knx'
 
 export const knxSchema = {
+  system: {
+    clock: {
+      dateTime: { address: '1/0/1', DataType: DPT_DateTime },
+      date: { address: '1/0/2', DataType: DPT_Date },
+      time: { address: '1/0/3', DataType: DPT_Time },
+    },
+  },
   home: {
     airQuality: {
       co2: {
         reading: { address: '2/3/3', DataType: DPT_Value_AirQuality },
         alert: { address: '2/5/1', DataType: DPT_Alarm },
+      },
+      dewPoint: {
+        reading: { address: '2/3/10', DataType: DPT_Value_Temp },
       },
       humidity: {
         reading: { address: '2/3/5', DataType: DPT_Value_Humidity },
