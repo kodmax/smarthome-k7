@@ -1,5 +1,5 @@
-import { getNumberContent } from '../utils/get-number-content'
-import { withScraperSource } from '../utils/require-scraper'
+import { getNumberContent } from '@/utils/get-number-content'
+import { withScraperSource } from '@/utils/scraper'
 import { fetchDocument } from '@/fetch'
 
 type NaturalGasPrice = {

@@ -1,9 +1,8 @@
 import { DayWeatherForecast } from '@repo/types'
 import { fetchDocument } from '@/fetch'
 import { basename } from 'path'
-import { withScraperSource } from '../../utils/require-scraper'
+import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
-import { requireElements, requireText } from './parseUtils'
 
 export const parseForecastFromDocument = (document: Document): DayWeatherForecast[] =>
   withScraperSource('weather', () => {

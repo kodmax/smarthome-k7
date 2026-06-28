@@ -6,7 +6,8 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/utils/*": ["./src/data-sources/utils/*"]
     },
     "resolveJsonModule": true,
     "outDir": "./dist",

@@ -2,7 +2,7 @@ import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { fetchDocument } from '@/fetch'
 import db from '../db'
 import DateTime from '../DateTime'
-import { getTextContent } from './utils/get-text-context'
+import { getTextContent } from '@/utils/get-text-context'
 import { FXFeed, FXRateHistory, FXRates } from '@repo/types'
 
 export const source: DataSourceDefinition<FXFeed> = {

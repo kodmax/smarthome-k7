@@ -6,9 +6,10 @@ const srcDir = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   resolve: {
-    alias: {
-      '@': path.resolve(srcDir, 'src'),
-    },
+    alias: [
+      { find: '@/utils', replacement: path.resolve(srcDir, 'src/data-sources/utils') },
+      { find: '@', replacement: path.resolve(srcDir, 'src') },
+    ],
   },
   test: {
     exclude: [...configDefaults.exclude, 'dist/**'],

@@ -1,8 +1,8 @@
 import { parseHTML } from 'linkedom'
 import { describe, expect, it } from 'vitest'
-import { requireElements, requireNumber, withScraperSource } from './require-scraper'
+import { requireElements, requireNumber, withScraperSource } from '@/utils/scraper'
 
-describe('require-scraper', () => {
+describe('scraper', () => {
   it('requireNumber throws with selector when element is missing', () => {
     const document = parseHTML('<div></div>').window.document
 

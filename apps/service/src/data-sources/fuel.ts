@@ -2,7 +2,7 @@ import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../DateTime'
 import db from '../db'
 import { fetchDocument } from '@/fetch'
-import { getTextContent } from './utils/get-text-context'
+import { getTextContent } from '@/utils/get-text-context'
 import { FuelPricesFeed } from '@repo/types'
 
 export const source: DataSourceDefinition<FuelPricesFeed> = {

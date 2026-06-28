@@ -1,7 +1,6 @@
 import { fetchDocument } from '@/fetch'
-import { withScraperSource } from '../../utils/require-scraper'
+import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
-import { requireElements, requireText } from './parseUtils'
 
 export type AllergenForecast = {
   id: string | null

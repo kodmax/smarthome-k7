@@ -2,9 +2,8 @@ import { HourWeatherForecast } from '@repo/types'
 import { fetchDocument } from '@/fetch'
 import * as suncalc from 'suncalc'
 import { basename } from 'path'
-import { withScraperSource } from '../../utils/require-scraper'
+import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
-import { requireElements, requireText } from './parseUtils'
 
 export const parseHourlyFromDocument = (
   document: Document,

@@ -36,3 +36,12 @@ export const requireNumber = (root: ParentNode, selector: string): number => {
 
   return value
 }
+
+export const requireText = (element: ParentNode, selector: string, context: string): string => {
+  const target = element.querySelector(selector)
+  if (target?.textContent === null || target?.textContent === undefined || target.textContent.trim() === '') {
+    throw new Error(`missing "${selector}" in ${context}`)
+  }
+
+  return target.textContent.replace(',', '.').trim()
+}

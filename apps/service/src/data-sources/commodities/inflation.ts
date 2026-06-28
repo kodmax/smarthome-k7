@@ -1,4 +1,4 @@
-import { requireElements, withScraperSource } from '../utils/require-scraper'
+import { requireElements, withScraperSource } from '@/utils/scraper'
 import { fetchDocument } from '@/fetch'
 
 // eslint-disable-next-line max-len

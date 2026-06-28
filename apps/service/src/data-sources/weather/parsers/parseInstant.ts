@@ -1,8 +1,16 @@
 import { fetchDocument } from '@/fetch'
-import { withScraperSource } from '../../utils/require-scraper'
+import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
 import { windDirectionCodes } from './windDirectionCodes'
-import { requireDetail, requireElements, requireText } from './parseUtils'
+
+const requireDetail = (details: Record<string, string>, key: string, context: string): string => {
+  const value = details[key]
+  if (value === undefined) {
+    throw new Error(`missing detail "${key}" in ${context}`)
+  }
+
+  return value
+}
 
 export type InstantWeather = {
   clouds: {
