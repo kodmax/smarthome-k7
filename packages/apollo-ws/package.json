@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && bun build src/index.ts --target=node --format=cjs --outdir=./dist",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "author": "Marcin Malinowski <mm.kodmax@gmail.com>",
   "license": "GPL-3.0-or-later",

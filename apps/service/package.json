@@ -30,6 +30,6 @@
   "scripts": {
     "build": "tsc && bun build src/index.ts --target=node --format=cjs --outdir=./dist",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "vitest"
+    "test": "vitest run"
   }
 }
