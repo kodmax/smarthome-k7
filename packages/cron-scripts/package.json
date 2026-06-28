@@ -3,13 +3,23 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
   "imports": {
-    "#config/*": "./src/config/*.mjs"
+    "#config/*": "./dist/config/*.js"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
     "js-knx": "2.16.0",
     "mariadb": "^3.0.0",
     "sony-bravia-ip-control": "^1.1.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/node": "^17.0.45",
+    "typescript": "5.5.4"
   }
 }
