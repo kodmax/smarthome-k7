@@ -1,10 +1,12 @@
 #!/usr/bin/ts-node
-process.setMaxListeners(100)
 
 import { Server, Cache, sysLog, Feeds } from '@repo/apollo-ws'
 import { config } from './config'
 import path from 'node:path'
 import { initKnxFeeds, initWebFeeds } from './feeds'
+import { setupGracefulShutdown } from './graceful-shutdown'
+
+setupGracefulShutdown()
 
 Server.listen({}, async apollo => {
   console.log('Feed cache directory:', path.resolve(config.cache.dir))
