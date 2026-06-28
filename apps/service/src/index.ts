@@ -5,15 +5,13 @@ import { Server, Cache, sysLog, Feeds } from '@repo/apollo-ws'
 import { config } from './config'
 import path from 'node:path'
 import { knxInit } from './knx-init'
+import { knxSchema } from './home.knx-schema'
 import {
   addEnergyFeed,
   addHeatingFeed,
   addHomeAirQualityCo2Feed,
   addHomeAirQualityHumidityFeed,
-  addHomeTempBathroomFeed,
-  addHomeTempBathroomFloorFeed,
-  addHomeTempBedroomFeed,
-  addHomeTempLivingroomFeed,
+  addHomeTempFeed,
   addJobsFeed,
   addNewsFeed,
   addStockMarketFeed,
@@ -43,8 +41,8 @@ Server.listen({}, async apollo => {
   addEnergyFeed(feeds, knx)
   addHomeAirQualityCo2Feed(feeds, knx)
   addHomeAirQualityHumidityFeed(feeds, knx)
-  addHomeTempBathroomFloorFeed(feeds, knx)
-  addHomeTempBedroomFeed(feeds, knx)
-  addHomeTempLivingroomFeed(feeds, knx)
-  addHomeTempBathroomFeed(feeds, knx)
+  addHomeTempFeed(feeds, knx, 'bathroom-floor', knxSchema.home.temp.bathroomFloor)
+  addHomeTempFeed(feeds, knx, 'bedroom', knxSchema.home.temp.bedroom)
+  addHomeTempFeed(feeds, knx, 'livingroom', knxSchema.home.temp.livingRoom)
+  addHomeTempFeed(feeds, knx, 'bathroom', knxSchema.home.temp.bathroom)
 })

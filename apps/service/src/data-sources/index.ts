@@ -1,4 +1,4 @@
-export { source as indoorTempHistory } from './indoor-temp-history'
+export { source as indoorTempHistory, type TempHistory } from './indoor-temp-history'
 export { source as energyConsumption } from './energy-hourly'
 export { source as torrents } from './the-pirate-bay'
 export { source as commodities } from './commodities'

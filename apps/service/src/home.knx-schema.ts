@@ -44,17 +44,21 @@ export const knxSchema = {
     },
     temp: {
       bathroom: {
+        history: 'bathroom' as const,
         reading: { address: '2/3/8', DataType: DPT_Value_Temp },
         setpoint: { address: '2/1/0', DataType: DPT_Value_Temp },
       },
       bathroomFloor: {
+        history: 'bathroomFloor' as const,
         reading: { address: '2/3/1', DataType: DPT_Value_Temp },
       },
       bedroom: {
+        history: 'bedroom' as const,
         reading: { address: '2/3/9', DataType: DPT_Value_Temp },
         setpoint: { address: '2/2/0', DataType: DPT_Value_Temp },
       },
       livingRoom: {
+        history: 'livingroom' as const,
         reading: { address: '2/3/11', DataType: DPT_Value_Temp },
         setpoint: { address: '2/0/0', DataType: DPT_Value_Temp },
       },

@@ -8,7 +8,7 @@ type RoomTempHistory = Array<{
   active: boolean
 }>
 
-type TempHistory = {
+export type TempHistory = {
   bathroomFloor: RoomTempHistory
   livingroom: RoomTempHistory
   bathroom: RoomTempHistory
