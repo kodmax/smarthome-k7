@@ -40,6 +40,7 @@ export const config = {
   },
   jobs: {
     nfjCookie: getString('NFJ_COOKIE'),
+    theprotocolCookie: getString('THEPROTOCOL_COOKIE'),
   },
   knx: {
     disabled: knxDisabled,

@@ -17,6 +17,7 @@ declare module 'process' {
 
         readonly GOOGLE_SOCS_COOKIE: string
         readonly NFJ_COOKIE: string
+        readonly THEPROTOCOL_COOKIE: string
       }
     }
   }
