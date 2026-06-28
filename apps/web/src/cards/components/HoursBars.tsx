@@ -1,5 +1,6 @@
 import { styled } from '@mui/material'
 import { type FC } from 'react'
+import { buildHoursBarHeights, toHoursBarDataPoints } from './hoursBarsData'
 
 export interface Record {
   [key: string]: string | number
@@ -37,18 +38,8 @@ export const HoursBars: FC<{ data?: Record[]; positiveMax: number; negativeMax?:
   valueKey = 'value',
 }) => {
   if (data) {
-    const dataPoints: DataPoint[] = data.map(record => {
-      return {
-        hour: Number(typeof record.hour === 'string' ? record.hour.substring(0, 2) : record.hour),
-        value: Number(record[valueKey]),
-      }
-    })
-
-    const bars: Array<number | undefined> = new Array(24).fill(void 0)
-    for (const dp of dataPoints) {
-      const v = (dp.value >= 0 ? dp.value / positiveMax : dp.value / negativeMax) * height
-      bars[dp.hour] = v
-    }
+    const dataPoints = toHoursBarDataPoints(data, valueKey)
+    const bars = buildHoursBarHeights(dataPoints, positiveMax, negativeMax, height)
 
     return (
       <Vector>

@@ -1,5 +1,6 @@
 import { styled } from '@mui/material'
 import { type FC } from 'react'
+import { buildGraphSeries } from './graphSeries'
 
 export interface Record {
   datetime: string
@@ -52,43 +53,7 @@ const width = 300
 export type GraphProps = { data?: Record[]; scaleY: number; scaleX: number; valueKey?: string; activeKey?: string }
 export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value', activeKey = 'active' }) => {
   if (data) {
-    const dataPoints: DataPoint[] = data.map(record => {
-      return {
-        datetime: record.datetime,
-        active: Boolean(record[activeKey]),
-        value: Number(record[valueKey]),
-      }
-    })
-
-    const values: number[] = dataPoints.map(dp => dp.value)
-    const min = Math.min(...values)
-    const max = Math.max(...values)
-    const mid = (min + max) / 2
-    const spread = max - min
-
-    const now = new Date().getTime()
-    const records = dataPoints.map(({ datetime, value, active }: DataPoint) => {
-      return {
-        age: (((now - new Date(datetime).getTime()) / 3600_000) * width) / scaleX / 24,
-        active,
-        value,
-      }
-    })
-
-    const stepY = spread > scaleY ? spread / height : scaleY / height
-    const points = records
-      .filter(({ age }) => age <= width)
-      .map(({ age, value }) => {
-        const y = Number(height / 2 - (value - mid) / stepY).toFixed(4)
-        const x = Number(width - age).toFixed(4)
-        return `${x},${y}`
-      })
-
-    const actives = records
-      .filter(record => record.age <= width && record.active)
-      .map(({ age }) => {
-        return Number(width - age).toFixed(4)
-      })
+    const { points, actives, min, max, stroke } = buildGraphSeries(data, scaleY, scaleX, new Date().getTime(), valueKey, activeKey)
 
     return (
       <Vector>
@@ -101,9 +66,9 @@ export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value'
           xmlns='http://www.w3.org/2000/svg'
         >
           <polyline
-            stroke={spread > scaleY ? 'hsl(0deg 100% 50%)' : 'hsl(0deg 0% 20%)'}
+            stroke={stroke}
             fill='none'
-            points={points.join(' ')}
+            points={points}
           />
           {actives.map(x => (
             <circle key={x} cx={x} cy='98' r='0.2' strokeWidth='0' fill='red' />
