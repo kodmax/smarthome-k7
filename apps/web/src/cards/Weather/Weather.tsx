@@ -6,7 +6,7 @@ import { beaufortLevelLabel, beaufortScale, optimalHumidityRange } from '../../l
 import { ApolloCard, ZoomContext } from '@/apollo-card'
 import TablePlaceholder from '../components/TablePlaceholder'
 import { HoursBars } from '../components/HoursBars'
-import NorthIcon from '@mui/icons-material/North'
+import { North } from '@mui/icons-material'
 import { getPosition, getMoonPosition } from 'suncalc'
 import { useFeed } from '@repo/feed-client'
 import { WeatherFeed } from '@repo/types'
@@ -69,7 +69,7 @@ export const Weather: FC<Record<string, never>> = () => {
                 <td style={{ fontSize: '0.5em' }}>{zoom.active ? `${bs} - ${beaufortLevelLabel(bs)}` : `${bs} B`}</td>
                 <td>
                   {zoom.active ? (
-                    <NorthIcon sx={{ transform: `rotate(${feed.instant.wind.angle}deg)`, marginRight: '0.25em' }} />
+                    <North sx={{ transform: `rotate(${feed.instant.wind.angle}deg)`, marginRight: '0.25em' }} />
                   ) : null}
                   <ColorIndicator instant={bs} range={{ lowest: 0, highest: 7, optimal: 1 }} />
                   {windSpeed} m/s

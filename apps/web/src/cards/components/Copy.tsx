@@ -1,7 +1,7 @@
 import { IconButton } from '@mui/material'
 import { type FC } from 'react'
 
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import { ContentCopy } from '@mui/icons-material'
 
 const copyText = async (text: string): Promise<void> => {
   await navigator.clipboard.write([
@@ -17,7 +17,7 @@ const Copy: FC<{ text: string }> = ({ text }) => {
       sx={{ verticalAlign: 'initial', padding: 0, color: 'inherit', marginRight: '0.25em' }}
       onClick={() => void copyText(text)}
     >
-      <ContentCopyIcon sx={{ fontSize: '0.5em' }} />
+      <ContentCopy sx={{ fontSize: '0.5em' }} />
     </IconButton>
   )
 }

@@ -10,7 +10,7 @@ export interface Record {
 export type DataPoint = {
   datetime: string
   value: number
-  active: boolean
+  heating: boolean
 }
 
 const baseFontSize = 12
@@ -50,8 +50,8 @@ const Max = styled('span')({
 const height = 100
 const width = 300
 
-export type GraphProps = { data?: Record[]; scaleY: number; scaleX: number; valueKey?: string; activeKey?: string }
-export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value', activeKey = 'active' }) => {
+export type GraphProps = { data?: Record[]; scaleY: number; scaleX: number; valueKey?: string; heatingKey?: string }
+export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value', heatingKey = 'heating' }) => {
   if (data) {
     const { points, actives, min, max, stroke } = buildGraphSeries(
       data,
@@ -59,7 +59,7 @@ export const Graph: FC<GraphProps> = ({ data, scaleY, scaleX, valueKey = 'value'
       scaleX,
       new Date().getTime(),
       valueKey,
-      activeKey,
+      heatingKey,
     )
 
     return (

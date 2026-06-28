@@ -17,11 +17,11 @@ export function buildGraphSeries(
   scaleX: number,
   now: number,
   valueKey = 'value',
-  activeKey = 'active',
+  heatingKey = 'heating',
 ): GraphSeries {
   const dataPoints = data.map(record => ({
     datetime: record.datetime,
-    active: Boolean(record[activeKey]),
+    heating: Boolean(record[heatingKey]),
     value: Number(record[valueKey]),
   }))
 
@@ -31,9 +31,9 @@ export function buildGraphSeries(
   const mid = (min + max) / 2
   const spread = max - min
 
-  const records = dataPoints.map(({ datetime, value, active }) => ({
+  const records = dataPoints.map(({ datetime, value, heating }) => ({
     age: (((now - new Date(datetime).getTime()) / 3600_000) * width) / scaleX / 24,
-    active,
+    heating,
     value,
   }))
 
@@ -47,7 +47,7 @@ export function buildGraphSeries(
     })
 
   const actives = records
-    .filter(record => record.age <= width && record.active)
+    .filter(record => record.age <= width && record.heating)
     .map(({ age }) => Number(width - age).toFixed(4))
 
   return {

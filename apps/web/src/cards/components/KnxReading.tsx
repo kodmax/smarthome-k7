@@ -2,7 +2,7 @@ import { type ReactNode } from 'react'
 import { useFeed } from '@repo/feed-client'
 import { ColorIndicator, type ColorIndicationRange } from './ColorIndication'
 import { Graph, type DataPoint, type GraphProps } from './Graph'
-import { HoursBars, type Record } from './HoursBars'
+import { HoursBars, type HoursBarsProps, type Record } from './HoursBars'
 import { KnxReadingType } from '@repo/types'
 
 type KnxValue<T> = KnxReadingType<T> & {
@@ -15,7 +15,7 @@ type Props<P> = {
   label: string
   unit?: boolean
   range?: ColorIndicationRange
-  bars?: string
+  bars?: Omit<HoursBarsProps, 'data'> & { historyKey: string }
   graph?: Omit<GraphProps, 'data'> & { historyKey: string }
   icon?: ReactNode
   target?: (payload: P) => string
@@ -49,7 +49,14 @@ const KnxReading = <T extends KnxValue<string | number> = KnxValue<string | numb
     <tr>
       <td>{label}</td>
       <td>
-        {!bars ? null : <HoursBars positiveMax={range?.highest || 0} data={reading[bars] as Record[]} />}
+        {!bars ? null : (
+          <HoursBars
+            positiveMax={bars.positiveMax}
+            negativeMax={bars.negativeMax}
+            valueKey={bars.valueKey}
+            data={reading[bars.historyKey] as Record[]}
+          />
+        )}
         {!graph ? null : (
           <Graph
             scaleX={graph.scaleX}

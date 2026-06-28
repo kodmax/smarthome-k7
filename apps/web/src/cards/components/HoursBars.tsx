@@ -16,9 +16,9 @@ const baseFontSize = 12
 
 const Vector = styled('span')({
   display: 'inline-block',
-  verticalAlign: 'top',
+  verticalAlign: 'bottom',
 
-  height: Number(16 / baseFontSize).toFixed(3) + 'em',
+  height: Number(14 / baseFontSize).toFixed(3) + 'em',
   width: Number(48 / baseFontSize).toFixed(3) + 'em',
 })
 
@@ -31,12 +31,8 @@ const Svg = styled('svg')({
 const height = 100
 const width = 300
 
-export const HoursBars: FC<{ data?: Record[]; positiveMax: number; negativeMax?: number; valueKey?: string }> = ({
-  data,
-  positiveMax,
-  negativeMax = positiveMax,
-  valueKey = 'value',
-}) => {
+export type HoursBarsProps = { data?: Record[]; positiveMax: number; negativeMax?: number; valueKey?: string }
+export const HoursBars: FC<HoursBarsProps> = ({ data, positiveMax, negativeMax = positiveMax, valueKey = 'value' }) => {
   if (data) {
     const dataPoints = toHoursBarDataPoints(data, valueKey)
     const bars = buildHoursBarHeights(dataPoints, positiveMax, negativeMax, height)

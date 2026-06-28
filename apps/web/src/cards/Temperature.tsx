@@ -20,7 +20,7 @@ export const Temperature: FC<Record<string, never>> = () => {
       <table className='apollo-data-table'>
         <tbody>
           <KnxReading
-            graph={{ historyKey: 'history', scaleX: 1, scaleY: 3 }}
+            bars={{ historyKey: 'history', positiveMax: 30 }}
             precision={2}
             id='home.temp.bathroom-floor'
             label='Podłoga łazienki'
@@ -34,7 +34,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             }
           />
           <KnxReading
-            graph={{ historyKey: 'history', scaleX: 1, scaleY: 3 }}
+            bars={{ historyKey: 'history', positiveMax: 30 }}
             precision={2}
             id='home.temp.livingroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
@@ -49,7 +49,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             }
           />
           <KnxReading
-            graph={{ historyKey: 'history', scaleX: 1, scaleY: 3 }}
+            bars={{ historyKey: 'history', positiveMax: 30 }}
             precision={2}
             id='home.temp.bedroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
@@ -64,7 +64,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             }
           />
           <KnxReading
-            graph={{ historyKey: 'history', scaleX: 1, scaleY: 3 }}
+            bars={{ historyKey: 'history', positiveMax: 30 }}
             precision={2}
             id='home.temp.bathroom'
             target={payload => Number(payload.setpoint).toFixed(1)}

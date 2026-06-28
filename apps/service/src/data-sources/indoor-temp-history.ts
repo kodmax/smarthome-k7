@@ -3,9 +3,9 @@ import DateTime from '../DateTime'
 import db from '../db'
 
 type RoomTempHistory = Array<{
-  datetime: string
+  hour: number
   value: number
-  active: boolean
+  heating: boolean
 }>
 
 export type TempHistory = {
@@ -16,7 +16,7 @@ export type TempHistory = {
 }
 
 type HistoryRecord = {
-  timestamp: string
+  hour: number
   bathroom_floor_temp: number
   bedroom_temp: number
   livingroom_temp: number
@@ -38,35 +38,42 @@ export const source: DataSourceDefinition<TempHistory> = {
     const conn = await db.getConnection()
     try {
       const history = (await conn.query(
-        `select 
-              timestamp, 
-              bathroom_floor_temp, bedroom_temp, livingroom_temp, bathroom_temp,
-              bathroom_floor_heating, bedroom_heating, livingroom_heating, bathroom_heating
+        `select
+              hour(timestamp) as hour,
+              avg(bathroom_floor_temp) as bathroom_floor_temp,
+              avg(bedroom_temp) as bedroom_temp,
+              avg(livingroom_temp) as livingroom_temp,
+              avg(bathroom_temp) as bathroom_temp,
+              max(bathroom_floor_heating) as bathroom_floor_heating,
+              max(bedroom_heating) as bedroom_heating,
+              max(livingroom_heating) as livingroom_heating,
+              max(bathroom_heating) as bathroom_heating
               from indoor_air_condition where timestamp >= ?
-              order by timestamp ASC`,
+              group by hour(timestamp)
+              order by hour(timestamp) ASC`,
         [new DateTime().getDate()],
       )) as HistoryRecord[]
 
       return {
         bathroomFloor: history.map(record => ({
-          datetime: record.timestamp,
+          hour: record.hour,
           value: record.bathroom_floor_temp,
-          active: record.bathroom_floor_heating,
+          heating: record.bathroom_floor_heating,
         })),
         livingroom: history.map(record => ({
-          datetime: record.timestamp,
+          hour: record.hour,
           value: record.livingroom_temp,
-          active: record.livingroom_heating,
+          heating: record.livingroom_heating,
         })),
         bedroom: history.map(record => ({
-          datetime: record.timestamp,
+          hour: record.hour,
           value: record.bedroom_temp,
-          active: record.bedroom_heating,
+          heating: record.bedroom_heating,
         })),
         bathroom: history.map(record => ({
-          datetime: record.timestamp,
+          hour: record.hour,
           value: record.bathroom_temp,
-          active: record.bathroom_heating,
+          heating: record.bathroom_heating,
         })),
       }
     } finally {
