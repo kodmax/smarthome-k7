@@ -14,11 +14,13 @@ export const source: DataSourceDefinition<{ date: string; today: Co2HistoryRecor
       return {
         today: await conn.query(
           `select
-              hour(datetime) as hour,
-              avg(ppm) as value
-              from co2 where datetime >= ?
-              group by hour(datetime)
-              order by hour(datetime) ASC`,
+              hour(timestamp) as hour,
+              avg(reading_value) as value
+              from indoor_readings
+              where timestamp >= ?
+                and reading_name = 'co2'
+              group by hour(timestamp)
+              order by hour(timestamp) ASC`,
           [new DateTime().getDate()],
         ),
         date: new DateTime().getDate(),

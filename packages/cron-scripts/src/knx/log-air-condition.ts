@@ -12,63 +12,30 @@ KnxLink.connect(requireEnv('KNX_HOST'), { maxRetry: 3 }).then(async knx => {
 
   try {
     const schema = knxSchema.home
-    const bathroomFloor = {
-      temp: await knx.getDatapoint(schema.temp.bathroomFloor.reading).read(),
-      state: await knx.getDatapoint(schema.heating.bathroom.floorHeating).read(),
-    }
-    const bathroom = {
-      setpoint: await knx.getDatapoint(schema.temp.bathroom.setpoint).read(),
-      temp: await knx.getDatapoint(schema.temp.bathroom.reading).read(),
-      state: await knx.getDatapoint(schema.heating.bathroom.waterHeating).read(),
-    }
-    const livingroom = {
-      setpoint: await knx.getDatapoint(schema.temp.livingRoom.setpoint).read(),
-      temp: await knx.getDatapoint(schema.temp.livingRoom.reading).read(),
-      state: await knx.getDatapoint(schema.heating.livingRoom.waterHeating).read(),
-    }
-    const bedroom = {
-      setpoint: await knx.getDatapoint(schema.temp.bedroom.setpoint).read(),
-      temp: await knx.getDatapoint(schema.temp.bedroom.reading).read(),
-      state: await knx.getDatapoint(schema.heating.bedroom.waterHeating).read(),
-    }
+    const [bathroomFloorTemp, bedroomTemp, livingroomTemp, bathroomTemp, humidity, dewPoint, co2] = await Promise.all([
+      knx.getDatapoint(schema.temp.bathroomFloor.reading).read(),
+      knx.getDatapoint(schema.temp.bedroom.reading).read(),
+      knx.getDatapoint(schema.temp.livingRoom.reading).read(),
+      knx.getDatapoint(schema.temp.bathroom.reading).read(),
+      knx.getDatapoint(schema.airQuality.humidity.reading).read(),
+      knx.getDatapoint(schema.airQuality.dewPoint.reading).read(),
+      knx.getDatapoint(schema.airQuality.co2.reading).read(),
+    ])
 
-    const humidity = await knx.getDatapoint(schema.airQuality.humidity.reading).read()
-    const dewPoint = await knx.getDatapoint(schema.airQuality.dewPoint.reading).read()
-    const co2 = await knx.getDatapoint(schema.airQuality.co2.reading).read()
+    const timestamp = new Date()
+    const readings: Array<[string, number]> = [
+      ['bathroom_floor_temp', bathroomFloorTemp.value],
+      ['bedroom_temp', bedroomTemp.value],
+      ['livingroom_temp', livingroomTemp.value],
+      ['bathroom_temp', bathroomTemp.value],
+      ['dew_point', dewPoint.value],
+      ['humidity', humidity.value],
+      ['co2', co2.value],
+    ]
 
-    await db.query(
-      `insert into indoor_air_condition (
-            bathroom_floor_temp,
-            bathroom_floor_heating,
-            bedroom_temp,
-            bedroom_heating,
-            bedroom_setpoint,
-            livingroom_temp,
-            livingroom_heating,
-            livingroom_setpoint,
-            bathroom_temp,
-            bathroom_heating,
-            bathroom_setpoint,
-            dew_point,
-            humidity,
-            co2
-            ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        bathroomFloor.temp.value,
-        bathroomFloor.state.value,
-        bedroom.temp.value,
-        bedroom.state.value,
-        bedroom.setpoint.value,
-        livingroom.temp.value,
-        livingroom.state.value,
-        livingroom.setpoint.value,
-        bathroom.temp.value,
-        bathroom.state.value,
-        bathroom.setpoint.value,
-        dewPoint.value,
-        humidity.value,
-        co2.value,
-      ],
+    await db.batch(
+      'insert into indoor_readings (timestamp, reading_name, reading_value) values (?, ?, ?)',
+      readings.map(([reading_name, reading_value]) => [timestamp, reading_name, reading_value]),
     )
   } finally {
     await knx.disconnect()
