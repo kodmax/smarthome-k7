@@ -6,12 +6,12 @@ export function getAbsoluteHumidity(temp: number, relativeHumidity: number): num
   )
 }
 
-export const optimalHumidityRange: ColorIndicationRange = {
+export const optimalHumidityRange = {
   optimal: 45,
   highest: 60,
   lowest: 20,
   reverse: true,
-}
+} satisfies ColorIndicationRange
 
 const bScale = [1, 4, 7, 11, 17, 22, 28, 34, 41, 48, 56, 64]
 export const beaufortScale: (speed: number) => number = speed => {

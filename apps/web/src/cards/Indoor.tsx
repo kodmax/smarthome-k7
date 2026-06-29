@@ -3,7 +3,6 @@ import { type FC, useCallback } from 'react'
 import {
   ApolloDataTable,
   ColorIndicator,
-  Humidity,
   KnxReading,
   KnxStateIcon,
   TablePlaceholder,
@@ -14,6 +13,7 @@ import { ApolloCard } from '@/apollo-card'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { Warning } from '@mui/icons-material'
 import { Co2Data, WeatherFeed } from '@repo/types'
+import { optimalHumidityRange } from '../lib'
 import { sunTimes } from './Weather/sunTimes'
 
 export const Indoor: FC<Record<string, never>> = () => {
@@ -50,7 +50,12 @@ export const Indoor: FC<Record<string, never>> = () => {
               />
             }
           />
-          <Humidity label='Wilgotność' />
+          <KnxReading
+            id='home.air-quality.humidity'
+            label='Wilgotność'
+            range={optimalHumidityRange}
+            bars={{ historyKey: 'today', color: true, ...optimalHumidityRange }}
+          />
           <tr>
             <td>Jakość powietrza</td>
             <td></td>

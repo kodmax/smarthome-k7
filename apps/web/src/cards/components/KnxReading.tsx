@@ -54,6 +54,7 @@ const KnxReading = <T extends KnxValue<string | number> = KnxValue<string | numb
             highest={bars.highest}
             optimal={bars.optimal}
             lowest={bars.lowest}
+            reverse={bars.reverse}
             color={bars.color}
             valueKey={bars.valueKey}
             data={reading[bars.historyKey] as Record[]}

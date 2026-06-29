@@ -39,6 +39,7 @@ export type HoursBarsProps = {
   highest: number
   lowest?: number
   optimal?: number
+  reverse?: boolean
   color?: boolean
   valueKey?: string
 }
@@ -47,6 +48,7 @@ export const HoursBars: FC<HoursBarsProps> = ({
   highest,
   lowest = 0,
   optimal,
+  reverse,
   color = false,
   valueKey = 'value',
 }) => {
@@ -59,7 +61,7 @@ export const HoursBars: FC<HoursBarsProps> = ({
       valuesByHour[dp.hour] = dp.value
     }
 
-    const range = { lowest, optimal, highest }
+    const range = { lowest, optimal, highest, reverse }
 
     return (
       <Vector>
