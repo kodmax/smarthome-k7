@@ -1,0 +1,25 @@
+{
+  "folders": [
+    { "name": "smarthome-k7 (root)", "path": "." },
+    { "name": "apps/web", "path": "apps/web" },
+    { "name": "apps/service", "path": "apps/service" },
+    { "name": "packages/apollo-ws", "path": "packages/apollo-ws" },
+    { "name": "packages/cloudflare", "path": "packages/cloudflare" },
+    { "name": "packages/cron-scripts", "path": "packages/cron-scripts" },
+    { "name": "packages/eslint-config", "path": "packages/eslint-config" },
+    { "name": "packages/feed-client", "path": "packages/feed-client" },
+    { "name": "packages/knx-schema", "path": "packages/knx-schema" },
+    { "name": "packages/types", "path": "packages/types" },
+    { "name": "packages/typescript-config", "path": "packages/typescript-config" },
+    { "name": "packages/ui", "path": "packages/ui" },
+    { "name": "packages/weather-icons", "path": "packages/weather-icons" }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.turbo": true
+    },
+    "eslint.workingDirectories": [{ "mode": "auto" }]
+  }
+}
