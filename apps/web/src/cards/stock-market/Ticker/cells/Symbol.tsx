@@ -3,11 +3,16 @@ import { Data } from '../styled'
 import LinkOpen from '../../../components/LinkOpen'
 import { TickerData } from '@repo/types'
 
-export const Symbol: FC<{ ticker: TickerData }> = ({ ticker }) => {
+export const Symbol: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
   return (
     <Data>
       {ticker.symbol}
-      <LinkOpen href={`https://finance.yahoo.com/quote/${ticker.symbol}/`} />
+      {zoom ? (
+        <>
+          {' '}
+          <LinkOpen href={`https://finance.yahoo.com/quote/${ticker.symbol}/`} />
+        </>
+      ) : null}
     </Data>
   )
 }
