@@ -152,7 +152,7 @@ export class Feeds implements Feeds {
     }
   }
 
-  public async addFeed<R, S extends Record<string, DataSourceDefinition<any>>>(
+  public async addFeed<R, S extends Record<string, DataSourceDefinition<unknown>>>(
     feedId: string,
     sourcesDefinitions: S,
     cb?: (content: SourceDataTypes<S>) => R,

@@ -4,11 +4,17 @@ import db from '../db'
 import { energyRates } from './calculate-cost'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const source: DataSourceDefinition<{ datetime: string; rates: typeof energyRates; avg: number }> = {
+type EnergyCost = {
+  datetime: string
+  rates: typeof energyRates
+  avg: number
+}
+
+export const source: DataSourceDefinition<EnergyCost> = {
   cron: '0 0 * * *',
   id: 'energy-cost',
 
-  expired: snapshot => snapshot.getContent().datetime !== new DateTime().getDate(),
+  expired: snapshot => (snapshot.getContent() as EnergyCost).datetime !== new DateTime().getDate(),
   script: async () => {
     const conn = await db.getConnection()
     try {

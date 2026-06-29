@@ -9,7 +9,7 @@ type DSM<S extends Record<string, DataSourceDefinition<unknown>>> = {
 
 type DD = DataSourceDefinition<unknown>
 type DataSourceDefinition<T> = {
-  expired: (cache: Snapshot<T>) => boolean
+  expired: (cache: Snapshot<unknown>) => boolean
   script: () => Promise<T>
   id: string
 
