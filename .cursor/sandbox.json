@@ -1,0 +1,7 @@
+{
+  "type": "workspace_readwrite",
+  "additionalReadwritePaths": [
+    "/Users/marcin/coding/smarthome-k7"
+  ],
+  "enableSharedBuildCache": true
+}
