@@ -1,7 +1,8 @@
+import path from 'node:path'
 import { configDotenv } from 'dotenv'
 
-if (process.env.VITEST !== 'true') {
-  configDotenv()
+if (process.env.VITEST !== 'true' && process.env.NODE_ENV !== 'production') {
+  configDotenv({ path: path.resolve(__dirname, '../.env') })
 }
 
 const getString = (name: string): string => {

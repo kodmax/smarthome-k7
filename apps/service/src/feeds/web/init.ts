@@ -5,10 +5,12 @@ import { addStockMarketFeed } from './stock-market'
 import { addTopTorrentsFeed } from './top-torrents'
 import { addWeatherFeed } from './weather'
 
-export const initWebFeeds = (feeds: Feeds): void => {
-  addWeatherFeed(feeds)
-  addStockMarketFeed(feeds)
-  addNewsFeed(feeds)
-  addJobsFeed(feeds)
-  addTopTorrentsFeed(feeds)
+export const initWebFeeds = async (feeds: Feeds): Promise<void> => {
+  await Promise.all([
+    addWeatherFeed(feeds),
+    addStockMarketFeed(feeds),
+    addNewsFeed(feeds),
+    addJobsFeed(feeds),
+    addTopTorrentsFeed(feeds),
+  ])
 }

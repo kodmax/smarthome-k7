@@ -29,7 +29,10 @@
     "vitest": "^4.1.8"
   },
   "scripts": {
-    "build": "tsc && bun build src/index.ts --target=node --format=cjs --outdir=./dist",
+    "bundle": "bun build src/index.ts --target=node --format=cjs --outdir=./dist",
+    "dev": "yarn bundle && sh -c 'bun build --watch src/index.ts --target=node --format=cjs --outdir=./dist & exec node --watch dist/index.js'",
+    "start": "node dist/index.js",
+    "build": "tsc && yarn bundle",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "vitest run"

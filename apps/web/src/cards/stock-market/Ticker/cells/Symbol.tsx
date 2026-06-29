@@ -3,7 +3,7 @@ import { Data } from '../styled'
 import LinkOpen from '../../../components/LinkOpen'
 import { TickerData } from '@repo/types'
 
-export const Symbol: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
+export const Symbol: FC<{ ticker: TickerData }> = ({ ticker }) => {
   return (
     <Data>
       {ticker.symbol}

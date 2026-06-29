@@ -6,7 +6,7 @@ import { NasdaqTickerData } from '@/data-sources/stock-market/nasdaq/types'
 import { NasdaqEPSData } from '@/data-sources/stock-market/nasdaq-eps/types'
 import { tickerList } from '@/data-sources/stock-market/tickerList'
 
-export const addStockMarketFeed = (feeds: Feeds): void => {
+export const addStockMarketFeed = (feeds: Feeds): Promise<void> =>
   feeds.addFeed(
     'stock-market',
     { nasdaqMarketData, yahooMarketData, nasdaqEPSData },
@@ -86,4 +86,3 @@ export const addStockMarketFeed = (feeds: Feeds): void => {
       return { tickers }
     },
   )
-}

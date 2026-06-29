@@ -6,7 +6,7 @@ import { TableRow } from '@mui/material'
 export const Ticker: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
   return (
     <TableRow>
-      <Symbol ticker={ticker} zoom={zoom} />
+      <Symbol ticker={ticker} />
       <EarningsDate ticker={ticker} zoom={zoom} />
       <EG ticker={ticker} />
       <PEAtPT ticker={ticker} />

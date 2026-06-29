@@ -1,5 +1,5 @@
 #!/usr/bin/ts-node
-
+process.setMaxListeners(11)
 import { Server, Cache, sysLog, Feeds } from '@repo/apollo-ws'
 import { config } from './config'
 import path from 'node:path'
@@ -14,9 +14,11 @@ Server.listen({}, async apollo => {
 
   sysLog(apollo.vent, 6)
 
-  initWebFeeds(feeds)
+  await initWebFeeds(feeds)
+  console.log('Web feeds initialized!')
 
   if (!config.knx.disabled) {
     await initKnxFeeds(feeds)
+    console.log('KNX feeds initialized!')
   }
 })
