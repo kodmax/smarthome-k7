@@ -1,33 +1,77 @@
-# `Turborepo` Vite starter
+# smarthome-k7
 
-This is a community-maintained example. If you experience a problem, please submit a pull request with a fix. GitHub
-Issues will be closed.
+Smart home dashboard monorepo: the backend aggregates data from KNX and web scrapers; the frontend displays it live over WebSocket.
 
-## Using this example
+## Structure
 
-Run the following command:
+| Directory | Description |
+|-----------|-------------|
+| [`apps/web`](apps/web) | React dashboard (Vite, MUI) |
+| [`apps/service`](apps/service) | Backend — feeds, cache, WebSocket |
+| [`packages/apollo-ws`](packages/apollo-ws) | WebSocket server and feed registry |
+| [`packages/feed-client`](packages/feed-client) | React hooks for feed subscriptions |
+| [`packages/types`](packages/types) | Shared feed payload types |
+| [`packages/knx-schema`](packages/knx-schema) | KNX group address map |
+| [`packages/cron-scripts`](packages/cron-scripts) | Cron scripts (KNX, TV, DB logging) |
+| [`packages/cloudflare`](packages/cloudflare) | Dynamic DNS (Cloudflare API) |
+| [`packages/weather-icons`](packages/weather-icons) | Weather SVG icons |
+| [`packages/eslint-config`](packages/eslint-config) | Shared ESLint config |
+| [`packages/typescript-config`](packages/typescript-config) | Shared `tsconfig` presets |
+| [`packages/ui`](packages/ui) | Component library stub (Turborepo starter) |
+
+## Requirements
+
+- Node.js
+- Yarn 1.x (`packageManager`: yarn@1.22.22)
+- Bun (bundling in `apps/service` and `packages/apollo-ws`)
+
+## Quick start
 
 ```sh
-npx create-turbo@latest -e with-vite-react
+yarn install
+yarn dev
 ```
 
-## What's inside?
+Starts `apps/web` (Vite) and `apps/service` (WebSocket on port **3678**) in parallel.
 
-This Turborepo includes the following packages and apps:
+Individually:
 
-### Apps and Packages
+```sh
+yarn workspace web dev
+yarn workspace service dev
+```
 
-- `web`: react [vite](https://vitejs.dev) ts app
-- `@repo/ui`: a stub component library shared by `web` application
-- `@repo/eslint-config`: shared `eslint` configurations
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## Root scripts
 
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
+| Script | Description |
+|--------|-------------|
+| `yarn dev` | Dev mode for all packages |
+| `yarn build` | Build all packages (Turbo) |
+| `yarn test` | Run tests |
+| `yarn lint` | ESLint |
+| `yarn format` | Prettier |
 
-### Utilities
+## Architecture
 
-This Turborepo has some additional tools already setup for you:
+```
+apps/service  ──►  @repo/apollo-ws  ──►  WebSocket :3678
+       │                                      │
+       ├── @repo/knx-schema                   ▼
+       ├── @repo/types                   @repo/feed-client
+       └── MariaDB, scrapers                  │
+                                              ▼
+                                        apps/web
+```
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+The backend registers feeds (weather, stock market, news, jobs, torrents, energy, heating, CO₂, humidity, room temperatures) and pushes updates to clients. The frontend subscribes to topics via `@repo/feed-client`.
+
+Scheduled tasks (energy logging, KNX clock sync, TV power-off) run independently in [`packages/cron-scripts`](packages/cron-scripts).
+
+## Configuration
+
+- **Service:** copy `apps/service/.env.example` → `.env` (database, KNX, location, scraper cookies).
+- **Web:** optional `VITE_WEBSOCKET_URL` (defaults to `ws://<hostname>:3678`).
+
+## Tooling
+
+Monorepo built with [Turborepo](https://turbo.build/) and Yarn workspaces. TypeScript, ESLint, and Prettier are configured centrally in `packages/typescript-config` and `packages/eslint-config`.
