@@ -9,14 +9,15 @@ export function toHoursBarDataPoints(data: Record[], valueKey: string): DataPoin
 
 export function buildHoursBarHeights(
   dataPoints: DataPoint[],
-  positiveMax: number,
-  negativeMax: number,
+  highest: number,
+  lowest = 0,
   barHeight = 100,
 ): Array<number | undefined> {
   const bars: Array<number | undefined> = new Array(24).fill(undefined)
+  const range = highest - lowest
 
   for (const dp of dataPoints) {
-    const v = (dp.value >= 0 ? dp.value / positiveMax : dp.value / negativeMax) * barHeight
+    const v = range === 0 ? 0 : ((dp.value - lowest) / range) * barHeight
     bars[dp.hour] = v
   }
 

@@ -8,16 +8,22 @@ describe('toHoursBarDataPoints', () => {
 })
 
 describe('buildHoursBarHeights', () => {
-  it('scales positive values against positiveMax', () => {
-    const bars = buildHoursBarHeights([{ hour: 12, value: 15 }], 30, 30)
+  it('scales values between lowest and highest', () => {
+    const bars = buildHoursBarHeights([{ hour: 12, value: 15 }], 30)
 
     expect(bars[12]).toBe(50)
     expect(bars[0]).toBeUndefined()
   })
 
-  it('scales negative values against negativeMax', () => {
-    const bars = buildHoursBarHeights([{ hour: 8, value: -20 }], 30, 40)
+  it('uses a custom lowest bound instead of zero', () => {
+    const bars = buildHoursBarHeights([{ hour: 12, value: 25 }], 30, 20)
 
-    expect(bars[8]).toBe(-50)
+    expect(bars[12]).toBe(50)
+  })
+
+  it('scales negative values against lowest', () => {
+    const bars = buildHoursBarHeights([{ hour: 8, value: -20 }], 30, -40)
+
+    expect(bars[8]).toBeCloseTo(28.571, 2)
   })
 })

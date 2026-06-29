@@ -45,7 +45,7 @@ export const Energy: FC<Record<string, never>> = () => {
                 <tr>
                   <td>Zużycie dziś</td>
                   <td style={{ padding: 0, width: '4em' }}>
-                    <HoursBars data={feed.today.bars} positiveMax={1000} valueKey='hourly_consumption' />
+                    <HoursBars data={feed.today.bars} highest={1000} valueKey='hourly_consumption' />
                   </td>
                   <td>{Number(feed.today.value / 1000).toLocaleString('en-PL', { maximumFractionDigits: 2 })} kWh</td>
                 </tr>
