@@ -32,9 +32,9 @@ const KnxReading = <T extends KnxValue<string | number> = KnxValue<string | numb
   precision = 0,
   target,
 }: Props<T>) => {
-  const reading = useFeed<T>(id)
+  const feed = useFeed<T>(id)
 
-  if (reading === undefined) {
+  if (feed === undefined) {
     return (
       <tr>
         <td>{label}</td>
@@ -44,6 +44,9 @@ const KnxReading = <T extends KnxValue<string | number> = KnxValue<string | numb
       </tr>
     )
   }
+
+  const reading = 'reading' in feed ? (feed.reading as KnxValue<string | number>) : (feed as KnxValue<string | number>)
+  const history = 'history' in feed ? (feed.history as Record<string, unknown>) : (feed as Record<string, unknown>)
 
   return (
     <tr>
@@ -57,7 +60,7 @@ const KnxReading = <T extends KnxValue<string | number> = KnxValue<string | numb
             reverse={bars.reverse}
             color={bars.color}
             valueKey={bars.valueKey}
-            data={reading[bars.historyKey] as Record[]}
+            data={history[bars.historyKey] as Record[]}
           />
         )}
         {!graph ? null : (
@@ -65,14 +68,14 @@ const KnxReading = <T extends KnxValue<string | number> = KnxValue<string | numb
             scaleX={graph.scaleX}
             scaleY={graph.scaleY}
             valueKey={graph.valueKey}
-            data={reading[graph.historyKey ?? 'value'] as DataPoint[]}
+            data={history[graph.historyKey ?? 'value'] as DataPoint[]}
           />
         )}
       </td>
       <td>
         <span>{icon}</span>
         <span style={{ fontSize: '0.25em', verticalAlign: 'super' }}>
-          {target ? `${target(reading)} ${unit ? reading.unit : ''}` : null}
+          {target ? `${target(feed)} ${unit ? reading.unit : ''}` : null}
         </span>
       </td>
       <td>

@@ -25,11 +25,11 @@ yarn workspace @repo/apollo-ws test
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `build` | `tsc` + Bun bundle → `dist/` |
-| `test` | Vitest |
-| `lint` / `format` | ESLint / Prettier |
+| Script            | Description                  |
+| ----------------- | ---------------------------- |
+| `build`           | `tsc` + Bun bundle → `dist/` |
+| `test`            | Vitest                       |
+| `lint` / `format` | ESLint / Prettier            |
 
 ## Stack
 

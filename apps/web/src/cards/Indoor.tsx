@@ -1,12 +1,6 @@
 import { type FC, useCallback } from 'react'
 
-import {
-  ApolloDataTable,
-  ColorIndicator,
-  KnxReading,
-  KnxStateIcon,
-  TablePlaceholder,
-} from '@/card-components'
+import { ApolloDataTable, ColorIndicator, KnxReading, KnxStateIcon, TablePlaceholder } from '@/card-components'
 import zoomBanner from './card-banners/comfort-zoom.jpg'
 import banner from './card-banners/comfort.jpg'
 import { ApolloCard } from '@/apollo-card'
@@ -46,7 +40,7 @@ export const Indoor: FC<Record<string, never>> = () => {
               <KnxStateIcon<Co2Data>
                 icon={() => Warning}
                 id='home.air-quality.co2'
-                visible={payload => payload.alert.value === 1}
+                visible={payload => payload.reading.alert.value === 1}
               />
             }
           />

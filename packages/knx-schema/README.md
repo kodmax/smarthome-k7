@@ -24,9 +24,9 @@ Consumers:
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `build` | `tsc` → `dist/` |
+| Script            | Description       |
+| ----------------- | ----------------- |
+| `build`           | `tsc` → `dist/`   |
 | `lint` / `format` | ESLint / Prettier |
 
 ## Stack

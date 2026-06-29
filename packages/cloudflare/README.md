@@ -17,17 +17,18 @@ Typical setup: a crontab entry every few minutes.
 
 ## Environment variables
 
-| Variable | Description |
-|----------|-------------|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare API token |
-| `CLOUDFLARE_ZONE_ID` | DNS zone ID |
-| `CLOUDFLARE_DOMAIN` | A record name to update |
+| Variable               | Description             |
+| ---------------------- | ----------------------- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token    |
+| `CLOUDFLARE_ZONE_ID`   | DNS zone ID             |
+| `CLOUDFLARE_DOMAIN`    | A record name to update |
 
 Public IP is fetched from ipify; record TTL is set to 120 s, `proxied: false`.
 
 ## API
 
-The `CloudflareDNS` module (`src/CloudflareDNS.ts`) is exported from `src/index.ts` — DNS record operations via Cloudflare API v4.
+The `CloudflareDNS` module (`src/CloudflareDNS.ts`) is exported from `src/index.ts` — DNS record operations via
+Cloudflare API v4.
 
 ## Monorepo relationship
 
@@ -35,7 +36,7 @@ The `CloudflareDNS` module (`src/CloudflareDNS.ts`) is exported from `src/index.
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `build` | `tsc` + Bun bundle → `dist/` |
-| `lint` / `format` | ESLint / Prettier |
+| Script            | Description                  |
+| ----------------- | ---------------------------- |
+| `build`           | `tsc` + Bun bundle → `dist/` |
+| `lint` / `format` | ESLint / Prettier            |

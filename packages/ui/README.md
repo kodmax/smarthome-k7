@@ -4,12 +4,13 @@ React component library stub from the Turborepo starter (`header`, `counter`, ut
 
 ## Status
 
-Listed in `apps/web/package.json` but **not used** in the frontend codebase — leftover from `create-turbo`. Shared UI components could be moved here in the future, or the package can be removed.
+Listed in `apps/web/package.json` but **not used** in the frontend codebase — leftover from `create-turbo`. Shared UI
+components could be moved here in the future, or the package can be removed.
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
+| Script            | Description       |
+| ----------------- | ----------------- |
 | `lint` / `format` | ESLint / Prettier |
 
 ## Stack

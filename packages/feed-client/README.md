@@ -4,11 +4,11 @@ React client library for the Apollo WebSocket protocol — feed subscriptions an
 
 ## API
 
-| Export | Description |
-|--------|-------------|
-| `useFeed(topic)` | Hook — subscribes to a topic, returns the latest payload |
-| `useCommand()` | Sends a command to a data source |
-| `refreshFeeds(topics)` | Forces a refresh of selected feeds |
+| Export                 | Description                                              |
+| ---------------------- | -------------------------------------------------------- |
+| `useFeed(topic)`       | Hook — subscribes to a topic, returns the latest payload |
+| `useCommand()`         | Sends a command to a data source                         |
+| `refreshFeeds(topics)` | Forces a refresh of selected feeds                       |
 
 Default WebSocket URL: `ws://${location.hostname}:3678` (overridable via `VITE_WEBSOCKET_URL`).
 
@@ -27,6 +27,6 @@ The package exports TypeScript source with no separate build step — Vite compi
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
+| Script            | Description       |
+| ----------------- | ----------------- |
 | `lint` / `format` | ESLint / Prettier |

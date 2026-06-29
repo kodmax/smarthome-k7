@@ -26,6 +26,6 @@ Types only — no runtime code, no build step.
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
+| Script            | Description       |
+| ----------------- | ----------------- |
 | `lint` / `format` | ESLint / Prettier |

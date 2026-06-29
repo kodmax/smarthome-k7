@@ -12,7 +12,7 @@ export default (id: string, dp: DPT_Value_AirQuality) => {
       return await dp.read()
     },
 
-    push: (push) => {
+    push: push => {
       dp.addValueListener(async reading => {
         push(reading)
       })

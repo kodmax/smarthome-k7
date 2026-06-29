@@ -16,6 +16,6 @@ Entry point: `v2/index.ts`. Static assets only — no runtime build step.
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `format` | Prettier |
+| Script   | Description |
+| -------- | ----------- |
+| `format` | Prettier    |
