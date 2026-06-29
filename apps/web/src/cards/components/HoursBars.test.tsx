@@ -24,17 +24,23 @@ describe('HoursBars', () => {
     expect(container.querySelectorAll('rect')).toHaveLength(2)
   })
 
-  it('renders a gradient with an optimal stop', () => {
+  it('colors bars by value when color is true', () => {
     const { container } = render(
-      <HoursBars data={[{ hour: 12, value: 21 }]} highest={30} lowest={15} optimal={21} gradient={true} />,
+      <HoursBars
+        data={[
+          { hour: 10, value: 15 },
+          { hour: 12, value: 21 },
+          { hour: 14, value: 30 },
+        ]}
+        highest={30}
+        lowest={15}
+        optimal={21}
+        color={true}
+      />,
     )
 
-    const stops = container.querySelectorAll('stop')
-    expect(stops).toHaveLength(3)
-    expect(stops[0]).toHaveAttribute('stop-color', 'hsl(4deg 52% 62%)')
-    expect(stops[1]).toHaveAttribute('stop-color', 'hsl(132deg 36% 54%)')
-    expect(stops[2]).toHaveAttribute('stop-color', 'hsl(215deg 48% 63%)')
-    expect(stops[1]).toHaveAttribute('offset', '60%')
+    const fills = [...container.querySelectorAll('rect')].map(rect => rect.getAttribute('fill'))
+    expect(fills).toEqual(['hsl(240deg 100% 50%', 'hsl(120deg 100% 50%', 'hsl(0deg 100% 50%'])
   })
 
   it('renders gray bars by default', () => {

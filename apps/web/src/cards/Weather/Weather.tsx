@@ -41,7 +41,7 @@ export const Weather: FC<Record<string, never>> = () => {
               <tr>
                 <td>Temperatura</td>
                 <td>
-                  <HoursBars data={feed.outdoorTemp} highest={30} lowest={15} optimal={24} gradient={true} />
+                  <HoursBars data={feed.outdoorTemp} highest={30} lowest={15} optimal={24} color />
                 </td>
                 <td>
                   <ColorIndicator instant={feed.instant.temp} range={{ optimal: 21, highest: 30, lowest: 15 }} />
