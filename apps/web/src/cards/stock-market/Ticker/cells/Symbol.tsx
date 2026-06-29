@@ -4,10 +4,6 @@ import LinkOpen from '../../../components/LinkOpen'
 import { TickerData } from '@repo/types'
 
 export const Symbol: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
-  if (!zoom) {
-    return null
-  }
-
   return (
     <Data>
       {ticker.symbol}
