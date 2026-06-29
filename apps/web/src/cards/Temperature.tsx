@@ -21,7 +21,7 @@ export const Temperature: FC<Record<string, never>> = () => {
           <KnxReading
             bars={{ historyKey: 'today', highest: 30, lowest: 20, optimal: 24, color: true }}
             precision={2}
-            id='home.temp.bathroom-floor'
+            feed='home.temp.bathroom-floor'
             label='Podłoga łazienki'
             range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
@@ -35,7 +35,7 @@ export const Temperature: FC<Record<string, never>> = () => {
           <KnxReading
             bars={{ historyKey: 'today', highest: 30, lowest: 20, optimal: 24, color: true }}
             precision={2}
-            id='home.temp.livingroom'
+            feed='home.temp.livingroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
             label='Salon'
             range={{ optimal: 25, lowest: 21, highest: 30 }}
@@ -50,7 +50,7 @@ export const Temperature: FC<Record<string, never>> = () => {
           <KnxReading
             bars={{ historyKey: 'today', highest: 30, lowest: 20, optimal: 24, color: true }}
             precision={2}
-            id='home.temp.bedroom'
+            feed='home.temp.bedroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
             label='Sypialnia'
             range={{ optimal: 25, lowest: 21, highest: 30 }}
@@ -65,7 +65,7 @@ export const Temperature: FC<Record<string, never>> = () => {
           <KnxReading
             bars={{ historyKey: 'today', highest: 30, lowest: 20, optimal: 24, color: true }}
             precision={2}
-            id='home.temp.bathroom'
+            feed='home.temp.bathroom'
             target={payload => Number(payload.setpoint).toFixed(1)}
             label='Łazienka'
             range={{ optimal: 25, lowest: 21, highest: 30 }}

@@ -75,26 +75,25 @@ export type Co2HistoryRecord = {
   value: number
 }
 
+export type KNXReadingPayload<T = number> = {
+  reading: KnxReading<T>
+  history?: Record<string, unknown>
+}
+
 export type EnergyFeed = {
-  total: {
-    adjusted: number
-    target: string
-    source: string
-    text: string
-    unit: string
-    value: number
+  daily: KNXReadingPayload & {
+    history: { today: EnergyHourConsumption[] }
   }
-  today: {
-    value: number
-    bars: EnergyHourConsumption[]
+  instant: KNXReadingPayload
+  meter: KNXReadingPayload
+  total: KNXReadingPayload & {
+    adjusted: number
   }
   cost: {
     datetime: string
     rates: EnergyRates
     avg: number
   }
-  instant: KnxReading<number>
-  meter: KnxReading<number>
 }
 
 export type Torrent = {

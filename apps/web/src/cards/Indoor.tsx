@@ -32,7 +32,7 @@ export const Indoor: FC<Record<string, never>> = () => {
       <ApolloDataTable>
         <tbody>
           <KnxReading
-            id='home.air-quality.co2'
+            feed='home.air-quality.co2'
             label='Poziom CO₂'
             range={{ optimal: 400, highest: 1500 }}
             bars={{ historyKey: 'today', highest: 2000, lowest: 400, optimal: 600, color: true }}
@@ -45,7 +45,7 @@ export const Indoor: FC<Record<string, never>> = () => {
             }
           />
           <KnxReading
-            id='home.air-quality.humidity'
+            feed='home.air-quality.humidity'
             label='Wilgotność'
             range={optimalHumidityRange}
             bars={{ historyKey: 'today', color: true, ...optimalHumidityRange }}

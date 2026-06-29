@@ -3,7 +3,7 @@ import zoomBanner from './card-banners/electricity-zoom.jpg'
 import banner from './card-banners/electricity.jpg'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import { ApolloDataTable, ColorIndicator, Copy, HoursBars, TablePlaceholder } from '@/card-components'
+import { ApolloDataTable, Copy, KnxReading, TablePlaceholder } from '@/card-components'
 import { EnergyFeed } from '@repo/types'
 
 export const Energy: FC<Record<string, never>> = () => {
@@ -22,7 +22,7 @@ export const Energy: FC<Record<string, never>> = () => {
   }
 
   const grossPrice = +feed.cost.rates.distribution + +feed.cost.rates.energy * feed.cost.rates.vat
-  const cost = (feed.meter.value / 1000) * grossPrice
+  const cost = (feed.meter.reading.value / 1000) * grossPrice
   const meterReading = feed.total.adjusted / 1000
 
   const avgMonthlyConsumption = (feed.cost.avg * 30) / 1000
@@ -39,17 +39,19 @@ export const Energy: FC<Record<string, never>> = () => {
           ) : (
             <ApolloDataTable>
               <tbody>
-                <tr>
-                  <td>Zużycie dziś</td>
-                  <td style={{ padding: 0, width: '4em' }}>
-                    <HoursBars data={feed.today.bars} highest={1000} valueKey='hourly_consumption' />
-                  </td>
-                  <td>{Number(feed.today.value / 1000).toLocaleString('en-PL', { maximumFractionDigits: 2 })} kWh</td>
-                </tr>
+                <KnxReading
+                  feed={feed.daily}
+                  label='Zużycie dziś'
+                  formatValue={r =>
+                    Number(r.value).toLocaleString('en-PL', { maximumFractionDigits: 2 }) + ' ' + r.unit
+                  }
+                  bars={{ historyKey: 'today', highest: 1000, valueKey: 'hourly_consumption' }}
+                />
                 {!zoom.active ? null : (
                   <>
                     <tr>
                       <td>Stan licznika</td>
+                      <td></td>
                       <td></td>
                       <td>
                         <Copy text={Number(meterReading).toFixed(2).replace('.', ',')} />
@@ -63,6 +65,7 @@ export const Energy: FC<Record<string, never>> = () => {
                     <tr>
                       <td>Cena brutto</td>
                       <td></td>
+                      <td></td>
                       <td>
                         <Copy text={Number(grossPrice).toFixed(4).replace('.', ',')} />
                         {Number(grossPrice).toLocaleString('en-PL', {
@@ -72,13 +75,10 @@ export const Energy: FC<Record<string, never>> = () => {
                         zł/kWh
                       </td>
                     </tr>
-                    <tr>
-                      <td>Meter energy</td>
-                      <td></td>
-                      <td>{feed.meter.text}</td>
-                    </tr>
+                    <KnxReading feed={feed.meter} label='Meter energy' />
                     <tr>
                       <td>Meter cost</td>
+                      <td></td>
                       <td></td>
                       <td>{Number(cost).toFixed(4).replace('.', ',')} PLN</td>
                     </tr>
@@ -89,23 +89,25 @@ export const Energy: FC<Record<string, never>> = () => {
                     <tr>
                       <td>Śr. zużycie msc</td>
                       <td></td>
+                      <td></td>
                       <td>{Number(avgMonthlyConsumption).toFixed(0)} kWh</td>
                     </tr>
                     <tr>
                       <td>Śr. koszt za msc</td>
                       <td></td>
+                      <td></td>
                       <td>{Number(avgMonthlyCost).toFixed(0)} zł</td>
                     </tr>
                   </>
                 )}
-                <tr>
-                  <td>Chwilowy pobór</td>
-                  <td></td>
-                  <td>
-                    <ColorIndicator instant={feed.instant.value} range={{ optimal: 400, lowest: 100, highest: 2400 }} />
-                    {Number(feed.instant.value).toLocaleString('en-PL', { maximumFractionDigits: 0 })} W
-                  </td>
-                </tr>
+                <KnxReading
+                  feed={feed.instant}
+                  label='Chwilowy pobór'
+                  range={{ optimal: 400, lowest: 100, highest: 2400 }}
+                  formatValue={r =>
+                    Number(r.value).toLocaleString('en-PL', { maximumFractionDigits: 0 }) + ' ' + r.unit
+                  }
+                />
               </tbody>
             </ApolloDataTable>
           )

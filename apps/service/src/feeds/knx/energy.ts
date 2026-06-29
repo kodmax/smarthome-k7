@@ -23,14 +23,21 @@ export const addEnergyFeed = (feeds: Feeds, knx: KnxLink): void => {
     'energy',
     { energyCost, energyConsumption, ...energyReadings },
     ({ energyCost, total, instant, energyConsumption, meter }): EnergyFeed => ({
-      total: { ...total, adjusted: total.value + energyMeterOffset },
-      today: {
-        value: total.value - energyConsumption.startOfDayValue,
-        bars: energyConsumption.bars,
+      daily: {
+        reading: {
+          ...total,
+          value: (total.value - energyConsumption.startOfDayValue) / 1000,
+          unit: 'kWh',
+        },
+        history: { today: energyConsumption.bars },
+      },
+      instant: { reading: instant },
+      meter: { reading: meter },
+      total: {
+        reading: total,
+        adjusted: total.value + energyMeterOffset,
       },
       cost: energyCost,
-      instant,
-      meter,
     }),
   )
 }
