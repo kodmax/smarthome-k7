@@ -3,7 +3,7 @@ import banner from './stock-market.webp'
 import { type FC } from 'react'
 import { useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import TablePlaceholder from '../components/TablePlaceholder'
+import { ApolloDataTable, TablePlaceholder } from '@/card-components'
 import { StockMarketFeed } from '@repo/types'
 import { Ticker } from './Ticker'
 import { TableBody, TableHead, TableRow } from '@mui/material'
@@ -26,7 +26,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
     <ApolloCard cardId='stock-market' banner={banner} zoomBanner={zoomBanner} height={10}>
       <ZoomContext.Consumer>
         {zoom => (
-          <table className='apollo-data-table' style={zoom.active ? { fontSize: '0.6em', lineHeight: 1.2 } : undefined}>
+          <ApolloDataTable style={zoom.active ? { fontSize: '0.6em', lineHeight: 1.2 } : undefined}>
             {zoom.active ? (
               <TableHead>
                 <TableRow>
@@ -43,7 +43,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
                 <Ticker key={item.symbol} ticker={item} zoom={zoom.active} />
               ))}
             </TableBody>
-          </table>
+          </ApolloDataTable>
         )}
       </ZoomContext.Consumer>
     </ApolloCard>

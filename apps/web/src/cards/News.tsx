@@ -3,8 +3,7 @@ import zoomBanner from './card-banners/news-zoom.jpg'
 import banner from './card-banners/news.jpg'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import LinkOpen from './components/LinkOpen'
-import TablePlaceholder from './components/TablePlaceholder'
+import { ApolloDataTable, LinkOpen, TablePlaceholder } from '@/card-components'
 import styled from '@emotion/styled'
 import { NewsFeed } from '@repo/types'
 
@@ -27,24 +26,29 @@ export const News: FC<Record<string, never>> = () => {
         {zoom =>
           !news ? (
             <TablePlaceholder rows={10} graph={false} value={false} />
-          ) : (
-            <table
-              className={zoom.active ? '' : 'apollo-data-table'}
-              style={zoom.active ? { fontSize: '0.4em', lineHeight: 1.2 } : { tableLayout: 'fixed', width: '100%' }}
-            >
+          ) : zoom.active ? (
+            <table style={{ fontSize: '0.4em', lineHeight: 1.2 }}>
               <tbody>
                 {news.articles.map(article => (
                   <tr key={article.href}>
-                    {!zoom.active ? null : (
-                      <Open style={{ padding: '0 1em 0em', verticalAlign: 'middle' }}>
-                        <LinkOpen href={article.href} />
-                      </Open>
-                    )}
-                    <td style={zoom.active ? { paddingBottom: '0em' } : { textAlign: 'left' }}>{article.title}</td>
+                    <Open style={{ padding: '0 1em 0em', verticalAlign: 'middle' }}>
+                      <LinkOpen href={article.href} />
+                    </Open>
+                    <td style={{ paddingBottom: '0em' }}>{article.title}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          ) : (
+            <ApolloDataTable style={{ tableLayout: 'fixed' }}>
+              <tbody>
+                {news.articles.map(article => (
+                  <tr key={article.href}>
+                    <td style={{ textAlign: 'left' }}>{article.title}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </ApolloDataTable>
           )
         }
       </ZoomContext.Consumer>

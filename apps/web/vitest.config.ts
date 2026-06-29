@@ -9,9 +9,16 @@ export default mergeConfig(
   viteConfig,
   defineConfig({
     resolve: {
-      alias: {
-        '@': path.resolve(srcDir, 'src'),
-      },
+      alias: [
+        {
+          find: '@/card-components',
+          replacement: path.resolve(srcDir, 'src/cards/components'),
+        },
+        {
+          find: '@',
+          replacement: path.resolve(srcDir, 'src'),
+        },
+      ],
     },
     test: {
       environment: 'jsdom',

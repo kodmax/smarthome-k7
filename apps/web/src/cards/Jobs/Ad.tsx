@@ -1,7 +1,7 @@
 import { JobAd } from '@repo/types'
 import { FC, useMemo } from 'react'
 import { Company, JobTitle, Logo, Open, Salary } from './styled'
-import LinkOpen from '../components/LinkOpen'
+import { LinkOpen } from '@/card-components'
 import { formatJobSalary } from './formatJobSalary'
 import { isFavSkill } from './isFavSkill'
 

@@ -8,9 +8,14 @@ export const PriceChange = styled('span')<{ dir: 'up' | 'down' | 'none' }>(({ di
 }))
 
 export const Data = styled(TableCell)({
-  paddingTop: 0,
-  paddingBottom: 0,
+  padding: '0 16px',
   fontSize: 'inherit',
+  '&:first-of-type': {
+    paddingLeft: 0,
+  },
+  '&:last-of-type': {
+    paddingRight: 0,
+  },
 })
 
 export const Header = styled(TableCell)({

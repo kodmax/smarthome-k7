@@ -1,17 +1,20 @@
 import { type FC, useCallback } from 'react'
 
-import KnxReading from './components/KnxReading'
+import {
+  ApolloDataTable,
+  ColorIndicator,
+  Humidity,
+  KnxReading,
+  KnxStateIcon,
+  TablePlaceholder,
+} from '@/card-components'
 import zoomBanner from './card-banners/comfort-zoom.jpg'
 import banner from './card-banners/comfort.jpg'
-import Humidity from './components/Humidity'
 import { ApolloCard } from '@/apollo-card'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
-import KnxStateIcon from './components/KnxStateIcon'
 import { Warning } from '@mui/icons-material'
 import { Co2Data, WeatherFeed } from '@repo/types'
 import { sunTimes } from './Weather/sunTimes'
-import TablePlaceholder from './components/TablePlaceholder'
-import { ColorIndicator } from './components/ColorIndication'
 
 export const Indoor: FC<Record<string, never>> = () => {
   const feed = useFeed<WeatherFeed>('weather')
@@ -32,7 +35,7 @@ export const Indoor: FC<Record<string, never>> = () => {
 
   return (
     <ApolloCard cardId='air-quality' banner={banner} zoomBanner={zoomBanner} onZoom={onZoom}>
-      <table className='apollo-data-table'>
+      <ApolloDataTable>
         <tbody>
           <KnxReading
             id='home.air-quality.co2'
@@ -64,7 +67,7 @@ export const Indoor: FC<Record<string, never>> = () => {
             <td>{sun.time}</td>
           </tr>
         </tbody>
-      </table>
+      </ApolloDataTable>
     </ApolloCard>
   )
 }

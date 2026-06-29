@@ -1,9 +1,8 @@
 import { useCallback, type FC } from 'react'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import banner from '../cards/card-banners/fx.jpg'
-import { Graph } from '../cards/components/Graph'
+import { ApolloDataTable, Graph, TablePlaceholder } from '@/card-components'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import TablePlaceholder from '../cards/components/TablePlaceholder'
 import { FXFeed, FXRates } from '@repo/types'
 
 const moreFx: Array<keyof FXRates> = ['EUR/PLN', 'USD/PLN', 'CHF/PLN', 'EUR/UAH', 'GBP/PLN', 'PLN/UAH', 'PLN/RUB']
@@ -23,7 +22,7 @@ export const FX: FC<Record<string, never>> = () => {
           !fx ? (
             <TablePlaceholder rows={4} graph={true} value={true} />
           ) : (
-            <table className='apollo-data-table'>
+            <ApolloDataTable>
               <tbody>
                 {(zoom.active ? moreFx : mainFx)
                   .filter(pair => pair in fx.rates)
@@ -45,7 +44,7 @@ export const FX: FC<Record<string, never>> = () => {
                     )
                   })}
               </tbody>
-            </table>
+            </ApolloDataTable>
           )
         }
       </ZoomContext.Consumer>

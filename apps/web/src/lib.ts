@@ -1,4 +1,4 @@
-import { type ColorIndicationRange } from './cards/components/ColorIndication'
+import { type ColorIndicationRange } from '@/card-components'
 
 export function getAbsoluteHumidity(temp: number, relativeHumidity: number): number {
   return Number(

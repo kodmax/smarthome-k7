@@ -1,7 +1,6 @@
 import banner from '../cards/card-banners/interest-rates.jpg'
 import { ApolloCard } from '@/apollo-card'
-import { Graph } from '../cards/components/Graph'
-import TablePlaceholder from '../cards/components/TablePlaceholder'
+import { ApolloDataTable, Graph, TablePlaceholder } from '@/card-components'
 import { useFeed } from '@repo/feed-client'
 import { type FC } from 'react'
 import { InterestRatesFeed } from '@repo/types'
@@ -19,7 +18,7 @@ export const Wibor: FC<Record<string, never>> = () => {
 
   return (
     <ApolloCard cardId='interest-rates' banner={banner}>
-      <table className='apollo-data-table'>
+      <ApolloDataTable>
         <tbody>
           <tr>
             <td>Stopa ref.</td>
@@ -50,7 +49,7 @@ export const Wibor: FC<Record<string, never>> = () => {
             <td>{feed['WIBOR 6M'].current} %</td>
           </tr>
         </tbody>
-      </table>
+      </ApolloDataTable>
     </ApolloCard>
   )
 }

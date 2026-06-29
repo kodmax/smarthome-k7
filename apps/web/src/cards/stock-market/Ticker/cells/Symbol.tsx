@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { Data } from '../styled'
-import LinkOpen from '../../../components/LinkOpen'
+import { LinkOpen } from '@/card-components'
 import { TickerData } from '@repo/types'
 
 export const Symbol: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {

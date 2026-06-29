@@ -1,7 +1,6 @@
 import banner from '../cards/card-banners/fuel.jpg'
 import { ApolloCard } from '@/apollo-card'
-import { Graph } from '../cards/components/Graph'
-import TablePlaceholder from '../cards/components/TablePlaceholder'
+import { ApolloDataTable, Graph, TablePlaceholder } from '@/card-components'
 import { useFeed } from '@repo/feed-client'
 
 import { type FC } from 'react'
@@ -15,7 +14,7 @@ export const Fuel: FC<Record<string, never>> = () => {
       {!reading ? (
         <TablePlaceholder rows={4} graph={true} value={true} />
       ) : (
-        <table className='apollo-data-table'>
+        <ApolloDataTable>
           <tbody>
             <tr>
               <td>Pb 98</td>
@@ -46,7 +45,7 @@ export const Fuel: FC<Record<string, never>> = () => {
               <td>{Number(reading.ON.current).toFixed(2)} zł/ℓ</td>
             </tr>
           </tbody>
-        </table>
+        </ApolloDataTable>
       )}
     </ApolloCard>
   )

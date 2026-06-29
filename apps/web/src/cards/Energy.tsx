@@ -3,10 +3,7 @@ import zoomBanner from './card-banners/electricity-zoom.jpg'
 import banner from './card-banners/electricity.jpg'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import { ColorIndicator } from './components/ColorIndication'
-import TablePlaceholder from './components/TablePlaceholder'
-import Copy from './components/Copy'
-import { HoursBars } from './components/HoursBars'
+import { ApolloDataTable, ColorIndicator, Copy, HoursBars, TablePlaceholder } from '@/card-components'
 import { EnergyFeed } from '@repo/types'
 
 export const Energy: FC<Record<string, never>> = () => {
@@ -40,7 +37,7 @@ export const Energy: FC<Record<string, never>> = () => {
           !feed ? (
             <TablePlaceholder rows={4} graph={false} value={true} />
           ) : (
-            <table className='apollo-data-table'>
+            <ApolloDataTable>
               <tbody>
                 <tr>
                   <td>Zużycie dziś</td>
@@ -110,7 +107,7 @@ export const Energy: FC<Record<string, never>> = () => {
                   </td>
                 </tr>
               </tbody>
-            </table>
+            </ApolloDataTable>
           )
         }
       </ZoomContext.Consumer>

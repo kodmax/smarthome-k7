@@ -1,9 +1,8 @@
 import { type FC } from 'react'
-import KnxReading from './components/KnxReading'
+import { ApolloDataTable, KnxReading, KnxStateIcon } from '@/card-components'
 import zoomBanner from './card-banners/indoor-temp-zoom.jpg'
 import banner from './card-banners/indoor-temp.jpg'
 import { ApolloCard } from '@/apollo-card'
-import KnxStateIcon from './components/KnxStateIcon'
 import { Bedtime, Fireplace, LightMode, Air, type SvgIconComponent, ThermostatAuto } from '@mui/icons-material'
 import { TemperatureData } from '@repo/types'
 
@@ -17,7 +16,7 @@ const icons: Record<string, SvgIconComponent> = {
 export const Temperature: FC<Record<string, never>> = () => {
   return (
     <ApolloCard cardId='indoor-temp' banner={banner} zoomBanner={zoomBanner}>
-      <table className='apollo-data-table'>
+      <ApolloDataTable>
         <tbody>
           <KnxReading
             bars={{ historyKey: 'history', highest: 30, lowest: 20, optimal: 24, color: true }}
@@ -79,7 +78,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             }
           />
         </tbody>
-      </table>
+      </ApolloDataTable>
     </ApolloCard>
   )
 }

@@ -2,16 +2,20 @@ import { type FC } from 'react'
 import zoomBanner from './torrents-zoom.jpg'
 import banner from './torrents.jpg'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import TablePlaceholder from '../components/TablePlaceholder'
-import Copy from '../components/Copy'
+import { ApolloDataTable, Copy, TablePlaceholder, TorrentSearch } from '@/card-components'
 import { useFeed } from '@repo/feed-client'
-import { TorrentSearch } from '../components/TorrentSearch'
-import { styled } from '@mui/material'
+import styled from '@emotion/styled'
 import { Torrent } from '@repo/types'
 
-const Torrents = styled('table')({
+const TorrentsTable = styled(ApolloDataTable)<{ zoomed: boolean }>(({ zoomed }) => ({
   tableLayout: 'fixed',
-})
+  fontSize: zoomed ? '0.25em' : '1em',
+  ...(zoomed && {
+    '& tr:nth-of-type(even)': {
+      backgroundColor: '#ececec',
+    },
+  }),
+}))
 
 export const TopTorrents: FC<Record<string, never>> = () => {
   const feed = useFeed<Torrent[]>('top-torrents')
@@ -30,17 +34,7 @@ export const TopTorrents: FC<Record<string, never>> = () => {
         {zoom => (
           <div>
             <div>{zoom.active ? <TorrentSearch /> : null}</div>
-            <Torrents
-              className='apollo-data-table'
-              sx={{
-                fontSize: zoom.active ? '0.25em' : '1em',
-                '& tr:nth-child(even)': !zoom.active
-                  ? void 0
-                  : {
-                      background: '#ececec',
-                    },
-              }}
-            >
+            <TorrentsTable zoomed={zoom.active}>
               <tbody>
                 {feed.map(torrent => (
                   <tr key={torrent.info_hash}>
@@ -77,7 +71,7 @@ export const TopTorrents: FC<Record<string, never>> = () => {
                   </tr>
                 ))}
               </tbody>
-            </Torrents>
+            </TorrentsTable>
           </div>
         )}
       </ZoomContext.Consumer>

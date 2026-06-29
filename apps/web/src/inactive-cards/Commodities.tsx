@@ -3,8 +3,7 @@ import banner from '../cards/card-banners/commodities.jpg'
 import { type FC, useCallback } from 'react'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import { Graph } from '../cards/components/Graph'
-import TablePlaceholder from '../cards/components/TablePlaceholder'
+import { ApolloDataTable, Graph, TablePlaceholder } from '@/card-components'
 import { CommoditiesFeed } from '@repo/types'
 
 type Salaries = {
@@ -58,7 +57,7 @@ export const Commodities: FC<Record<string, never>> = () => {
           !commodities ? (
             <TablePlaceholder rows={6} graph={true} value={true} />
           ) : (
-            <table className='apollo-data-table'>
+            <ApolloDataTable>
               <tbody>
                 <tr>
                   <td>Inflacja</td>
@@ -134,7 +133,7 @@ export const Commodities: FC<Record<string, never>> = () => {
                   </tr>
                 )}
               </tbody>
-            </table>
+            </ApolloDataTable>
           )
         }
       </ZoomContext.Consumer>

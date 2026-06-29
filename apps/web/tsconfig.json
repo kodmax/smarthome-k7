@@ -6,7 +6,8 @@
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/card-components": ["./src/cards/components/index.ts"]
     }
   }
 }

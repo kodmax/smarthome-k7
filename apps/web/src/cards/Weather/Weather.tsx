@@ -1,11 +1,9 @@
 import { type FC } from 'react'
 import zoomBanner from './card-banners/weather-zoom.jpg'
 import banner from './card-banners/weather.jpg'
-import { ColorIndicator } from '../components/ColorIndication'
+import { ApolloDataTable, ColorIndicator, HoursBars, TablePlaceholder } from '@/card-components'
 import { beaufortLevelLabel, beaufortScale, optimalHumidityRange } from '../../lib'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import TablePlaceholder from '../components/TablePlaceholder'
-import { HoursBars } from '../components/HoursBars'
 import { North } from '@mui/icons-material'
 import { getPosition, getMoonPosition } from 'suncalc'
 import { useFeed } from '@repo/feed-client'
@@ -36,7 +34,7 @@ export const Weather: FC<Record<string, never>> = () => {
     <ApolloCard cardId='current-weather' banner={banner} zoomBanner={zoomBanner}>
       <ZoomContext.Consumer>
         {zoom => (
-          <table className='apollo-data-table'>
+          <ApolloDataTable>
             <tbody>
               <tr>
                 <td>Temperatura</td>
@@ -97,7 +95,7 @@ export const Weather: FC<Record<string, never>> = () => {
                 </tr>
               )}
             </tbody>
-          </table>
+          </ApolloDataTable>
         )}
       </ZoomContext.Consumer>
     </ApolloCard>

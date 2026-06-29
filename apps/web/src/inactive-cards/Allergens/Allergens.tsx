@@ -3,7 +3,7 @@ import zoomBanner from '../../cards/card-banners/pollen-zoom.jpg'
 import banner from '../../cards/card-banners/pollen.jpg'
 import { Allergen } from './Allergen'
 import { ApolloCard } from '@/apollo-card'
-import TablePlaceholder from '../../cards/components/TablePlaceholder'
+import { ApolloDataTable, TablePlaceholder } from '@/card-components'
 import { useFeed } from '@repo/feed-client'
 import { AllergensFeed } from '@repo/types'
 
@@ -15,13 +15,13 @@ export const Allergens: FC<Record<string, never>> = () => {
       {!feed ? (
         <TablePlaceholder rows={5} graph={false} value={true} />
       ) : (
-        <table className='apollo-data-table'>
+        <ApolloDataTable>
           <tbody>
             {feed.allergens.map(allergen => (
               <Allergen key={allergen.id} data={allergen} />
             ))}
           </tbody>
-        </table>
+        </ApolloDataTable>
       )}
     </ApolloCard>
   )
