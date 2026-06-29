@@ -11,10 +11,8 @@ export const addHomeAirQualityCo2Feed = (feeds: Feeds, knx: KnxLink): void => {
   const co2Alert = knxB1('home.air-quality.co2-alert', knx.getDatapoint(schema.alert))
 
   feeds.addFeed('home.air-quality.co2', { co2Hourly, co2Level, co2Alert }, ({ co2Level, co2Hourly, co2Alert }) => ({
-    reading: {
-      ...co2Level,
-      alert: co2Alert,
-    },
+    reading: co2Level,
     history: co2Hourly,
+    alert: co2Alert,
   }))
 }

@@ -40,7 +40,7 @@ export const Indoor: FC<Record<string, never>> = () => {
               <KnxStateIcon<Co2Data>
                 icon={() => Warning}
                 id='home.air-quality.co2'
-                visible={payload => payload.reading.alert.value === 1}
+                visible={payload => payload.alert.value === 1}
               />
             }
           />

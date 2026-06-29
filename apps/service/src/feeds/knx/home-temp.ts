@@ -3,6 +3,7 @@ import type { KnxLink } from 'js-knx'
 import { DPT_Value_Temp } from 'js-knx'
 import { indoorTempHistory, type TempHistory } from '@/data-sources'
 import knxTemp from '@/data-sources/knx/temp'
+import DateTime from '@/DateTime'
 
 export type HomeTempRoomSchema = {
   history: keyof TempHistory
@@ -19,16 +20,22 @@ export const addHomeTempFeed = (feeds: Feeds, knx: KnxLink, feed: string, schema
       `home.temp.${feed}`,
       { reading, setpoint, indoorTempHistory },
       ({ reading, setpoint, indoorTempHistory }) => ({
-        history: indoorTempHistory[schema.history],
+        reading,
+        history: {
+          date: new DateTime().getDate(),
+          today: indoorTempHistory[schema.history],
+        },
         setpoint: setpoint.value.toFixed(1),
-        ...reading,
       }),
     )
     return
   }
 
   feeds.addFeed(`home.temp.${feed}`, { reading, indoorTempHistory }, ({ reading, indoorTempHistory }) => ({
-    history: indoorTempHistory[schema.history],
-    ...reading,
+    reading,
+    history: {
+      date: new DateTime().getDate(),
+      today: indoorTempHistory[schema.history],
+    },
   }))
 }

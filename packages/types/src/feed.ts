@@ -215,15 +215,26 @@ export type CommoditiesFeed = {
   }
 }
 
-export type Co2Data = {
+export type AirQualityHistory = {
   date: string
   today: Co2HistoryRecord[]
-  target: string
-  source: string
-  text: string
-  unit: string
-  value: number
+}
+
+export type Co2Data = {
+  reading: KnxReading<number>
+  history: AirQualityHistory
   alert: KnxReading<number>
+}
+
+export type HumidityData = {
+  reading: KnxReading<number>
+  history: AirQualityHistory
+}
+
+export type HomeTempFeedData = {
+  reading: KnxReading<number>
+  history: AirQualityHistory
+  setpoint?: string
 }
 
 export type TemperatureData = {

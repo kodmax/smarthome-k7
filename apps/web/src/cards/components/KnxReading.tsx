@@ -2,7 +2,7 @@ import { type ReactNode } from 'react'
 import { useFeed } from '@repo/feed-client'
 import { ColorIndicator, type ColorIndicationRange } from './ColorIndication'
 import { Graph, type DataPoint, type GraphProps } from './Graph'
-import { HoursBars, type HoursBarsProps, type Record } from './HoursBars'
+import { HoursBars, type HoursBarsProps, type Record as HistoryRecord } from './HoursBars'
 import { KnxReadingType } from '@repo/types'
 
 type KnxValue<T> = KnxReadingType<T> & {
@@ -45,8 +45,10 @@ const KnxReading = <T extends KnxValue<string | number> = KnxValue<string | numb
     )
   }
 
-  const reading = 'reading' in feed ? (feed.reading as KnxValue<string | number>) : (feed as KnxValue<string | number>)
-  const history = 'history' in feed ? (feed.history as Record<string, unknown>) : (feed as Record<string, unknown>)
+  const reading = feed.reading as KnxValue<string | number>
+  const history = feed.history as Record<string, unknown> | undefined
+  const historyBars = history?.[bars?.historyKey ?? ''] as HistoryRecord[] | undefined
+  const historyGraph = history?.[graph?.historyKey ?? 'value'] as DataPoint[] | undefined
 
   return (
     <tr>
@@ -60,16 +62,11 @@ const KnxReading = <T extends KnxValue<string | number> = KnxValue<string | numb
             reverse={bars.reverse}
             color={bars.color}
             valueKey={bars.valueKey}
-            data={history[bars.historyKey] as Record[]}
+            data={historyBars}
           />
         )}
         {!graph ? null : (
-          <Graph
-            scaleX={graph.scaleX}
-            scaleY={graph.scaleY}
-            valueKey={graph.valueKey}
-            data={history[graph.historyKey ?? 'value'] as DataPoint[]}
-          />
+          <Graph scaleX={graph.scaleX} scaleY={graph.scaleY} valueKey={graph.valueKey} data={historyGraph} />
         )}
       </td>
       <td>
