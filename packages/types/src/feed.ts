@@ -71,7 +71,7 @@ export type StockMarketFeed = {
 }
 
 export type Co2HistoryRecord = {
-  datetime: string
+  hour: number
   value: number
 }
 

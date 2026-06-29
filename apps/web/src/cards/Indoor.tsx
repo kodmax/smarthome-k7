@@ -38,11 +38,7 @@ export const Indoor: FC<Record<string, never>> = () => {
             id='home.air-quality.co2'
             label='Poziom CO₂'
             range={{ optimal: 400, highest: 1500 }}
-            graph={{
-              historyKey: 'today',
-              scaleX: 1,
-              scaleY: 1000,
-            }}
+            bars={{ historyKey: 'today', highest: 2000, lowest: 400, optimal: 600, color: true }}
             icon={
               <KnxStateIcon<Co2Data>
                 icon={() => Warning}

@@ -12,13 +12,15 @@ export const source: DataSourceDefinition<{ date: string; today: Co2HistoryRecor
     const conn = await db.getConnection()
     try {
       return {
-        // average: await conn.query(
-        //     'select from_unixtime(max(unix_timestamp(datetime))) as datetime as hour, avg(ppm) as value from co2 where datetime >= ? group by hour(datetime);',
-        //     [new DateTime(-30, CacheAgeUnit.DAYS).getDate()]
-        // ),
-        today: await conn.query('select datetime, ppm as value from co2 where datetime >= ?', [
-          new DateTime().getDate(),
-        ]),
+        today: await conn.query(
+          `select
+              hour(datetime) as hour,
+              avg(ppm) as value
+              from co2 where datetime >= ?
+              group by hour(datetime)
+              order by hour(datetime) ASC`,
+          [new DateTime().getDate()],
+        ),
         date: new DateTime().getDate(),
       }
     } finally {
