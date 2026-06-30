@@ -1,6 +1,7 @@
 import { Card, CardContent, CardMedia, styled } from '@mui/material'
 import { type FC, type ReactNode } from 'react'
-import { ZoomContext, ZoomCurtain } from './ZoomCurtain'
+import { ZoomContext } from './ZoomContext'
+import { ZoomCurtain } from './ZoomCurtain'
 
 type ApolloCardProps = {
   zoomBanner?: string
