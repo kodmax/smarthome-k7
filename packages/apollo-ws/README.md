@@ -25,11 +25,13 @@ yarn workspace @repo/apollo-ws test
 
 ## Scripts
 
-| Script            | Description                  |
-| ----------------- | ---------------------------- |
-| `build`           | `tsc` + Bun bundle → `dist/` |
-| `test`            | Vitest                       |
-| `lint` / `format` | ESLint / Prettier            |
+| Script            | Description                         |
+| ----------------- | ----------------------------------- |
+| `build`           | `tsc` → `dist/` (JS + `.d.ts`)      |
+| `test`            | Vitest                              |
+| `lint` / `format` | ESLint / Prettier                   |
+
+Package entry: `dist/index.js` with types in `dist/index.d.ts`. Agent notes: [`AGENTS.md`](./AGENTS.md).
 
 ## Stack
 

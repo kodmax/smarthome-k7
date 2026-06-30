@@ -1,6 +1,7 @@
 import EventEmitter from 'events'
 import { CacheEntry, Snapshot } from './cache'
 import { NoRecentContent } from './Errors'
+import { ApolloEvents } from './ApolloEvents'
 
 type DSCT<S> = S extends DataSourceDefinition<infer T> ? T : never
 type DSM<S extends Record<string, DataSourceDefinition<unknown>>> = {
@@ -14,7 +15,6 @@ type DataSourceDefinition<T> = {
   id: string
 
   push?: (push: (content: T) => void, command: EventEmitter, err: (e: Error) => void) => void
-  dependencies?: string[]
   volatile?: boolean
   cron?: string
 }
@@ -31,12 +31,12 @@ class DataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>> {
   public constructor(
     private definition: S,
     private cacheEntry: CacheEntry<T>,
-    private vent: EventEmitter,
+    private vent: ApolloEvents,
   ) {
     const command = new EventEmitter()
 
     if (definition.push) {
-      this.vent.on('command', (ev: DataSourceCommand) => {
+      this.vent.on('command', ev => {
         if (ev.sourceId === definition.id) {
           try {
             command.emit(ev.name, ev.args)

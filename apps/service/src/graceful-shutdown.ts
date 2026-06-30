@@ -1,17 +1,34 @@
+import type { Feeds, Server } from '@repo/apollo-ws'
 import type { KnxLink } from 'js-knx'
 import pool from './db'
 
 let knxLink: KnxLink | undefined
+let apolloFeeds: Feeds | undefined
+let apolloServer: Server | undefined
 let shuttingDown = false
 
 export const registerKnxLink = (link: KnxLink): void => {
   knxLink = link
 }
 
+export const registerApollo = (server: Server, feeds: Feeds): void => {
+  apolloServer = server
+  apolloFeeds = feeds
+}
+
 const closeConnections = async (): Promise<void> => {
+  if (apolloFeeds !== undefined) {
+    apolloFeeds.close()
+  }
+
+  if (apolloServer !== undefined) {
+    await apolloServer.close()
+  }
+
   if (knxLink !== undefined) {
     await knxLink.disconnect()
   }
+
   await pool.end()
 }
 

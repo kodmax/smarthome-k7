@@ -1,6 +1,6 @@
 import { WebSocket, WebSocketServer, AddressInfo } from 'ws'
-import { EventEmitter } from 'events'
 import { Socket } from 'net'
+import { ApolloEvents } from './ApolloEvents'
 import { DataSourceCommand } from './DataSource'
 
 export type ApolloWebSocketOptions = {
@@ -17,9 +17,25 @@ type Client = {
 }
 
 export class Server {
-  public vent: EventEmitter = new EventEmitter()
+  public vent: ApolloEvents = new ApolloEvents()
   private readonly clients: Set<Client> = new Set<Client>()
   private readonly feedDebounceTimeout: Map<string, NodeJS.Timeout> = new Map()
+  private wsServer: WebSocketServer | undefined
+
+  private readonly onFeed = (id: string, value: unknown): void => {
+    const previousTimeoutId = this.feedDebounceTimeout.get(id)
+    if (previousTimeoutId !== undefined) {
+      clearTimeout(previousTimeoutId)
+    }
+
+    this.feedDebounceTimeout.set(
+      id,
+      setTimeout(() => {
+        this.feedDebounceTimeout.delete(id)
+        this.feed(id, value)
+      }, 1000),
+    )
+  }
 
   public static async listen<T>(
     { port = 3678 }: ApolloWebSocketOptions,
@@ -33,6 +49,32 @@ export class Server {
   }
 
   private constructor(private readonly options: Required<ApolloWebSocketOptions>) {}
+
+  public async close(): Promise<void> {
+    for (const timeoutId of this.feedDebounceTimeout.values()) {
+      clearTimeout(timeoutId)
+    }
+    this.feedDebounceTimeout.clear()
+
+    this.vent.removeListener('feed', this.onFeed)
+
+    for (const client of this.clients) {
+      client.ws.close()
+    }
+    this.clients.clear()
+
+    if (this.wsServer !== undefined) {
+      const server = this.wsServer
+      this.wsServer = undefined
+
+      await new Promise<void>((resolve, reject) => {
+        server.close(err => (err ? reject(err) : resolve()))
+      })
+    }
+
+    this.vent.emit('sys-log', 5, 'Apollo WebSocket Server closed.')
+  }
+
   private feed(id: string, value: unknown): void {
     const content = JSON.stringify(value)
 
@@ -61,6 +103,7 @@ export class Server {
 
   private connect(): Promise<void> {
     const server = new WebSocketServer({ port: this.options.port })
+    this.wsServer = server
 
     server.on('connection', (ws, req) => {
       const client: Client = {
@@ -102,9 +145,12 @@ export class Server {
 
           this.vent.emit(
             'sys-log',
+            6,
             `Client <${client.socket.remoteAddress}> requested feed ${sourceId} command ${name} with arguments "${args.join(' ')}"`,
           )
           this.vent.emit('command', command)
+        } else {
+          this.vent.emit('sys-log', 5, `Client <${client.socket.remoteAddress}> sent unknown command <${cmd}>`)
         }
       })
 
@@ -119,19 +165,7 @@ export class Server {
       })
     })
 
-    this.vent.addListener('feed', (id: string, value: unknown) => {
-      const previousTimeoutId = this.feedDebounceTimeout.get(id)
-      if (previousTimeoutId !== undefined) {
-        clearTimeout(previousTimeoutId)
-      }
-
-      this.feedDebounceTimeout.set(
-        id,
-        setTimeout(() => {
-          this.feed(id, value)
-        }, 1000),
-      )
-    })
+    this.vent.addListener('feed', this.onFeed)
 
     return new Promise((resolve, reject) => {
       server.on('listening', () => {

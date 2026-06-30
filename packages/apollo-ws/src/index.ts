@@ -1,5 +1,7 @@
 export { DataSourceDefinition, DataSource } from './DataSource'
 export { Cache, CacheAgeUnit } from './cache'
+export { ApolloEvents } from './ApolloEvents'
+export type { ApolloEventMap } from './ApolloEvents'
 export { sysLog } from './sys-log'
 export { Server } from './Server'
 export { Feeds } from './Feeds'

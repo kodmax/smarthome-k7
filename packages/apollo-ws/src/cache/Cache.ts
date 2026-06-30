@@ -1,6 +1,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { isFileSystemError } from '../fs-error'
+import { CorruptCacheError } from '../Errors'
 import { CacheEntry } from './CacheEntry'
 
 class Cache {
@@ -30,10 +31,15 @@ class Cache {
         fileName,
       )
     } catch (e) {
-      if (!isFileSystemError(e) || e.code !== 'ENOENT') {
-        throw e
+      if (isFileSystemError(e) && e.code === 'ENOENT') {
+        return new CacheEntry<T>(this.path, { timestamp: new Date().getTime() }, fileName)
       }
-      return new CacheEntry<T>(this.path, { timestamp: new Date().getTime() }, fileName)
+
+      if (e instanceof SyntaxError) {
+        throw new CorruptCacheError(fileName, e)
+      }
+
+      throw e
     }
   }
 }

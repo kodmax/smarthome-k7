@@ -4,7 +4,7 @@ import { Server, Cache, sysLog, Feeds } from '@repo/apollo-ws'
 import { config } from './config'
 import path from 'node:path'
 import { initKnxFeeds, initWebFeeds } from './feeds'
-import { setupGracefulShutdown } from './graceful-shutdown'
+import { registerApollo, setupGracefulShutdown } from './graceful-shutdown'
 
 setupGracefulShutdown()
 
@@ -12,6 +12,7 @@ Server.listen({}, async apollo => {
   console.log('Feed cache directory:', path.resolve(config.cache.dir))
   const feeds = new Feeds(new Cache(config.cache.dir), apollo.vent)
 
+  registerApollo(apollo, feeds)
   sysLog(apollo.vent, 6)
 
   await initWebFeeds(feeds)

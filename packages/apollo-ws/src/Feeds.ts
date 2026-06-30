@@ -1,32 +1,22 @@
 import { DataSource, DSCT, DataSourceDefinition } from './DataSource'
 import { Chronos } from './chronos'
 import { Cache } from './cache'
+import type { Feed, FeedCb, FeedSources, SourceDataTypes, SourceRegistration } from './Feeds.types'
+import { ApolloEvents } from './ApolloEvents'
 
-import EventEmitter from 'events'
-import { NonErrorException } from './Errors'
+import { DuplicateDataSourceIdError, NonErrorException } from './Errors'
 
-type DS = DataSource<DataSourceDefinition<unknown>>
+export type { SourceDataTypes } from './Feeds.types'
 
-type SourceDataTypes<S extends Record<string, DataSourceDefinition<unknown>>> = {
-  [K in keyof S]: S[K] extends DataSourceDefinition<infer T> ? T : never
-}
-
-type FeedSources = Map<string, DataSource<DataSourceDefinition<unknown>>>
-type Feed = {
-  sources: FeedSources
-  cb: (content: SourceDataTypes<Record<string, DataSourceDefinition<unknown>>>) => unknown
-  feedId: string
-}
-
-export class Feeds implements Feeds {
-  private sources: Map<DataSourceDefinition<unknown>, DS> = new Map()
+export class Feeds {
+  private sourcesById = new Map<string, SourceRegistration>()
   private feeds: Map<string, Feed> = new Map()
 
   private chronos: Chronos
 
   public constructor(
     private cache: Cache,
-    private vent: EventEmitter,
+    private vent: ApolloEvents,
   ) {
     this.chronos = new Chronos(vent)
 
@@ -64,6 +54,21 @@ export class Feeds implements Feeds {
     })
   }
 
+  private async ensureDataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>>(
+    definition: S,
+  ): Promise<DataSource<S, T>> {
+    const existing = this.sourcesById.get(definition.id)
+    if (existing !== undefined) {
+      if (existing.definition !== definition) {
+        throw new DuplicateDataSourceIdError(definition.id)
+      }
+
+      return existing.dataSource as DataSource<S, T>
+    }
+
+    return this.addDataSource(definition)
+  }
+
   private async addDataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>>(
     definition: S,
   ): Promise<DataSource<S, T>> {
@@ -84,7 +89,7 @@ export class Feeds implements Feeds {
       })
     }
 
-    this.sources.set(definition, dataSource)
+    this.sourcesById.set(definition.id, { definition, dataSource })
     return dataSource
   }
 
@@ -161,16 +166,21 @@ export class Feeds implements Feeds {
     for (const contentName of Object.keys(sourcesDefinitions)) {
       const definition = sourcesDefinitions[contentName]
 
-      sources.set(contentName, this.sources.get(definition) ?? (await this.addDataSource(definition)))
+      sources.set(contentName, await this.ensureDataSource(definition))
     }
 
     const srcNames = Object.keys(sourcesDefinitions)
-    const callback = cb ?? ((content: SourceDataTypes<S>) => content[srcNames[0]])
+    const defaultCallback: FeedCb = content => content[srcNames[0]]
+    const callback: FeedCb = cb !== undefined ? content => cb(content as SourceDataTypes<S>) : defaultCallback
 
     this.feeds.set(feedId, {
-      cb: callback as unknown as (content: SourceDataTypes<Record<string, DataSourceDefinition<unknown>>>) => unknown,
+      cb: callback,
       sources,
       feedId,
     })
+  }
+
+  public close(): void {
+    this.chronos.stop()
   }
 }

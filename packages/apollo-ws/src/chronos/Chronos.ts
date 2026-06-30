@@ -1,4 +1,4 @@
-import { EventEmitter } from 'stream'
+import { ApolloEvents } from '../ApolloEvents'
 import { CronDayOfWeek, CronMonth, decode } from './decode'
 
 export type Worker = () => Promise<void>
@@ -18,21 +18,30 @@ type Job = {
 
 export class Chronos {
   private jobs: Job[] = []
+  private tickTimeout: NodeJS.Timeout | undefined
+  private stopped = false
 
-  public constructor(private readonly vent?: EventEmitter) {
+  public constructor(private readonly vent?: ApolloEvents) {
     this.next()
   }
 
   private next(): void {
+    if (this.stopped) {
+      return
+    }
+
     const interval = 60000
 
     /**
      * Not more often than once a minute. Each tick is adjusted to hit the start of the next minute
      */
-    setTimeout(() => this.tick(new Date()), 5000 + interval - (new Date().getTime() % interval))
+    this.tickTimeout = setTimeout(() => this.tick(new Date()), 5000 + interval - (new Date().getTime() % interval))
   }
 
   private tick(now: Date): void {
+    if (this.stopped) {
+      return
+    }
     const mm = now.getMonth() + 1
     const nn = now.getMinutes()
     const hh = now.getHours()
@@ -61,7 +70,7 @@ export class Chronos {
             })
             .catch(e => {
               job.state = JobState.ERROR
-              this.vent?.emit('sys-log', 3, `Crontab job <${job.id}> error`, e + '')
+              this.vent?.emit('sys-log', 3, `Crontab job <${job.id}> error: ${e}`)
             })
         }
       }
@@ -85,5 +94,14 @@ export class Chronos {
       script,
       id,
     })
+  }
+
+  public stop(): void {
+    this.stopped = true
+
+    if (this.tickTimeout !== undefined) {
+      clearTimeout(this.tickTimeout)
+      this.tickTimeout = undefined
+    }
   }
 }
