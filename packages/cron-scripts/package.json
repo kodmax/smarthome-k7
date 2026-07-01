@@ -15,7 +15,7 @@
   "dependencies": {
     "@repo/knx-schema": "*",
     "dotenv": "^17.4.2",
-    "js-knx": "^2.18.0",
+    "js-knx": "^2.19.0",
     "mariadb": "^3.0.0",
     "sony-bravia-ip-control": "^1.1.0"
   },
