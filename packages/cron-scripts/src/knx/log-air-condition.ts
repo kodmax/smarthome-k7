@@ -7,7 +7,9 @@ import { requireEnv } from '#config/env'
 
 const pool = mariadb.createPool(dbConfig())
 
-KnxLink.connect(requireEnv('KNX_HOST'), { maxRetry: 3 }).then(async knx => {
+const knx = new KnxLink(requireEnv('KNX_HOST'), { maxRetry: 3 })
+knx.on('error', err => console.error(err))
+knx.connect().then(async () => {
   const db = await pool.getConnection()
 
   try {

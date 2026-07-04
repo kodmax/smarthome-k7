@@ -3,7 +3,9 @@ import { knxSchema } from '@repo/knx-schema'
 import { DPT_DateTime, KnxLink } from 'js-knx'
 import { requireEnv } from '#config/env'
 
-KnxLink.connect(requireEnv('KNX_HOST'), { maxRetry: 5 }).then(async knx => {
+const knx = new KnxLink(requireEnv('KNX_HOST'), { maxRetry: 5 })
+knx.on('error', err => console.error(err))
+knx.connect().then(async () => {
   const now = new Date()
   const date = now.toISOString().substring(0, 10)
   const time = now.toString().substring(16, 24)

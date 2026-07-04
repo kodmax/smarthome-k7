@@ -5,7 +5,9 @@ import * as mariadb from 'mariadb'
 import { dbConfig } from '#config/db'
 import { requireEnv } from '#config/env'
 
-KnxLink.connect(requireEnv('KNX_HOST'), { maxRetry: 5 }).then(async knx => {
+const knx = new KnxLink(requireEnv('KNX_HOST'), { maxRetry: 5 })
+knx.on('error', err => console.error(err))
+knx.connect().then(async () => {
   // This script is executed every day at 24:00.
   try {
     const db = await mariadb.createConnection(dbConfig())
