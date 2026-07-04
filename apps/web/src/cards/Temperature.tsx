@@ -1,7 +1,7 @@
+import { TableBody } from '@mui/material'
 import { type FC } from 'react'
+import { TemperatureIcon } from '@repo/assets'
 import { ApolloDataTable, KnxReading, KnxStateIcon } from '@/card-components'
-import zoomBanner from './card-banners/indoor-temp-zoom.jpg'
-import banner from './card-banners/indoor-temp.jpg'
 import { ApolloCard } from '@/apollo-card'
 import { Bedtime, Fireplace, LightMode, Air, type SvgIconComponent, ThermostatAuto } from '@mui/icons-material'
 import { TemperatureData } from '@repo/types'
@@ -15,9 +15,9 @@ const icons: Record<string, SvgIconComponent> = {
 
 export const Temperature: FC<Record<string, never>> = () => {
   return (
-    <ApolloCard cardId='indoor-temp' banner={banner} zoomBanner={zoomBanner}>
+    <ApolloCard cardId='indoor-temp' title='Temperatura' icon={TemperatureIcon}>
       <ApolloDataTable>
-        <tbody>
+        <TableBody>
           <KnxReading
             bars={{ historyKey: 'today', highest: 30, lowest: 20, optimal: 24, color: true }}
             precision={2}
@@ -77,7 +77,7 @@ export const Temperature: FC<Record<string, never>> = () => {
               />
             }
           />
-        </tbody>
+        </TableBody>
       </ApolloDataTable>
     </ApolloCard>
   )

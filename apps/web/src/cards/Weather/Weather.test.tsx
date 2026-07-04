@@ -32,8 +32,8 @@ describe('Weather', () => {
 
     render(<Weather />)
 
-    expect(screen.getByText('22 °C')).toBeInTheDocument()
-    expect(screen.getByText('55%')).toBeInTheDocument()
-    expect(screen.getByText('5 m/s')).toBeInTheDocument()
+    expect(screen.getByText('Temperatura').closest('tr')).toHaveTextContent(/22\s*°C/)
+    expect(screen.getByText('Wilgotność').closest('tr')).toHaveTextContent(/55\s*%/)
+    expect(screen.getByText('Predkość wiatru').closest('tr')).toHaveTextContent(/5\s*m\/s/)
   })
 })

@@ -1,19 +1,25 @@
 import { styled } from '@mui/material'
+import { IconLink } from '@repo/assets'
+import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
-import icon from './open-in-new-window.png'
 
-const A = styled('a')({
-  backgroundImage: `url("${icon}")`,
-  backgroundRepeat: 'no-repeat',
-  backgroundSize: 'contain',
-  verticalAlign: 'text-bottom',
-  display: 'inline-block',
-  width: '1em',
-  height: '1em',
+const { icon } = designTokens
+
+const Link = styled('a')({
+  display: 'inline-flex',
+  alignItems: 'center',
+  verticalAlign: 'middle',
+  lineHeight: 0,
+  color: 'inherit',
+  textDecoration: 'none',
 })
 
 const LinkOpen: FC<{ href: string }> = ({ href }) => {
-  return <A href={href} target='_blank' />
+  return (
+    <Link href={href} target='_blank' rel='noopener noreferrer'>
+      <IconLink size={icon.sizeXs} strokeWidth={icon.strokeWidth} aria-hidden />
+    </Link>
+  )
 }
 
 export default LinkOpen

@@ -1,12 +1,14 @@
+import { TableBody } from '@mui/material'
 import { type FC } from 'react'
+import ApolloDataTable, { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
 
 const TablePlaceholder: FC<{ rows: number; graph: boolean; value: boolean }> = ({ rows, graph, value }) => {
   return (
-    <table style={{ width: '100%' }}>
-      <tbody>
+    <ApolloDataTable>
+      <TableBody>
         {[...new Array(rows).keys()].map(i => (
-          <tr key={i}>
-            <td>
+          <ApolloTableRow key={i}>
+            <ApolloTableCell>
               <span
                 style={{
                   background: 'hsl(0deg 0% 50% / 10%)',
@@ -16,25 +18,25 @@ const TablePlaceholder: FC<{ rows: number; graph: boolean; value: boolean }> = (
               >
                 &nbsp;
               </span>
-            </td>
+            </ApolloTableCell>
             {!graph ? null : (
-              <td style={{ width: '4em' }}>
+              <ApolloTableCell sx={{ width: '4em' }}>
                 <span style={{ background: 'hsl(0deg 0% 50% / 10%)', width: '80%', display: 'inline-block' }}>
                   &nbsp;
                 </span>
-              </td>
+              </ApolloTableCell>
             )}
             {!value ? null : (
-              <td style={{ width: '20%' }}>
+              <ApolloTableCell sx={{ width: '20%' }}>
                 <span style={{ background: 'hsl(0deg 0% 50% / 10%)', width: '80%', display: 'inline-block' }}>
                   &nbsp;
                 </span>
-              </td>
+              </ApolloTableCell>
             )}
-          </tr>
+          </ApolloTableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </ApolloDataTable>
   )
 }
 

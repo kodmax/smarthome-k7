@@ -6,7 +6,7 @@ jobs, torrents).
 ## Stack
 
 - React 18, Vite, TypeScript
-- MUI + Emotion
+- MUI v7 (Material 3 color system, CSS variables) + Emotion
 - Vitest + Testing Library
 
 ## Running
@@ -46,7 +46,8 @@ The backend (`apps/service`) must be running for cards to receive data.
 | ------------------------------------------------ | --------------------------------------- |
 | `@repo/feed-client`                              | `useFeed`, `useCommand`, `refreshFeeds` |
 | `@repo/types`                                    | Feed payload types                      |
-| `@repo/weather-icons`                            | Weather icons in forecast cards         |
+| `@repo/assets`                                   | Lucide icons and weather SVGs in cards  |
+| `@repo/design-tokens`                            | Shared MUI theme                        |
 | `@repo/eslint-config`, `@repo/typescript-config` | Tooling                                 |
 
 Cards in `src/cards/` map WebSocket topics to UI components. App entry point: `src/main.tsx`.

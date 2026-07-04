@@ -11,8 +11,8 @@
     { "name": "packages/knx-schema", "path": "packages/knx-schema" },
     { "name": "packages/types", "path": "packages/types" },
     { "name": "packages/typescript-config", "path": "packages/typescript-config" },
-    { "name": "packages/ui", "path": "packages/ui" },
-    { "name": "packages/weather-icons", "path": "packages/weather-icons" }
+    { "name": "packages/assets", "path": "packages/assets" },
+    { "name": "packages/design-tokens", "path": "packages/design-tokens" }
   ],
   "settings": {
     "files.exclude": {

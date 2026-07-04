@@ -22,7 +22,7 @@ Shared `tsconfig.json` presets for the monorepo.
 
 ## Consumers
 
-`apps/web`, `@repo/feed-client`, `@repo/ui`, `@repo/cron-scripts`, and other packages with a local `tsconfig.json`.
+`apps/web`, `@repo/feed-client`, `@repo/assets`, `@repo/cron-scripts`, and other packages with a local `tsconfig.json`.
 
 ## Scripts
 

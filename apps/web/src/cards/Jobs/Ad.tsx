@@ -1,6 +1,7 @@
 import { JobAd } from '@repo/types'
 import { FC, useMemo } from 'react'
-import { Company, JobTitle, Logo, Open, Salary } from './styled'
+import { ApolloTableRow } from '@/card-components'
+import { JobTitle, Open, Salary } from './styled'
 import { LinkOpen } from '@/card-components'
 import { formatJobSalary } from './formatJobSalary'
 import { isFavSkill } from './isFavSkill'
@@ -10,11 +11,7 @@ export const Ad: FC<{ ad: JobAd; zoom: boolean }> = ({ ad, zoom }) => {
   const { monthlySalaryFrom, monthlySalaryTo, b2bHourlyRateEquivalent } = useMemo(() => formatJobSalary(ad), [ad])
 
   return (
-    <tr>
-      <Company>
-        {' '}
-        {ad.companyLogoUrl ? <Logo src={ad.companyLogoUrl} isUnwanted={ad.isUnwantedCompany} /> : ad.companyName}{' '}
-      </Company>
+    <ApolloTableRow>
       {zoom ? (
         <Open>
           {' '}
@@ -34,13 +31,15 @@ export const Ad: FC<{ ad: JobAd; zoom: boolean }> = ({ ad, zoom }) => {
         )}
       </JobTitle>
       <Salary>
-        {' '}
         {ad.monthlySalaryRangeAfterTaxes !== undefined ? (
           <>
-            {monthlySalaryFrom}k — {monthlySalaryTo}k{zoom ? <>({b2bHourlyRateEquivalent}/h)</> : null}
+            {monthlySalaryFrom}k — {monthlySalaryTo}k
           </>
         ) : null}
       </Salary>
-    </tr>
+      {zoom ? (
+        <Salary>{ad.monthlySalaryRangeAfterTaxes !== undefined ? <>{b2bHourlyRateEquivalent}/h</> : null}</Salary>
+      ) : null}
+    </ApolloTableRow>
   )
 }

@@ -1,9 +1,9 @@
+import { TableBody } from '@mui/material'
 import { type FC, useCallback } from 'react'
-import zoomBanner from './card-banners/electricity-zoom.jpg'
-import banner from './card-banners/electricity.jpg'
+import { EnergyIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import { ApolloDataTable, Copy, KnxReading, TablePlaceholder } from '@/card-components'
+import { ApolloDataTable, KnxReading, Reading, TablePlaceholder } from '@/card-components'
 import { EnergyFeed } from '@repo/types'
 
 export const Energy: FC<Record<string, never>> = () => {
@@ -15,7 +15,7 @@ export const Energy: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='energy' banner={banner} zoomBanner={zoomBanner}>
+      <ApolloCard cardId='energy' title='Energia' icon={EnergyIcon}>
         <TablePlaceholder rows={4} graph={false} value={true} />
       </ApolloCard>
     )
@@ -31,84 +31,61 @@ export const Energy: FC<Record<string, never>> = () => {
     feed.cost.rates.vat
 
   return (
-    <ApolloCard cardId='energy' banner={banner} zoomBanner={zoomBanner} onZoom={onZoom}>
+    <ApolloCard cardId='energy' title='Energia' icon={EnergyIcon} onZoom={onZoom}>
       <ZoomContext.Consumer>
         {zoom =>
           !feed ? (
             <TablePlaceholder rows={4} graph={false} value={true} />
           ) : (
             <ApolloDataTable>
-              <tbody>
+              <TableBody>
                 <KnxReading
                   feed={feed.daily}
                   label='Zużycie dziś'
-                  formatValue={r =>
-                    Number(r.value).toLocaleString('en-PL', { maximumFractionDigits: 2 }) + ' ' + r.unit
-                  }
+                  formatValue={r => Number(r.value).toLocaleString('en-PL', { maximumFractionDigits: 2 })}
                   bars={{ historyKey: 'today', highest: 1000, valueKey: 'hourly_consumption' }}
                 />
                 {!zoom.active ? null : (
                   <>
-                    <tr>
-                      <td>Stan licznika</td>
-                      <td></td>
-                      <td></td>
-                      <td>
-                        <Copy text={Number(meterReading).toFixed(2).replace('.', ',')} />
-                        {Number(meterReading).toLocaleString('en-PL', {
-                          maximumFractionDigits: 2,
-                          minimumFractionDigits: 2,
-                        })}{' '}
-                        kWh
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Cena brutto</td>
-                      <td></td>
-                      <td></td>
-                      <td>
-                        <Copy text={Number(grossPrice).toFixed(4).replace('.', ',')} />
-                        {Number(grossPrice).toLocaleString('en-PL', {
-                          maximumFractionDigits: 4,
-                          minimumFractionDigits: 4,
-                        })}{' '}
-                        zł/kWh
-                      </td>
-                    </tr>
+                    <Reading
+                      title='Stan licznika'
+                      copy={Number(meterReading).toFixed(2).replace('.', ',')}
+                      displayValue={Number(meterReading).toLocaleString('en-PL', {
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2,
+                      })}
+                      unit='kWh'
+                    />
+                    <Reading
+                      title='Cena brutto'
+                      copy={Number(grossPrice).toFixed(4).replace('.', ',')}
+                      displayValue={Number(grossPrice).toLocaleString('en-PL', {
+                        maximumFractionDigits: 4,
+                        minimumFractionDigits: 4,
+                      })}
+                      unit='zł/kWh'
+                    />
                     <KnxReading feed={feed.meter} label='Meter energy' />
-                    <tr>
-                      <td>Meter cost</td>
-                      <td></td>
-                      <td></td>
-                      <td>{Number(cost).toFixed(4).replace('.', ',')} PLN</td>
-                    </tr>
+                    <Reading title='Meter cost' displayValue={Number(cost).toFixed(4).replace('.', ',')} unit='PLN' />
                   </>
                 )}
                 {zoom.active ? null : (
                   <>
-                    <tr>
-                      <td>Śr. zużycie msc</td>
-                      <td></td>
-                      <td></td>
-                      <td>{Number(avgMonthlyConsumption).toFixed(0)} kWh</td>
-                    </tr>
-                    <tr>
-                      <td>Śr. koszt za msc</td>
-                      <td></td>
-                      <td></td>
-                      <td>{Number(avgMonthlyCost).toFixed(0)} zł</td>
-                    </tr>
+                    <Reading
+                      title='Śr. zużycie msc'
+                      displayValue={Number(avgMonthlyConsumption).toFixed(0)}
+                      unit='kWh'
+                    />
+                    <Reading title='Śr. koszt za msc' displayValue={Number(avgMonthlyCost).toFixed(0)} unit='zł' />
                   </>
                 )}
                 <KnxReading
                   feed={feed.instant}
                   label='Chwilowy pobór'
                   range={{ optimal: 400, lowest: 100, highest: 2400 }}
-                  formatValue={r =>
-                    Number(r.value).toLocaleString('en-PL', { maximumFractionDigits: 0 }) + ' ' + r.unit
-                  }
+                  formatValue={r => Number(r.value).toLocaleString('en-PL', { maximumFractionDigits: 0 })}
                 />
-              </tbody>
+              </TableBody>
             </ApolloDataTable>
           )
         }

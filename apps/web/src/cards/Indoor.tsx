@@ -1,13 +1,13 @@
+import { TableBody } from '@mui/material'
 import { type FC, useCallback } from 'react'
+import { AirQualityIcon } from '@repo/assets'
 
-import { ApolloDataTable, ColorIndicator, KnxReading, KnxStateIcon, TablePlaceholder } from '@/card-components'
-import zoomBanner from './card-banners/comfort-zoom.jpg'
-import banner from './card-banners/comfort.jpg'
+import { ApolloDataTable, KnxReading, KnxStateIcon, Reading, TablePlaceholder } from '@/card-components'
 import { ApolloCard } from '@/apollo-card'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { Warning } from '@mui/icons-material'
 import { Co2Data, WeatherFeed } from '@repo/types'
-import { optimalHumidityRange } from '../lib'
+import { optimalHumidityRange } from './Weather/optimalHumidityRange'
 import { sunTimes } from './Weather/sunTimes'
 
 export const Indoor: FC<Record<string, never>> = () => {
@@ -19,7 +19,7 @@ export const Indoor: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='air-quality' banner={banner}>
+      <ApolloCard cardId='air-quality' title='Jakość powietrza' icon={AirQualityIcon}>
         <TablePlaceholder rows={4} graph={false} value={true} />
       </ApolloCard>
     )
@@ -28,9 +28,9 @@ export const Indoor: FC<Record<string, never>> = () => {
   const sun = sunTimes(feed)
 
   return (
-    <ApolloCard cardId='air-quality' banner={banner} zoomBanner={zoomBanner} onZoom={onZoom}>
+    <ApolloCard cardId='air-quality' title='Jakość powietrza' icon={AirQualityIcon} onZoom={onZoom}>
       <ApolloDataTable>
-        <tbody>
+        <TableBody>
           <KnxReading
             feed='home.air-quality.co2'
             label='Poziom CO₂'
@@ -50,22 +50,15 @@ export const Indoor: FC<Record<string, never>> = () => {
             range={optimalHumidityRange}
             bars={{ historyKey: 'today', color: true, ...optimalHumidityRange }}
           />
-          <tr>
-            <td>Jakość powietrza</td>
-            <td></td>
-            <td></td>
-            <td>
-              <ColorIndicator instant={feed.aq.aqi} range={{ optimal: 0, highest: 150 }} />
-              {feed.aq.aqi} AQI
-            </td>
-          </tr>
-          <tr>
-            <td>{sun.timeOfDay === 'day' ? 'Zmierzch' : 'Świt'}</td>
-            <td></td>
-            <td></td>
-            <td>{sun.time}</td>
-          </tr>
-        </tbody>
+          <Reading
+            title='Jakość powietrza'
+            displayValue={String(feed.aq.aqi)}
+            unit='AQI'
+            colorIndicatorRange={{ optimal: 0, highest: 150 }}
+            value={feed.aq.aqi}
+          />
+          <Reading title={sun.timeOfDay === 'day' ? 'Zmierzch' : 'Świt'} displayValue={sun.time} />
+        </TableBody>
       </ApolloDataTable>
     </ApolloCard>
   )

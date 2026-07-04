@@ -1,6 +1,7 @@
-import banner from '../cards/card-banners/fuel.jpg'
+import { TableBody } from '@mui/material'
+import { HeatingIcon } from '@repo/assets'
 import { ApolloCard } from '@/apollo-card'
-import { ApolloDataTable, Graph, TablePlaceholder } from '@/card-components'
+import { ApolloDataTable, ApolloTableCell, ApolloTableRow, Graph, TablePlaceholder } from '@/card-components'
 import { useFeed } from '@repo/feed-client'
 
 import { type FC } from 'react'
@@ -10,41 +11,41 @@ export const Fuel: FC<Record<string, never>> = () => {
   const reading = useFeed<FuelPricesFeed>('fuel')
 
   return (
-    <ApolloCard cardId='fuel' banner={banner}>
+    <ApolloCard cardId='fuel' title='Paliwa' icon={HeatingIcon}>
       {!reading ? (
         <TablePlaceholder rows={4} graph={true} value={true} />
       ) : (
         <ApolloDataTable>
-          <tbody>
-            <tr>
-              <td>Pb 98</td>
-              <td style={{ width: '4em', padding: 0 }}>
+          <TableBody>
+            <ApolloTableRow>
+              <ApolloTableCell>Pb 98</ApolloTableCell>
+              <ApolloTableCell sx={{ width: '4em', padding: 0 }}>
                 <Graph data={reading['98'].history} scaleX={30} scaleY={2} valueKey={'price'} />
-              </td>
-              <td>{Number(reading['98'].current).toFixed(2)} zł/ℓ</td>
-            </tr>
-            <tr>
-              <td>Pb 95</td>
-              <td style={{ width: '4em', padding: 0 }}>
+              </ApolloTableCell>
+              <ApolloTableCell>{Number(reading['98'].current).toFixed(2)} zł/ℓ</ApolloTableCell>
+            </ApolloTableRow>
+            <ApolloTableRow>
+              <ApolloTableCell>Pb 95</ApolloTableCell>
+              <ApolloTableCell sx={{ width: '4em', padding: 0 }}>
                 <Graph data={reading['95'].history} scaleX={30} scaleY={2} valueKey={'price'} />
-              </td>
-              <td>{Number(reading['95'].current).toFixed(2)} zł/ℓ</td>
-            </tr>
-            <tr>
-              <td>LPG</td>
-              <td style={{ width: '4em', padding: 0 }}>
+              </ApolloTableCell>
+              <ApolloTableCell>{Number(reading['95'].current).toFixed(2)} zł/ℓ</ApolloTableCell>
+            </ApolloTableRow>
+            <ApolloTableRow>
+              <ApolloTableCell>LPG</ApolloTableCell>
+              <ApolloTableCell sx={{ width: '4em', padding: 0 }}>
                 <Graph data={reading.LPG.history} scaleX={30} scaleY={1} valueKey={'price'} />
-              </td>
-              <td>{Number(reading.LPG.current).toFixed(2)} zł/ℓ</td>
-            </tr>
-            <tr>
-              <td>ON</td>
-              <td style={{ width: '4em', padding: 0 }}>
+              </ApolloTableCell>
+              <ApolloTableCell>{Number(reading.LPG.current).toFixed(2)} zł/ℓ</ApolloTableCell>
+            </ApolloTableRow>
+            <ApolloTableRow>
+              <ApolloTableCell>ON</ApolloTableCell>
+              <ApolloTableCell sx={{ width: '4em', padding: 0 }}>
                 <Graph data={reading.ON.history} scaleX={30} scaleY={2} valueKey={'price'} />
-              </td>
-              <td>{Number(reading.ON.current).toFixed(2)} zł/ℓ</td>
-            </tr>
-          </tbody>
+              </ApolloTableCell>
+              <ApolloTableCell>{Number(reading.ON.current).toFixed(2)} zł/ℓ</ApolloTableCell>
+            </ApolloTableRow>
+          </TableBody>
         </ApolloDataTable>
       )}
     </ApolloCard>

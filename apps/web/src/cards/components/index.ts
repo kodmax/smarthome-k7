@@ -1,4 +1,9 @@
-export { default as ApolloDataTable } from './ApolloDataTable'
+export {
+  default as ApolloDataTable,
+  ApolloTableCell,
+  ApolloTableRow,
+  apolloDataTableRowHeight,
+} from './ApolloDataTable'
 export { default as AQI } from './AQI'
 export { ColorIndicator, chooseColor } from './ColorIndication'
 export type { ColorIndicationRange } from './ColorIndication'
@@ -13,4 +18,6 @@ export { default as KnxStateIcon } from './KnxStateIcon'
 export { default as LinkOpen } from './LinkOpen'
 export { default as Pressure } from './Pressure'
 export { default as TablePlaceholder } from './TablePlaceholder'
+export { default as ValuePlaceholder } from './ValuePlaceholder'
 export { TorrentSearch } from './TorrentSearch'
+export * from './Reading'

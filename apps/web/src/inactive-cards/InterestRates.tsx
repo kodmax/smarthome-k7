@@ -1,6 +1,7 @@
-import banner from '../cards/card-banners/interest-rates.jpg'
+import { TableBody } from '@mui/material'
 import { ApolloCard } from '@/apollo-card'
-import { ApolloDataTable, Graph, TablePlaceholder } from '@/card-components'
+import { TrendUpIcon } from '@repo/assets'
+import { ApolloDataTable, ApolloTableCell, ApolloTableRow, Graph, TablePlaceholder } from '@/card-components'
 import { useFeed } from '@repo/feed-client'
 import { type FC } from 'react'
 import { InterestRatesFeed } from '@repo/types'
@@ -10,45 +11,45 @@ export const Wibor: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='interest-rates' banner={banner}>
+      <ApolloCard cardId='interest-rates' title='Stopy procentowe' icon={TrendUpIcon}>
         <TablePlaceholder rows={4} graph={true} value={true} />
       </ApolloCard>
     )
   }
 
   return (
-    <ApolloCard cardId='interest-rates' banner={banner}>
+    <ApolloCard cardId='interest-rates' title='Stopy procentowe' icon={TrendUpIcon}>
       <ApolloDataTable>
-        <tbody>
-          <tr>
-            <td>Stopa ref.</td>
-            <td style={{ width: '4em', padding: 0 }}>
+        <TableBody>
+          <ApolloTableRow>
+            <ApolloTableCell>Stopa ref.</ApolloTableCell>
+            <ApolloTableCell sx={{ width: '4em', padding: 0 }}>
               <Graph data={feed['NBP Ref.'].history} scaleX={30} scaleY={1} valueKey='rate' />
-            </td>
-            <td>{feed['NBP Ref.'].current} %</td>
-          </tr>
-          <tr>
-            <td>Wibor 1M</td>
-            <td style={{ width: '4em', padding: 0 }}>
+            </ApolloTableCell>
+            <ApolloTableCell>{feed['NBP Ref.'].current} %</ApolloTableCell>
+          </ApolloTableRow>
+          <ApolloTableRow>
+            <ApolloTableCell>Wibor 1M</ApolloTableCell>
+            <ApolloTableCell sx={{ width: '4em', padding: 0 }}>
               <Graph data={feed['WIBOR 1M'].history} scaleX={30} scaleY={1} valueKey='rate' />
-            </td>
-            <td>{feed['WIBOR 1M'].current} %</td>
-          </tr>
-          <tr>
-            <td>Wibor 3M</td>
-            <td style={{ width: '4em', padding: 0 }}>
+            </ApolloTableCell>
+            <ApolloTableCell>{feed['WIBOR 1M'].current} %</ApolloTableCell>
+          </ApolloTableRow>
+          <ApolloTableRow>
+            <ApolloTableCell>Wibor 3M</ApolloTableCell>
+            <ApolloTableCell sx={{ width: '4em', padding: 0 }}>
               <Graph data={feed['WIBOR 3M'].history} scaleX={30} scaleY={1} valueKey='rate' />
-            </td>
-            <td>{feed['WIBOR 3M'].current} %</td>
-          </tr>
-          <tr>
-            <td>Wibor 6M</td>
-            <td style={{ width: '4em', padding: 0 }}>
+            </ApolloTableCell>
+            <ApolloTableCell>{feed['WIBOR 3M'].current} %</ApolloTableCell>
+          </ApolloTableRow>
+          <ApolloTableRow>
+            <ApolloTableCell>Wibor 6M</ApolloTableCell>
+            <ApolloTableCell sx={{ width: '4em', padding: 0 }}>
               <Graph data={feed['WIBOR 6M'].history} scaleX={30} scaleY={1} valueKey='rate' />
-            </td>
-            <td>{feed['WIBOR 6M'].current} %</td>
-          </tr>
-        </tbody>
+            </ApolloTableCell>
+            <ApolloTableCell>{feed['WIBOR 6M'].current} %</ApolloTableCell>
+          </ApolloTableRow>
+        </TableBody>
       </ApolloDataTable>
     </ApolloCard>
   )

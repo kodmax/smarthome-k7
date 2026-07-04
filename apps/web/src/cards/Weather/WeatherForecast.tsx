@@ -1,5 +1,5 @@
-import banner from './card-banners/weather-forecast-long.jpg'
 import { Day, WeekContainer } from './Day'
+import { WeatherIcon as WeatherCardIcon } from '@repo/assets'
 import { ApolloCard } from '@/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { type FC } from 'react'
@@ -14,7 +14,7 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
   if (feed === undefined) {
     const placeholders = new Array(15).fill(undefined)
     return (
-      <ApolloCard cardId='weather-forecast' banner={banner} height={8} allowZoom={false}>
+      <ApolloCard cardId='weather-forecast' title='Prognoza pogody' icon={WeatherCardIcon} height={8} allowZoom={false}>
         <div style={{ paddingTop: '0.5em', paddingBottom: '1em' }}>
           <WeekContainer>
             {placeholders.map((_, i) => (
@@ -29,7 +29,7 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
   const passedDays = new Array(dows.indexOf(feed.forecast[0].dow)).fill(undefined)
 
   return (
-    <ApolloCard cardId='weather-forecast' banner={banner} height={8} allowZoom={false}>
+    <ApolloCard cardId='weather-forecast' title='Prognoza pogody' icon={WeatherCardIcon} height={8} allowZoom={false}>
       <div style={{ paddingTop: '0.5em', paddingBottom: '1em' }}>
         <WeekContainer>
           {passedDays.map((_, i) => (

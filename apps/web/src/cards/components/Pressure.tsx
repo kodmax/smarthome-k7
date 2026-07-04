@@ -1,25 +1,21 @@
 import { type FC } from 'react'
 import { useFeed } from '@repo/feed-client'
+import { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
 import { Graph } from './Graph'
+import ValuePlaceholder from './ValuePlaceholder'
 import { WeatherFeed } from '@repo/types'
 
 const Pressure: FC = () => {
   const feed = useFeed<WeatherFeed>('weather')
 
   if (feed === undefined) {
-    return (
-      <tr>
-        <td>Zmiany ciśnienia</td>
-        <td></td>
-        <td style={{ color: 'silver' }}>--</td>
-      </tr>
-    )
+    return <ValuePlaceholder label='Zmiany ciśnienia' />
   }
 
   return (
-    <tr>
-      <td>Ciśnienie</td>
-      <td style={{ padding: 0 }}>
+    <ApolloTableRow>
+      <ApolloTableCell>Ciśnienie</ApolloTableCell>
+      <ApolloTableCell sx={{ padding: 0 }}>
         <Graph
           data={feed.pressure.week.map(({ pressure, datetime }) => ({
             value: pressure,
@@ -28,9 +24,10 @@ const Pressure: FC = () => {
           scaleX={14}
           scaleY={25}
         />
-      </td>
-      <td>{Number(feed.pressure.instant).toFixed(0)} hPa</td>
-    </tr>
+      </ApolloTableCell>
+      <ApolloTableCell />
+      <ApolloTableCell>{Number(feed.pressure.instant).toFixed(0)} hPa</ApolloTableCell>
+    </ApolloTableRow>
   )
 }
 

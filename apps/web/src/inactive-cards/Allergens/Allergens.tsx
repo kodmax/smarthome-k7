@@ -1,6 +1,6 @@
+import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import zoomBanner from '../../cards/card-banners/pollen-zoom.jpg'
-import banner from '../../cards/card-banners/pollen.jpg'
+import { AirQualityIcon } from '@repo/assets'
 import { Allergen } from './Allergen'
 import { ApolloCard } from '@/apollo-card'
 import { ApolloDataTable, TablePlaceholder } from '@/card-components'
@@ -11,16 +11,16 @@ export const Allergens: FC<Record<string, never>> = () => {
   const feed = useFeed<AllergensFeed>('weather')
 
   return (
-    <ApolloCard cardId='allergens' banner={banner} zoomBanner={zoomBanner} height={5}>
+    <ApolloCard cardId='allergens' title='Alergeny' icon={AirQualityIcon} height={5}>
       {!feed ? (
         <TablePlaceholder rows={5} graph={false} value={true} />
       ) : (
         <ApolloDataTable>
-          <tbody>
+          <TableBody>
             {feed.allergens.map(allergen => (
               <Allergen key={allergen.id} data={allergen} />
             ))}
-          </tbody>
+          </TableBody>
         </ApolloDataTable>
       )}
     </ApolloCard>

@@ -1,24 +1,19 @@
 import styled from '@emotion/styled'
+import { designTokens } from '@repo/design-tokens'
 import { TableCell } from '@mui/material'
 
+const { success, danger } = designTokens.color
+
 export const PriceChange = styled('span')<{ dir: 'up' | 'down' | 'none' }>(({ dir }) => ({
-  color: dir === 'up' ? '#037b66' : dir === 'down' ? '#d60a22' : 'inherit',
+  color: dir === 'up' ? success : dir === 'down' ? danger : 'inherit',
   display: 'inline-block',
   width: '4em',
 }))
 
 export const Data = styled(TableCell)({
-  padding: '0 16px',
   fontSize: 'inherit',
-  '&:first-of-type': {
-    paddingLeft: 0,
-  },
-  '&:last-of-type': {
-    paddingRight: 0,
-  },
 })
 
 export const Header = styled(TableCell)({
-  padding: '16px 0',
   fontSize: 'inherit',
 })

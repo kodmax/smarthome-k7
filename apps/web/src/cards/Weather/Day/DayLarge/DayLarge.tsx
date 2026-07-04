@@ -1,13 +1,13 @@
-import { icons } from '@repo/weather-icons'
 import { type FC } from 'react'
-import { DayWrapper, Icon } from './styled'
+import WeatherIcon from '../../WeatherIcon'
+import { DayWrapper } from './styled'
 import { DayWeatherForecast } from '@repo/types'
 
 export const DayLarge: FC<{ forecast: DayWeatherForecast }> = ({ forecast }) => {
   return (
     <DayWrapper>
       <div style={{ paddingRight: '1em' }}>
-        <Icon style={{ backgroundImage: `url("${icons[forecast.icon]}")`, backgroundSize: 'contain' }}></Icon>
+        <WeatherIcon icon={forecast.icon} width='2.5em' height='2.5em' />
       </div>
       <div style={{ textAlign: 'left' }}>
         <div>

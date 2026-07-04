@@ -1,8 +1,9 @@
+import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import zoomBanner from './card-banners/weather-zoom.jpg'
-import banner from './card-banners/weather.jpg'
-import { ApolloDataTable, ColorIndicator, HoursBars, TablePlaceholder } from '@/card-components'
-import { beaufortLevelLabel, beaufortScale, optimalHumidityRange } from '../../lib'
+import { WeatherIcon as WeatherCardIcon } from '@repo/assets'
+import { ApolloDataTable, HoursBars, Reading, TablePlaceholder } from '@/card-components'
+import { beaufortLevelLabel, beaufortScale } from './beaufort'
+import { optimalHumidityRange } from './optimalHumidityRange'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
 import { North } from '@mui/icons-material'
 import { getPosition, getMoonPosition } from 'suncalc'
@@ -16,7 +17,7 @@ export const Weather: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='current-weather' banner={banner}>
+      <ApolloCard cardId='current-weather' title='Pogoda' icon={WeatherCardIcon}>
         <TablePlaceholder rows={4} graph={true} value={true} />
       </ApolloCard>
     )
@@ -31,70 +32,62 @@ export const Weather: FC<Record<string, never>> = () => {
   const windSpeed = toMetersPerSecond(feed.instant.wind.speed, feed.instant.wind.speedUnit)
 
   return (
-    <ApolloCard cardId='current-weather' banner={banner} zoomBanner={zoomBanner}>
+    <ApolloCard cardId='current-weather' title='Pogoda' icon={WeatherCardIcon}>
       <ZoomContext.Consumer>
         {zoom => (
           <ApolloDataTable>
-            <tbody>
-              <tr>
-                <td>Temperatura</td>
-                <td>
-                  <HoursBars data={feed.outdoorTemp} highest={30} lowest={15} optimal={24} color />
-                </td>
-                <td>
-                  <ColorIndicator instant={feed.instant.temp} range={{ optimal: 21, highest: 30, lowest: 15 }} />
-                  {Number(feed.instant.temp).toFixed(0)} °C
-                </td>
-              </tr>
-              <tr>
-                <td>Indeks UV</td>
-                <td></td>
-                <td>
-                  <ColorIndicator instant={feed.instant.uv} range={{ optimal: 4, highest: 8, lowest: 0 }} />
-                  {feed.instant.uv}
-                </td>
-              </tr>
-              <tr>
-                <td>Wilgotność</td>
-                <td></td>
-                <td>
-                  <ColorIndicator instant={hum} range={optimalHumidityRange} />
-                  {hum.toFixed(0)}%
-                </td>
-              </tr>
-              <tr>
-                <td>Predkość wiatru</td>
-                <td style={{ fontSize: '0.5em' }}>{zoom.active ? `${bs} - ${beaufortLevelLabel(bs)}` : `${bs} B`}</td>
-                <td>
-                  {zoom.active ? (
+            <TableBody>
+              <Reading
+                title='Temperatura'
+                graph={<HoursBars data={feed.outdoorTemp} highest={30} lowest={15} optimal={24} color />}
+                displayValue={Number(feed.instant.temp).toFixed(0)}
+                unit='°C'
+                colorIndicatorRange={{ optimal: 21, highest: 30, lowest: 15 }}
+                value={feed.instant.temp}
+              />
+              <Reading
+                title='Indeks UV'
+                displayValue={String(feed.instant.uv)}
+                colorIndicatorRange={{ optimal: 4, highest: 8, lowest: 0 }}
+                value={feed.instant.uv}
+              />
+              <Reading
+                title='Wilgotność'
+                displayValue={hum.toFixed(0)}
+                unit='%'
+                colorIndicatorRange={optimalHumidityRange}
+                value={hum}
+              />
+              <Reading
+                title='Predkość wiatru'
+                graph={
+                  <span style={{ fontSize: '0.5em' }}>
+                    {zoom.active ? `${bs} - ${beaufortLevelLabel(bs)}` : `${bs} B`}
+                  </span>
+                }
+                extraInfo={
+                  zoom.active ? (
                     <North sx={{ transform: `rotate(${feed.instant.wind.angle}deg)`, marginRight: '0.25em' }} />
-                  ) : null}
-                  <ColorIndicator instant={bs} range={{ lowest: 0, highest: 7, optimal: 1 }} />
-                  {windSpeed} m/s
-                </td>
-              </tr>
-              {!zoom.active ? null : (
-                <tr>
-                  <td>Porywy wiatru</td>
-                  <td></td>
-                  <td>{windMaxSpeed} m/s</td>
-                </tr>
+                  ) : undefined
+                }
+                displayValue={String(windSpeed)}
+                unit='m/s'
+                colorIndicatorRange={{ lowest: 0, highest: 7, optimal: 1 }}
+                value={bs}
+              />
+              {!zoom.active ? null : <Reading title='Porywy wiatru' displayValue={String(windMaxSpeed)} unit='m/s' />}
+              {!zoom.active ? null : sun.timeOfDay === 'day' ? (
+                <Reading
+                  title='Wysokość słońca'
+                  displayValue={Number(sunAlt).toFixed(0)}
+                  unit='°'
+                  colorIndicatorRange={{ lowest: -6, optimal: 30, highest: 50 }}
+                  value={sunAlt}
+                />
+              ) : (
+                <Reading title='Wysokość księżyca' displayValue={Number(moonAlt).toFixed(0)} unit='°' />
               )}
-              {!zoom.active ? null : (
-                <tr>
-                  <td>Wysokość {sun.timeOfDay === 'day' ? 'słońca' : 'księżyca'}</td>
-                  <td></td>
-                  {sun.timeOfDay === 'day' ? (
-                    <td>
-                      <ColorIndicator instant={sunAlt} range={{ lowest: -6, optimal: 30, highest: 50 }} />
-                      {Number(sunAlt).toFixed(0)}°
-                    </td>
-                  ) : (
-                    <td>{Number(moonAlt).toFixed(0)}°</td>
-                  )}
-                </tr>
-              )}
-            </tbody>
+            </TableBody>
           </ApolloDataTable>
         )}
       </ZoomContext.Consumer>

@@ -1,28 +1,24 @@
 import styled from '@emotion/styled'
+import { ApolloTableCell } from '@/card-components'
 
-export const Logo = styled('img')<{ isUnwanted: boolean }>(({ isUnwanted }) => ({
-  opacity: isUnwanted ? 0.2 : 1,
-  maxHeight: '1em',
-}))
-
-export const Company = styled('td')({
-  width: '3em',
-  textAlign: 'right',
-})
-
-export const Open = styled('td')({
+export const Open = styled(ApolloTableCell)({
   padding: '0 1em 0.25em',
   verticalAlign: 'middle',
   boxSizing: 'border-box',
   width: '3em',
+  borderBottom: 'none',
 })
 
-export const JobTitle = styled('td')({
+export const JobTitle = styled(ApolloTableCell)({
   textOverflow: 'ellipsis',
+  padding: 0,
+  borderBottom: 'none',
 })
 
-export const Salary = styled('td')({
+export const Salary = styled(ApolloTableCell)({
   width: '6em',
+  padding: 0,
+  borderBottom: 'none',
 })
 
 export const SkillsList = styled('ul')({

@@ -1,7 +1,9 @@
-import { IconButton } from '@mui/material'
+import { styled } from '@mui/material'
+import { IconCopy } from '@repo/assets'
+import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
 
-import { ContentCopy } from '@mui/icons-material'
+const { icon } = designTokens
 
 const copyText = async (text: string): Promise<void> => {
   await navigator.clipboard.write([
@@ -9,16 +11,28 @@ const copyText = async (text: string): Promise<void> => {
   ])
 }
 
+const CopyButton = styled('button')({
+  display: 'inline-flex',
+  alignItems: 'center',
+  verticalAlign: 'middle',
+  lineHeight: 0,
+  padding: 0,
+  marginRight: '0.25em',
+  border: 'none',
+  background: 'none',
+  cursor: 'pointer',
+  color: 'inherit',
+  '&:disabled': {
+    cursor: 'not-allowed',
+    opacity: 0.5,
+  },
+})
+
 const Copy: FC<{ text: string }> = ({ text }) => {
   return (
-    <IconButton
-      disabled={!isSecureContext}
-      size='large'
-      sx={{ verticalAlign: 'initial', padding: 0, color: 'inherit', marginRight: '0.25em' }}
-      onClick={() => void copyText(text)}
-    >
-      <ContentCopy sx={{ fontSize: '0.5em' }} />
-    </IconButton>
+    <CopyButton type='button' disabled={!isSecureContext} aria-label='Kopiuj' onClick={() => void copyText(text)}>
+      <IconCopy size={icon.sizeXs} strokeWidth={icon.strokeWidth} aria-hidden />
+    </CopyButton>
   )
 }
 

@@ -1,16 +1,16 @@
+import { TableBody, styled } from '@mui/material'
 import { type FC, useCallback } from 'react'
-import zoomBanner from './card-banners/news-zoom.jpg'
-import banner from './card-banners/news.jpg'
+import { NewsIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import { ApolloDataTable, LinkOpen, TablePlaceholder } from '@/card-components'
-import styled from '@emotion/styled'
+import { ApolloDataTable, ApolloTableCell, ApolloTableRow, LinkOpen, TablePlaceholder } from '@/card-components'
 import { NewsFeed } from '@repo/types'
 
-const Open = styled('td')({
+const Open = styled(ApolloTableCell)({
   verticalAlign: 'middle',
-  padding: '0 1em 0em',
-  width: '1em',
+  width: '3em',
+  paddingLeft: '1em',
+  paddingRight: '1em',
 })
 
 export const News: FC<Record<string, never>> = () => {
@@ -21,33 +21,30 @@ export const News: FC<Record<string, never>> = () => {
   }, [])
 
   return (
-    <ApolloCard cardId='news' banner={banner} zoomBanner={zoomBanner} height={10} onZoom={onZoom}>
+    <ApolloCard cardId='news' title='Wiadomości' icon={NewsIcon} height={10} onZoom={onZoom}>
       <ZoomContext.Consumer>
         {zoom =>
           !news ? (
             <TablePlaceholder rows={10} graph={false} value={false} />
-          ) : zoom.active ? (
-            <table style={{ fontSize: '0.4em', lineHeight: 1.2 }}>
-              <tbody>
-                {news.articles.map(article => (
-                  <tr key={article.href}>
-                    <Open style={{ padding: '0 1em 0em', verticalAlign: 'middle' }}>
-                      <LinkOpen href={article.href} />
-                    </Open>
-                    <td style={{ paddingBottom: '0em' }}>{article.title}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           ) : (
             <ApolloDataTable style={{ tableLayout: 'fixed' }}>
-              <tbody>
-                {news.articles.map(article => (
-                  <tr key={article.href}>
-                    <td style={{ textAlign: 'left' }}>{article.title}</td>
-                  </tr>
-                ))}
-              </tbody>
+              <TableBody>
+                {news.articles.map(article =>
+                  zoom.active ? (
+                    <ApolloTableRow key={article.href}>
+                      <Open>
+                        <LinkOpen href={article.href} />
+                      </Open>
+                      <ApolloTableCell>{article.title}</ApolloTableCell>
+                      <ApolloTableCell sx={{ width: 0 }}></ApolloTableCell>
+                    </ApolloTableRow>
+                  ) : (
+                    <ApolloTableRow key={article.href}>
+                      <ApolloTableCell sx={{ textAlign: 'left' }}>{article.title}</ApolloTableCell>
+                    </ApolloTableRow>
+                  ),
+                )}
+              </TableBody>
             </ApolloDataTable>
           )
         }

@@ -5,6 +5,7 @@ import { useCommand } from '@repo/feed-client'
 
 const TorrentSearchContainer = styled('div')({
   display: 'flex',
+  marginBottom: '16px',
 })
 
 const Query = styled(TextField)({

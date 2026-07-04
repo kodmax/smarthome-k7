@@ -1,7 +1,8 @@
+import { TableBody } from '@mui/material'
 import { useCallback, type FC } from 'react'
+import { TrendUpIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
-import banner from '../cards/card-banners/fx.jpg'
-import { ApolloDataTable, Graph, TablePlaceholder } from '@/card-components'
+import { ApolloDataTable, ApolloTableCell, ApolloTableRow, Graph, TablePlaceholder } from '@/card-components'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
 import { FXFeed, FXRates } from '@repo/types'
 
@@ -16,34 +17,34 @@ export const FX: FC<Record<string, never>> = () => {
   }, [])
 
   return (
-    <ApolloCard cardId='fx' banner={banner} onZoom={onZoom}>
+    <ApolloCard cardId='fx' title='Waluty' icon={TrendUpIcon} onZoom={onZoom}>
       <ZoomContext.Consumer>
         {zoom =>
           !fx ? (
             <TablePlaceholder rows={4} graph={true} value={true} />
           ) : (
             <ApolloDataTable>
-              <tbody>
+              <TableBody>
                 {(zoom.active ? moreFx : mainFx)
                   .filter(pair => pair in fx.rates)
                   .map(pair => {
                     return (
-                      <tr key={pair}>
-                        <td>{pair}</td>
-                        <td style={{ padding: 0, width: '4em' }}>
+                      <ApolloTableRow key={pair}>
+                        <ApolloTableCell>{pair}</ApolloTableCell>
+                        <ApolloTableCell sx={{ padding: 0, width: '4em' }}>
                           <Graph scaleX={30} scaleY={+fx.rates[pair] / 10} data={fx.history[pair]} />
-                        </td>
+                        </ApolloTableCell>
                         {zoom.active ? (
-                          <td>
+                          <ApolloTableCell>
                             {Number(fx.rates[pair]).toFixed(2)} ({Number(1 / +fx.rates[pair]).toFixed(4)})
-                          </td>
+                          </ApolloTableCell>
                         ) : (
-                          <td>{Number(fx.rates[pair]).toFixed(2)}</td>
+                          <ApolloTableCell>{Number(fx.rates[pair]).toFixed(2)}</ApolloTableCell>
                         )}
-                      </tr>
+                      </ApolloTableRow>
                     )
                   })}
-              </tbody>
+              </TableBody>
             </ApolloDataTable>
           )
         }

@@ -13,17 +13,18 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.8.1",
-    "@mui/icons-material": "^5.8.4",
-    "@mui/material": "^5.8.1",
-    "@mui/system": "^5.10.1",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.0.0",
+    "@mui/material": "^7.0.0",
+    "@mui/system": "^7.0.0",
+    "@repo/assets": "*",
+    "@repo/design-tokens": "*",
     "@repo/feed-client": "*",
-    "@repo/ui": "*",
-    "@repo/weather-icons": "*",
     "dotenv": "^17.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-is": "^18.3.1",
     "suncalc": "^1.9.0"
   },
   "devDependencies": {

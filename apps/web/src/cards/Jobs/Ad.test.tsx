@@ -39,10 +39,4 @@ describe('Ad', () => {
     expect(screen.getByText(/20k — 28k/)).toBeInTheDocument()
     expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
   })
-
-  it('renders company name when logo url is missing', () => {
-    renderAd(jobAd({ id: '3', title: 'DevOps', companyLogoUrl: '', companyName: 'Acme Corp' }), false)
-
-    expect(screen.getByText('Acme Corp')).toBeInTheDocument()
-  })
 })

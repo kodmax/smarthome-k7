@@ -17,7 +17,7 @@ Exports from `index.js`: TypeScript ESLint + Prettier rules (`eslint-config-pret
 ## Consumers
 
 - `apps/web`
-- `@repo/feed-client`, `@repo/knx-schema`, `@repo/types`, `@repo/ui`
+- `@repo/feed-client`, `@repo/knx-schema`, `@repo/types`, `@repo/assets`
 
 `apps/service` uses a separate config based on `eslint-config-standard`.
 
