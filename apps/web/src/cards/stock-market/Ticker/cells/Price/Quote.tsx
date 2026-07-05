@@ -3,16 +3,12 @@ import { TickerData } from '@repo/types'
 import { FC } from 'react'
 import { ApolloTableCell } from '@/card-components'
 import { PriceChange } from '../../styled'
-import { MarketStatusIcon } from './MarketStatusIcon'
 
-export const Price: FC<{ ticker: TickerData }> = ({ ticker }) => {
+export const Quote: FC<{ ticker: TickerData }> = ({ ticker }) => {
   const priceChangeDirection = +ticker.price.netChange > 0 ? 'up' : +ticker.price.netChange < 0 ? 'down' : 'none'
 
   return (
-    <ApolloTableCell sx={{ display: 'flex' }}>
-      <Box sx={{ flex: '0 0 2em' }}>
-        <MarketStatusIcon marketStatus={ticker.exchange.status} />
-      </Box>
+    <ApolloTableCell sx={{ display: 'flex', justifyContent: 'flex-start' }}>
       <Box sx={{ fontFamily: 'monospace', flex: '0 0 5em' }}>{ticker.price.lastTradePrice.toFixed(2)} </Box>
       <Box sx={{ fontFamily: 'monospace', flex: '0 0 4.5em' }}>
         <PriceChange dir={priceChangeDirection}>

@@ -2,12 +2,12 @@ import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { ticker } from '@/test/fixtures/stockMarket'
 import { renderInTableRow } from '@/test/renderInTable'
-import { Price } from './Price'
+import { Quote } from './Quote'
 
-describe('Price', () => {
+describe('Quote', () => {
   it('renders price and positive change with a plus sign', () => {
     renderInTableRow(
-      <Price
+      <Quote
         ticker={ticker({
           symbol: 'AAA',
           price: { lastTradePrice: 123.456, netChange: 1.2, percentageChange: 2.5 },
@@ -21,7 +21,7 @@ describe('Price', () => {
 
   it('renders negative change without a plus sign', () => {
     renderInTableRow(
-      <Price
+      <Quote
         ticker={ticker({
           symbol: 'BBB',
           price: { lastTradePrice: 50, netChange: -0.5, percentageChange: -1.25 },

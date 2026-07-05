@@ -2,10 +2,11 @@ import { type FC } from 'react'
 import { StockMarketIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import { ApolloDataTable, ApolloTableCell, TablePlaceholder } from '@/card-components'
+import { ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
 import { StockMarketFeed } from '@repo/types'
 import { Ticker } from './Ticker'
+import { StockMarketTable } from './styled'
 import { TableBody, TableHead, TableRow } from '@mui/material'
 import { useSortedTickers } from './useSortedTickers'
 
@@ -25,11 +26,13 @@ export const StockMarket: FC<Record<string, never>> = () => {
     )
   }
 
+  const marketStatus = feed?.tickers.find(item => item.exchange.name === 'NYSE')?.exchange.status
+
   return (
-    <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9}>
+    <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9} headingInfo={marketStatus}>
       <ZoomContext.Consumer>
         {zoom => (
-          <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: zoom.active ? 1.2 : undefined }}>
+          <StockMarketTable style={{ fontSize: cardTableFontSize, lineHeight: zoom.active ? 1.2 : undefined }}>
             {zoom.active ? (
               <TableHead>
                 <TableRow sx={headerRowSx}>
@@ -37,7 +40,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
                   <ApolloTableCell>Earnings</ApolloTableCell>
                   <ApolloTableCell>EG</ApolloTableCell>
                   <ApolloTableCell>PE@PT</ApolloTableCell>
-                  <ApolloTableCell sx={{ textAlign: 'center' }}>Price</ApolloTableCell>
+                  <ApolloTableCell>Quote</ApolloTableCell>
                 </TableRow>
               </TableHead>
             ) : null}
@@ -46,7 +49,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
                 <Ticker key={item.symbol} ticker={item} zoom={zoom.active} />
               ))}
             </TableBody>
-          </ApolloDataTable>
+          </StockMarketTable>
         )}
       </ZoomContext.Consumer>
     </ApolloCard>

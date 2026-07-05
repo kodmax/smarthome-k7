@@ -15,6 +15,7 @@ type ApolloCardProps = {
   height?: number
   allowZoom?: boolean
   onZoom?: () => void
+  headingInfo?: ReactNode
 }
 
 const ApolloCardHeader = styled(Box)(({ theme }) => ({
@@ -31,9 +32,22 @@ const ApolloCardTitle = styled(Typography)(({ theme }) => ({
   fontWeight: designTokens.font.h3.weight,
   lineHeight: designTokens.font.h3.lineHeight,
   color: theme.vars.palette.text.primary,
+  flex: '0 0 auto',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+}))
+
+const ApolloCardHeadingInfo = styled(Box)(({ theme }) => ({
+  fontSize: designTokens.font.h3.size,
+  fontWeight: designTokens.font.h3.weight,
+  lineHeight: designTokens.font.h3.lineHeight,
+  color: theme.vars.palette.text.disabled,
   flex: 1,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
+  display: 'flex',
+  justifyContent: 'flex-end',
   whiteSpace: 'nowrap',
 }))
 
@@ -82,6 +96,7 @@ const ApolloCard: FC<ApolloCardProps> = ({
   cardId,
   onZoom,
   allowZoom = true,
+  headingInfo,
 }) => {
   return (
     <ZoomCurtain cardId={cardId} allowZoom={allowZoom} onZoom={onZoom}>
@@ -91,6 +106,7 @@ const ApolloCard: FC<ApolloCardProps> = ({
             <ApolloCardHeader>
               <Icon size={designTokens.icon.sizeSm} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
               <ApolloCardTitle variant='h3'>{title}</ApolloCardTitle>
+              <ApolloCardHeadingInfo>{headingInfo}</ApolloCardHeadingInfo>
             </ApolloCardHeader>
 
             <ApolloCardContent
