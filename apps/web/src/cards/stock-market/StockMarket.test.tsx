@@ -24,7 +24,7 @@ describe('StockMarket', () => {
   it('renders ticker rows when feed data is available', () => {
     mockedUseFeed.mockReturnValue(
       stockMarketFeed(
-        ticker({ symbol: 'MU', price: { eg: 15, lastTradePrice: 95.5 } }),
+        ticker({ symbol: 'MU', exchange: { name: 'NYSE', status: 'Open' }, price: { eg: 15, lastTradePrice: 95.5 } }),
         ticker({ symbol: 'NVDA', price: { eg: 25, lastTradePrice: 120 } }),
       ),
     )
@@ -35,5 +35,6 @@ describe('StockMarket', () => {
     expect(screen.getByText('15%')).toBeInTheDocument()
     expect(screen.getByText('120.00')).toBeInTheDocument()
     expect(screen.getByText('95.50')).toBeInTheDocument()
+    expect(screen.getByText('Rynek otwarty')).toBeInTheDocument()
   })
 })
