@@ -6,7 +6,7 @@ jobs, torrents).
 ## Stack
 
 - React 18, Vite, TypeScript
-- MUI v7 (Material 3 color system, CSS variables) + Emotion
+- MUI v7 (Material 3 color system, CSS variables, light/dark schemes) + Emotion
 - Vitest + Testing Library
 
 ## Running
@@ -51,3 +51,9 @@ The backend (`apps/service`) must be running for cards to receive data.
 | `@repo/eslint-config`, `@repo/typescript-config` | Tooling                                 |
 
 Cards in `src/cards/` map WebSocket topics to UI components. App entry point: `src/main.tsx`.
+
+## Theming
+
+The dashboard supports **dark and light** themes via `@repo/design-tokens`. By default it follows the OS preference
+(`defaultMode='system'` in `src/main.tsx`). Use `theme.vars.palette.*` in styled components for scheme-aware colors.
+Tests pin `defaultMode='dark'` for stable snapshots.

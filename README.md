@@ -15,7 +15,7 @@ Smart home dashboard monorepo: the backend aggregates data from KNX and web scra
 | [`packages/cron-scripts`](packages/cron-scripts) | Cron scripts (KNX, TV, DB logging) |
 | [`packages/cloudflare`](packages/cloudflare) | Dynamic DNS (Cloudflare API) |
 | [`packages/assets`](packages/assets) | Lucide icons, weather SVGs, and other media |
-| [`packages/design-tokens`](packages/design-tokens) | Shared design tokens and MUI theme |
+| [`packages/design-tokens`](packages/design-tokens) | Shared design tokens, dark/light MUI theme |
 | [`packages/eslint-config`](packages/eslint-config) | Shared ESLint config |
 | [`packages/typescript-config`](packages/typescript-config) | Shared TypeScript config |
 

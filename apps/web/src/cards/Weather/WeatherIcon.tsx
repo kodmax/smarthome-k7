@@ -44,7 +44,7 @@ type WeatherIconProps = {
   style?: CSSProperties
 }
 
-const WeatherIcon: FC<WeatherIconProps> = ({ icon, glow = 'default', width, height, style }) => {
+const WeatherIcon: FC<WeatherIconProps> = ({ icon, glow = 'off', width, height, style }) => {
   const src = weatherIcons[icon]
   if (!src) {
     return null
