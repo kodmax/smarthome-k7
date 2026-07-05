@@ -26,7 +26,7 @@ const WeatherIconRoot = styled('img')<{ $intensity: 'soft' | 'default' }>(({ the
   display: 'inline-block',
   objectFit: 'contain',
   verticalAlign: 'middle',
-  filter: `${iconTone} ${glowByIntensity(theme.vars!.palette.weather.main, $intensity)}`,
+  filter: `${iconTone} ${glowByIntensity(theme.vars.palette.weather.main, $intensity)}`,
 }))
 
 const mutedIconStyle: CSSProperties = {

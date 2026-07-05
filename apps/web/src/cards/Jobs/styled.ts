@@ -5,7 +5,7 @@ export const Open = styled(ApolloTableCell)({
   padding: '0 1em 0.25em',
   verticalAlign: 'middle',
   boxSizing: 'border-box',
-  width: '3em',
+  width: '1em',
   borderBottom: 'none',
 })
 

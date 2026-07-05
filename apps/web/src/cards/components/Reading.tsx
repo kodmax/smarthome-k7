@@ -7,7 +7,7 @@ import ValuePlaceholder from './ValuePlaceholder'
 
 export const Unit = styled('span')(({ theme }) => ({
   fontSize: '0.8em',
-  color: theme.vars!.palette.text.secondary,
+  color: theme.vars.palette.text.secondary,
 }))
 
 type Props = {

@@ -10,7 +10,7 @@ export const ApolloDataTable = styled(Table)(({ theme }) => ({
   width: '100%',
   fontSize: font.body.size,
   lineHeight: font.body.lineHeight,
-  color: theme.vars!.palette.text.primary,
+  color: theme.vars.palette.text.primary,
 }))
 
 export const ApolloTableRow = styled(TableRow)({})
@@ -23,10 +23,10 @@ export const ApolloTableCell = styled(TableCell)(({ theme }) => ({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   verticalAlign: 'middle',
-  color: theme.vars!.palette.text.primary,
+  color: theme.vars.palette.text.primary,
   '&:last-of-type:not(:first-of-type)': {
     textAlign: 'right',
-    color: theme.vars!.palette.text.primary,
+    color: theme.vars.palette.text.primary,
   },
 }))
 

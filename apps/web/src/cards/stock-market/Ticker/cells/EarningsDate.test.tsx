@@ -27,6 +27,6 @@ describe('EarningsDate', () => {
       <EarningsDate ticker={ticker({ symbol: 'AAA', earningsDate: { confirmed: '2026-07-15' } })} zoom={true} />,
     )
 
-    expect(screen.getByText(/\(17d\)/)).toBeInTheDocument()
+    expect(screen.getByText(/17d/)).toBeInTheDocument()
   })
 })

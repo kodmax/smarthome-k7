@@ -10,6 +10,8 @@ import { TableBody, TableHead, TableRow } from '@mui/material'
 import { useSortedTickers } from './useSortedTickers'
 
 const cardTableFontSize = designTokens.font.body.size
+const tableHeaderGap = designTokens.space[3]
+const headerRowSx = { '& .MuiTableCell-root': { pb: `${tableHeaderGap}px` } }
 
 export const StockMarket: FC<Record<string, never>> = () => {
   const feed = useFeed<StockMarketFeed>('stock-market')
@@ -30,9 +32,9 @@ export const StockMarket: FC<Record<string, never>> = () => {
           <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: zoom.active ? 1.2 : undefined }}>
             {zoom.active ? (
               <TableHead>
-                <TableRow>
+                <TableRow sx={headerRowSx}>
                   <ApolloTableCell>Ticker</ApolloTableCell>
-                  <ApolloTableCell>Earnings Date</ApolloTableCell>
+                  <ApolloTableCell>Earnings</ApolloTableCell>
                   <ApolloTableCell>EG</ApolloTableCell>
                   <ApolloTableCell>PE@PT</ApolloTableCell>
                   <ApolloTableCell sx={{ textAlign: 'center' }}>Price</ApolloTableCell>

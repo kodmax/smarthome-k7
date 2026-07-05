@@ -183,9 +183,9 @@ export const theme = createTheme({
       },
       styleOverrides: {
         root: ({ theme }: { theme: Theme }) => ({
-          border: `${borderWidth.hairline}px solid ${theme.vars!.palette.cardHeaderBorder.main}`,
-          backgroundColor: theme.vars!.palette.background.paper,
-          backgroundImage: `linear-gradient(180deg, ${theme.vars!.palette.surfaceElevated.main} 0%, ${theme.vars!.palette.background.paper} 50%, ${theme.vars!.palette.background.paper} 100%)`,
+          border: `${borderWidth.hairline}px solid ${theme.vars.palette.cardHeaderBorder.main}`,
+          backgroundColor: theme.vars.palette.background.paper,
+          backgroundImage: `linear-gradient(180deg, ${theme.vars.palette.surfaceElevated.main} 0%, ${theme.vars.palette.background.paper} 50%, ${theme.vars.palette.background.paper} 100%)`,
           ...theme.applyStyles('dark', cardRootStyles(schemes.dark)),
           ...theme.applyStyles('light', cardRootStyles(schemes.light)),
         }),
@@ -209,13 +209,13 @@ export const theme = createTheme({
         root: ({ theme }: { theme: Theme }) => ({
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
-              borderColor: theme.vars!.palette.divider,
+              borderColor: theme.vars.palette.divider,
             },
             '&:hover fieldset': {
-              borderColor: theme.vars!.palette.borderStrong.main,
+              borderColor: theme.vars.palette.borderStrong.main,
             },
             '&.Mui-focused fieldset': {
-              borderColor: theme.vars!.palette.primary.main,
+              borderColor: theme.vars.palette.primary.main,
             },
           },
         }),
@@ -225,8 +225,8 @@ export const theme = createTheme({
       styleOverrides: {
         root: ({ theme }: { theme: Theme }) => ({
           padding: darkScheme.table.cellPadding,
-          borderBottomColor: theme.vars!.palette.divider,
-          color: theme.vars!.palette.text.primary,
+          borderBottomColor: theme.vars.palette.divider,
+          color: theme.vars.palette.text.primary,
           '&:first-of-type': {
             paddingLeft: 0,
           },
@@ -235,7 +235,7 @@ export const theme = createTheme({
           },
         }),
         head: ({ theme }: { theme: Theme }) => ({
-          color: theme.vars!.palette.text.secondary,
+          color: theme.vars.palette.text.secondary,
           fontWeight: 500,
         }),
       },

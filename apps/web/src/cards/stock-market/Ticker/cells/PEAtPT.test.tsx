@@ -16,7 +16,7 @@ describe('PEAtPT', () => {
       />,
     )
 
-    expect(screen.getByText('24 → 20')).toBeInTheDocument()
+    expect(screen.getByRole('cell')).toHaveTextContent('24 → 20')
   })
 
   it('renders placeholders when values are unavailable', () => {
@@ -30,6 +30,6 @@ describe('PEAtPT', () => {
       />,
     )
 
-    expect(screen.getByText('-- → --')).toBeInTheDocument()
+    expect(screen.getByRole('cell')).toHaveTextContent('-- → --')
   })
 })

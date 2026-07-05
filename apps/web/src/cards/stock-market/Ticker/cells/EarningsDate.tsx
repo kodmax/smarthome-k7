@@ -12,8 +12,7 @@ export const EarningsDate: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker
 
   return (
     <ApolloTableCell>
-      {earningsDaysLeft > 0 ? earningsDate.toLocaleDateString() : null}
-      {earningsDaysLeft > 0 && earningsDaysLeft <= 30 ? <> ({earningsDaysLeft}d)</> : null}
+      {earningsDaysLeft > 0 && earningsDaysLeft <= 30 ? <> {earningsDaysLeft}d</> : null}
     </ApolloTableCell>
   )
 }

@@ -17,7 +17,7 @@ const Link = styled('a')({
 const LinkOpen: FC<{ href: string }> = ({ href }) => {
   return (
     <Link href={href} target='_blank' rel='noopener noreferrer'>
-      <IconLink size={icon.sizeXs} strokeWidth={icon.strokeWidth} aria-hidden />
+      <IconLink size={icon.sizeXs - 4} strokeWidth={icon.strokeWidth} aria-hidden />
     </Link>
   )
 }

@@ -8,6 +8,10 @@ type PaletteColor = {
 }
 
 declare module '@mui/material/styles' {
+  interface CssThemeVariables {
+    enabled: true
+  }
+
   interface Palette {
     energy: PaletteColor
     temperature: PaletteColor
