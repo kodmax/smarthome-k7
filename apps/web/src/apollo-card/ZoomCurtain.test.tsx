@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, renderWithTheme as render, screen } from '@/test/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ZOOM_AUTO_DISMISS_MS, ZOOM_EXPAND_DURATION_MS } from './zoomConstants'
 import { ZoomContext, ZoomCurtain } from './ZoomCurtain'

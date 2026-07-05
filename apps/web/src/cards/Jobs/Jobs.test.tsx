@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { renderWithTheme as render, screen } from '@/test/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useFeed } from '@repo/feed-client'
 import { jobAd } from '@/test/fixtures/jobs'

@@ -1,6 +1,6 @@
 import { styled } from '@mui/material'
 import { type FC } from 'react'
-import { chooseColor } from './ColorIndication'
+import { chooseColor } from './chooseColor'
 import { buildHoursBarHeights, toHoursBarDataPoints } from './hoursBarsData'
 
 const grayColor = 'hsl(0deg 0% 50%)'

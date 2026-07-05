@@ -1,15 +1,14 @@
 import { styled } from '@mui/material'
-import { designTokens } from '@repo/design-tokens'
 import { FC, type ReactNode } from 'react'
 import { ColorIndicator, type ColorIndicationRange } from './ColorIndication'
 import { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
 import Copy from './Copy'
 import ValuePlaceholder from './ValuePlaceholder'
 
-export const Unit = styled('span')({
+export const Unit = styled('span')(({ theme }) => ({
   fontSize: '0.8em',
-  color: designTokens.color.textSecondary,
-})
+  color: theme.vars!.palette.text.secondary,
+}))
 
 type Props = {
   title: string

@@ -1,4 +1,3 @@
-import { designTokens } from '@repo/design-tokens'
 import { ReactNode, type FC } from 'react'
 import { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
 
@@ -11,7 +10,7 @@ const ValuePlaceholder: FC<ValuePlaceholderProps> = ({ label }) => (
     <ApolloTableCell>{label}</ApolloTableCell>
     <ApolloTableCell />
     <ApolloTableCell />
-    <ApolloTableCell sx={{ color: designTokens.color.textMuted }}>--</ApolloTableCell>
+    <ApolloTableCell sx={{ color: 'text.disabled' }}>--</ApolloTableCell>
   </ApolloTableRow>
 )
 

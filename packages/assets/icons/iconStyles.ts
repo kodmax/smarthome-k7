@@ -1,16 +1,15 @@
-import { designTokens } from '@repo/design-tokens'
 import type { StyledIconOptions } from './createStyledIcon'
 
-const { color } = designTokens
+const paletteMain = (key: string) => `var(--mui-palette-${key}-main)`
 
 export const iconStyles = {
-  energy: { color: color.energy, glow: 'default' },
-  air: { color: color.air, glow: 'default' },
-  temperature: { color: color.temperature, glow: 'default' },
-  weather: { color: color.info, glow: 'default' },
-  media: { color: color.media, glow: 'default' },
-  warning: { color: color.warning, glow: 'default' },
-  neutral: { color: color.textPrimary, glow: 'soft' },
-  muted: { color: color.textSecondary, glow: 'soft' },
-  link: { color: color.primary, glow: 'off' },
+  energy: { color: paletteMain('energy'), glow: 'default' },
+  air: { color: paletteMain('air'), glow: 'default' },
+  temperature: { color: paletteMain('temperature'), glow: 'default' },
+  weather: { color: paletteMain('info'), glow: 'default' },
+  media: { color: paletteMain('media'), glow: 'default' },
+  warning: { color: paletteMain('warning'), glow: 'default' },
+  neutral: { color: 'var(--mui-palette-text-primary)', glow: 'soft' },
+  muted: { color: 'var(--mui-palette-text-secondary)', glow: 'soft' },
+  link: { color: paletteMain('primary'), glow: 'off' },
 } as const satisfies Record<string, StyledIconOptions>

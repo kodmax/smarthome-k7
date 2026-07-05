@@ -1,22 +1,32 @@
 import { weatherIcons } from '@repo/assets'
-import { designTokens } from '@repo/design-tokens'
 import { styled } from '@mui/material/styles'
 import { type CSSProperties, type FC } from 'react'
 
-const weather = designTokens.color.weather
-
 const iconTone = 'brightness(0.82) saturate(0.65)'
 
-const glowByIntensity = {
-  soft: `drop-shadow(0 0 0.2em ${weather}33) drop-shadow(0 0 0.5em ${weather}14)`,
-  default: `drop-shadow(0 0 0.3em ${weather}44) drop-shadow(0 0 0.75em ${weather}22) drop-shadow(0 0 1.2em ${weather}0d)`,
-} as const
+const colorWithAlpha = (color: string, alphaHex: string): string => {
+  if (!color.startsWith('var(')) {
+    return `${color}${alphaHex}`
+  }
 
-const WeatherIconRoot = styled('img')<{ $intensity: 'soft' | 'default' }>(({ $intensity }) => ({
+  const percent = Math.round((Number.parseInt(alphaHex, 16) / 255) * 100)
+
+  return `color-mix(in srgb, ${color} ${percent}%, transparent)`
+}
+
+const glowByIntensity = (weather: string, intensity: 'soft' | 'default') => {
+  if (intensity === 'soft') {
+    return `drop-shadow(0 0 0.2em ${colorWithAlpha(weather, '33')}) drop-shadow(0 0 0.5em ${colorWithAlpha(weather, '14')})`
+  }
+
+  return `drop-shadow(0 0 0.3em ${colorWithAlpha(weather, '44')}) drop-shadow(0 0 0.75em ${colorWithAlpha(weather, '22')}) drop-shadow(0 0 1.2em ${colorWithAlpha(weather, '0d')})`
+}
+
+const WeatherIconRoot = styled('img')<{ $intensity: 'soft' | 'default' }>(({ theme, $intensity }) => ({
   display: 'inline-block',
   objectFit: 'contain',
   verticalAlign: 'middle',
-  filter: `${iconTone} ${glowByIntensity[$intensity]}`,
+  filter: `${iconTone} ${glowByIntensity(theme.vars!.palette.weather.main, $intensity)}`,
 }))
 
 const mutedIconStyle: CSSProperties = {

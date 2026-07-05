@@ -6,7 +6,7 @@ import { Dashboard } from './Dashboard'
 import { theme } from '@repo/design-tokens'
 
 createRoot(document.getElementById('app')!).render(
-  <ThemeProvider theme={theme} defaultMode='dark'>
+  <ThemeProvider theme={theme} defaultMode='system'>
     <CssBaseline />
     <Dashboard />
   </ThemeProvider>,

@@ -17,25 +17,25 @@ type ApolloCardProps = {
   onZoom?: () => void
 }
 
-const ApolloCardHeader = styled(Box)({
+const ApolloCardHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: designTokens.space[2],
   padding: '12px 12px 12px 16px',
   paddingBottom: designTokens.space[2],
-  borderBottom: `${designTokens.borderWidth.hairline}px solid ${designTokens.card.headerBorderColor}`,
-})
+  borderBottom: `${designTokens.borderWidth.hairline}px solid ${theme.vars!.palette.cardHeaderBorder.main}`,
+}))
 
-const ApolloCardTitle = styled(Typography)({
+const ApolloCardTitle = styled(Typography)(({ theme }) => ({
   fontSize: designTokens.font.h3.size,
   fontWeight: designTokens.font.h3.weight,
   lineHeight: designTokens.font.h3.lineHeight,
-  color: designTokens.color.textPrimary,
+  color: theme.vars!.palette.text.primary,
   flex: 1,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-})
+}))
 
 const CARD_CONTENT_PADDING_Y_PX = 0.666 * 16 * 2
 

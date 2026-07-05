@@ -1,9 +1,9 @@
 import { Table, TableBody, TableRow } from '@mui/material'
-import { render, type RenderOptions, type RenderResult } from '@testing-library/react'
 import { type ReactElement } from 'react'
+import { renderWithTheme, type RenderOptions, type RenderResult } from './test-utils'
 
-export function renderInTableRow(ui: ReactElement, options?: RenderOptions): RenderResult {
-  return render(
+export function renderInTableRow(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>): RenderResult {
+  return renderWithTheme(
     <Table>
       <TableBody>
         <TableRow>{ui}</TableRow>
@@ -13,8 +13,8 @@ export function renderInTableRow(ui: ReactElement, options?: RenderOptions): Ren
   )
 }
 
-export function renderInTableBody(ui: ReactElement, options?: RenderOptions): RenderResult {
-  return render(
+export function renderInTableBody(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>): RenderResult {
+  return renderWithTheme(
     <Table>
       <TableBody>{ui}</TableBody>
     </Table>,

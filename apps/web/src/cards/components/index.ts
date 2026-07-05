@@ -5,7 +5,7 @@ export {
   apolloDataTableRowHeight,
 } from './ApolloDataTable'
 export { default as AQI } from './AQI'
-export { ColorIndicator, chooseColor } from './ColorIndication'
+export { ColorIndicator } from './ColorIndication'
 export type { ColorIndicationRange } from './ColorIndication'
 export { default as Copy } from './Copy'
 export { Graph } from './Graph'

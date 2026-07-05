@@ -1,0 +1,64 @@
+{
+  "color": {
+    "background": "#F5F1E8",
+    "backgroundSubtle": "#EFE8DB",
+
+    "surface": "#FCFAF5",
+    "surfaceElevated": "#FFFDF9",
+    "surfaceOverlay": "#F8F3EA",
+
+    "border": "#E4DCCD",
+    "borderStrong": "#D5C9B5",
+
+    "textPrimary": "#2A2A26",
+    "textSecondary": "#5B5A55",
+    "textMuted": "#8C8A84",
+    "textInverse": "#FFFFFF",
+
+    "primary": "#2563EB",
+    "primaryLight": "#60A5FA",
+    "primaryDark": "#1D4ED8",
+
+    "success": "#2F9E44",
+    "warning": "#D97706",
+    "danger": "#DC2626",
+    "info": "#0284C7",
+    "purple": "#7C3AED",
+
+    "energy": "#2F9E44",
+    "temperature": "#E67E22",
+    "humidity": "#0284C7",
+    "air": "#16A34A",
+    "weather": "#0284C7",
+    "media": "#7C3AED",
+    "news": "#2563EB",
+    "jobs": "#2563EB"
+  },
+
+  "shadow": {
+    "xs": "0 1px 2px rgba(90,70,40,0.04)",
+    "sm": "0 2px 6px rgba(90,70,40,0.06)",
+    "md": "0 6px 18px rgba(90,70,40,0.08)",
+    "lg": "0 12px 28px rgba(90,70,40,0.10)",
+    "xl": "0 20px 48px rgba(90,70,40,0.12)",
+    "card": "0 8px 24px rgba(90,70,40,0.08)"
+  },
+
+  "card": {
+    "radius": 16,
+    "padding": 20,
+    "gap": 12,
+
+    "borderColor": "#E4DCCD",
+    "headerBorderColor": "#ECE5D8",
+
+    "highlightTop": "rgba(255,255,255,0.75)",
+
+    "background": "{color.surface}",
+    "shadow": "{shadow.card}"
+  },
+
+  "table": {
+    "cellPadding": "0 4px 0 4px"
+  }
+}

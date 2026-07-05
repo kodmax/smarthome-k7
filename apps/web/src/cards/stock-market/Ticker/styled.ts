@@ -1,11 +1,8 @@
-import styled from '@emotion/styled'
-import { designTokens } from '@repo/design-tokens'
+import { styled } from '@mui/material'
 import { TableCell } from '@mui/material'
 
-const { success, danger } = designTokens.color
-
-export const PriceChange = styled('span')<{ dir: 'up' | 'down' | 'none' }>(({ dir }) => ({
-  color: dir === 'up' ? success : dir === 'down' ? danger : 'inherit',
+export const PriceChange = styled('span')<{ dir: 'up' | 'down' | 'none' }>(({ theme, dir }) => ({
+  color: dir === 'up' ? theme.vars!.palette.success.main : dir === 'down' ? theme.vars!.palette.error.main : 'inherit',
   display: 'inline-block',
   width: '4em',
 }))

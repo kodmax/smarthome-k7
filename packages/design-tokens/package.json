@@ -9,6 +9,8 @@
   "exports": {
     ".": "./index.ts",
     "./tokens": "./tokens.json",
+    "./tokens.dark": "./tokens.dark.json",
+    "./tokens.light": "./tokens.light.json",
     "./theme": "./theme.ts"
   },
   "scripts": {

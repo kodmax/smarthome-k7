@@ -1,8 +1,12 @@
-import { createTheme } from '@mui/material/styles'
-import designTokens from './tokens.json'
+import { createTheme, type Theme } from '@mui/material/styles'
+import { tokens } from './tokens'
 import './theme.types'
 
-const { color, font, radius, shadow, layout, card, table, breakpoint } = designTokens
+const { shared, schemes } = tokens
+const darkScheme = schemes.dark
+const { font, radius, layout, breakpoint, borderWidth } = shared
+
+type SchemeTokens = typeof darkScheme
 
 const fontVariant = (variant: { size: number; weight: number; lineHeight: number }) => ({
   fontSize: variant.size,
@@ -12,32 +16,91 @@ const fontVariant = (variant: { size: number; weight: number; lineHeight: number
 
 const domainColor = (main: string) => ({ main })
 
+const buildPalette = (scheme: SchemeTokens) => {
+  const { color, card } = scheme
+
+  return {
+    primary: {
+      main: color.primary,
+      light: color.primaryLight,
+      dark: color.primaryDark,
+      contrastText: '#FFFFFF',
+    },
+    secondary: {
+      main: color.purple,
+      contrastText: '#FFFFFF',
+    },
+    error: {
+      main: color.danger,
+      contrastText: '#FFFFFF',
+    },
+    warning: {
+      main: color.warning,
+      contrastText: '#FFFFFF',
+    },
+    success: {
+      main: color.success,
+      contrastText: '#FFFFFF',
+    },
+    info: {
+      main: color.info,
+      contrastText: '#FFFFFF',
+    },
+    background: {
+      default: color.background,
+      paper: color.surface,
+    },
+    text: {
+      primary: color.textPrimary,
+      secondary: color.textSecondary,
+      disabled: color.textMuted,
+    },
+    divider: color.border,
+    energy: domainColor(color.energy),
+    temperature: domainColor(color.temperature),
+    humidity: domainColor(color.humidity),
+    air: domainColor(color.air),
+    weather: domainColor(color.weather),
+    media: domainColor(color.media),
+    news: domainColor(color.news),
+    jobs: domainColor(color.jobs),
+    surfaceElevated: domainColor(color.surfaceElevated),
+    borderStrong: domainColor(color.borderStrong),
+    cardHeaderBorder: domainColor(card.headerBorderColor),
+  }
+}
+
+const cardRootStyles = (scheme: SchemeTokens) => ({
+  borderRadius: scheme.card.radius,
+  boxShadow: `${scheme.shadow.card}, inset 0 1px 0 ${scheme.card.highlightTop}`,
+})
+
 const muiShadows = [
   'none',
-  shadow.xs,
-  shadow.xs,
-  shadow.sm,
-  shadow.sm,
-  shadow.sm,
-  shadow.md,
-  shadow.md,
-  shadow.md,
-  shadow.md,
-  shadow.lg,
-  shadow.lg,
-  shadow.lg,
-  shadow.lg,
-  shadow.lg,
-  shadow.lg,
-  shadow.xl,
-  shadow.xl,
-  shadow.xl,
-  shadow.xl,
-  shadow.xl,
-  shadow.xl,
-  shadow.xl,
-  shadow.xl,
-  shadow.xl,
+  darkScheme.shadow.xs,
+  darkScheme.shadow.xs,
+  darkScheme.shadow.sm,
+  darkScheme.shadow.sm,
+  darkScheme.shadow.sm,
+  darkScheme.shadow.md,
+  darkScheme.shadow.md,
+  darkScheme.shadow.md,
+  darkScheme.shadow.md,
+  darkScheme.shadow.lg,
+  darkScheme.shadow.lg,
+  darkScheme.shadow.lg,
+  darkScheme.shadow.lg,
+  darkScheme.shadow.lg,
+  darkScheme.shadow.lg,
+  darkScheme.shadow.xl,
+  darkScheme.shadow.xl,
+  darkScheme.shadow.xl,
+  darkScheme.shadow.xl,
+  darkScheme.shadow.xl,
+  darkScheme.shadow.xl,
+  darkScheme.shadow.xl,
+  darkScheme.shadow.xl,
+  darkScheme.shadow.xl,
 ] as const
 
 export const theme = createTheme({
@@ -47,52 +110,10 @@ export const theme = createTheme({
   defaultColorScheme: 'dark',
   colorSchemes: {
     dark: {
-      palette: {
-        primary: {
-          main: color.primary,
-          light: color.primaryLight,
-          dark: color.primaryDark,
-          contrastText: '#FFFFFF',
-        },
-        secondary: {
-          main: color.purple,
-          contrastText: '#FFFFFF',
-        },
-        error: {
-          main: color.danger,
-          contrastText: '#FFFFFF',
-        },
-        warning: {
-          main: color.warning,
-          contrastText: '#FFFFFF',
-        },
-        success: {
-          main: color.success,
-          contrastText: '#FFFFFF',
-        },
-        info: {
-          main: color.info,
-          contrastText: '#FFFFFF',
-        },
-        background: {
-          default: color.background,
-          paper: color.surface,
-        },
-        text: {
-          primary: color.textPrimary,
-          secondary: color.textSecondary,
-          disabled: color.textMuted,
-        },
-        divider: color.border,
-        energy: domainColor(color.energy),
-        temperature: domainColor(color.temperature),
-        humidity: domainColor(color.humidity),
-        air: domainColor(color.air),
-        weather: domainColor(color.weather),
-        media: domainColor(color.media),
-        news: domainColor(color.news),
-        jobs: domainColor(color.jobs),
-      },
+      palette: buildPalette(schemes.dark),
+    },
+    light: {
+      palette: buildPalette(schemes.light),
     },
   },
   typography: {
@@ -128,8 +149,8 @@ export const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: color.background,
-          color: color.textPrimary,
+          backgroundColor: 'var(--mui-palette-background-default)',
+          color: 'var(--mui-palette-text-primary)',
           padding: layout.paddingMobile,
           fontSize: font.body.size,
           lineHeight: font.body.lineHeight,
@@ -161,21 +182,21 @@ export const theme = createTheme({
         elevation: 0,
       },
       styleOverrides: {
-        root: {
-          borderRadius: card.radius,
-          border: `${designTokens.borderWidth.hairline}px solid ${card.borderColor}`,
-          backgroundColor: color.surface,
-          backgroundImage: `linear-gradient(180deg, ${color.surfaceElevated} 0%, ${color.surface} 50%, ${color.surface} 100%)`,
-          boxShadow: `${shadow.card}, inset 0 1px 0 ${card.highlightTop}`,
-        },
+        root: ({ theme }: { theme: Theme }) => ({
+          border: `${borderWidth.hairline}px solid ${theme.vars!.palette.cardHeaderBorder.main}`,
+          backgroundColor: theme.vars!.palette.background.paper,
+          backgroundImage: `linear-gradient(180deg, ${theme.vars!.palette.surfaceElevated.main} 0%, ${theme.vars!.palette.background.paper} 50%, ${theme.vars!.palette.background.paper} 100%)`,
+          ...theme.applyStyles('dark', cardRootStyles(schemes.dark)),
+          ...theme.applyStyles('light', cardRootStyles(schemes.light)),
+        }),
       },
     },
     MuiCardContent: {
       styleOverrides: {
         root: {
-          padding: card.padding,
+          padding: darkScheme.card.padding,
           '&:last-child': {
-            paddingBottom: card.padding,
+            paddingBottom: darkScheme.card.padding,
           },
         },
       },
@@ -185,38 +206,38 @@ export const theme = createTheme({
         variant: 'outlined',
       },
       styleOverrides: {
-        root: {
+        root: ({ theme }: { theme: Theme }) => ({
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
-              borderColor: color.border,
+              borderColor: theme.vars!.palette.divider,
             },
             '&:hover fieldset': {
-              borderColor: color.borderStrong,
+              borderColor: theme.vars!.palette.borderStrong.main,
             },
             '&.Mui-focused fieldset': {
-              borderColor: color.primary,
+              borderColor: theme.vars!.palette.primary.main,
             },
           },
-        },
+        }),
       },
     },
     MuiTableCell: {
       styleOverrides: {
-        root: {
-          padding: table.cellPadding,
-          borderBottomColor: color.border,
-          color: color.textPrimary,
+        root: ({ theme }: { theme: Theme }) => ({
+          padding: darkScheme.table.cellPadding,
+          borderBottomColor: theme.vars!.palette.divider,
+          color: theme.vars!.palette.text.primary,
           '&:first-of-type': {
             paddingLeft: 0,
           },
           '&:last-of-type': {
             paddingRight: 0,
           },
-        },
-        head: {
-          color: color.textSecondary,
+        }),
+        head: ({ theme }: { theme: Theme }) => ({
+          color: theme.vars!.palette.text.secondary,
           fontWeight: 500,
-        },
+        }),
       },
     },
   },

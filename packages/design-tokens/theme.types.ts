@@ -17,6 +17,9 @@ declare module '@mui/material/styles' {
     media: PaletteColor
     news: PaletteColor
     jobs: PaletteColor
+    surfaceElevated: PaletteColor
+    borderStrong: PaletteColor
+    cardHeaderBorder: PaletteColor
   }
 
   interface PaletteOptions {
@@ -28,6 +31,9 @@ declare module '@mui/material/styles' {
     media?: PaletteColor
     news?: PaletteColor
     jobs?: PaletteColor
+    surfaceElevated?: PaletteColor
+    borderStrong?: PaletteColor
+    cardHeaderBorder?: PaletteColor
   }
 
   interface TypographyVariants {
