@@ -6,8 +6,8 @@ import { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
 import Copy from './Copy'
 import ValuePlaceholder from './ValuePlaceholder'
 
-const Unit = styled('span')({
-  fontSize: designTokens.font.bodySmall.size,
+export const Unit = styled('span')({
+  fontSize: '0.8em',
   color: designTokens.color.textSecondary,
 })
 

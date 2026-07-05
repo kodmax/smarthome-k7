@@ -1,4 +1,5 @@
 import { type SvgIconComponent } from '@mui/icons-material'
+import { designTokens } from '@repo/design-tokens'
 import { useFeed } from '@repo/feed-client'
 
 type KnxStateIconProps<T> = {
@@ -29,9 +30,9 @@ const KnxStateIcon = <T,>({
     <Icon
       sx={{
         paddingRight: '0.1em',
-        width: '0.7em',
-        height: '0.7em',
-        color: isActive ? 'red' : '#636363',
+        width: '12px',
+        height: '12px',
+        color: isActive ? designTokens.color.temperature : designTokens.color.textMuted,
         fontSize: 'inherit',
         visibility: visible(reading) ? 'visible' : 'hidden',
         opacity: opacity(reading),

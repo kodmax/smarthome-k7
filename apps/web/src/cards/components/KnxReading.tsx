@@ -5,7 +5,8 @@ import { type ColorIndicationRange } from './ColorIndication'
 import { Graph, type DataPoint, type GraphProps } from './Graph'
 import { HoursBars, type HoursBarsProps, type Record as HistoryRecord } from './HoursBars'
 import ValuePlaceholder from './ValuePlaceholder'
-import { Reading } from './Reading'
+import { Reading, Unit } from './Reading'
+import { Box } from '@mui/system'
 
 type KnxValue<T> = KnxReadingType<T> & {
   [key: string]: unknown
@@ -74,10 +75,22 @@ const KnxReading = ({
       }
       extraInfo={
         <>
-          <span>{icon}</span>
-          <span style={{ fontSize: '0.25em', verticalAlign: 'super' }}>
-            {target ? `${target(payload)}${unit && reading.unit ? ` ${reading.unit}` : ''}` : null}
-          </span>
+          {icon !== undefined ? (
+            <>
+              <Box sx={{ display: 'inline-block', verticalAlign: 'middle' }}>{icon}</Box>{' '}
+            </>
+          ) : null}
+          {target !== undefined ? (
+            <Box sx={{ display: 'inline-block', verticalAlign: 'text-top', fontSize: '10px' }}>
+              {target(payload)}
+              {unit && reading.unit !== undefined ? (
+                <>
+                  {' '}
+                  <Unit>{reading.unit}</Unit>
+                </>
+              ) : null}
+            </Box>
+          ) : null}
         </>
       }
       colorIndicatorRange={range}

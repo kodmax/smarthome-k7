@@ -19,9 +19,9 @@ const baseFontSize = 12
 
 const Vector = styled('span')({
   display: 'inline-block',
-  verticalAlign: 'bottom',
+  verticalAlign: 'top',
 
-  height: Number(14 / baseFontSize).toFixed(3) + 'em',
+  height: Number(15 / baseFontSize).toFixed(3) + 'em',
   width: Number(48 / baseFontSize).toFixed(3) + 'em',
 })
 
