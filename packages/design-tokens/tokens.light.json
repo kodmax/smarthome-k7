@@ -11,7 +11,7 @@
     "borderStrong": "#D5C9B5",
 
     "textPrimary": "#2A2A26",
-    "textSecondary": "#5B5A55",
+    "textSecondary": "#6B6255",
     "textMuted": "#8C8A84",
     "textInverse": "#FFFFFF",
 
@@ -19,9 +19,9 @@
     "primaryLight": "#60A5FA",
     "primaryDark": "#1D4ED8",
 
-    "success": "#2F9E44",
+    "success": "#5E8268",
     "warning": "#D97706",
-    "danger": "#DC2626",
+    "danger": "#A86058",
     "info": "#0284C7",
     "purple": "#7C3AED",
 

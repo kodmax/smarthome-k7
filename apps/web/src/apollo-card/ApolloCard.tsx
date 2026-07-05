@@ -27,19 +27,18 @@ const ApolloCardHeader = styled(Box)(({ theme }) => ({
   borderBottom: `${designTokens.borderWidth.hairline}px solid ${theme.vars.palette.cardHeaderBorder.main}`,
 }))
 
-const ApolloCardTitle = styled(Typography)(({ theme }) => ({
+const ApolloCardTitle = styled(Typography)({
   fontSize: designTokens.font.h3.size,
   fontWeight: designTokens.font.h3.weight,
   lineHeight: designTokens.font.h3.lineHeight,
-  color: theme.vars.palette.text.primary,
   flex: '0 0 auto',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-}))
+})
 
 const ApolloCardHeadingInfo = styled(Box)(({ theme }) => ({
-  fontSize: designTokens.font.h3.size,
+  fontSize: designTokens.font.h3.size - 6,
   fontWeight: designTokens.font.h3.weight,
   lineHeight: designTokens.font.h3.lineHeight,
   color: theme.vars.palette.text.disabled,

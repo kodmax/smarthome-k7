@@ -17,13 +17,15 @@ export const ApolloTableRow = styled(TableRow)({})
 
 export const ApolloTableCell = styled(TableCell)(({ theme }) => ({
   borderBottom: 'none',
-  fontSize: 'inherit',
   lineHeight: 'inherit',
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   verticalAlign: 'middle',
   color: theme.vars.palette.text.primary,
+  '&:not(.MuiTableCell-head)': {
+    fontSize: 'inherit',
+  },
   '&:last-of-type:not(:first-of-type)': {
     textAlign: 'right',
     color: theme.vars.palette.text.primary,

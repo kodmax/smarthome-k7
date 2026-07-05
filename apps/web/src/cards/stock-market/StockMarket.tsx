@@ -4,7 +4,7 @@ import { useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
 import { ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
-import { StockMarketFeed } from '@repo/types'
+import { ExchangeStatus, StockMarketFeed } from '@repo/types'
 import { Ticker } from './Ticker'
 import { StockMarketTable } from './styled'
 import { TableBody, TableHead, TableRow } from '@mui/material'
@@ -14,11 +14,20 @@ const cardTableFontSize = designTokens.font.body.size
 const tableHeaderGap = designTokens.space[3]
 const headerRowSx = { '& .MuiTableCell-root': { pb: `${tableHeaderGap}px` } }
 
+const marketStatusTitles: Record<ExchangeStatus, string> = {
+  'After-Hours': 'Po zamkięciu',
+  'Pre-Market': 'Przed otwarciem',
+  Closed: 'Rynek zamknięty',
+  Open: 'Rynek otwarty',
+}
+
 export const StockMarket: FC<Record<string, never>> = () => {
   const feed = useFeed<StockMarketFeed>('stock-market')
   const tickers = useSortedTickers(feed)
 
-  if (feed === undefined || tickers === undefined) {
+  const marketStatus = feed?.tickers.find(item => item.exchange.name === 'NYSE')?.exchange.status
+
+  if (feed === undefined || tickers === undefined || marketStatus === undefined) {
     return (
       <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9}>
         <TablePlaceholder rows={12} graph={false} value={true} />
@@ -26,21 +35,25 @@ export const StockMarket: FC<Record<string, never>> = () => {
     )
   }
 
-  const marketStatus = feed?.tickers.find(item => item.exchange.name === 'NYSE')?.exchange.status
-
   return (
-    <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9} headingInfo={marketStatus}>
+    <ApolloCard
+      cardId='stock-market'
+      title='Giełda'
+      icon={StockMarketIcon}
+      height={9}
+      headingInfo={marketStatusTitles[marketStatus]}
+    >
       <ZoomContext.Consumer>
         {zoom => (
           <StockMarketTable style={{ fontSize: cardTableFontSize, lineHeight: zoom.active ? 1.2 : undefined }}>
             {zoom.active ? (
               <TableHead>
                 <TableRow sx={headerRowSx}>
-                  <ApolloTableCell>Ticker</ApolloTableCell>
-                  <ApolloTableCell>Earnings</ApolloTableCell>
-                  <ApolloTableCell>EG</ApolloTableCell>
-                  <ApolloTableCell>PE@PT</ApolloTableCell>
-                  <ApolloTableCell>Quote</ApolloTableCell>
+                  <ApolloTableCell>Symbol</ApolloTableCell>
+                  <ApolloTableCell>Do wyników</ApolloTableCell>
+                  <ApolloTableCell>Do celu</ApolloTableCell>
+                  <ApolloTableCell>C/Z@Cel</ApolloTableCell>
+                  <ApolloTableCell>Notowanie</ApolloTableCell>
                 </TableRow>
               </TableHead>
             ) : null}

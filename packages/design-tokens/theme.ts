@@ -14,6 +14,11 @@ const fontVariant = (variant: { size: number; weight: number; lineHeight: number
   lineHeight: variant.lineHeight,
 })
 
+const headingVariant = (variant: { size: number; weight: number; lineHeight: number }) => ({
+  ...fontVariant(variant),
+  color: 'var(--mui-palette-text-secondary)',
+})
+
 const domainColor = (main: string) => ({ main })
 
 const buildPalette = (scheme: SchemeTokens) => {
@@ -120,9 +125,9 @@ export const theme = createTheme({
     fontFamily: font.family,
     display1: fontVariant(font.display1),
     display2: fontVariant(font.display2),
-    h1: fontVariant(font.h1),
-    h2: fontVariant(font.h2),
-    h3: fontVariant(font.h3),
+    h1: headingVariant(font.h1),
+    h2: headingVariant(font.h2),
+    h3: headingVariant(font.h3),
     body1: fontVariant(font.body),
     body2: fontVariant(font.bodySmall),
     subtitle1: fontVariant(font.bodyLarge),
@@ -236,7 +241,9 @@ export const theme = createTheme({
         }),
         head: ({ theme }: { theme: Theme }) => ({
           color: theme.vars.palette.text.secondary,
-          fontWeight: 500,
+          fontWeight: 600,
+          fontSize: font.body.size - 2,
+          fontVariant: 'small-caps',
         }),
       },
     },
