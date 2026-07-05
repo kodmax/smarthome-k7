@@ -4,8 +4,6 @@ export type ZoomStyle = {
   right: number | string
   left: number | string
   top: number | string
-  fontSize: number
-  lineHeight: number
 }
 
 export type ZoomSetup =

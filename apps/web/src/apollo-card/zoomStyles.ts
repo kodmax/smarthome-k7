@@ -1,11 +1,9 @@
-import { ZOOM_SCALE, zoomCardTransition } from './zoomConstants'
+import { zoomCardTransition } from './zoomConstants'
 import type { ZoomStyle } from './zoomReducer'
 
 function baseZoomStyle(overrides: Pick<ZoomStyle, 'bottom' | 'right' | 'left' | 'top'>): ZoomStyle {
   return {
     transition: zoomCardTransition,
-    fontSize: 12 * ZOOM_SCALE,
-    lineHeight: 1.2,
     ...overrides,
   }
 }

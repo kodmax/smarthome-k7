@@ -7,8 +7,6 @@ const style = {
   right: 10,
   left: 10,
   top: 10,
-  fontSize: 42,
-  lineHeight: 1.2,
 }
 
 describe('zoomReducer', () => {
