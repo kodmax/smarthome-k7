@@ -1,11 +1,12 @@
-import { type SvgIconComponent } from '@mui/icons-material'
 import { useFeed } from '@repo/feed-client'
+import { designTokens } from '@repo/design-tokens'
+import type { LucideIcon } from 'lucide-react'
 
 type KnxStateIconProps<T> = {
   id: string
   active?: (payload: T) => boolean
   visible?: (payload: T) => boolean
-  icon: (payload: T) => SvgIconComponent
+  icon: (payload: T) => LucideIcon
   opacity?: (payload: T) => number
 }
 
@@ -27,12 +28,11 @@ const KnxStateIcon = <T,>({
 
   return (
     <Icon
-      sx={{
+      size={12}
+      strokeWidth={designTokens.icon.strokeWidth}
+      color={isActive ? 'var(--mui-palette-temperature-main)' : 'var(--mui-palette-text-disabled)'}
+      style={{
         paddingRight: '0.1em',
-        width: '12px',
-        height: '12px',
-        color: isActive ? 'temperature.main' : 'text.disabled',
-        fontSize: 'inherit',
         visibility: visible(reading) ? 'visible' : 'hidden',
         opacity: opacity(reading),
       }}

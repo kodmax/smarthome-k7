@@ -1,5 +1,6 @@
 import {
   Activity,
+  AirVent,
   BriefcaseBusiness,
   Camera,
   ChartCandlestick,
@@ -11,6 +12,7 @@ import {
   Copy,
   Droplets,
   Flame,
+  Heater,
   House,
   Info,
   LayoutDashboard,
@@ -37,7 +39,7 @@ import { createStyledIcon } from './createStyledIcon'
 import { iconStyles } from './iconStyles'
 
 export { createStyledIcon } from './createStyledIcon'
-export type { StyledIconOptions } from './createStyledIcon'
+export type { StyledIconOptions, StyledIconProps, StyledLucideIcon } from './createStyledIcon'
 export type { IconGlow } from './iconGlow'
 export { iconStyles } from './iconStyles'
 
@@ -47,7 +49,9 @@ export const EnergyIcon = createStyledIcon(Zap, iconStyles.energy)
 export const ConsumptionIcon = createStyledIcon(Activity, iconStyles.energy)
 export const PowerIcon = createStyledIcon(ChartNoAxesColumnIncreasing, iconStyles.energy)
 export const TemperatureIcon = createStyledIcon(Thermometer, iconStyles.temperature)
+export const AirVentIcon = createStyledIcon(AirVent, iconStyles.temperature)
 export const HeatingIcon = createStyledIcon(Flame, iconStyles.temperature)
+export const HeaterIcon = createStyledIcon(Heater, iconStyles.temperature)
 export const CoolingIcon = createStyledIcon(Snowflake, iconStyles.weather)
 export const HumidityIcon = createStyledIcon(Droplets, iconStyles.weather)
 export const AirQualityIcon = createStyledIcon(Leaf, iconStyles.air)

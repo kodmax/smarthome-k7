@@ -1,17 +1,22 @@
 import type { LucideIcon, LucideProps } from 'lucide-react'
-import { forwardRef } from 'react'
+import { forwardRef, type ForwardRefExoticComponent, type RefAttributes } from 'react'
 import { type IconGlow, iconGlowFilter } from './iconGlow'
 
 export type StyledIconOptions = {
   color: string
+}
+
+export type StyledIconProps = LucideProps & {
   glow?: IconGlow
 }
 
-export function createStyledIcon(source: LucideIcon, { color, glow = 'default' }: StyledIconOptions): LucideIcon {
+export type StyledLucideIcon = ForwardRefExoticComponent<StyledIconProps & RefAttributes<SVGSVGElement>>
+
+export function createStyledIcon(source: LucideIcon, { color }: StyledIconOptions): StyledLucideIcon {
   const SourceIcon = source
 
-  const StyledIcon = forwardRef<SVGSVGElement, LucideProps>(function StyledLucideIcon(
-    { color: colorOverride, style, ...props },
+  const StyledIcon = forwardRef<SVGSVGElement, StyledIconProps>(function StyledLucideIcon(
+    { color: colorOverride, style, glow = 'off', ...props },
     ref,
   ) {
     const iconColor = colorOverride ?? color
@@ -29,5 +34,5 @@ export function createStyledIcon(source: LucideIcon, { color, glow = 'default' }
 
   StyledIcon.displayName = `Styled${source.displayName ?? source.name ?? 'Icon'}`
 
-  return StyledIcon as LucideIcon
+  return StyledIcon as StyledLucideIcon
 }

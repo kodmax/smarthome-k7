@@ -5,7 +5,8 @@ import { ApolloDataTable, HoursBars, Reading, TablePlaceholder } from '@/card-co
 import { beaufortLevelLabel, beaufortScale } from './beaufort'
 import { optimalHumidityRange } from './optimalHumidityRange'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import { North } from '@mui/icons-material'
+import { designTokens } from '@repo/design-tokens'
+import { ArrowUp } from 'lucide-react'
 import { getPosition, getMoonPosition } from 'suncalc'
 import { useFeed } from '@repo/feed-client'
 import { WeatherFeed } from '@repo/types'
@@ -67,7 +68,15 @@ export const Weather: FC<Record<string, never>> = () => {
                 }
                 extraInfo={
                   zoom.active ? (
-                    <North sx={{ transform: `rotate(${feed.instant.wind.angle}deg)`, marginRight: '0.25em' }} />
+                    <ArrowUp
+                      size={designTokens.icon.sizeXs - 4}
+                      strokeWidth={designTokens.icon.strokeWidth}
+                      style={{
+                        transform: `rotate(${feed.instant.wind.angle}deg)`,
+                        marginRight: '0.25em',
+                        verticalAlign: 'middle',
+                      }}
+                    />
                   ) : undefined
                 }
                 displayValue={String(windSpeed)}

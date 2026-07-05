@@ -1,11 +1,10 @@
 import { TableBody } from '@mui/material'
 import { type FC, useCallback } from 'react'
-import { AirQualityIcon } from '@repo/assets'
+import { AirQualityIcon, AlertIcon } from '@repo/assets'
 
 import { ApolloDataTable, KnxReading, KnxStateIcon, Reading, TablePlaceholder } from '@/card-components'
 import { ApolloCard } from '@/apollo-card'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
-import { Warning } from '@mui/icons-material'
 import { Co2Data, WeatherFeed } from '@repo/types'
 import { optimalHumidityRange } from './Weather/optimalHumidityRange'
 import { sunTimes } from './Weather/sunTimes'
@@ -38,7 +37,7 @@ export const Indoor: FC<Record<string, never>> = () => {
             bars={{ historyKey: 'today', highest: 2000, lowest: 400, optimal: 600, color: true }}
             icon={
               <KnxStateIcon<Co2Data>
-                icon={() => Warning}
+                icon={() => AlertIcon}
                 id='home.air-quality.co2'
                 visible={payload => payload.alert.value === 1}
               />

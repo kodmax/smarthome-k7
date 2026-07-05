@@ -1,20 +1,29 @@
-import { Bedtime, Circle, WbSunny } from '@mui/icons-material'
+import { NightIcon, SunriseIcon } from '@repo/assets'
+import { designTokens } from '@repo/design-tokens'
 import { ExchangeStatus } from '@repo/types'
+import { Circle } from 'lucide-react'
 import { FC } from 'react'
+
+const iconStyle = { verticalAlign: 'middle' as const }
+const iconSize = designTokens.icon.sizeXs - 4
 
 export const MarketStatusIcon: FC<{ marketStatus: ExchangeStatus }> = ({ marketStatus }) => {
   switch (marketStatus) {
     case 'Open':
-      return <Circle sx={{ fontSize: '1em', color: 'green', verticalAlign: 'middle' }} />
+      return (
+        <Circle size={iconSize} fill='var(--mui-palette-success-main)' strokeWidth={0} style={iconStyle} aria-hidden />
+      )
 
     case 'After-Hours':
-      return <Bedtime sx={{ fontSize: '1em', verticalAlign: 'middle' }} />
+      return <NightIcon size={iconSize} strokeWidth={designTokens.icon.strokeWidth} style={iconStyle} aria-hidden />
 
     case 'Pre-Market':
-      return <WbSunny sx={{ fontSize: '1em', verticalAlign: 'middle' }} />
+      return <SunriseIcon size={iconSize} strokeWidth={designTokens.icon.strokeWidth} style={iconStyle} aria-hidden />
 
     case 'Closed':
-      return <Circle sx={{ fontSize: '1em', color: 'gray', verticalAlign: 'middle' }} />
+      return (
+        <Circle size={iconSize} fill='var(--mui-palette-text-disabled)' strokeWidth={0} style={iconStyle} aria-hidden />
+      )
 
     default:
       return <>{marketStatus}</>

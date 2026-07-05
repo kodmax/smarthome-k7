@@ -1,16 +1,16 @@
 import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import { TemperatureIcon } from '@repo/assets'
+import { AirVentIcon, HeaterIcon, HeatingIcon, NightIcon, SunIcon, TemperatureIcon } from '@repo/assets'
 import { ApolloDataTable, KnxReading, KnxStateIcon } from '@/card-components'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
-import { Bedtime, Fireplace, LightMode, Air, type SvgIconComponent, ThermostatAuto } from '@mui/icons-material'
+import type { LucideIcon } from 'lucide-react'
 import { TemperatureData } from '@repo/types'
 
-const icons: Record<string, SvgIconComponent> = {
-  FrostProtection: Air,
-  Comfort: Fireplace,
-  Standby: LightMode,
-  Economy: Bedtime,
+const icons: Record<string, LucideIcon> = {
+  FrostProtection: AirVentIcon,
+  Comfort: HeatingIcon,
+  Standby: SunIcon,
+  Economy: NightIcon,
 }
 
 export const Temperature: FC<Record<string, never>> = () => {
@@ -29,7 +29,7 @@ export const Temperature: FC<Record<string, never>> = () => {
                 icon={
                   zoom.active ? (
                     <KnxStateIcon<TemperatureData>
-                      icon={payload => icons[payload.mode.bathroom.text] ?? ThermostatAuto}
+                      icon={payload => icons[payload.mode.bathroom.text] ?? HeaterIcon}
                       id='heating'
                       active={payload => payload.status.lazienkaPodloga.value === 1}
                     />
@@ -46,7 +46,7 @@ export const Temperature: FC<Record<string, never>> = () => {
                 icon={
                   zoom.active ? (
                     <KnxStateIcon<TemperatureData>
-                      icon={payload => icons[payload.mode.livingroom.text] ?? ThermostatAuto}
+                      icon={payload => icons[payload.mode.livingroom.text] ?? HeaterIcon}
                       id='heating'
                       active={payload => payload.status.salon.value === 1}
                     />
@@ -63,7 +63,7 @@ export const Temperature: FC<Record<string, never>> = () => {
                 icon={
                   zoom.active ? (
                     <KnxStateIcon<TemperatureData>
-                      icon={payload => icons[payload.mode.bedroom.text] ?? ThermostatAuto}
+                      icon={payload => icons[payload.mode.bedroom.text] ?? HeaterIcon}
                       id='heating'
                       active={payload => payload.status.sypialnia.value === 1}
                     />
@@ -80,7 +80,7 @@ export const Temperature: FC<Record<string, never>> = () => {
                 icon={
                   zoom.active ? (
                     <KnxStateIcon<TemperatureData>
-                      icon={payload => icons[payload.mode.bathroom.text] ?? ThermostatAuto}
+                      icon={payload => icons[payload.mode.bathroom.text] ?? HeaterIcon}
                       id='heating'
                       active={payload => payload.status.lazienka.value === 1}
                     />

@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Typography, styled } from '@mui/material'
 import { apolloDataTableRowHeight } from '@/cards/components/ApolloDataTable'
 import { designTokens } from '@repo/design-tokens'
-import type { LucideIcon } from 'lucide-react'
+import type { StyledLucideIcon } from '@repo/assets'
 import { type FC, type ReactNode } from 'react'
 import { ZOOM_SCALE } from './zoomConstants'
 import { ZoomContext } from './ZoomContext'
@@ -9,7 +9,7 @@ import { ZoomCurtain } from './ZoomCurtain'
 
 type ApolloCardProps = {
   title: string
-  icon: LucideIcon
+  icon: StyledLucideIcon
   children: ReactNode
   cardId: string
   height?: number
@@ -103,7 +103,12 @@ const ApolloCard: FC<ApolloCardProps> = ({
         {zoom => (
           <ApolloCardRoot zoom={zoom.active}>
             <ApolloCardHeader>
-              <Icon size={designTokens.icon.sizeSm} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
+              <Icon
+                size={designTokens.icon.sizeSm}
+                strokeWidth={designTokens.icon.strokeWidth}
+                glow='default'
+                aria-hidden
+              />
               <ApolloCardTitle variant='h3'>{title}</ApolloCardTitle>
               <ApolloCardHeadingInfo>{headingInfo}</ApolloCardHeadingInfo>
             </ApolloCardHeader>
