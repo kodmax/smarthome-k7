@@ -9,7 +9,7 @@ export const Price: FC<{ ticker: TickerData }> = ({ ticker }) => {
 
   return (
     <Data sx={{ display: 'flex' }}>
-      <Box sx={{ flex: '0 0 1em' }}>
+      <Box sx={{ flex: '0 0 2em' }}>
         <MarketStatusIcon marketStatus={ticker.exchange.status} />
       </Box>
       <Box sx={{ fontFamily: 'monospace', flex: '0 0 5em' }}>{ticker.price.lastTradePrice.toFixed(2)} </Box>

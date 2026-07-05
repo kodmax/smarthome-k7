@@ -165,7 +165,7 @@ export const theme = createTheme({
           borderRadius: card.radius,
           border: `${designTokens.borderWidth.hairline}px solid ${card.borderColor}`,
           backgroundColor: color.surface,
-          backgroundImage: `linear-gradient(180deg, ${color.surfaceElevated} 0%, ${color.surface} 52%, ${color.surface} 100%)`,
+          backgroundImage: `linear-gradient(180deg, ${color.surfaceElevated} 0%, ${color.surface} 50%, ${color.surface} 100%)`,
           boxShadow: `${shadow.card}, inset 0 1px 0 ${card.highlightTop}`,
         },
       },
