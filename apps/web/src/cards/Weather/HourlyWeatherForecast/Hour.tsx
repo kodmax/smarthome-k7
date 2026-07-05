@@ -11,12 +11,12 @@ export const Hour: FC<{ fc: HourWeatherForecast; zoom: boolean }> = ({ fc, zoom 
         <WeatherIcon icon={fc.icon} width={`${WEATHER_ICON_SIZE}px`} height={`${WEATHER_ICON_SIZE}px`} />
       </IconSlot>
       <RowText>{Number(fc.temp).toFixed(0)} °C</RowText>
+      <PrecipRow>
+        <WeatherIcon icon={fc.precipIcon} width={`${PRECIP_ICON_SIZE}px`} height={`${PRECIP_ICON_SIZE}px`} />
+        <span> {fc.precip}</span>
+      </PrecipRow>
       {zoom ? (
         <>
-          <PrecipRow>
-            <WeatherIcon icon={fc.precipIcon} width={`${PRECIP_ICON_SIZE}px`} height={`${PRECIP_ICON_SIZE}px`} />
-            <span> {fc.precip}</span>
-          </PrecipRow>
           <SunText>{Number(fc.sun.altitude).toFixed(0)}°</SunText>
         </>
       ) : null}

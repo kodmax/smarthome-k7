@@ -5,5 +5,6 @@ export const weatherPageUrls = {
   instant: `${ACCUWEATHER_BASE}/current-weather/274663`,
   allergens: `${ACCUWEATHER_BASE}/weather-forecast/274663`,
   hourly: `${ACCUWEATHER_BASE}/hourly-weather-forecast/274663`,
+  tomorrowHourly: `${ACCUWEATHER_BASE}/hourly-weather-forecast/274663?day=2`,
   airQuality: `${ACCUWEATHER_BASE}/air-quality-index/274663`,
 } as const

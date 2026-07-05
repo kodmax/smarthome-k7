@@ -14,12 +14,11 @@ export const source: DataSourceDefinition<WeatherFeed> = {
 
   expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 15,
   script: async () => {
-    const date = new DateTime().getDate()
     const [forecast, instant, allergens, hourly, aq] = await Promise.all([
       parseForecast(),
       parseInstant(),
       parseAllergens(),
-      parseHourly(date, lat, long),
+      parseHourly(lat, long),
       parseAirQuality(),
     ])
 

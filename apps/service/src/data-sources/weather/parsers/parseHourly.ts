@@ -4,6 +4,7 @@ import * as suncalc from 'suncalc'
 import { basename } from 'path'
 import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
+import DateTime from '@/DateTime'
 
 export const parseHourlyFromDocument = (
   document: Document,
@@ -41,10 +42,19 @@ export const parseHourlyFromDocument = (
     })
   })
 
-export const parseHourly = async (
-  date: string,
-  latitude: number,
-  longitude: number,
-): Promise<HourWeatherForecast[]> => {
-  return parseHourlyFromDocument(await fetchDocument(weatherPageUrls.hourly), date, latitude, longitude)
+export const parseHourly = async (latitude: number, longitude: number): Promise<HourWeatherForecast[]> => {
+  console.log(new DateTime().getDate(), new DateTime(24).getDate())
+  const today = parseHourlyFromDocument(
+    await fetchDocument(weatherPageUrls.hourly),
+    new DateTime().getDate(),
+    latitude,
+    longitude,
+  )
+  const tomorrow = parseHourlyFromDocument(
+    await fetchDocument(weatherPageUrls.tomorrowHourly),
+    new DateTime(24).getDate(),
+    latitude,
+    longitude,
+  )
+  return [...today, ...tomorrow]
 }

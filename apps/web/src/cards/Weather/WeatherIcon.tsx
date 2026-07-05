@@ -53,7 +53,7 @@ const WeatherIcon: FC<WeatherIconProps> = ({ icon, glow = 'off', width, height, 
   const sizeStyle: CSSProperties = { width, height, ...style }
 
   if (glow === 'off') {
-    return <img src={src} alt='' style={{ ...mutedIconStyle, ...sizeStyle }} />
+    return <img src={src} alt='' style={{ ...mutedIconStyle, ...sizeStyle, verticalAlign: 'baseline' }} />
   }
 
   return <WeatherIconRoot src={src} alt='' $intensity={glow} style={sizeStyle} />

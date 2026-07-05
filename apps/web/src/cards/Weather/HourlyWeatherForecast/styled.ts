@@ -6,9 +6,9 @@ const { font, space } = designTokens
 export const HOUR_COLUMN_WIDTH = 64
 export const HOUR_GAP = space[4]
 export const HOUR_ROW_GAP = 4
-export const WEATHER_ICON_SIZE = 36
+export const WEATHER_ICON_SIZE = 32
 export const PRECIP_ICON_SIZE = 9
-export const ROW_FONT_SIZE = Math.round(font.body.size * 1)
+export const ROW_FONT_SIZE = Math.round(font.body.size - 2)
 export const SUN_FONT_SIZE = Math.round(font.body.size * 0.5)
 
 export const ScrollArea = styled(Box)({
