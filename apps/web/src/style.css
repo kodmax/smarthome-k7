@@ -14,8 +14,3 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
-
-@viewport {
-  min-zoom: 1;
-  max-zoom: 1;
-}
