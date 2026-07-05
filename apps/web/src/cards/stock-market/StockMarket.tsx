@@ -49,6 +49,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
             {zoom.active ? (
               <TableHead>
                 <TableRow sx={headerRowSx}>
+                  <ApolloTableCell sx={{ width: '1em' }} />
                   <ApolloTableCell>Symbol</ApolloTableCell>
                   <ApolloTableCell>Do wyników</ApolloTableCell>
                   <ApolloTableCell>Do celu</ApolloTableCell>

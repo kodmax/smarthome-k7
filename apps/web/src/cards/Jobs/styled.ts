@@ -1,14 +1,6 @@
 import styled from '@emotion/styled'
 import { ApolloTableCell } from '@/card-components'
 
-export const Open = styled(ApolloTableCell)({
-  padding: '0 1em 0.25em',
-  verticalAlign: 'middle',
-  boxSizing: 'border-box',
-  width: '1em',
-  borderBottom: 'none',
-})
-
 export const JobTitle = styled(ApolloTableCell)({
   textOverflow: 'ellipsis',
   padding: 0,

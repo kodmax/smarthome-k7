@@ -2,8 +2,16 @@ import { styled } from '@mui/material'
 import { IconLink } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
+import { ApolloTableCell } from './ApolloDataTable'
 
 const { icon } = designTokens
+
+const OpenCell = styled(ApolloTableCell)({
+  verticalAlign: 'middle',
+  boxSizing: 'border-box',
+  width: '1em',
+  textOverflow: 'clip',
+})
 
 const Link = styled('a')({
   display: 'inline-flex',
@@ -16,9 +24,11 @@ const Link = styled('a')({
 
 const LinkOpen: FC<{ href: string }> = ({ href }) => {
   return (
-    <Link href={href} target='_blank' rel='noopener noreferrer'>
-      <IconLink size={icon.sizeXs - 4} strokeWidth={icon.strokeWidth} aria-hidden />
-    </Link>
+    <OpenCell>
+      <Link href={href} target='_blank' rel='noopener noreferrer'>
+        <IconLink size={icon.sizeXs - 4} strokeWidth={icon.strokeWidth} aria-hidden />
+      </Link>
+    </OpenCell>
   )
 }
 

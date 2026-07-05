@@ -1,8 +1,7 @@
 import { JobAd } from '@repo/types'
 import { FC, useMemo } from 'react'
-import { ApolloTableRow } from '@/card-components'
-import { JobTitle, Open, Salary } from './styled'
-import { LinkOpen } from '@/card-components'
+import { ApolloTableRow, LinkOpen } from '@/card-components'
+import { JobTitle, Salary } from './styled'
 import { formatJobSalary } from './formatJobSalary'
 import { isFavSkill } from './isFavSkill'
 
@@ -12,12 +11,7 @@ export const Ad: FC<{ ad: JobAd; zoom: boolean }> = ({ ad, zoom }) => {
 
   return (
     <ApolloTableRow>
-      {zoom ? (
-        <Open>
-          {' '}
-          <LinkOpen href={ad.advertUrl} />{' '}
-        </Open>
-      ) : null}
+      {zoom ? <LinkOpen href={ad.advertUrl} /> : null}
       <JobTitle>
         {zoom ? (
           <>

@@ -1,17 +1,10 @@
-import { TableBody, styled } from '@mui/material'
+import { TableBody } from '@mui/material'
 import { type FC, useCallback } from 'react'
 import { NewsIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
 import { ApolloDataTable, ApolloTableCell, ApolloTableRow, LinkOpen, TablePlaceholder } from '@/card-components'
 import { NewsFeed } from '@repo/types'
-
-const Open = styled(ApolloTableCell)({
-  verticalAlign: 'middle',
-  width: '3em',
-  paddingLeft: '1em',
-  paddingRight: '1em',
-})
 
 export const News: FC<Record<string, never>> = () => {
   const news = useFeed<NewsFeed>('news')
@@ -32,9 +25,7 @@ export const News: FC<Record<string, never>> = () => {
                 {news.articles.map(article =>
                   zoom.active ? (
                     <ApolloTableRow key={article.href}>
-                      <Open>
-                        <LinkOpen href={article.href} />
-                      </Open>
+                      <LinkOpen href={article.href} />
                       <ApolloTableCell>{article.title}</ApolloTableCell>
                       <ApolloTableCell sx={{ width: 0 }}></ApolloTableCell>
                     </ApolloTableRow>
