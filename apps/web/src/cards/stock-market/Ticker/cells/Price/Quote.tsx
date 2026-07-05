@@ -9,7 +9,7 @@ export const Quote: FC<{ ticker: TickerData }> = ({ ticker }) => {
 
   return (
     <ApolloTableCell sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-      <Box sx={{ fontFamily: 'monospace', flex: '0 0 5em' }}>{ticker.price.lastTradePrice.toFixed(2)} </Box>
+      <Box sx={{ fontFamily: 'monospace', flex: '0 0 5.5em' }}>{ticker.price.lastTradePrice.toFixed(2)} </Box>
       <Box sx={{ fontFamily: 'monospace', flex: '0 0 4.5em' }}>
         <PriceChange dir={priceChangeDirection}>
           {priceChangeDirection === 'up' ? '+' : ''}
