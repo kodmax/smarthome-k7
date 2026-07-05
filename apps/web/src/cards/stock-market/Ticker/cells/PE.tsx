@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Data } from '../styled'
+import { ApolloTableCell } from '@/card-components'
 import { TickerData } from '@repo/types'
 
 export const PE: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
@@ -16,8 +16,8 @@ export const PE: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) 
     ticker.statistics.trailingEPS > 0 ? ticker.price.lastTradePrice / ticker.statistics.trailingEPS : null
 
   return (
-    <Data sx={{ fontFamily: 'monospace', textAlign: 'right' }}>
+    <ApolloTableCell sx={{ fontFamily: 'monospace', textAlign: 'right' }}>
       {trailingPE !== null ? trailingPE.toFixed(0) : '--'} → {forwardPE !== null ? forwardPE.toFixed(0) : '--'}{' '}
-    </Data>
+    </ApolloTableCell>
   )
 }

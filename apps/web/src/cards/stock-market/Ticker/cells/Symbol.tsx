@@ -1,17 +1,16 @@
 import { FC } from 'react'
-import { Data } from '../styled'
-import { LinkOpen } from '@/card-components'
+import { ApolloTableCell, LinkOpen } from '@/card-components'
 import { TickerData } from '@repo/types'
 
 export const Symbol: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
   return (
-    <Data>
+    <ApolloTableCell>
       {zoom ? (
         <>
           <LinkOpen href={`https://finance.yahoo.com/quote/${ticker.symbol}/`} />{' '}
         </>
       ) : null}
       {ticker.symbol}
-    </Data>
+    </ApolloTableCell>
   )
 }

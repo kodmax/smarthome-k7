@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Data } from '../styled'
+import { ApolloTableCell } from '@/card-components'
 import { TickerData } from '@repo/types'
 
 export const EarningsDate: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
@@ -11,9 +11,9 @@ export const EarningsDate: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker
   const earningsDaysLeft = Math.ceil((earningsDate.getTime() - new Date().getTime()) / 86400000)
 
   return (
-    <Data>
+    <ApolloTableCell>
       {earningsDaysLeft > 0 ? earningsDate.toLocaleDateString() : null}
       {earningsDaysLeft > 0 && earningsDaysLeft <= 30 ? <> ({earningsDaysLeft}d)</> : null}
-    </Data>
+    </ApolloTableCell>
   )
 }

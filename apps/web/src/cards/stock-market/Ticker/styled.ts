@@ -10,10 +10,6 @@ export const PriceChange = styled('span')<{ dir: 'up' | 'down' | 'none' }>(({ di
   width: '4em',
 }))
 
-export const Data = styled(TableCell)({
-  fontSize: 'inherit',
-})
-
 export const Header = styled(TableCell)({
   fontSize: 'inherit',
 })

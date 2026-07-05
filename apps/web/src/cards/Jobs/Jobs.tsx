@@ -14,7 +14,7 @@ export const Jobs: FC<Record<string, never>> = () => {
   const feed = useFeed<JobsFeed>('jobs')
 
   return (
-    <ApolloCard cardId='jobs' title='Oferty pracy' icon={JobsIcon} height={10}>
+    <ApolloCard cardId='jobs' title='Oferty pracy' icon={JobsIcon} height={9}>
       <ZoomContext.Consumer>
         {zoom =>
           !feed ? (

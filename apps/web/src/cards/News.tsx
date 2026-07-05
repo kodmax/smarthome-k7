@@ -21,7 +21,7 @@ export const News: FC<Record<string, never>> = () => {
   }, [])
 
   return (
-    <ApolloCard cardId='news' title='Wiadomości' icon={NewsIcon} height={10} onZoom={onZoom}>
+    <ApolloCard cardId='news' title='Wiadomości' icon={NewsIcon} height={9} onZoom={onZoom}>
       <ZoomContext.Consumer>
         {zoom =>
           !news ? (

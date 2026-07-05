@@ -1,14 +1,15 @@
 import { Box } from '@mui/system'
 import { TickerData } from '@repo/types'
 import { FC } from 'react'
-import { Data, PriceChange } from '../../styled'
+import { ApolloTableCell } from '@/card-components'
+import { PriceChange } from '../../styled'
 import { MarketStatusIcon } from './MarketStatusIcon'
 
 export const Price: FC<{ ticker: TickerData }> = ({ ticker }) => {
   const priceChangeDirection = +ticker.price.netChange > 0 ? 'up' : +ticker.price.netChange < 0 ? 'down' : 'none'
 
   return (
-    <Data sx={{ display: 'flex' }}>
+    <ApolloTableCell sx={{ display: 'flex' }}>
       <Box sx={{ flex: '0 0 2em' }}>
         <MarketStatusIcon marketStatus={ticker.exchange.status} />
       </Box>
@@ -19,6 +20,6 @@ export const Price: FC<{ ticker: TickerData }> = ({ ticker }) => {
           {ticker.price.percentageChange.toFixed(2)}%
         </PriceChange>
       </Box>
-    </Data>
+    </ApolloTableCell>
   )
 }
