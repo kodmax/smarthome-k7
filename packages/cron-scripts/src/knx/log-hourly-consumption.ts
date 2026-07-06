@@ -13,8 +13,8 @@ knx.connect().then(async () => {
   const now = new Date().getTime() - new Date().getTimezoneOffset() * 60_000
   const db = await pool.getConnection()
 
-  if (now % 3_600_000 > 60_000) {
-    throw new Error('This script needs to be run in the first minute of an hour!')
+  if (now % 3_600_000 > 180_000) {
+    throw new Error('This script needs to be run in the first 3 minutes of an hour!')
   }
 
   try {
