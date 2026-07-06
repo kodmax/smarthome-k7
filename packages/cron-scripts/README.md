@@ -7,7 +7,6 @@ Scheduled job implementations for the smart home backend. KNX jobs run **inside*
 
 | File                                | Schedule (cron) | Description                      |
 | ----------------------------------- | --------------- | -------------------------------- |
-| `src/knx/log-daily-consumption.ts`  | `0 0 * * *`     | Daily energy consumption logs    |
 | `src/knx/clocks-sync.ts`            | `0 * * * *`     | Sync KNX system clock datapoints |
 | `src/knx/log-hourly-consumption.ts` | `0 * * * *`     | Hourly energy readings → MariaDB |
 | `src/knx/log-air-condition.ts`      | `*/15 * * * *`  | Temperature, humidity, CO₂ logs  |
