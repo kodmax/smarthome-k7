@@ -11,7 +11,7 @@ export type EnergyRates = {
 
 export type EnergyHourConsumption = {
   hourly_consumption: number
-  hour: string
+  hour: number
 }
 
 export type ExchangeStatus = 'Open' | 'After-Hours' | 'Closed' | 'Pre-Market'
