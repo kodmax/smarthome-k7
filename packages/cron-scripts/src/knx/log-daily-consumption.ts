@@ -2,15 +2,14 @@
 import { knxSchema } from '@repo/knx-schema'
 import { KnxLink } from 'js-knx'
 import * as mariadb from 'mariadb'
+import { fileURLToPath } from 'node:url'
 import { dbConfig } from '#config/db'
 import { requireEnv } from '#config/env'
 
-const knx = new KnxLink(requireEnv('KNX_HOST'), { maxRetry: 5 })
-knx.on('error', err => console.error(err))
-knx.connect().then(async () => {
-  // This script is executed every day at 24:00.
+export async function logDailyConsumption(knx: KnxLink): Promise<void> {
+  const db = await mariadb.createConnection(dbConfig())
+
   try {
-    const db = await mariadb.createConnection(dbConfig())
     const lastReading = await db.query(
       'select date, total_reading from daily_energy_readings order by date desc limit 1',
     )
@@ -30,8 +29,20 @@ knx.connect().then(async () => {
       consumption,
     ])
   } finally {
-    await knx.disconnect()
+    await db.end()
   }
+}
 
-  process.exit(0)
-})
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const knx = new KnxLink(requireEnv('KNX_HOST'), { maxRetry: 5 })
+  knx.on('error', err => console.error(err))
+  knx.connect().then(async () => {
+    try {
+      await logDailyConsumption(knx)
+    } finally {
+      await knx.disconnect()
+    }
+
+    process.exit(0)
+  })
+}

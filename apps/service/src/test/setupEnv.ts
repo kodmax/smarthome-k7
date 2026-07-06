@@ -11,6 +11,7 @@ export const setupEnv = {
   NFJ_COOKIE: 'test',
   THEPROTOCOL_COOKIE: 'test',
   NO_KNX: '1',
+  NO_CRON: '1',
 } as const
 
 export function applySetupEnv(): void {

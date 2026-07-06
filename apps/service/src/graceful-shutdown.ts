@@ -3,6 +3,7 @@ import type { KnxLink } from 'js-knx'
 import pool from './db'
 
 let knxLink: KnxLink | undefined
+let knxCron: { stop(): void } | undefined
 let apolloFeeds: Feeds | undefined
 let apolloServer: Server | undefined
 let shuttingDown = false
@@ -11,12 +12,20 @@ export const registerKnxLink = (link: KnxLink): void => {
   knxLink = link
 }
 
+export const registerKnxCron = (chronos: { stop(): void }): void => {
+  knxCron = chronos
+}
+
 export const registerApollo = (server: Server, feeds: Feeds): void => {
   apolloServer = server
   apolloFeeds = feeds
 }
 
 const closeConnections = async (): Promise<void> => {
+  if (knxCron !== undefined) {
+    knxCron.stop()
+  }
+
   if (apolloFeeds !== undefined) {
     apolloFeeds.close()
   }

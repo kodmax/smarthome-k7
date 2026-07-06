@@ -96,6 +96,10 @@ export class Chronos {
   }
 
   public stop(): void {
+    if (this.stopped) {
+      return
+    }
+
     this.stopped = true
 
     if (this.tickTimeout !== undefined) {

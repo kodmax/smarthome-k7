@@ -24,6 +24,7 @@ const getNumber = (name: string): number => {
 }
 
 const knxDisabled = process.env.NO_KNX === '1'
+const cronDisabled = process.env.NO_CRON === '1' || knxDisabled
 
 export const config = {
   db: {
@@ -49,5 +50,8 @@ export const config = {
   knx: {
     disabled: knxDisabled,
     host: knxDisabled ? (process.env.KNX_HOST ?? '') : getString('KNX_HOST'),
+  },
+  cron: {
+    disabled: cronDisabled,
   },
 }

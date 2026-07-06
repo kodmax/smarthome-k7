@@ -13,8 +13,9 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 ```sh
 cp .env.example .env   # fill in values
 
-yarn workspace service dev    # watch + node --watch
-yarn workspace service start  # production (after build)
+yarn dev                          # from repo root — everything with a dev script
+yarn workspace service dev:local  # backend + library watchers, without web
+yarn workspace service start      # production (after build)
 ```
 
 The WebSocket server listens on port **3678**.
@@ -27,7 +28,8 @@ Copy `.env.example` and fill in:
 | ------------------------------------------------ | ------------------------------------------------ |
 | `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_SCHEMA` | MariaDB connection                               |
 | `KNX_HOST`                                       | KNX gateway address (required unless `NO_KNX=1`) |
-| `NO_KNX`                                         | `1` — disables KNX feeds                         |
+| `NO_KNX`                                         | `1` — disables KNX feeds and cron jobs           |
+| `NO_CRON`                                        | `1` — disables KNX cron jobs (requires KNX)      |
 | `CACHE_DIR`                                      | Feed cache directory (default `.cache`)          |
 | `LOCATION_LAT`, `LOCATION_LONG`                  | Coordinates (weather, suncalc)                   |
 | `GOOGLE_SOCS_COOKIE`                             | Cookie for Google weather scraping               |

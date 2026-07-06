@@ -3,6 +3,7 @@ declare module 'process' {
     namespace NodeJS {
       interface ProcessEnv {
         readonly NO_KNX?: string
+        readonly NO_CRON?: string
         readonly DB_PASSWORD: string
         readonly DB_HOST: string
         readonly DB_SCHEMA: string

@@ -36,12 +36,13 @@ In development, `.env` is loaded via `src/config/env.ts`.
 
 ## Scripts
 
-| Script      | Description           |
-| ----------- | --------------------- |
-| `build`     | `tsc` → `dist/` (ESM) |
-| `typecheck` | Type checking         |
-| `clean`     | Removes `dist/`       |
-| `format`    | Prettier              |
+| Script      | Description                              |
+| ----------- | ---------------------------------------- |
+| `build`     | `tsc` → `dist/` (ESM)                    |
+| `dev`       | `tsc --watch` — rebuilds `dist/` on save |
+| `typecheck` | Type checking                            |
+| `clean`     | Removes `dist/`                          |
+| `format`    | Prettier                                 |
 
 ## Stack
 

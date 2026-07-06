@@ -2,14 +2,13 @@
 import { knxSchema } from '@repo/knx-schema'
 import { KnxLink } from 'js-knx'
 import * as mariadb from 'mariadb'
+import { fileURLToPath } from 'node:url'
 import { dbConfig } from '#config/db'
 import { requireEnv } from '#config/env'
 
 const pool = mariadb.createPool(dbConfig())
 
-const knx = new KnxLink(requireEnv('KNX_HOST'), { maxRetry: 3 })
-knx.on('error', err => console.error(err))
-knx.connect().then(async () => {
+export async function logAirCondition(knx: KnxLink): Promise<void> {
   const db = await pool.getConnection()
 
   try {
@@ -40,9 +39,20 @@ knx.connect().then(async () => {
       readings.map(([reading_name, reading_value]) => [timestamp, reading_name, reading_value]),
     )
   } finally {
-    await knx.disconnect()
     await db.end()
   }
+}
 
-  process.exit(0)
-})
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const knx = new KnxLink(requireEnv('KNX_HOST'), { maxRetry: 3 })
+  knx.on('error', err => console.error(err))
+  knx.connect().then(async () => {
+    try {
+      await logAirCondition(knx)
+    } finally {
+      await knx.disconnect()
+    }
+
+    process.exit(0)
+  })
+}
