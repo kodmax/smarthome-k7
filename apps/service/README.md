@@ -61,6 +61,17 @@ Copy `.env.example` and fill in:
 
 Entry point: `src/index.ts`.
 
+## Database migrations
+
+Schema DDL and migration tooling live in [`packages/db`](packages/db) (`@repo/db`, db-migrate). Copy
+`packages/db/.env.example` → `.env` — credentials are independent from service (you can use a DDL user for migrations).
+
+```sh
+yarn workspace @repo/db db:migrate
+```
+
+See [`packages/db/README.md`](../packages/db/README.md).
+
 ## MCP / agent access to MariaDB
 
 Cursor can query the database via [mysql-mcp-server](https://github.com/askdba/mysql-mcp-server) (read-only by default).

@@ -13,6 +13,7 @@ Smart home dashboard monorepo: the backend aggregates data from KNX and web scra
 | [`packages/types`](packages/types) | Shared feed payload types |
 | [`packages/knx-schema`](packages/knx-schema) | KNX group address map |
 | [`packages/cron-scripts`](packages/cron-scripts) | Cron scripts (KNX, TV, DB logging) |
+| [`packages/db`](packages/db) | MariaDB schema migrations (db-migrate) |
 | [`packages/cloudflare`](packages/cloudflare) | Dynamic DNS (Cloudflare API) |
 | [`packages/assets`](packages/assets) | Lucide icons, weather SVGs, and other media |
 | [`packages/design-tokens`](packages/design-tokens) | Shared design tokens, dark/light MUI theme |
@@ -50,6 +51,7 @@ yarn workspace service dev
 | `yarn test` | Run tests |
 | `yarn lint` | ESLint |
 | `yarn format` | Prettier |
+| `yarn db:migrate` | Apply MariaDB migrations (`@repo/db`) |
 
 ## Architecture
 
@@ -70,6 +72,7 @@ Scheduled tasks (energy logging, KNX clock sync, TV power-off) run independently
 ## Configuration
 
 - **Service:** copy `apps/service/.env.example` → `.env` (database, KNX, location, scraper cookies).
+- **Database migrations:** copy `packages/db/.env.example` → `packages/db/.env` (can differ from service — e.g. DDL user for migrations).
 - **Web:** optional `VITE_WEBSOCKET_URL` (defaults to `ws://<hostname>:3678`).
 
 ## Tooling

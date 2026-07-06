@@ -1,0 +1,16 @@
+{
+  "name": "@repo/db",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "db:migrate": "node -r dotenv/config node_modules/.bin/db-migrate up",
+    "db:rollback": "node -r dotenv/config node_modules/.bin/db-migrate down",
+    "db:status": "node -r dotenv/config node_modules/.bin/db-migrate check",
+    "db:create": "node -r dotenv/config node_modules/.bin/db-migrate create"
+  },
+  "devDependencies": {
+    "db-migrate": "^0.11.14",
+    "db-migrate-mysql": "^3.0.0",
+    "dotenv": "^17.4.2"
+  }
+}

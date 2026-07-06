@@ -5,7 +5,10 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "format": "turbo run format"
+    "format": "turbo run format",
+    "db:migrate": "yarn workspace @repo/db db:migrate",
+    "db:rollback": "yarn workspace @repo/db db:rollback",
+    "db:status": "yarn workspace @repo/db db:status"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
