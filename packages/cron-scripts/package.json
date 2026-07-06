@@ -27,10 +27,10 @@
   },
   "dependencies": {
     "@repo/chronos": "*",
+    "@repo/db": "*",
     "@repo/knx-schema": "*",
     "dotenv": "^17.4.2",
     "js-knx": "^2.20.1",
-    "mariadb": "^3.0.0",
     "sony-bravia-ip-control": "^1.1.0"
   },
   "devDependencies": {

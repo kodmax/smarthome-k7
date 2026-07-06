@@ -6,7 +6,7 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 
 - Node.js (CommonJS), TypeScript
 - Bun (bundling)
-- `@repo/apollo-ws`, `js-knx`, MariaDB, Vitest
+- `@repo/apollo-ws`, `js-knx`, `@repo/db`, Vitest
 
 ## Running
 
@@ -26,7 +26,7 @@ Copy `.env.example` and fill in:
 
 | Variable                                         | Description                                      |
 | ------------------------------------------------ | ------------------------------------------------ |
-| `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_SCHEMA` | MariaDB connection                               |
+| `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_SCHEMA` | MariaDB runtime pool (`@repo/db`)                |
 | `KNX_HOST`                                       | KNX gateway address (required unless `NO_KNX=1`) |
 | `NO_KNX`                                         | `1` — disables KNX feeds and cron jobs           |
 | `NO_CRON`                                        | `1` — disables KNX cron jobs (requires KNX)      |
@@ -41,6 +41,9 @@ Copy `.env.example` and fill in:
 
 **KNX:** energy, heating, CO₂, humidity, room temperatures
 
+KNX cron jobs (energy logging, clock sync, indoor readings) run in-process via `@repo/cron-scripts` →
+`initKnxCronJobs()`. Disabled with `NO_CRON=1` or `NO_KNX=1`.
+
 ## Scripts
 
 | Script                     | Description                     |
@@ -53,18 +56,21 @@ Copy `.env.example` and fill in:
 
 ## Monorepo dependencies
 
-| Package            | Role                                   |
-| ------------------ | -------------------------------------- |
-| `@repo/apollo-ws`  | WebSocket server, cache, feed registry |
-| `@repo/knx-schema` | KNX group address map                  |
-| `@repo/types`      | Feed payload type contracts            |
+| Package              | Role                                   |
+| -------------------- | -------------------------------------- |
+| `@repo/apollo-ws`    | WebSocket server, cache, feed registry |
+| `@repo/cron-scripts` | KNX scheduled jobs (in-process)        |
+| `@repo/db`           | Shared MariaDB pool + migrations       |
+| `@repo/knx-schema`   | KNX group address map                  |
+| `@repo/types`        | Feed payload type contracts            |
 
 Entry point: `src/index.ts`.
 
 ## Database migrations
 
-Schema DDL and migration tooling live in [`packages/db`](packages/db) (`@repo/db`, db-migrate). Copy
-`packages/db/.env.example` → `.env` — credentials are independent from service (you can use a DDL user for migrations).
+Schema DDL and migration tooling live in [`packages/db`](packages/db) (`@repo/db`, db-migrate). Runtime pool uses `DB_*`
+in this `.env`; migrations use `DB_MIGRATE_*` in `packages/db/.env`. Copy `packages/db/.env.example` → `.env` —
+credentials are independent from service (you can use a DDL user for migrations).
 
 ```sh
 yarn workspace @repo/db db:migrate

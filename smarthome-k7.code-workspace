@@ -54,6 +54,9 @@
     },
     {
       "path": "packages/chronos"
+    },
+    {
+      "path": "packages/db"
     }
   ],
   "settings": {

@@ -27,12 +27,6 @@ const knxDisabled = process.env.NO_KNX === '1'
 const cronDisabled = process.env.NO_CRON === '1' || knxDisabled
 
 export const config = {
-  db: {
-    password: getString('DB_PASSWORD'),
-    database: getString('DB_SCHEMA'),
-    host: getString('DB_HOST'),
-    user: getString('DB_USER'),
-  },
   geoLocation: {
     long: getNumber('LOCATION_LONG'),
     lat: getNumber('LOCATION_LAT'),

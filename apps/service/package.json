@@ -7,11 +7,11 @@
     "@types/suncalc": "^1.8.1",
     "@repo/apollo-ws": "*",
     "@repo/cron-scripts": "*",
+    "@repo/db": "*",
     "@repo/knx-schema": "*",
     "dotenv": "^17.4.2",
     "js-knx": "^2.20.1",
     "linkedom": "^0.18.12",
-    "mariadb": "^3.0.0",
     "suncalc": "^1.9.0"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
   "scripts": {
     "bundle": "bun build src/index.ts --target=node --format=cjs --outdir=./dist",
     "dev": "yarn bundle && sh -c 'bun build --watch src/index.ts --target=node --format=cjs --outdir=./dist & exec node --watch dist/index.js'",
-    "dev:local": "sh -c 'yarn workspace @repo/chronos dev & yarn workspace @repo/apollo-ws dev & yarn workspace @repo/cron-scripts dev & yarn workspace @repo/knx-schema dev & exec yarn dev'",
+    "dev:local": "sh -c 'yarn workspace @repo/chronos dev & yarn workspace @repo/apollo-ws dev & yarn workspace @repo/cron-scripts dev & yarn workspace @repo/db dev & yarn workspace @repo/knx-schema dev & exec yarn dev'",
     "start": "node dist/index.js",
     "build": "tsc && yarn bundle",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

@@ -1,6 +1,3 @@
-import * as mariadb from 'mariadb'
-import { config } from './config'
+import { getDbPool } from '@repo/db'
 
-const pool = mariadb.createPool({ ...config.db })
-
-export default pool
+export default getDbPool()

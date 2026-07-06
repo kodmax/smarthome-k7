@@ -1,6 +1,6 @@
 import type { Feeds, Server } from '@repo/apollo-ws'
+import { closeDbPool } from '@repo/db'
 import type { KnxLink } from 'js-knx'
-import pool from './db'
 
 let knxLink: KnxLink | undefined
 let knxCron: { stop(): void } | undefined
@@ -38,7 +38,7 @@ const closeConnections = async (): Promise<void> => {
     await knxLink.disconnect()
   }
 
-  await pool.end()
+  await closeDbPool()
 }
 
 export const setupGracefulShutdown = (): void => {

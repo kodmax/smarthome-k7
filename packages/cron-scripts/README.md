@@ -1,36 +1,42 @@
 # @repo/cron-scripts
 
-Node.js scripts run on a schedule (cron/systemd) — independent of the long-running `apps/service`.
+Scheduled job implementations for the smart home backend. KNX jobs run **inside** `apps/service` via `initKnxCronJobs()`
+— not as standalone CLI scripts.
 
-## Scripts
+## KNX jobs (via service)
 
-| File                                | Description                                        |
-| ----------------------------------- | -------------------------------------------------- |
-| `src/knx/clocks-sync.ts`            | Sync KNX system clock datapoints                   |
-| `src/knx/log-hourly-consumption.ts` | Hourly energy readings → MariaDB                   |
-| `src/knx/log-daily-consumption.ts`  | Daily energy consumption logs                      |
-| `src/knx/log-air-condition.ts`      | Temperature, humidity, CO₂ logs                    |
-| `src/tv/sony.ts`                    | Turn off Sony Bravia when there is no input signal |
+| File                                | Schedule (cron) | Description                      |
+| ----------------------------------- | --------------- | -------------------------------- |
+| `src/knx/log-daily-consumption.ts`  | `0 0 * * *`     | Daily energy consumption logs    |
+| `src/knx/clocks-sync.ts`            | `0 * * * *`     | Sync KNX system clock datapoints |
+| `src/knx/log-hourly-consumption.ts` | `0 * * * *`     | Hourly energy readings → MariaDB |
+| `src/knx/log-air-condition.ts`      | `*/15 * * * *`  | Temperature, humidity, CO₂ logs  |
 
-After building, run files from `dist/`, e.g.:
+Service wires these in [`src/knx/schedule.ts`](src/knx/schedule.ts) and starts them when KNX is enabled (`NO_CRON`
+unset).
 
-```sh
-yarn workspace @repo/cron-scripts build
-node packages/cron-scripts/dist/knx/log-hourly-consumption.js
-```
+## Standalone script
+
+| File             | Description                                        |
+| ---------------- | -------------------------------------------------- |
+| `src/tv/sony.ts` | Turn off Sony Bravia when there is no input signal |
+
+Not integrated into service yet — run manually after build if needed.
 
 ## Environment variables
 
-| Variable                                         | Scripts                            |
-| ------------------------------------------------ | ---------------------------------- |
-| `KNX_HOST`                                       | All KNX scripts                    |
-| `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_SCHEMA` | Scripts that write to the database |
-| `SONY_TV_IP`, `SONY_TV_SECRET`                   | `tv/sony.ts`                       |
+| Variable                                         | Used by                               |
+| ------------------------------------------------ | ------------------------------------- |
+| `KNX_HOST`                                       | KNX jobs (via service)                |
+| `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_SCHEMA` | Runtime pool via service → `@repo/db` |
+| `SONY_TV_IP`, `SONY_TV_SECRET`                   | `tv/sony.ts`                          |
 
-In development, `.env` is loaded via `src/config/env.ts`.
+Service loads `apps/service/.env`. For `tv/sony.ts`, development uses `.env` via `src/config/env.ts`.
 
 ## Monorepo dependencies
 
+- `@repo/chronos` — cron scheduler
+- `@repo/db` — shared MariaDB pool
 - `@repo/knx-schema` — KNX addresses (same as service)
 - `@repo/typescript-config` — TypeScript config
 
@@ -46,4 +52,4 @@ In development, `.env` is loaded via `src/config/env.ts`.
 
 ## Stack
 
-TypeScript (NodeNext/ESM), `js-knx`, MariaDB, `sony-bravia-ip-control`.
+TypeScript (NodeNext/ESM), `js-knx`, `@repo/db`, `sony-bravia-ip-control`.

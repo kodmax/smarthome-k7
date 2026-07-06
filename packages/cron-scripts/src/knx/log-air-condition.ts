@@ -1,15 +1,9 @@
-#!/usr/bin/node
 import { knxSchema } from '@repo/knx-schema'
+import { getDbPool } from '@repo/db'
 import { KnxLink } from 'js-knx'
-import * as mariadb from 'mariadb'
-import { fileURLToPath } from 'node:url'
-import { dbConfig } from '#config/db'
-import { requireEnv } from '#config/env'
-
-const pool = mariadb.createPool(dbConfig())
 
 export async function logAirCondition(knx: KnxLink): Promise<void> {
-  const db = await pool.getConnection()
+  const db = await getDbPool().getConnection()
 
   try {
     const schema = knxSchema.home
@@ -39,20 +33,6 @@ export async function logAirCondition(knx: KnxLink): Promise<void> {
       readings.map(([reading_name, reading_value]) => [timestamp, reading_name, reading_value]),
     )
   } finally {
-    await db.end()
+    await db.release()
   }
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const knx = new KnxLink(requireEnv('KNX_HOST'), { maxRetry: 3 })
-  knx.on('error', err => console.error(err))
-  knx.connect().then(async () => {
-    try {
-      await logAirCondition(knx)
-    } finally {
-      await knx.disconnect()
-    }
-
-    process.exit(0)
-  })
 }

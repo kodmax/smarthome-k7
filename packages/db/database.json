@@ -2,10 +2,10 @@
   "defaultEnv": "dev",
   "dev": {
     "driver": "mysql",
-    "host": { "ENV": "DB_HOST" },
-    "user": { "ENV": "DB_USER" },
-    "password": { "ENV": "DB_PASSWORD" },
-    "database": { "ENV": "DB_SCHEMA" },
+    "host": { "ENV": "DB_MIGRATE_HOST" },
+    "user": { "ENV": "DB_MIGRATE_USER" },
+    "password": { "ENV": "DB_MIGRATE_PASSWORD" },
+    "database": { "ENV": "DB_MIGRATE_SCHEMA" },
     "multipleStatements": true
   },
   "sql-file": true
