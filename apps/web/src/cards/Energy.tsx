@@ -21,10 +21,10 @@ export const Energy: FC<Record<string, never>> = () => {
     )
   }
 
-  const grossPrice = +feed.cost.rates.distribution + +feed.cost.rates.energy * feed.cost.rates.vat
-  const cost = (feed.meter.reading.value / 1000) * grossPrice
-  const meterReading = feed.total.adjusted / 1000
+  const grossPrice = (feed.cost.rates.distribution + feed.cost.rates.energy) * feed.cost.rates.vat
+  const cost = (feed.meter.reading.value / 1000) * grossPrice + feed.cost.rates.added
 
+  const avgDailyConsumption = feed.cost.avg / 1000
   const avgMonthlyConsumption = (feed.cost.avg * 30) / 1000
   const avgMonthlyCost =
     (avgMonthlyConsumption * (+feed.cost.rates.distribution + +feed.cost.rates.energy) + feed.cost.rates.added) *
@@ -48,12 +48,8 @@ export const Energy: FC<Record<string, never>> = () => {
                 {!zoom.active ? null : (
                   <>
                     <Reading
-                      title='Stan licznika'
-                      copy={Number(meterReading).toFixed(2).replace('.', ',')}
-                      displayValue={Number(meterReading).toLocaleString('en-PL', {
-                        maximumFractionDigits: 2,
-                        minimumFractionDigits: 2,
-                      })}
+                      title='Śr. zużycie dzienne'
+                      displayValue={Number(avgDailyConsumption).toLocaleString('en-PL', { maximumFractionDigits: 1 })}
                       unit='kWh'
                     />
                     <Reading
@@ -65,8 +61,15 @@ export const Energy: FC<Record<string, never>> = () => {
                       })}
                       unit='zł/kWh'
                     />
-                    <KnxReading feed={feed.meter} label='Meter energy' />
-                    <Reading title='Meter cost' displayValue={Number(cost).toFixed(4).replace('.', ',')} unit='PLN' />
+                    <Reading
+                      title='Opłata stała'
+                      displayValue={Number(feed.cost.rates.added * feed.cost.rates.vat)
+                        .toFixed(2)
+                        .replace('.', ',')}
+                      unit='PLN'
+                    />
+                    <KnxReading feed={feed.meter} label='Pomiar' />
+                    <Reading title='Koszt' displayValue={Number(cost).toFixed(4).replace('.', ',')} unit='PLN' />
                   </>
                 )}
                 {zoom.active ? null : (

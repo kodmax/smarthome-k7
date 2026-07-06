@@ -1,8 +1,8 @@
 import { EnergyRates } from '@repo/types'
 
 export const energyRates: EnergyRates = {
-  added: 33.8,
-  distribution: '0.16036',
-  energy: '0.5376',
+  added: 206.46 / 6,
+  distribution: 0.2619,
+  energy: 0.505,
   vat: 1.23,
 }

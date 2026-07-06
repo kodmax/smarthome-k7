@@ -1,5 +1,4 @@
 export { avgDailyConsumption } from './avgDailyConsumption'
-export { calculateCost } from './calculateCost'
 export { dayStart } from './dayStart'
 export { daysBetweenReadings } from './daysBetweenReadings'
 export { energyRates } from './energyRates'

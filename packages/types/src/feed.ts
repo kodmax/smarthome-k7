@@ -4,8 +4,8 @@ export { KnxReading as KnxReadingType }
 
 export type EnergyRates = {
   added: number
-  distribution: string
-  energy: string
+  distribution: number
+  energy: number
   vat: number
 }
 
