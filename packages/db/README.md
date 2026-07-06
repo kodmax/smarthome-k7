@@ -1,8 +1,10 @@
 # @repo/db
 
-MariaDB for the `apollo` database: schema migrations (`db-migrate`) and a shared runtime connection pool.
+MariaDB for the `apollo` database: SQL migrations and a shared runtime connection pool.
 
 Used by `apps/service` (reads + weather writes) and `@repo/cron-scripts` (KNX logging).
+
+Migration tooling is a small Node script on `mariadb` only — no `db-migrate`, no native `ssh2`/`cpu-features` (works on Raspberry Pi).
 
 ## Runtime API
 
@@ -57,7 +59,7 @@ yarn workspace @repo/db db:migrate
 | `db:migrate` | Apply pending migrations |
 | `db:rollback` | Revert last migration (**destructive** on `down`) |
 | `db:status` | Check migration state |
-| `db:create <name> -- --sql-file` | Scaffold a new SQL migration |
+| `db:create <name>` | Scaffold new SQL migration files |
 
 From repo root, shorthand:
 
@@ -68,22 +70,22 @@ yarn db:migrate
 ## New migration
 
 ```sh
-yarn workspace @repo/db db:create add-meter-total -- --sql-file
+yarn workspace @repo/db db:create add-meter-total
 ```
 
 Edit `migrations/sqls/<timestamp>-add-meter-total-up.sql` and `-down.sql`, then `db:migrate`.
 
 ## Existing production database
 
-The initial migration uses `CREATE TABLE IF NOT EXISTS`. First `db:migrate` on a DB that already has tables is safe — db-migrate records the version in the `migrations` table.
+The initial migration uses `CREATE TABLE IF NOT EXISTS`. First `db:migrate` on a DB that already has tables is safe — applied versions are recorded in the `migrations` table (compatible with prior db-migrate runs).
 
 ## Layout
 
 ```
-src/              # runtime (getDbPool, closeDbPool)
-database.json
+scripts/migrate.js   # migration CLI (up / down / status / create)
+src/                 # runtime (getDbPool, closeDbPool)
 migrations/
-  <timestamp>-<name>.js      # thin wrapper → runSqlFile
+  <timestamp>-<name>.js      # optional marker file
   sqls/
     <timestamp>-<name>-up.sql
     <timestamp>-<name>-down.sql

@@ -68,9 +68,9 @@ Entry point: `src/index.ts`.
 
 ## Database migrations
 
-Schema DDL and migration tooling live in [`packages/db`](packages/db) (`@repo/db`, db-migrate). Runtime pool uses `DB_*`
-in this `.env`; migrations use `DB_MIGRATE_*` in `packages/db/.env`. Copy `packages/db/.env.example` → `.env` —
-credentials are independent from service (you can use a DDL user for migrations).
+Schema DDL and migration tooling live in [`packages/db`](packages/db) (`@repo/db`). Runtime pool uses `DB_*` in this
+`.env`; migrations use `DB_MIGRATE_*` in `packages/db/.env`. Copy `packages/db/.env.example` → `.env` — credentials are
+independent from service (you can use a DDL user for migrations).
 
 ```sh
 yarn workspace @repo/db db:migrate

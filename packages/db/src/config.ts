@@ -7,7 +7,7 @@ const requireEnv = (name: string): string => {
   return value
 }
 
-/** Runtime pool — DB_* from apps/service/.env (not DB_MIGRATE_* used by db-migrate). */
+/** Runtime pool — DB_* from apps/service/.env (not DB_MIGRATE_* used by migrations). */
 export const getDbConfig = () => ({
   host: requireEnv('DB_HOST'),
   user: requireEnv('DB_USER'),
