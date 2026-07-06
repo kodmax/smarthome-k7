@@ -2,7 +2,7 @@ import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../../DateTime'
 import db from '../../db'
 import { EnergyHourConsumption } from '@repo/types'
-import { dayStart, getStartOfDayReading } from './helpers'
+import { dayStart, getStartOfDayReading, METER_TOTAL_READING } from './helpers'
 
 export const source: DataSourceDefinition<{ date: string; bars: EnergyHourConsumption[]; startOfDayValue: number }> = {
   cron: '1 * * * *',
@@ -17,8 +17,19 @@ export const source: DataSourceDefinition<{ date: string; bars: EnergyHourConsum
       const startOfDayValue = await getStartOfDayReading(conn, today, yesterday)
 
       const bars = await conn.query(
-        'select hour(datetime) as hour, hourly_consumption from energy_readings where datetime >= ? and hourly_consumption is not null',
-        [dayStart(today)],
+        `select
+            hour(date_sub(timestamp, interval 1 hour)) as hour,
+            hourly_consumption
+          from (
+            select
+              timestamp,
+              reading_value - lag(reading_value) over (order by timestamp) as hourly_consumption
+            from readings
+            where reading_name = ?
+              and timestamp >= ?
+          ) as deltas
+          where hourly_consumption is not null`,
+        [METER_TOTAL_READING, dayStart(today)],
       )
 
       return {

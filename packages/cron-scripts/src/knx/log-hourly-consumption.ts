@@ -2,6 +2,8 @@ import { knxSchema } from '@repo/knx-schema'
 import { getDbPool } from '@repo/db'
 import { KnxLink } from 'js-knx'
 
+const METER_TOTAL_READING = 'meter_total'
+
 export async function logHourlyConsumption(knx: KnxLink): Promise<void> {
   const now = new Date().getTime() - new Date().getTimezoneOffset() * 60_000
   const db = await getDbPool().getConnection()
@@ -12,16 +14,12 @@ export async function logHourlyConsumption(knx: KnxLink): Promise<void> {
 
   try {
     const total = await knx.getDatapoint(knxSchema.home.energy.consumption.meterTotalReading).read()
-    const prevHour = new Date(now - (now % 3_600_000) - 3_600_000)
     const thisHour = new Date(now - (now % 3_600_000))
 
-    await db.query('insert into energy_readings (datetime, hour_start_reading) values (?, ?)', [
+    await db.query('insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)', [
       thisHour.toISOString().substring(0, 19),
+      METER_TOTAL_READING,
       total.value,
-    ])
-    await db.query('update energy_readings set hourly_consumption = ? - hour_start_reading where datetime = ?', [
-      total.value,
-      prevHour.toISOString().substring(0, 19),
     ])
   } finally {
     await db.release()
