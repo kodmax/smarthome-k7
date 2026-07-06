@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "smarthome-mariadb": {
+      "command": "node",
+      "args": ["/Users/marcin/coding/smarthome-k7/.cursor/mcp-mariadb.mjs"]
+    }
+  }
+}

@@ -60,3 +60,31 @@ Copy `.env.example` and fill in:
 | `@repo/types`      | Feed payload type contracts            |
 
 Entry point: `src/index.ts`.
+
+## MCP / agent access to MariaDB
+
+Cursor can query the database via [mysql-mcp-server](https://github.com/askdba/mysql-mcp-server) (read-only by default).
+
+```sh
+brew install askdba/tap/mysql-mcp-server
+cp .cursor/mcp.json.example .cursor/mcp.json
+chmod +x .cursor/mcp-mariadb.sh
+```
+
+The launcher [`.cursor/mcp-mariadb.mjs`](../.cursor/mcp-mariadb.mjs) verifies credentials with the same `mariadb` driver
+as service, then starts `mysql-mcp-server` from a generated YAML config (avoids passing `%`-encoded DSN via env).
+Credentials are read from `apps/service/.env` by [`.cursor/mcp-dsn.py`](../.cursor/mcp-dsn.py). Optional `DB_MCP_*`
+overrides apply. Enable the server in **Cursor Settings → MCP** and restart Cursor.
+
+### Troubleshooting: `no route to host`
+
+If `ping 192.168.1.2` works in Terminal but MCP logs `connect: no route to host`, Cursor likely blocks private LAN IPs
+in its sandbox (RFC 1918). This repo’s [`.cursor/sandbox.json`](../.cursor/sandbox.json) allows `192.168.1.0/24` —
+**restart Cursor** after changing it, then toggle MCP off/on.
+
+Also check **System Settings → Privacy & Security → Local Network** — Cursor must be allowed (toggle off/on if needed).
+
+MCP connects from the Mac to `DB_HOST` (or `DB_MCP_HOST`). Error `dial tcp …: no route to host` with working Terminal
+ping usually means Cursor sandbox or Local Network permission, not MariaDB config.
+
+**Away from home:** SSH tunnel + `DB_MCP_HOST=127.0.0.1` (add `127.0.0.0/8` to sandbox allow if needed).
