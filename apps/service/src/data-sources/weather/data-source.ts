@@ -25,12 +25,14 @@ export const source: DataSourceDefinition<WeatherFeed> = {
     const datetime = DateTime.now()
     const conn = await db.getConnection()
     try {
-      await conn.query('insert into outdoor_temp (datetime, value) values (?, ?)', [
+      await conn.query('insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)', [
         datetime.getDateTime(),
+        'outdoor_temp',
         instant.temp,
       ])
-      await conn.query('insert into pressure (datetime, pressure) values (?, ?)', [
+      await conn.query('insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)', [
         datetime.getDateTime(),
+        'air_pressure',
         instant.pressure,
       ])
 
@@ -44,13 +46,27 @@ export const source: DataSourceDefinition<WeatherFeed> = {
 
       return {
         outdoorTemp: await conn.query(
-          'select hour(datetime) as hour, avg(value) as value from outdoor_temp where datetime >= ? group by hour(datetime) order by hour(datetime);',
+          `select
+              hour(timestamp) as hour,
+              avg(reading_value) as value
+              from readings
+              where timestamp >= ?
+                and reading_name = 'outdoor_temp'
+              group by hour(timestamp)
+              order by hour(timestamp)`,
           [datetime.getDate()],
         ),
         pressure: {
-          week: await conn.query('select * from pressure where datetime >= ? order by datetime', [
-            DateTime.shift(-14, CacheAgeUnit.DAYS).getDateTime(),
-          ]),
+          week: await conn.query(
+            `select
+                reading_value as pressure,
+                timestamp as datetime
+                from readings
+                where timestamp >= ?
+                  and reading_name = 'air_pressure'
+                order by timestamp`,
+            [DateTime.shift(-14, CacheAgeUnit.DAYS).getDateTime()],
+          ),
           instant: instant.pressure,
         },
         sunTimes,
