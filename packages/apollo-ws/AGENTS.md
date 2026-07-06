@@ -82,4 +82,4 @@ yarn lint
 ## Tests still to add (P4)
 
 `Feeds.test.ts` covers data-source registration. Still missing: `DataSource`, `Server` protocol/debounce,
-`Cache`/`CacheEntry`, `Chronos` scheduling and `stop()`.
+`Cache`/`CacheEntry`. Cron scheduling lives in `@repo/chronos`.

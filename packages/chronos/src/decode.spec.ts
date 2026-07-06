@@ -1,4 +1,5 @@
-import { CronDayOfWeek, CronMonth, decode } from './decode'
+import { CronDayOfWeek, CronMonth } from './constants'
+import { decode } from './decode'
 import { describe, it, expect } from 'vitest'
 
 describe('Chronos decode', () => {

@@ -1,27 +1,25 @@
-import { ApolloEvents } from '../ApolloEvents'
-import { CronDayOfWeek, CronMonth, decode } from './decode'
-
-export type Worker = () => Promise<void>
-
-enum JobState {
-  RUNNING,
-  ERROR,
-  IDLE,
-}
-
-type Job = {
-  when: number[][]
-  state: JobState
-  script: Worker
-  id: string
-}
+import {
+  CRON_DAY_OF_MONTH,
+  CRON_DAY_OF_WEEK,
+  CRON_HOUR,
+  CRON_MINUTE,
+  CRON_MONTH,
+  CronDayOfWeek,
+  CronMonth,
+  LOG_PRIORITY_INFO,
+  LOG_PRIORITY_WARN,
+  TICK_INTERVAL_MS,
+  TICK_LEAD_MS,
+} from './constants'
+import { decode } from './decode'
+import { Job, JobState, Worker, ChronosLogger } from './types'
 
 export class Chronos {
   private jobs: Job[] = []
   private tickTimeout: NodeJS.Timeout | undefined
   private stopped = false
 
-  public constructor(private readonly vent?: ApolloEvents) {
+  public constructor(private readonly log?: ChronosLogger) {
     this.next()
   }
 
@@ -30,12 +28,13 @@ export class Chronos {
       return
     }
 
-    const interval = 60000
-
     /**
      * Not more often than once a minute. Each tick is adjusted to hit the start of the next minute
      */
-    this.tickTimeout = setTimeout(() => this.tick(new Date()), 5000 + interval - (new Date().getTime() % interval))
+    this.tickTimeout = setTimeout(
+      () => this.tick(new Date()),
+      TICK_LEAD_MS + TICK_INTERVAL_MS - (new Date().getTime() % TICK_INTERVAL_MS),
+    )
   }
 
   private tick(now: Date): void {
@@ -57,20 +56,20 @@ export class Chronos {
         job.when[4].includes(dw)
       ) {
         if (job.state === JobState.RUNNING) {
-          this.vent?.emit('sys-log', 3, `Crontab job <${job.id}> still running, skiping execution`)
+          this.log?.(LOG_PRIORITY_WARN, `Crontab job <${job.id}> still running, skiping execution`)
         } else {
-          this.vent?.emit('sys-log', 4, `Crontab job <${job.id}> starting`)
+          this.log?.(LOG_PRIORITY_INFO, `Crontab job <${job.id}> starting`)
           job.state = JobState.RUNNING
 
           job
             .script()
             .then(() => {
               job.state = JobState.IDLE
-              this.vent?.emit('sys-log', 4, `Crontab job <${job.id}> completed successfully`)
+              this.log?.(LOG_PRIORITY_INFO, `Crontab job <${job.id}> completed successfully`)
             })
             .catch(e => {
               job.state = JobState.ERROR
-              this.vent?.emit('sys-log', 3, `Crontab job <${job.id}> error: ${e}`)
+              this.log?.(LOG_PRIORITY_WARN, `Crontab job <${job.id}> error: ${e}`)
             })
         }
       }
@@ -84,11 +83,11 @@ export class Chronos {
 
     this.jobs.push({
       when: [
-        decode(nn, 0, 59),
-        decode(hh, 0, 23),
-        decode(dm, 1, 31),
-        decode(mm, 1, 12, CronMonth),
-        decode(dw, 0, 6, CronDayOfWeek),
+        decode(nn, CRON_MINUTE.min, CRON_MINUTE.max),
+        decode(hh, CRON_HOUR.min, CRON_HOUR.max),
+        decode(dm, CRON_DAY_OF_MONTH.min, CRON_DAY_OF_MONTH.max),
+        decode(mm, CRON_MONTH.min, CRON_MONTH.max, CronMonth),
+        decode(dw, CRON_DAY_OF_WEEK.min, CRON_DAY_OF_WEEK.max, CronDayOfWeek),
       ],
       state: JobState.IDLE,
       script,

@@ -1,7 +1,7 @@
 {
-  "name": "@repo/apollo-ws",
-  "version": "4.1.0",
-  "description": "Real-time feed framework — WebSocket server, data source registry, file cache, and update broadcast.",
+  "name": "@repo/chronos",
+  "version": "1.0.0",
+  "description": "Minute-resolution cron scheduler for Node.js.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -22,13 +22,8 @@
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "@types/node": "^17.0.35",
-    "@types/ws": "^8.5.3",
     "eslint": "^8.57.0",
     "typescript": "5.5.4",
     "vitest": "^4.1.8"
-  },
-  "dependencies": {
-    "@repo/chronos": "*",
-    "ws": "^8.7.0"
   }
 }

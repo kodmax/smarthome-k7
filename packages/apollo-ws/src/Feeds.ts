@@ -1,5 +1,5 @@
+import { Chronos } from '@repo/chronos'
 import { DataSource, DSCT, DataSourceDefinition } from './DataSource'
-import { Chronos } from './chronos'
 import { Cache } from './cache'
 import type { Feed, FeedCb, FeedSources, SourceDataTypes, SourceRegistration } from './Feeds.types'
 import { ApolloEvents } from './ApolloEvents'
@@ -18,7 +18,7 @@ export class Feeds {
     private cache: Cache,
     private vent: ApolloEvents,
   ) {
-    this.chronos = new Chronos(vent)
+    this.chronos = new Chronos((priority, msg) => this.vent.emit('sys-log', priority, msg))
 
     this.vent.on('feeds-request', feedsIds => {
       for (const id of feedsIds) {

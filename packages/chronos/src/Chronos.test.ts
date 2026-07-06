@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ApolloEvents } from '../ApolloEvents'
 import { Chronos } from './Chronos'
 
 describe('Chronos', () => {
@@ -28,15 +27,14 @@ describe('Chronos', () => {
 
   it('skips execution when the previous run is still in progress', async () => {
     const skipLogs: string[] = []
-    const vent = new ApolloEvents()
-    vent.on('sys-log', (priority, msg) => {
+    const log = (priority: number, msg: string) => {
       if (priority === 3) {
         skipLogs.push(msg)
       }
-    })
+    }
 
     const script = vi.fn(() => new Promise<void>(() => {}))
-    chronos = new Chronos(vent)
+    chronos = new Chronos(log)
     chronos.addJob('* * * * *', 'slow', script)
 
     await vi.advanceTimersByTimeAsync(10_000)
