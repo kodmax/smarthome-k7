@@ -16,7 +16,7 @@ export const source: DataSourceDefinition<{ date: string; today: Co2HistoryRecor
           `select
               hour(timestamp) as hour,
               avg(reading_value) as value
-              from indoor_readings
+              from readings
               where timestamp >= ?
                 and reading_name = 'humidity'
               group by hour(timestamp)

@@ -15,11 +15,11 @@ export async function logHourlyConsumption(knx: KnxLink): Promise<void> {
     const prevHour = new Date(now - (now % 3_600_000) - 3_600_000)
     const thisHour = new Date(now - (now % 3_600_000))
 
-    await db.query('insert into hourly_energy_readings (datetime, hour_start_reading) values (?, ?)', [
+    await db.query('insert into energy_readings (datetime, hour_start_reading) values (?, ?)', [
       thisHour.toISOString().substring(0, 19),
       total.value,
     ])
-    await db.query('update hourly_energy_readings set hourly_consumption = ? - hour_start_reading where datetime = ?', [
+    await db.query('update energy_readings set hourly_consumption = ? - hour_start_reading where datetime = ?', [
       total.value,
       prevHour.toISOString().substring(0, 19),
     ])

@@ -42,7 +42,7 @@ export const source: DataSourceDefinition<TempHistory> = {
               reading_name,
               hour(timestamp) as hour,
               avg(reading_value) as value
-              from indoor_readings
+              from readings
               where timestamp >= ?
                 and reading_name in ('bathroom_floor_temp', 'bedroom_temp', 'livingroom_temp', 'bathroom_temp')
               group by reading_name, hour(timestamp)

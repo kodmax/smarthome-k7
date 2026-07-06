@@ -17,7 +17,7 @@ export const source: DataSourceDefinition<{ date: string; bars: EnergyHourConsum
       const startOfDayValue = await getStartOfDayReading(conn, today, yesterday)
 
       const bars = await conn.query(
-        'select hour(datetime) as hour, hourly_consumption from hourly_energy_readings where datetime >= ? and hourly_consumption is not null',
+        'select hour(datetime) as hour, hourly_consumption from energy_readings where datetime >= ? and hourly_consumption is not null',
         [dayStart(today)],
       )
 

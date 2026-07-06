@@ -29,7 +29,7 @@ export async function logAirCondition(knx: KnxLink): Promise<void> {
     ]
 
     await db.batch(
-      'insert into indoor_readings (timestamp, reading_name, reading_value) values (?, ?, ?)',
+      'insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)',
       readings.map(([reading_name, reading_value]) => [timestamp, reading_name, reading_value]),
     )
   } finally {
