@@ -22,7 +22,7 @@ export const source: DataSourceDefinition<WeatherFeed> = {
       parseAirQuality(),
     ])
 
-    const datetime = new DateTime()
+    const datetime = DateTime.now()
     const conn = await db.getConnection()
     try {
       await conn.query('insert into outdoor_temp (datetime, value) values (?, ?)', [
@@ -49,7 +49,7 @@ export const source: DataSourceDefinition<WeatherFeed> = {
         ),
         pressure: {
           week: await conn.query('select * from pressure where datetime >= ? order by datetime', [
-            new DateTime(-14, CacheAgeUnit.DAYS).getDateTime(),
+            DateTime.shift(-14, CacheAgeUnit.DAYS).getDateTime(),
           ]),
           instant: instant.pressure,
         },

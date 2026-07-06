@@ -21,9 +21,9 @@ export const source: DataSourceDefinition<{ date: string; today: Co2HistoryRecor
                 and reading_name = 'co2'
               group by hour(timestamp)
               order by hour(timestamp) ASC`,
-          [new DateTime().getDate()],
+          [DateTime.now().getDate()],
         ),
-        date: new DateTime().getDate(),
+        date: DateTime.now().getDate(),
       }
     } finally {
       conn.release()

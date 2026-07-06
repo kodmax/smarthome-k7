@@ -47,7 +47,7 @@ export const source: DataSourceDefinition<TempHistory> = {
                 and reading_name in ('bathroom_floor_temp', 'bedroom_temp', 'livingroom_temp', 'bathroom_temp')
               group by reading_name, hour(timestamp)
               order by reading_name, hour(timestamp) ASC`,
-        [new DateTime().getDate()],
+        [DateTime.now().getDate()],
       )) as HistoryRecord[]
 
       const result: TempHistory = {

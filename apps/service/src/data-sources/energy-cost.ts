@@ -14,11 +14,11 @@ export const source: DataSourceDefinition<EnergyCost> = {
   cron: '0 0 * * *',
   id: 'energy-cost',
 
-  expired: snapshot => (snapshot.getContent() as EnergyCost).datetime !== new DateTime().getDate(),
+  expired: snapshot => (snapshot.getContent() as EnergyCost).datetime !== DateTime.now().getDate(),
   script: async () => {
     const conn = await db.getConnection()
     try {
-      const from = new DateTime(-30, CacheAgeUnit.DAYS)
+      const from = DateTime.shift(-30, CacheAgeUnit.DAYS)
       const avg = +Number(
         (
           await conn.query('select avg(daily_consumption) as avg from daily_energy_readings where date > ?', [
@@ -29,7 +29,7 @@ export const source: DataSourceDefinition<EnergyCost> = {
 
       return {
         // bill: Number((+cost.distribution + +cost.energy) * +avg).toFixed(2),
-        datetime: new DateTime().getDate(),
+        datetime: DateTime.now().getDate(),
         rates: energyRates,
         avg,
       }

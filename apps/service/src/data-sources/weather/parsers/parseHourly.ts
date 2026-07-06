@@ -5,6 +5,7 @@ import { basename } from 'path'
 import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
 import DateTime from '@/DateTime'
+import { CacheAgeUnit } from '@repo/apollo-ws'
 
 export const parseHourlyFromDocument = (
   document: Document,
@@ -28,6 +29,7 @@ export const parseHourlyFromDocument = (
         temp: requireText(hour, '.temp.metric', 'hourly forecast hour').replace(/[^\d-]/g, ''),
         precip: requireText(hour, '.precip', 'hourly forecast hour'),
         hour: requireText(hour, '.date', 'hourly forecast hour'),
+        date,
       }
 
       const sunPosition = suncalc.getPosition(new Date(`${date} ${forecast.hour}:00:00`), latitude, longitude)
@@ -43,16 +45,17 @@ export const parseHourlyFromDocument = (
   })
 
 export const parseHourly = async (latitude: number, longitude: number): Promise<HourWeatherForecast[]> => {
-  console.log(new DateTime().getDate(), new DateTime(24).getDate())
+  const todayDate = DateTime.now()
+  const tomorrowDate = todayDate.shifted(1, CacheAgeUnit.DAYS)
   const today = parseHourlyFromDocument(
     await fetchDocument(weatherPageUrls.hourly),
-    new DateTime().getDate(),
+    todayDate.getDate(),
     latitude,
     longitude,
   )
   const tomorrow = parseHourlyFromDocument(
     await fetchDocument(weatherPageUrls.tomorrowHourly),
-    new DateTime(24).getDate(),
+    tomorrowDate.getDate(),
     latitude,
     longitude,
   )

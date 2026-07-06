@@ -15,7 +15,9 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
         <ForecastRow>
           <ZoomContext.Consumer>
             {zoom =>
-              forecast?.hourly.map((fc: HourWeatherForecast) => <Hour key={fc.hour} fc={fc} zoom={zoom.active} />)
+              forecast?.hourly.map((fc: HourWeatherForecast) => (
+                <Hour key={`${fc.date}-${fc.hour}`} fc={fc} zoom={zoom.active} />
+              ))
             }
           </ZoomContext.Consumer>
         </ForecastRow>

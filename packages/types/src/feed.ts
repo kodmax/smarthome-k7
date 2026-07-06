@@ -124,6 +124,7 @@ export type HourWeatherForecast = {
   temp: string
   icon: string
   hour: string
+  date: string
   sun: {
     altitude: number
     azimuth: number

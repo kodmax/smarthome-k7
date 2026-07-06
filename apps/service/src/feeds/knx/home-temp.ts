@@ -22,7 +22,7 @@ export const addHomeTempFeed = (feeds: Feeds, knx: KnxLink, feed: string, schema
       ({ reading, setpoint, indoorTempHistory }) => ({
         reading,
         history: {
-          date: new DateTime().getDate(),
+          date: DateTime.now().getDate(),
           today: indoorTempHistory[schema.history],
         },
         setpoint: setpoint.value.toFixed(1),
@@ -34,7 +34,7 @@ export const addHomeTempFeed = (feeds: Feeds, knx: KnxLink, feed: string, schema
   feeds.addFeed(`home.temp.${feed}`, { reading, indoorTempHistory }, ({ reading, indoorTempHistory }) => ({
     reading,
     history: {
-      date: new DateTime().getDate(),
+      date: DateTime.now().getDate(),
       today: indoorTempHistory[schema.history],
     },
   }))

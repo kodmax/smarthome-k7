@@ -17,12 +17,12 @@ export const source: DataSourceDefinition<{ date: string; bars: EnergyHourConsum
 
       const bars = await conn.query(
         'SELECT hour, hourly_consumption FROM hourly_energy_readings WHERE Date(datetime) = ? and hourly_consumption is not null',
-        [new DateTime().getDate()],
+        [DateTime.now().getDate()],
       )
 
       return {
         startOfDayValue: startOfDayRecord[0].total_reading,
-        date: new DateTime().getDate(),
+        date: DateTime.now().getDate(),
         bars,
       }
     } finally {

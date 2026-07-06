@@ -2,12 +2,18 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseHTML } from 'linkedom'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { fetchDocument } from '@/fetch'
 import { parseAirQualityFromDocument } from './parseAirQuality'
 import { parseAllergensFromDocument } from './parseAllergens'
 import { parseForecastFromDocument } from './parseForecast'
-import { parseHourlyFromDocument } from './parseHourly'
+import { parseHourly, parseHourlyFromDocument } from './parseHourly'
 import { parseInstantFromDocument } from './parseInstant'
+import { weatherPageUrls } from '../urls'
+
+vi.mock('@/fetch', () => ({
+  fetchDocument: vi.fn(),
+}))
 
 const fixturesDir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
 
@@ -91,6 +97,7 @@ describe('weather parsers', () => {
     const [hour] = parseHourlyFromDocument(loadDocument('hourly.html'), '2026-06-28', 52.23, 21.01)
 
     expect(hour).toMatchObject({
+      date: '2026-06-28',
       hour: '14',
       temp: '21',
       precip: '10%',
@@ -99,6 +106,12 @@ describe('weather parsers', () => {
     })
     expect(Number.isFinite(hour.sun.altitude)).toBe(true)
     expect(Number.isFinite(hour.sun.azimuth)).toBe(true)
+  })
+
+  it('parseHourly attaches passed date to every hour', () => {
+    const hours = parseHourlyFromDocument(loadDocument('hourly.html'), '2026-06-28', 52.23, 21.01)
+
+    expect(hours.every(hour => hour.date === '2026-06-28')).toBe(true)
   })
 
   it('parseHourly throws when hourly wrapper is empty', () => {
@@ -144,5 +157,41 @@ describe('weather parsers', () => {
     expect(() => parseAirQualityFromDocument(document)).toThrow(
       'weather: no elements matched "#pollutants .air-quality-pollutant" in air quality pollutants',
     )
+  })
+})
+
+describe('parseHourly', () => {
+  const fixedNow = new Date('2025-06-28T14:30:45.123Z')
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(fixedNow)
+    vi.mocked(fetchDocument).mockImplementation(async url => {
+      if (url === weatherPageUrls.hourly || url === weatherPageUrls.tomorrowHourly) {
+        return loadDocument('hourly.html')
+      }
+
+      throw new Error(`unexpected url: ${url}`)
+    })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
+  it('combines today and tomorrow hourly forecasts with distinct dates', async () => {
+    const result = await parseHourly(52.23, 21.01)
+
+    expect(result).toHaveLength(2)
+    expect(result[0]).toMatchObject({ date: '2025-06-28', hour: '14' })
+    expect(result[1]).toMatchObject({ date: '2025-06-29', hour: '14' })
+  })
+
+  it('fetches today and tomorrow hourly pages', async () => {
+    await parseHourly(52.23, 21.01)
+
+    expect(fetchDocument).toHaveBeenCalledWith(weatherPageUrls.hourly)
+    expect(fetchDocument).toHaveBeenCalledWith(weatherPageUrls.tomorrowHourly)
   })
 })

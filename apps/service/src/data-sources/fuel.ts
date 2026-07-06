@@ -25,8 +25,8 @@ export const source: DataSourceDefinition<FuelPricesFeed> = {
           }),
         )
 
-        const timeWindow = new DateTime(-30, CacheAgeUnit.DAYS).getDateTime()
-        const now = new DateTime().getDateTime()
+        const timeWindow = DateTime.shift(-30, CacheAgeUnit.DAYS).getDateTime()
+        const now = DateTime.now().getDateTime()
         const conn = await db.getConnection()
 
         const prices: FuelPricesFeed = {}
