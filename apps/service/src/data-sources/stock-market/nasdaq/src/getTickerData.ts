@@ -8,7 +8,6 @@ export const getTickerData = async (ticker: string): Promise<NasdaqTickerData> =
     ticker,
     exchange: info.exchange,
     title: info.companyName,
-    marketStatus: info.marketStatus,
     price: {
       lastTradeTimestamp: info.primaryData.lastTradeTimestamp,
       lastTradePrice: +info.primaryData.lastSalePrice.replaceAll(/^\$|,/g, ''),

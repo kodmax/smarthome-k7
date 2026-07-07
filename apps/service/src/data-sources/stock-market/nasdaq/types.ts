@@ -1,10 +1,9 @@
-import { MarketInfo, MarketStatus } from '@repo/types'
+import { MarketInfo } from '@repo/types'
 
 export type NasdaqTickerData = {
   ticker: string
   title: string
   exchange: 'NASDAQ-GS' | 'NYSE'
-  marketStatus: MarketStatus
   price: {
     lastTradeTimestamp: string
     lastTradePrice: number

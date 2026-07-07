@@ -38,10 +38,7 @@ export type TickerData = {
   symbol: string
   title: string
   marketCap: number
-  exchange: {
-    name: 'NASDAQ-GS' | 'NYSE'
-    status: MarketStatus
-  }
+  exchange: 'NASDAQ-GS' | 'NYSE'
   price: {
     lastTradeTimestamp: string
     lastTradePrice: number
@@ -70,20 +67,14 @@ export type MarketInfo = {
   countdown: string
   marketCountdown: string
   isBusinessDay: boolean
-  previousTradeDate: string
-  nextTradeDate: string
-  preMarketOpeningTime: string
-  preMarketClosingTime: string
-  marketOpeningTime: string
-  marketClosingTime: string
-  afterHoursMarketOpeningTime: string
-  afterHoursMarketClosingTime: string
-  schedule: {
-    preMarketOpen: string
-    marketOpen: string
-    marketClose: string
-    afterHoursClose: string
-  }
+  previousTradeDate: number
+  nextTradeDate: number
+  preMarketOpeningTime: number
+  preMarketClosingTime: number
+  marketOpeningTime: number
+  marketClosingTime: number
+  afterHoursMarketOpeningTime: number
+  afterHoursMarketClosingTime: number
 }
 
 export type StockMarketFeed = {

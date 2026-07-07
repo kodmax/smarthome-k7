@@ -1,5 +1,6 @@
 import { NasdaqApiMarketInfo, NasdaqApiResponse } from './types'
 import { NasdaqMarketInfo } from '../types'
+import { parseNasdaqEasternDisplay, parseNasdaqTradeDate } from './parseNasdaqEastern'
 
 export const getMarketInfo = async (): Promise<NasdaqMarketInfo> => {
   const req = await fetch('https://api.nasdaq.com/api/market-info', {
@@ -29,19 +30,13 @@ export const getMarketInfo = async (): Promise<NasdaqMarketInfo> => {
     countdown: resp.data.mrktCountDown,
     marketCountdown: resp.data.marketCountDown,
     isBusinessDay: resp.data.isBusinessDay,
-    previousTradeDate: resp.data.previousTradeDate,
-    nextTradeDate: resp.data.nextTradeDate,
-    preMarketOpeningTime: resp.data.preMarketOpeningTime,
-    preMarketClosingTime: resp.data.preMarketClosingTime,
-    marketOpeningTime: resp.data.marketOpeningTime,
-    marketClosingTime: resp.data.marketClosingTime,
-    afterHoursMarketOpeningTime: resp.data.afterHoursMarketOpeningTime,
-    afterHoursMarketClosingTime: resp.data.afterHoursMarketClosingTime,
-    schedule: {
-      preMarketOpen: resp.data.pmOpenRaw,
-      marketOpen: resp.data.openRaw,
-      marketClose: resp.data.closeRaw,
-      afterHoursClose: resp.data.ahCloseRaw,
-    },
+    previousTradeDate: parseNasdaqTradeDate(resp.data.previousTradeDate),
+    nextTradeDate: parseNasdaqTradeDate(resp.data.nextTradeDate),
+    preMarketOpeningTime: parseNasdaqEasternDisplay(resp.data.preMarketOpeningTime),
+    preMarketClosingTime: parseNasdaqEasternDisplay(resp.data.preMarketClosingTime),
+    marketOpeningTime: parseNasdaqEasternDisplay(resp.data.marketOpeningTime),
+    marketClosingTime: parseNasdaqEasternDisplay(resp.data.marketClosingTime),
+    afterHoursMarketOpeningTime: parseNasdaqEasternDisplay(resp.data.afterHoursMarketOpeningTime),
+    afterHoursMarketClosingTime: parseNasdaqEasternDisplay(resp.data.afterHoursMarketClosingTime),
   }
 }

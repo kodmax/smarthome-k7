@@ -14,20 +14,14 @@ const defaultMarketInfo: MarketInfo = {
   countdown: 'Closes in 6H 30M',
   marketCountdown: 'Market Closes in 6H 30M',
   isBusinessDay: true,
-  previousTradeDate: 'Jul 6, 2026',
-  nextTradeDate: 'Jul 8, 2026',
-  preMarketOpeningTime: 'Jul 7, 2026 04:00 AM ET',
-  preMarketClosingTime: 'Jul 7, 2026 09:30 AM ET',
-  marketOpeningTime: 'Jul 7, 2026 09:30 AM ET',
-  marketClosingTime: 'Jul 7, 2026 04:00 PM ET',
-  afterHoursMarketOpeningTime: 'Jul 7, 2026 04:00 PM ET',
-  afterHoursMarketClosingTime: 'Jul 7, 2026 08:00 PM ET',
-  schedule: {
-    preMarketOpen: '2026-07-07T04:00:00',
-    marketOpen: '2026-07-07T09:30:00',
-    marketClose: '2026-07-07T16:00:00',
-    afterHoursClose: '2026-07-07T20:00:00',
-  },
+  previousTradeDate: 1783310400000,
+  nextTradeDate: 1783483200000,
+  preMarketOpeningTime: 1783411200000,
+  preMarketClosingTime: 1783431000000,
+  marketOpeningTime: 1783431000000,
+  marketClosingTime: 1783454400000,
+  afterHoursMarketOpeningTime: 1783454400000,
+  afterHoursMarketClosingTime: 1783468800000,
 }
 
 type TickerOverrides = Omit<Partial<TickerData>, 'price' | 'statistics'> &
@@ -42,7 +36,7 @@ export function ticker(overrides: TickerOverrides): TickerData {
   return {
     title: symbol,
     marketCap: 1_000_000_000,
-    exchange: { name: 'NASDAQ-GS', status: 'Open' },
+    exchange: 'NASDAQ-GS',
     price: {
       lastTradeTimestamp: '2026-06-28T12:00:00Z',
       lastTradePrice: 100,

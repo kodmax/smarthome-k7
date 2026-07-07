@@ -4,29 +4,24 @@ import { useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
 import { ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
-import { MarketStatus, StockMarketFeed } from '@repo/types'
+import { StockMarketFeed } from '@repo/types'
 import { Ticker } from './Ticker'
 import { StockMarketTable } from './styled'
 import { TableBody, TableHead, TableRow } from '@mui/material'
 import { useSortedTickers } from './useSortedTickers'
+import { useMarketSession } from './useMarketSession'
+import { marketStatusTitles } from './consts'
 
 const cardTableFontSize = designTokens.font.body.size
 const tableHeaderGap = designTokens.space[3]
 const headerRowSx = { '& .MuiTableCell-root': { pb: `${tableHeaderGap}px` } }
 
-const marketStatusTitles: Record<MarketStatus, string> = {
-  'After-Hours': 'Po zamkięciu',
-  'Pre-Market': 'Przed otwarciem',
-  Closed: 'Rynek zamknięty',
-  Open: 'Rynek otwarty',
-}
-
 export const StockMarket: FC<Record<string, never>> = () => {
   const feed = useFeed<StockMarketFeed>('stock-market')
   const tickers = useSortedTickers(feed)
-  const marketInfo = feed?.marketInfo
+  const marketSession = useMarketSession(feed?.marketInfo)
 
-  if (feed === undefined || tickers === undefined || marketInfo === undefined) {
+  if (feed === undefined || tickers === undefined || marketSession === undefined) {
     return (
       <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9}>
         <TablePlaceholder rows={12} graph={false} value={true} />
@@ -34,7 +29,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
     )
   }
 
-  const headingInfo = marketStatusTitles[marketInfo.status]
+  const headingInfo = `${marketStatusTitles[marketSession.status]} · ${marketSession.countdown}`
 
   return (
     <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9} headingInfo={headingInfo}>

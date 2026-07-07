@@ -43,10 +43,7 @@ export const addStockMarketFeed = (feeds: Feeds): Promise<void> =>
           symbol: nasdaq.ticker,
           title: nasdaq.title,
           marketCap: yahoo.marketCap,
-          exchange: {
-            name: nasdaq.exchange,
-            status: nasdaq.marketStatus,
-          },
+          exchange: nasdaq.exchange,
           price: {
             lastTradeTimestamp: nasdaq.price.lastTradeTimestamp,
             lastTradePrice: nasdaq.price.lastTradePrice,
