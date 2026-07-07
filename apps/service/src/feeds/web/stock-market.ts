@@ -1,14 +1,14 @@
 import { Feeds } from '@repo/apollo-ws'
 import { StockMarketFeed, TickerData } from '@repo/types'
 import { YahooTickerData } from '@/data-sources/stock-market/yahoo/types'
-import { nasdaqMarketData, yahooMarketData } from '@/data-sources'
+import { NasdaqMarketDataSource, YahooMarketDataSource } from '@/data-sources'
 import { NasdaqTickerData } from '@/data-sources/stock-market/nasdaq/types'
 import { tickerList } from '@/data-sources/stock-market/tickerList'
 
 export const addStockMarketFeed = (feeds: Feeds): Promise<void> =>
   feeds.addFeed(
     'stock-market',
-    { nasdaqMarketData, yahooMarketData },
+    { nasdaqMarketData: NasdaqMarketDataSource, yahooMarketData: YahooMarketDataSource },
     ({ nasdaqMarketData, yahooMarketData }): StockMarketFeed => {
       const yahooMap: Map<string, YahooTickerData> = new Map()
       for (const data of yahooMarketData) {

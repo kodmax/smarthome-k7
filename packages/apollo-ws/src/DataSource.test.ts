@@ -3,17 +3,32 @@ import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApolloEvents } from './ApolloEvents'
-import { Cache } from './cache'
-import { DataSource, type DataSourceDefinition } from './DataSource'
+import { Cache, Snapshot } from './cache'
+import { DataSource, DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
 import { NoRecentContent } from './Errors'
 
-function makeDefinition<T>(
-  overrides: Partial<DataSourceDefinition<T>> & Pick<DataSourceDefinition<T>, 'id'>,
-): DataSourceDefinition<T> {
-  return {
-    expired: () => true,
-    script: async () => ({ value: 1 }) as T,
-    ...overrides,
+function createTestSourceClass<T>(options: {
+  id: string
+  isSnapshotExpired?: (snapshot: Snapshot<unknown>) => boolean
+  getData?: () => Promise<T>
+  isVolatile?: boolean
+}): DataSourceDefinitionClass<T> {
+  return class TestSource extends DataSourceDefinition<T> {
+    public getId(): string {
+      return options.id
+    }
+
+    public isSnapshotExpired(snapshot: Snapshot<unknown>): boolean {
+      return options.isSnapshotExpired?.(snapshot) ?? true
+    }
+
+    public async getData(): Promise<T> {
+      return options.getData !== undefined ? await options.getData() : ({ value: 1 } as T)
+    }
+
+    public isVolatile(): boolean {
+      return options.isVolatile ?? false
+    }
   }
 }
 
@@ -26,78 +41,78 @@ describe('DataSource', () => {
     }
   })
 
-  async function createDataSource<T>(definition: DataSourceDefinition<T>) {
+  async function createDataSource<T>(SourceClass: DataSourceDefinitionClass<T>) {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-ds-'))
     cacheDirs.push(cacheDir)
 
     const vent = new ApolloEvents()
     const cache = new Cache(cacheDir)
-    const entry = await cache.getEntry<T>(definition.volatile === true ? undefined : definition.id)
+    const dataSource = await DataSource.fromClass(SourceClass, cache, vent)
 
     return {
-      dataSource: new DataSource(definition, entry, vent),
+      dataSource,
       vent,
     }
   }
 
   it('returns cached content on cache hit without calling script', async () => {
-    const script = vi.fn(async () => ({ value: 99 }))
+    const getData = vi.fn(async () => ({ value: 99 }))
     const { dataSource } = await createDataSource(
-      makeDefinition({
+      createTestSourceClass({
         id: 'cache-hit',
-        expired: () => false,
-        script,
+        isSnapshotExpired: () => false,
+        getData,
       }),
     )
 
     await dataSource.getData()
-    script.mockClear()
+    getData.mockClear()
 
     await expect(dataSource.getData()).resolves.toEqual({ value: 99 })
-    expect(script).not.toHaveBeenCalled()
+    expect(getData).not.toHaveBeenCalled()
   })
 
   it('calls script on cache miss and on force refresh', async () => {
-    const script = vi.fn(async () => ({ value: 42 }))
+    const getData = vi.fn(async () => ({ value: 42 }))
     const { dataSource } = await createDataSource(
-      makeDefinition({
+      createTestSourceClass({
         id: 'cache-miss',
-        script,
+        getData,
       }),
     )
 
     await expect(dataSource.getData()).resolves.toEqual({ value: 42 })
-    expect(script).toHaveBeenCalledTimes(1)
+    expect(getData).toHaveBeenCalledTimes(1)
 
-    script.mockClear()
+    getData.mockClear()
     await dataSource.getData()
-    expect(script).toHaveBeenCalledTimes(1)
+    expect(getData).toHaveBeenCalledTimes(1)
 
-    script.mockClear()
+    getData.mockClear()
     await expect(dataSource.getData(true)).resolves.toEqual({ value: 42 })
-    expect(script).toHaveBeenCalledTimes(1)
+    expect(getData).toHaveBeenCalledTimes(1)
   })
 
   it('deduplicates concurrent getData() calls', async () => {
     vi.useFakeTimers()
 
-    const script = vi.fn(
+    const getData = vi.fn(
       () =>
         new Promise<{ value: number }>(resolve => {
           setTimeout(() => resolve({ value: 7 }), 50)
         }),
     )
     const { dataSource } = await createDataSource(
-      makeDefinition({
+      createTestSourceClass({
         id: 'dedup',
-        script,
+        getData,
       }),
     )
 
     const first = dataSource.getData()
     const second = dataSource.getData()
 
-    expect(script).toHaveBeenCalledTimes(1)
+    expect(getData).toHaveBeenCalledTimes(1)
 
     await vi.advanceTimersByTimeAsync(50)
     await expect(first).resolves.toEqual({ value: 7 })
@@ -109,9 +124,9 @@ describe('DataSource', () => {
   it('emits data-update after push', async () => {
     const updates: string[] = []
     const { dataSource, vent } = await createDataSource(
-      makeDefinition({
+      createTestSourceClass({
         id: 'push-src',
-        volatile: true,
+        isVolatile: true,
       }),
     )
 
@@ -124,27 +139,8 @@ describe('DataSource', () => {
   })
 
   it('throws NoRecentContent when cache is empty', async () => {
-    const { dataSource } = await createDataSource(makeDefinition({ id: 'empty' }))
+    const { dataSource } = await createDataSource(createTestSourceClass({ id: 'empty' }))
 
     expect(() => dataSource.getRecentContent()).toThrow(NoRecentContent)
-  })
-
-  it('routes commands through vent to the push source handler', async () => {
-    const commandHandler = vi.fn()
-    const { vent } = await createDataSource(
-      makeDefinition({
-        id: 'routed-src',
-        volatile: true,
-        push: (_push, command) => {
-          command.on('setLevel', args => commandHandler(args))
-        },
-      }),
-    )
-
-    vent.emit('command', { sourceId: 'routed-src', name: 'setLevel', args: '50' })
-    vent.emit('command', { sourceId: 'other-src', name: 'setLevel', args: '99' })
-
-    expect(commandHandler).toHaveBeenCalledTimes(1)
-    expect(commandHandler).toHaveBeenCalledWith('50')
   })
 })

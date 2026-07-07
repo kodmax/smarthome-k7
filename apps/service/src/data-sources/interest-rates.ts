@@ -5,12 +5,20 @@ import { fetchDocument } from '@/fetch'
 import { INTEREST_RATES, InterestRateData, InterestRatesFeed } from '@repo/types'
 import { parseNbpRatesFromDocument, parseWiborFromHtml } from './interest-rates/parse'
 
-export const source: DataSourceDefinition<InterestRatesFeed> = {
-  cron: '5 11,17 * * 1-5',
-  id: 'interest-rates',
+export class InterestRatesSource extends DataSourceDefinition<InterestRatesFeed> {
+  getId() {
+    return 'interest-rates'
+  }
 
-  expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 12,
-  script: async () => {
+  getCron() {
+    return '5 11,17 * * 1-5'
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.HOURS) > 12
+  }
+
+  async getData() {
     const wibor = await fetchDocument('https://www.bankier.pl/mieszkaniowe/stopy-procentowe/wibor', {
       accept: 'text/html',
     }).then(document => parseWiborFromHtml(document.documentElement.outerHTML))
@@ -46,5 +54,5 @@ export const source: DataSourceDefinition<InterestRatesFeed> = {
     } finally {
       conn.release()
     }
-  },
+  }
 }

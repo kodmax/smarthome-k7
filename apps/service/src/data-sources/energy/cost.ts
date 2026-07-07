@@ -12,12 +12,20 @@ type EnergyCost = {
   avg: number
 }
 
-export const source: DataSourceDefinition<EnergyCost> = {
-  cron: '0 0 * * *',
-  id: 'energy-cost',
+export class EnergyCostSource extends DataSourceDefinition<EnergyCost> {
+  getId() {
+    return 'energy-cost'
+  }
 
-  expired: snapshot => (snapshot.getContent() as EnergyCost).datetime !== DateTime.now().getDate(),
-  script: async () => {
+  getCron() {
+    return '0 0 * * *'
+  }
+
+  isSnapshotExpired(snapshot: { getContent: () => unknown }) {
+    return (snapshot.getContent() as EnergyCost).datetime !== DateTime.now().getDate()
+  }
+
+  async getData() {
     const conn = await db.getConnection()
     try {
       const today = DateTime.now().getDate()
@@ -41,5 +49,5 @@ export const source: DataSourceDefinition<EnergyCost> = {
     } finally {
       conn.release()
     }
-  },
+  }
 }

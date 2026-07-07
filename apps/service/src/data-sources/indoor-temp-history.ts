@@ -27,14 +27,24 @@ const readingToHistory: Record<string, keyof TempHistory> = {
   bathroom_temp: 'bathroom',
 }
 
-export const source: DataSourceDefinition<TempHistory> = {
-  id: 'indoor-temp-history',
-  cron: '*/5 * * * *',
-  volatile: true,
+export class IndoorTempHistorySource extends DataSourceDefinition<TempHistory> {
+  getId() {
+    return 'indoor-temp-history'
+  }
 
-  expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 5,
+  getCron() {
+    return '*/5 * * * *'
+  }
 
-  script: async () => {
+  isVolatile() {
+    return true
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.MINUTES) > 5
+  }
+
+  async getData() {
     const conn = await db.getConnection()
     try {
       const history = (await conn.query(
@@ -66,5 +76,5 @@ export const source: DataSourceDefinition<TempHistory> = {
     } finally {
       conn.release()
     }
-  },
+  }
 }

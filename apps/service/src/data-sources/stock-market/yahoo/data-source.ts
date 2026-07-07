@@ -3,12 +3,20 @@ import { getTickerData, sleep } from './src'
 import { tickerList } from '../tickerList'
 import { YahooTickerData } from './types'
 
-export const source: DataSourceDefinition<YahooTickerData[]> = {
-  cron: '5 10 * * Mon-Fri',
-  id: 'yahoo-stock-market',
+export class YahooMarketDataSource extends DataSourceDefinition<YahooTickerData[]> {
+  getId() {
+    return 'yahoo-stock-market'
+  }
 
-  expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 24,
-  script: async () => {
+  getCron() {
+    return '5 10 * * Mon-Fri'
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.HOURS) > 24
+  }
+
+  async getData() {
     const yahooTickerData: YahooTickerData[] = []
     for (const ticker of tickerList) {
       yahooTickerData.push(await getTickerData(ticker))
@@ -16,5 +24,5 @@ export const source: DataSourceDefinition<YahooTickerData[]> = {
     }
 
     return yahooTickerData
-  },
+  }
 }

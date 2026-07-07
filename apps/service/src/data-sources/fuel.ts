@@ -5,12 +5,20 @@ import { fetchDocument } from '@/fetch'
 import { getTextContent } from '@/utils/get-text-context'
 import { FuelPricesFeed } from '@repo/types'
 
-export const source: DataSourceDefinition<FuelPricesFeed> = {
-  cron: '0 10 * * *',
-  id: 'fossil-fuels',
+export class FuelSource extends DataSourceDefinition<FuelPricesFeed> {
+  getId() {
+    return 'fossil-fuels'
+  }
 
-  expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 24,
-  script: async () => {
+  getCron() {
+    return '0 10 * * *'
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.HOURS) > 24
+  }
+
+  async getData() {
     return await fetchDocument('https://www.autocentrum.pl/paliwa/ceny-paliw/mazowieckie/').then(
       async (document: Document) => {
         const current = Object.fromEntries(
@@ -53,5 +61,5 @@ export const source: DataSourceDefinition<FuelPricesFeed> = {
         return prices
       },
     )
-  },
+  }
 }

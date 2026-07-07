@@ -1,7 +1,7 @@
 import { Feeds } from '@repo/apollo-ws'
 import type { KnxLink } from 'js-knx'
 import { DPT_Value_Temp } from 'js-knx'
-import { indoorTempHistory, type TempHistory } from '@/data-sources'
+import { IndoorTempHistorySource, type TempHistory } from '@/data-sources'
 import knxTemp from '@/data-sources/knx/temp'
 import DateTime from '@/DateTime'
 
@@ -18,7 +18,7 @@ export const addHomeTempFeed = (feeds: Feeds, knx: KnxLink, feed: string, schema
     const setpoint = knxTemp(`temp.${feed}.setpoint`, knx.getDatapoint(schema.setpoint))
     feeds.addFeed(
       `home.temp.${feed}`,
-      { reading, setpoint, indoorTempHistory },
+      { reading, setpoint, indoorTempHistory: IndoorTempHistorySource },
       ({ reading, setpoint, indoorTempHistory }) => ({
         reading,
         history: {
@@ -31,11 +31,15 @@ export const addHomeTempFeed = (feeds: Feeds, knx: KnxLink, feed: string, schema
     return
   }
 
-  feeds.addFeed(`home.temp.${feed}`, { reading, indoorTempHistory }, ({ reading, indoorTempHistory }) => ({
-    reading,
-    history: {
-      date: DateTime.now().getDate(),
-      today: indoorTempHistory[schema.history],
-    },
-  }))
+  feeds.addFeed(
+    `home.temp.${feed}`,
+    { reading, indoorTempHistory: IndoorTempHistorySource },
+    ({ reading, indoorTempHistory }) => ({
+      reading,
+      history: {
+        date: DateTime.now().getDate(),
+        today: indoorTempHistory[schema.history],
+      },
+    }),
+  )
 }

@@ -3,12 +3,20 @@ import DateTime from '../DateTime'
 import db from '../db'
 import { Co2HistoryRecord } from '@repo/types'
 
-export const source: DataSourceDefinition<{ date: string; today: Co2HistoryRecord[] }> = {
-  cron: '1 * * * *',
-  id: 'co2-hourly',
+export class Co2HourlySource extends DataSourceDefinition<{ date: string; today: Co2HistoryRecord[] }> {
+  getId() {
+    return 'co2-hourly'
+  }
 
-  expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 5,
-  script: async () => {
+  getCron() {
+    return '1 * * * *'
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.MINUTES) > 5
+  }
+
+  async getData() {
     const conn = await db.getConnection()
     try {
       return {
@@ -28,5 +36,5 @@ export const source: DataSourceDefinition<{ date: string; today: Co2HistoryRecor
     } finally {
       conn.release()
     }
-  },
+  }
 }

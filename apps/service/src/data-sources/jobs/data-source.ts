@@ -4,12 +4,20 @@ import { JobAd, JobsFeed } from '@repo/types'
 import { nfj } from './nfj/nfj'
 import { addAds } from './filters'
 
-export const source: DataSourceDefinition<JobsFeed> = {
-  cron: '0 8 * * *',
-  id: 'jobs',
+export class JobsSource extends DataSourceDefinition<JobsFeed> {
+  getId() {
+    return 'jobs'
+  }
 
-  expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 15,
-  script: async () => {
+  getCron() {
+    return '0 8 * * *'
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.MINUTES) > 15
+  }
+
+  async getData() {
     const allAds = new Map<string, JobAd>()
 
     addAds(allAds, await jjit())
@@ -21,5 +29,5 @@ export const source: DataSourceDefinition<JobsFeed> = {
         (a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0),
       ),
     }
-  },
+  }
 }

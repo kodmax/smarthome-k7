@@ -1,1 +1,1 @@
-export { source as nasdaqMarketData } from './data-source'
+export { NasdaqMarketDataSource } from './data-source'

@@ -4,10 +4,10 @@ import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApolloEvents } from './ApolloEvents'
 import type { ApolloEvents as ApolloEventsType } from './ApolloEvents'
-import { Cache } from './cache'
+import { Cache, Snapshot } from './cache'
 import { DuplicateDataSourceIdError } from './Errors'
 import { Feeds } from './Feeds'
-import type { DataSourceDefinition } from './DataSource'
+import { DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
 
 function waitForDataUpdate(vent: ApolloEventsType, sourceId: string): Promise<void> {
   return new Promise(resolve => {
@@ -21,13 +21,38 @@ function waitForDataUpdate(vent: ApolloEventsType, sourceId: string): Promise<vo
   })
 }
 
-function makeDefinition<T = { value: number }>(
-  overrides: Partial<DataSourceDefinition<T>> & Pick<DataSourceDefinition<T>, 'id'>,
-): DataSourceDefinition<T> {
-  return {
-    expired: () => true,
-    script: async () => ({ value: 1 }) as T,
-    ...overrides,
+function createTestSourceClass<T>(options: {
+  id: string
+  isSnapshotExpired?: (snapshot: Snapshot<unknown>) => boolean
+  getData?: () => Promise<T>
+  isVolatile?: boolean
+  onInit?: (ctx: { push: (content: T) => void }) => void
+  handleCommand?: (command: string, args: string) => void | Promise<void>
+}): DataSourceDefinitionClass<T> {
+  return class TestSource extends DataSourceDefinition<T> {
+    protected init(): void {
+      options.onInit?.({ push: content => this.push(content) })
+    }
+
+    public async handleCommand(command: string, args: string): Promise<void> {
+      await options.handleCommand?.(command, args)
+    }
+
+    public getId(): string {
+      return options.id
+    }
+
+    public isSnapshotExpired(snapshot: Snapshot<unknown>): boolean {
+      return options.isSnapshotExpired?.(snapshot) ?? true
+    }
+
+    public async getData(): Promise<T> {
+      return options.getData !== undefined ? await options.getData() : ({ value: 1 } as T)
+    }
+
+    public isVolatile(): boolean {
+      return options.isVolatile ?? false
+    }
   }
 }
 
@@ -47,31 +72,57 @@ describe('Feeds data source registration', () => {
     return new Feeds(new Cache(cacheDir), new ApolloEvents())
   }
 
-  it('reuses the same DataSource when the same definition object is registered in multiple feeds', async () => {
+  it('reuses the same DataSource when the same definition class is registered in multiple feeds', async () => {
     const feeds = createFeeds()
-    const definition = makeDefinition({ id: 'shared-source' })
+    const SourceClass = createTestSourceClass({ id: 'shared-source' })
 
-    await feeds.addFeed('feed-a', { src: definition })
-    await feeds.addFeed('feed-b', { src: definition })
+    await feeds.addFeed('feed-a', { src: SourceClass })
+    await feeds.addFeed('feed-b', { src: SourceClass })
 
-    await expect(feeds.addFeed('feed-c', { src: definition })).resolves.toBeUndefined()
+    await expect(feeds.addFeed('feed-c', { src: SourceClass })).resolves.toBeUndefined()
   })
 
-  it('throws when a different definition object reuses an existing data source id', async () => {
+  it('throws when a different definition class reuses an existing data source id', async () => {
     const feeds = createFeeds()
-    const first = makeDefinition({ id: 'duplicate-id' })
-    const second = makeDefinition({ id: 'duplicate-id' })
+    const FirstSource = createTestSourceClass({ id: 'duplicate-id' })
+    const SecondSource = createTestSourceClass({ id: 'duplicate-id' })
 
-    await feeds.addFeed('feed-a', { src: first })
+    await feeds.addFeed('feed-a', { src: FirstSource })
 
-    await expect(feeds.addFeed('feed-b', { src: second })).rejects.toThrow(DuplicateDataSourceIdError)
+    await expect(feeds.addFeed('feed-b', { src: SecondSource })).rejects.toThrow(DuplicateDataSourceIdError)
   })
 
-  it('allows different ids for different definition objects', async () => {
+  it('allows different ids for different definition classes', async () => {
     const feeds = createFeeds()
 
-    await feeds.addFeed('feed-a', { src: makeDefinition({ id: 'source-a' }) })
-    await feeds.addFeed('feed-b', { src: makeDefinition({ id: 'source-b' }) })
+    await feeds.addFeed('feed-a', { src: createTestSourceClass({ id: 'source-a' }) })
+    await feeds.addFeed('feed-b', { src: createTestSourceClass({ id: 'source-b' }) })
+  })
+
+  it('routes commands through vent to the push source handler', async () => {
+    const commandHandler = vi.fn()
+    const vent = new ApolloEvents()
+    const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
+    cacheDirs.push(cacheDir)
+    const feeds = new Feeds(new Cache(cacheDir), vent)
+
+    const SourceClass = createTestSourceClass({
+      id: 'routed-src',
+      isVolatile: true,
+      handleCommand: (command, args) => {
+        if (command === 'setLevel') {
+          commandHandler(args)
+        }
+      },
+    })
+
+    await feeds.addFeed('routed', { src: SourceClass })
+
+    vent.emit('command', { sourceId: 'routed-src', name: 'setLevel', args: '50' })
+    vent.emit('command', { sourceId: 'other-src', name: 'setLevel', args: '99' })
+
+    await vi.waitFor(() => expect(commandHandler).toHaveBeenCalledTimes(1))
+    expect(commandHandler).toHaveBeenCalledWith('50')
   })
 })
 
@@ -92,24 +143,24 @@ describe('Feeds composition', () => {
 
     let pushA: (content: { value: number }) => void = () => {}
     let pushB: (content: { value: number }) => void = () => {}
-    const scriptA = vi.fn(async () => ({ value: 10 }))
-    const defA = makeDefinition({
+    const getDataA = vi.fn(async () => ({ value: 10 }))
+    const SourceA = createTestSourceClass({
       id: 'source-a',
-      volatile: true,
-      script: scriptA,
-      push: pushFn => {
-        pushA = pushFn
+      isVolatile: true,
+      getData: getDataA,
+      onInit: ({ push }) => {
+        pushA = push
       },
     })
-    const defB = makeDefinition({
+    const SourceB = createTestSourceClass({
       id: 'source-b',
-      volatile: true,
-      push: pushFn => {
-        pushB = pushFn
+      isVolatile: true,
+      onInit: ({ push }) => {
+        pushB = push
       },
     })
 
-    await feeds.addFeed('composed', { a: defA, b: defB }, content => content)
+    await feeds.addFeed('composed', { a: SourceA, b: SourceB }, content => content)
 
     const sourcesReady = Promise.all([waitForDataUpdate(vent, 'source-a'), waitForDataUpdate(vent, 'source-b')])
     pushA({ value: 10 })
@@ -117,7 +168,7 @@ describe('Feeds composition', () => {
     await sourcesReady
     await new Promise(resolve => setTimeout(resolve, 50))
 
-    scriptA.mockClear()
+    getDataA.mockClear()
 
     const feedEvents: unknown[] = []
     vent.on('feed', (_id, value) => feedEvents.push(value))
@@ -125,7 +176,7 @@ describe('Feeds composition', () => {
     vent.emit('data-update', 'source-a')
 
     await vi.waitFor(() => expect(feedEvents).toHaveLength(1))
-    expect(scriptA).not.toHaveBeenCalled()
+    expect(getDataA).not.toHaveBeenCalled()
     expect(feedEvents[0]).toEqual({ a: { value: 10 }, b: { value: 20 } })
   })
 
@@ -136,20 +187,19 @@ describe('Feeds composition', () => {
     const feeds = new Feeds(new Cache(cacheDir), vent)
 
     let pushWarm: (content: { value: number }) => void = () => {}
-    const warmDef = makeDefinition({
+    const WarmSource = createTestSourceClass({
       id: 'warm',
-      volatile: true,
-      push: pushFn => {
-        pushWarm = pushFn
+      isVolatile: true,
+      onInit: ({ push }) => {
+        pushWarm = push
       },
     })
-    const coldDef = makeDefinition({
+    const ColdSource = createTestSourceClass({
       id: 'cold',
-      volatile: true,
-      push: () => {},
+      isVolatile: true,
     })
 
-    await feeds.addFeed('partial', { warm: warmDef, cold: coldDef }, content => content)
+    await feeds.addFeed('partial', { warm: WarmSource, cold: ColdSource }, content => content)
 
     const warmReady = waitForDataUpdate(vent, 'warm')
     pushWarm({ value: 1 })
@@ -170,14 +220,14 @@ describe('Feeds composition', () => {
     cacheDirs.push(cacheDir)
     const feeds = new Feeds(new Cache(cacheDir), vent)
 
-    const scriptA = vi.fn(async () => ({ value: 1 }))
-    const scriptB = vi.fn(async () => ({ value: 2 }))
+    const getDataA = vi.fn(async () => ({ value: 1 }))
+    const getDataB = vi.fn(async () => ({ value: 2 }))
 
     await feeds.addFeed(
       'refreshable',
       {
-        a: makeDefinition({ id: 'refresh-a', script: scriptA }),
-        b: makeDefinition({ id: 'refresh-b', script: scriptB }),
+        a: createTestSourceClass({ id: 'refresh-a', getData: getDataA }),
+        b: createTestSourceClass({ id: 'refresh-b', getData: getDataB }),
       },
       content => content,
     )
@@ -188,7 +238,7 @@ describe('Feeds composition', () => {
     vent.emit('feeds-refresh', ['refreshable'])
 
     await vi.waitFor(() => expect(feedEvents).toContain('refreshable'))
-    expect(scriptA).toHaveBeenCalledTimes(1)
-    expect(scriptB).toHaveBeenCalledTimes(1)
+    expect(getDataA).toHaveBeenCalledTimes(1)
+    expect(getDataB).toHaveBeenCalledTimes(1)
   })
 })

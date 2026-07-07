@@ -5,12 +5,20 @@ import DateTime from '../DateTime'
 import { getTextContent } from '@/utils/get-text-context'
 import { FXFeed, FXRateHistory, FXRates } from '@repo/types'
 
-export const source: DataSourceDefinition<FXFeed> = {
-  cron: '0 */3 * * *',
-  id: 'fx',
+export class FxSource extends DataSourceDefinition<FXFeed> {
+  getId() {
+    return 'fx'
+  }
 
-  expired: snapshot => snapshot.age(CacheAgeUnit.HOURS) > 1,
-  script: async () => {
+  getCron() {
+    return '0 */3 * * *'
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.HOURS) > 1
+  }
+
+  async getData() {
     const [eur, usd, chf, gbp, uah, rub] = await Promise.all([
       fetchDocument('https://pl.investing.com/currencies/eur-pln', { accept: 'text/html' }).then(document => {
         return getTextContent(document.body, '.text-2xl[data-test=instrument-price-last]')
@@ -84,5 +92,5 @@ export const source: DataSourceDefinition<FXFeed> = {
       history,
       rates,
     }
-  },
+  }
 }

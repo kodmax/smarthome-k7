@@ -1,23 +1,28 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { KnxReading, DPT_Value_AirQuality, DataPointAbstract } from 'js-knx'
+import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionClass } from '@repo/apollo-ws'
+import { DPT_Value_AirQuality, KnxReading } from 'js-knx'
 
-export default (id: string, dp: DPT_Value_AirQuality) => {
-  const source: DataSourceDefinition<typeof dp extends DataPointAbstract<infer T> ? KnxReading<T> : never> = {
-    id,
-    volatile: true,
-
-    expired: snapshot => snapshot.age(CacheAgeUnit.SECONDS) > 3,
-
-    script: async () => {
-      return await dp.read()
-    },
-
-    push: push => {
-      dp.addValueListener(async reading => {
-        push(reading)
+export default (id: string, dp: DPT_Value_AirQuality): DataSourceDefinitionClass<KnxReading<number>> => {
+  return class KnxCo2Source extends DataSourceDefinition<KnxReading<number>> {
+    protected init(): void {
+      dp.addValueListener(reading => {
+        this.push(reading)
       })
-    },
-  }
+    }
 
-  return source
+    public getId(): string {
+      return id
+    }
+
+    public isVolatile(): boolean {
+      return true
+    }
+
+    public isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }): boolean {
+      return snapshot.age(CacheAgeUnit.SECONDS) > 3
+    }
+
+    public async getData(): Promise<KnxReading<number>> {
+      return await dp.read()
+    }
+  }
 }

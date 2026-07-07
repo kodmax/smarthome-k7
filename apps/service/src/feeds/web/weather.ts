@@ -1,4 +1,4 @@
 import { Feeds } from '@repo/apollo-ws'
-import { weather } from '@/data-sources'
+import { WeatherSource } from '@/data-sources'
 
-export const addWeatherFeed = (feeds: Feeds): Promise<void> => feeds.addFeed('weather', { weather })
+export const addWeatherFeed = (feeds: Feeds): Promise<void> => feeds.addFeed('weather', { weather: WeatherSource })

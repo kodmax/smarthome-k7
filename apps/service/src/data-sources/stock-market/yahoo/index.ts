@@ -1,1 +1,1 @@
-export { source as yahooMarketData } from './data-source'
+export { YahooMarketDataSource } from './data-source'

@@ -9,12 +9,20 @@ import { fetchNaturalGasPrice } from './natural-gas'
 import { fetchOilPrice } from './oil'
 import { Commodities } from './types'
 
-export const source: DataSourceDefinition<Commodities> = {
-  expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 30,
-  cron: '15 * * * *',
-  id: 'commodities',
+export class CommoditiesSource extends DataSourceDefinition<Commodities> {
+  getId() {
+    return 'commodities'
+  }
 
-  script: async () => {
+  getCron() {
+    return '15 * * * *'
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.MINUTES) > 30
+  }
+
+  async getData() {
     const [oil, ng, coal, btc, gold, inflation] = await Promise.all([
       fetchOilPrice(),
       fetchNaturalGasPrice(),
@@ -76,7 +84,7 @@ export const source: DataSourceDefinition<Commodities> = {
     } finally {
       conn.release()
     }
-  },
+  }
 }
 
 export type { Commodities }

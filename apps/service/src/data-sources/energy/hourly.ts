@@ -4,12 +4,24 @@ import db from '../../db'
 import { EnergyHourConsumption } from '@repo/types'
 import { dayStart, getStartOfDayReading, METER_TOTAL_READING } from './helpers'
 
-export const source: DataSourceDefinition<{ date: string; bars: EnergyHourConsumption[]; startOfDayValue: number }> = {
-  cron: '1 * * * *',
-  id: 'energy-hourly',
+export class EnergyHourlySource extends DataSourceDefinition<{
+  date: string
+  bars: EnergyHourConsumption[]
+  startOfDayValue: number
+}> {
+  getId() {
+    return 'energy-hourly'
+  }
 
-  expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 5,
-  script: async () => {
+  getCron() {
+    return '1 * * * *'
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.MINUTES) > 5
+  }
+
+  async getData() {
     const conn = await db.getConnection()
     try {
       const today = DateTime.now().getDate()
@@ -40,5 +52,5 @@ export const source: DataSourceDefinition<{ date: string; bars: EnergyHourConsum
     } finally {
       conn.release()
     }
-  },
+  }
 }

@@ -1,4 +1,4 @@
-export { DataSourceDefinition, DataSource } from './DataSource'
+export { DataSourceDefinition, DataSourceDefinitionClass, AnyDataSourceDefinitionClass, DataSource } from './DataSource'
 export { Cache, CacheAgeUnit } from './cache'
 export { ApolloEvents } from './ApolloEvents'
 export type { ApolloEventMap } from './ApolloEvents'

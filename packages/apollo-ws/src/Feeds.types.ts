@@ -1,17 +1,21 @@
-import { DataSource, DataSourceDefinition } from './DataSource'
+import { DataSource, DataSourceDefinition, AnyDataSourceDefinitionClass } from './DataSource'
 
-export type DS = DataSource<DataSourceDefinition<unknown>>
+export type DS = DataSource<unknown>
 
-export type SourceDataTypes<S extends Record<string, DataSourceDefinition<unknown>>> = {
-  [K in keyof S]: S[K] extends DataSourceDefinition<infer T> ? T : never
+export type SourceDataTypes<S extends Record<string, AnyDataSourceDefinitionClass>> = {
+  [K in keyof S]: S[K] extends new (...args: never[]) => infer I
+    ? I extends DataSourceDefinition<infer T>
+      ? T
+      : never
+    : never
 }
 
-export type FeedSources = Map<string, DataSource<DataSourceDefinition<unknown>>>
+export type FeedSources = Map<string, DataSource<unknown>>
 
 export type FeedCb = (content: Record<string, unknown>) => unknown
 
 export type SourceRegistration = {
-  definition: DataSourceDefinition<unknown>
+  sourceClass: AnyDataSourceDefinitionClass
   dataSource: DS
 }
 

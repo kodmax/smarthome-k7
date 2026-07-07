@@ -8,12 +8,20 @@ import { parseAirQuality, parseAllergens, parseForecast, parseHourly, parseInsta
 
 const { long, lat } = config.geoLocation
 
-export const source: DataSourceDefinition<WeatherFeed> = {
-  cron: '*/15 * * * *',
-  id: 'weather',
+export class WeatherSource extends DataSourceDefinition<WeatherFeed> {
+  getId() {
+    return 'weather'
+  }
 
-  expired: snapshot => snapshot.age(CacheAgeUnit.MINUTES) > 15,
-  script: async () => {
+  getCron() {
+    return '*/15 * * * *'
+  }
+
+  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
+    return snapshot.age(CacheAgeUnit.MINUTES) > 15
+  }
+
+  async getData() {
     const [forecast, instant, allergens, hourly, aq] = await Promise.all([
       parseForecast(),
       parseInstant(),
@@ -79,5 +87,5 @@ export const source: DataSourceDefinition<WeatherFeed> = {
     } finally {
       conn.release()
     }
-  },
+  }
 }

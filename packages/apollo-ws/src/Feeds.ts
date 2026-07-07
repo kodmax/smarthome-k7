@@ -1,7 +1,7 @@
 import { Chronos } from '@repo/chronos'
-import { DataSource, DSCT, DataSourceDefinition } from './DataSource'
+import { DataSource, DSCT, AnyDataSourceDefinitionClass } from './DataSource'
 import { Cache } from './cache'
-import type { Feed, FeedCb, FeedSources, SourceDataTypes, SourceRegistration } from './Feeds.types'
+import type { DS, Feed, FeedCb, FeedSources, SourceDataTypes, SourceRegistration } from './Feeds.types'
 import { ApolloEvents } from './ApolloEvents'
 
 import { DuplicateDataSourceIdError, NonErrorException } from './Errors'
@@ -52,44 +52,51 @@ export class Feeds {
         }
       }
     })
-  }
 
-  private async ensureDataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>>(
-    definition: S,
-  ): Promise<DataSource<S, T>> {
-    const existing = this.sourcesById.get(definition.id)
-    if (existing !== undefined) {
-      if (existing.definition !== definition) {
-        throw new DuplicateDataSourceIdError(definition.id)
+    this.vent.on('command', async ev => {
+      const registration = this.sourcesById.get(ev.sourceId)
+      if (registration === undefined) {
+        return
       }
 
-      return existing.dataSource as DataSource<S, T>
-    }
-
-    return this.addDataSource(definition)
+      try {
+        await registration.dataSource.handleCommand(ev.name, ev.args)
+      } catch (e) {
+        this.vent.emit('sys-log', 4, `Data source <${ev.sourceId}> command <${ev.name} execution error: ${e}`, e)
+      }
+    })
   }
 
-  private async addDataSource<S extends DataSourceDefinition<unknown>, T = DSCT<S>>(
-    definition: S,
-  ): Promise<DataSource<S, T>> {
-    const dataSource = new DataSource(
-      definition,
-      await this.cache.getEntry<T>(definition.volatile === true ? undefined : definition.id),
-      this.vent,
-    )
+  private async getOrCreateDataSource<S extends AnyDataSourceDefinitionClass, T = DSCT<S>>(
+    sourceClass: S,
+  ): Promise<DataSource<T>> {
+    for (const registration of this.sourcesById.values()) {
+      if (registration.sourceClass === sourceClass) {
+        return registration.dataSource as DataSource<T>
+      }
+    }
 
-    if (definition.cron) {
-      this.chronos.addJob(definition.cron, definition.id, async () => {
+    const dataSource = await DataSource.fromClass(sourceClass, this.cache, this.vent)
+    const sourceId = dataSource.getId()
+
+    const existingById = this.sourcesById.get(sourceId)
+    if (existingById !== undefined && existingById.sourceClass !== sourceClass) {
+      throw new DuplicateDataSourceIdError(sourceId)
+    }
+
+    const cron = dataSource.getCron()
+    if (cron) {
+      this.chronos.addJob(cron, sourceId, async () => {
         try {
           await dataSource.getData(true)
         } catch (e) {
-          this.vent.emit('sys-log', 4, `Crontab data source <${definition.id}> update error: ${e}`, e)
+          this.vent.emit('sys-log', 4, `Crontab data source <${sourceId}> update error: ${e}`, e)
           throw e
         }
       })
     }
 
-    this.sourcesById.set(definition.id, { definition, dataSource })
+    this.sourcesById.set(sourceId, { sourceClass, dataSource: dataSource as DS })
     return dataSource
   }
 
@@ -157,16 +164,16 @@ export class Feeds {
     }
   }
 
-  public async addFeed<R, S extends Record<string, DataSourceDefinition<unknown>>>(
+  public async addFeed<R, S extends Record<string, AnyDataSourceDefinitionClass>>(
     feedId: string,
     sourcesDefinitions: S,
     cb?: (content: SourceDataTypes<S>) => R,
   ): Promise<void> {
     const sources: FeedSources = new Map()
     for (const contentName of Object.keys(sourcesDefinitions)) {
-      const definition = sourcesDefinitions[contentName]
+      const sourceClass = sourcesDefinitions[contentName]
 
-      sources.set(contentName, await this.ensureDataSource(definition))
+      sources.set(contentName, await this.getOrCreateDataSource(sourceClass))
     }
 
     const srcNames = Object.keys(sourcesDefinitions)
