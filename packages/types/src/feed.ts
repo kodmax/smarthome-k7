@@ -14,7 +14,7 @@ export type EnergyHourConsumption = {
   hour: number
 }
 
-export type ExchangeStatus = 'Open' | 'After-Hours' | 'Closed' | 'Pre-Market'
+export type MarketStatus = 'Open' | 'After-Hours' | 'Closed' | 'Pre-Market'
 
 export type QuoteSummary = {
   ratingsCount: {
@@ -40,7 +40,7 @@ export type TickerData = {
   marketCap: number
   exchange: {
     name: 'NASDAQ-GS' | 'NYSE'
-    status: ExchangeStatus
+    status: MarketStatus
   }
   price: {
     lastTradeTimestamp: string
@@ -50,10 +50,6 @@ export type TickerData = {
     oneYearTarget: number | null
     priceTarget: number | null
     eg: number | null
-  }
-  eps: {
-    forecast: EPSForecast[]
-    ttm: TrailingEPS[]
   }
   statistics: {
     trailingEPS: number
@@ -66,7 +62,32 @@ export type TickerData = {
   quoteSummary: QuoteSummary
 }
 
+export type MarketInfo = {
+  country: string
+  status: MarketStatus
+  indicator: string
+  uiIndicator: string
+  countdown: string
+  marketCountdown: string
+  isBusinessDay: boolean
+  previousTradeDate: string
+  nextTradeDate: string
+  preMarketOpeningTime: string
+  preMarketClosingTime: string
+  marketOpeningTime: string
+  marketClosingTime: string
+  afterHoursMarketOpeningTime: string
+  afterHoursMarketClosingTime: string
+  schedule: {
+    preMarketOpen: string
+    marketOpen: string
+    marketClose: string
+    afterHoursClose: string
+  }
+}
+
 export type StockMarketFeed = {
+  marketInfo: MarketInfo
   tickers: TickerData[]
 }
 
@@ -353,16 +374,4 @@ export type InterestRateData = {
 
 export type InterestRatesFeed = {
   readonly [K in InterestRatesKeys]: InterestRateData
-}
-
-export type TrailingEPS = {
-  consensusForecast: number
-  dateReported: string
-  eps: number
-}
-
-export type EPSForecast = {
-  consensusEPSForecast: number
-  fiscalEnd: string
-  noOfEstimates: number
 }

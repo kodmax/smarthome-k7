@@ -1,9 +1,33 @@
-import { type StockMarketFeed, type TickerData } from '@repo/types'
+import { type MarketInfo, type StockMarketFeed, type TickerData } from '@repo/types'
 
 const emptyQuoteSummary: TickerData['quoteSummary'] = {
   ratingsCount: { last90days: 0, last30days: 0, last7days: 0 },
   priceTarget: { last90days: null, last30days: null, last7days: null },
   priceTargetChange: { last90days: null, last30days: null, last7days: null },
+}
+
+const defaultMarketInfo: MarketInfo = {
+  country: 'U.S.',
+  status: 'Open',
+  indicator: 'Market Open',
+  uiIndicator: 'Market Open',
+  countdown: 'Closes in 6H 30M',
+  marketCountdown: 'Market Closes in 6H 30M',
+  isBusinessDay: true,
+  previousTradeDate: 'Jul 6, 2026',
+  nextTradeDate: 'Jul 8, 2026',
+  preMarketOpeningTime: 'Jul 7, 2026 04:00 AM ET',
+  preMarketClosingTime: 'Jul 7, 2026 09:30 AM ET',
+  marketOpeningTime: 'Jul 7, 2026 09:30 AM ET',
+  marketClosingTime: 'Jul 7, 2026 04:00 PM ET',
+  afterHoursMarketOpeningTime: 'Jul 7, 2026 04:00 PM ET',
+  afterHoursMarketClosingTime: 'Jul 7, 2026 08:00 PM ET',
+  schedule: {
+    preMarketOpen: '2026-07-07T04:00:00',
+    marketOpen: '2026-07-07T09:30:00',
+    marketClose: '2026-07-07T16:00:00',
+    afterHoursClose: '2026-07-07T20:00:00',
+  },
 }
 
 type TickerOverrides = Omit<Partial<TickerData>, 'price' | 'statistics'> &
@@ -29,7 +53,6 @@ export function ticker(overrides: TickerOverrides): TickerData {
       eg: 10,
       ...price,
     },
-    eps: { forecast: [], ttm: [] },
     statistics: { trailingEPS: 5, forwardEPS: 6, ...statistics },
     earningsDate: {},
     quoteSummary: emptyQuoteSummary,
@@ -39,5 +62,5 @@ export function ticker(overrides: TickerOverrides): TickerData {
 }
 
 export function stockMarketFeed(...tickers: TickerData[]): StockMarketFeed {
-  return { tickers }
+  return { marketInfo: defaultMarketInfo, tickers }
 }

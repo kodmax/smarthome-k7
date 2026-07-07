@@ -1,13 +1,13 @@
 import { NightIcon, SunriseIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
-import { ExchangeStatus } from '@repo/types'
+import { MarketStatus } from '@repo/types'
 import { Circle } from 'lucide-react'
 import { FC } from 'react'
 
 const iconStyle = { verticalAlign: 'middle' as const }
 const iconSize = designTokens.icon.sizeXs - 4
 
-export const MarketStatusIcon: FC<{ marketStatus: ExchangeStatus }> = ({ marketStatus }) => {
+export const MarketStatusIcon: FC<{ marketStatus: MarketStatus }> = ({ marketStatus }) => {
   switch (marketStatus) {
     case 'Open':
       return (

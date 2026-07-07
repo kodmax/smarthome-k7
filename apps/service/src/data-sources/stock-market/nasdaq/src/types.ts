@@ -1,3 +1,5 @@
+import { MarketStatus } from '@repo/types'
+
 export type NasdaqApiResponse<T> = {
   data: T
   message: string | null
@@ -44,7 +46,7 @@ export type NasdaqApiQuoteInfo = {
     volume: ''
     currency: null
   }
-  marketStatus: 'Open' | 'After-Hours'
+  marketStatus: MarketStatus
   assetClass: 'STOCKS'
   keyStats: {
     fiftyTwoWeekHighLow: {
@@ -57,6 +59,28 @@ export type NasdaqApiQuoteInfo = {
     }
   }
   notifications: []
+}
+
+export type NasdaqApiMarketInfo = {
+  country: 'U.S.'
+  marketIndicator: 'Market Closed'
+  uiMarketIndicator: 'Market Closed'
+  marketCountDown: 'Market Opens in 6H 12M'
+  preMarketOpeningTime: 'Jul 7, 2026 04:00 AM ET'
+  preMarketClosingTime: 'Jul 7, 2026 09:30 AM ET'
+  marketOpeningTime: 'Jul 7, 2026 09:30 AM ET'
+  marketClosingTime: 'Jul 7, 2026 04:00 PM ET'
+  afterHoursMarketOpeningTime: 'Jul 7, 2026 04:00 PM ET'
+  afterHoursMarketClosingTime: 'Jul 7, 2026 08:00 PM ET'
+  previousTradeDate: 'Jul 6, 2026'
+  nextTradeDate: 'Jul 8, 2026'
+  isBusinessDay: boolean
+  mrktStatus: MarketStatus
+  mrktCountDown: 'Opens in 6H 12M'
+  pmOpenRaw: '2026-07-07T04:00:00'
+  ahCloseRaw: '2026-07-07T20:00:00'
+  openRaw: '2026-07-07T09:30:00'
+  closeRaw: '2026-07-07T16:00:00'
 }
 
 export type NasdaqApiQuoteSummary = {

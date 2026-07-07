@@ -4,7 +4,7 @@ import { useFeed } from '@repo/feed-client'
 import { ApolloCard, ZoomContext } from '@/apollo-card'
 import { ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
-import { ExchangeStatus, StockMarketFeed } from '@repo/types'
+import { MarketStatus, StockMarketFeed } from '@repo/types'
 import { Ticker } from './Ticker'
 import { StockMarketTable } from './styled'
 import { TableBody, TableHead, TableRow } from '@mui/material'
@@ -14,7 +14,7 @@ const cardTableFontSize = designTokens.font.body.size
 const tableHeaderGap = designTokens.space[3]
 const headerRowSx = { '& .MuiTableCell-root': { pb: `${tableHeaderGap}px` } }
 
-const marketStatusTitles: Record<ExchangeStatus, string> = {
+const marketStatusTitles: Record<MarketStatus, string> = {
   'After-Hours': 'Po zamkięciu',
   'Pre-Market': 'Przed otwarciem',
   Closed: 'Rynek zamknięty',
@@ -24,10 +24,9 @@ const marketStatusTitles: Record<ExchangeStatus, string> = {
 export const StockMarket: FC<Record<string, never>> = () => {
   const feed = useFeed<StockMarketFeed>('stock-market')
   const tickers = useSortedTickers(feed)
+  const marketInfo = feed?.marketInfo
 
-  const marketStatus = feed?.tickers.find(item => item.exchange.name === 'NYSE')?.exchange.status
-
-  if (feed === undefined || tickers === undefined || marketStatus === undefined) {
+  if (feed === undefined || tickers === undefined || marketInfo === undefined) {
     return (
       <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9}>
         <TablePlaceholder rows={12} graph={false} value={true} />
@@ -35,14 +34,10 @@ export const StockMarket: FC<Record<string, never>> = () => {
     )
   }
 
+  const headingInfo = marketStatusTitles[marketInfo.status]
+
   return (
-    <ApolloCard
-      cardId='stock-market'
-      title='Giełda'
-      icon={StockMarketIcon}
-      height={9}
-      headingInfo={marketStatusTitles[marketStatus]}
-    >
+    <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9} headingInfo={headingInfo}>
       <ZoomContext.Consumer>
         {zoom => (
           <StockMarketTable style={{ fontSize: cardTableFontSize, lineHeight: zoom.active ? 1.2 : undefined }}>
