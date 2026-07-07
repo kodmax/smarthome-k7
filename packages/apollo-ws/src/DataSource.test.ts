@@ -12,8 +12,13 @@ function createTestSourceClass<T>(options: {
   isSnapshotExpired?: (snapshot: Snapshot<unknown>) => boolean
   getData?: () => Promise<T>
   isVolatile?: boolean
+  handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
 }): DataSourceDefinitionClass<T> {
   return class TestSource extends DataSourceDefinition<T> {
+    public async handleCommand(command: string, args: string, recentContent?: T): Promise<void> {
+      await options.handleCommand?.(command, args, recentContent)
+    }
+
     public getId(): string {
       return options.id
     }
@@ -142,5 +147,36 @@ describe('DataSource', () => {
     const { dataSource } = await createDataSource(createTestSourceClass({ id: 'empty' }))
 
     expect(() => dataSource.getRecentContent()).toThrow(NoRecentContent)
+  })
+
+  it('passes recent content to handleCommand when cache has data', async () => {
+    const handleCommand = vi.fn()
+    const { dataSource } = await createDataSource(
+      createTestSourceClass({
+        id: 'cmd-src',
+        isVolatile: true,
+        handleCommand,
+      }),
+    )
+
+    await dataSource.push({ value: 42 })
+    await dataSource.handleCommand('set', '1')
+
+    expect(handleCommand).toHaveBeenCalledWith('set', '1', { value: 42 })
+  })
+
+  it('passes undefined recent content to handleCommand when cache is empty', async () => {
+    const handleCommand = vi.fn()
+    const { dataSource } = await createDataSource(
+      createTestSourceClass({
+        id: 'cmd-empty',
+        isVolatile: true,
+        handleCommand,
+      }),
+    )
+
+    await dataSource.handleCommand('set', '1')
+
+    expect(handleCommand).toHaveBeenCalledWith('set', '1', undefined)
   })
 })

@@ -27,15 +27,15 @@ function createTestSourceClass<T>(options: {
   getData?: () => Promise<T>
   isVolatile?: boolean
   onInit?: (ctx: { push: (content: T) => void }) => void
-  handleCommand?: (command: string, args: string) => void | Promise<void>
+  handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
 }): DataSourceDefinitionClass<T> {
   return class TestSource extends DataSourceDefinition<T> {
     protected init(): void {
       options.onInit?.({ push: content => this.push(content) })
     }
 
-    public async handleCommand(command: string, args: string): Promise<void> {
-      await options.handleCommand?.(command, args)
+    public async handleCommand(command: string, args: string, recentContent?: T): Promise<void> {
+      await options.handleCommand?.(command, args, recentContent)
     }
 
     public getId(): string {

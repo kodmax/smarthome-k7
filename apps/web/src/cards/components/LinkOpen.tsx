@@ -22,10 +22,10 @@ const Link = styled('a')({
   textDecoration: 'none',
 })
 
-const LinkOpen: FC<{ href: string }> = ({ href }) => {
+const LinkOpen: FC<{ href: string; onClick?: () => void }> = ({ href, onClick }) => {
   return (
     <OpenCell>
-      <Link href={href} target='_blank' rel='noopener noreferrer'>
+      <Link href={href} target='_blank' rel='noopener noreferrer' onClick={onClick}>
         <IconLink size={icon.sizeXs - 4} strokeWidth={icon.strokeWidth} aria-hidden />
       </Link>
     </OpenCell>

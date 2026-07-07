@@ -294,6 +294,8 @@ export type JobsFeed = {
 export type Article = {
   title: string
   href: string
+  uid: string
+  read: boolean
 }
 
 export type NewsFeed = {

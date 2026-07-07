@@ -14,7 +14,7 @@ export abstract class DataSourceDefinition<T> {
   protected init(): void {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public handleCommand(_command: string, _args: string): Promise<void> {
+  public handleCommand(_command: string, _args: string, _recentContent?: T): Promise<void> {
     return Promise.resolve()
   }
 
@@ -86,7 +86,17 @@ class DataSource<T> {
   }
 
   public async handleCommand(command: string, args: string): Promise<void> {
-    await this.definition.handleCommand(command, args)
+    let recentContent: T | undefined
+
+    try {
+      recentContent = this.getRecentContent()
+    } catch (e) {
+      if (!(e instanceof NoRecentContent)) {
+        throw e
+      }
+    }
+
+    await this.definition.handleCommand(command, args, recentContent)
   }
 
   public getCron(): string | undefined {
