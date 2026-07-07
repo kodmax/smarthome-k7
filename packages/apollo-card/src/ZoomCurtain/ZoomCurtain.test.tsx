@@ -1,7 +1,22 @@
 import { act, fireEvent, renderWithTheme as render, screen } from '../test/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ZOOM_AUTO_DISMISS_MS, ZOOM_EXPAND_DURATION_MS } from './zoomConstants'
-import { ZoomContext, ZoomCurtain } from './ZoomCurtain'
+import { ZoomCurtain } from './ZoomCurtain'
+import { ZoomStateProvider } from '../ZoomStateProvider'
+import { useZoom } from '../useZoom'
+
+const cardId = 'test-card'
+
+function CardSurface() {
+  const zoom = useZoom(cardId)
+
+  return (
+    <span data-testid='card-surface'>
+      <span data-testid='zoom-state'>{zoom ? 'active' : 'idle'}</span>
+      <button type='button'>Inside card</button>
+    </span>
+  )
+}
 
 function mockBoundingClientRect() {
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
@@ -19,16 +34,11 @@ function mockBoundingClientRect() {
 
 function renderWithZoomState(allowZoom = true) {
   return render(
-    <ZoomCurtain cardId='test-card' allowZoom={allowZoom}>
-      <ZoomContext.Consumer>
-        {zoom => (
-          <span data-testid='card-surface'>
-            <span data-testid='zoom-state'>{zoom.active ? 'active' : 'idle'}</span>
-            <button type='button'>Inside card</button>
-          </span>
-        )}
-      </ZoomContext.Consumer>
-    </ZoomCurtain>,
+    <ZoomStateProvider>
+      <ZoomCurtain cardId={cardId} allowZoom={allowZoom}>
+        <CardSurface />
+      </ZoomCurtain>
+    </ZoomStateProvider>,
   )
 }
 
@@ -38,7 +48,7 @@ describe('ZoomCurtain', () => {
     vi.restoreAllMocks()
   })
 
-  it('toggles zoom state when the card is clicked', () => {
+  it('opens zoom on card click and closes it when clicking outside the card', () => {
     vi.useFakeTimers()
     mockBoundingClientRect()
 
@@ -51,6 +61,10 @@ describe('ZoomCurtain', () => {
     expect(screen.getByTestId('zoom-state')).toHaveTextContent('active')
 
     fireEvent.click(screen.getByTestId('card-surface'))
+
+    expect(screen.getByTestId('zoom-state')).toHaveTextContent('active')
+
+    fireEvent.click(screen.getByTestId('zoom-curtain'))
 
     expect(screen.getByTestId('zoom-state')).toHaveTextContent('active')
 
@@ -114,7 +128,7 @@ describe('ZoomCurtain', () => {
       vi.advanceTimersByTime(3000)
     })
 
-    fireEvent.click(screen.getByTestId('card-surface'))
+    fireEvent.click(screen.getByTestId('zoom-curtain'))
 
     act(() => {
       vi.advanceTimersByTime(ZOOM_EXPAND_DURATION_MS)

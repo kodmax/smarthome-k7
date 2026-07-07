@@ -1,5 +1,5 @@
+import { ZoomStyle } from './types'
 import { zoomCardTransition } from './zoomConstants'
-import type { ZoomStyle } from './ZoomContext/zoomReducer'
 
 function baseZoomStyle(overrides: Pick<ZoomStyle, 'bottom' | 'right' | 'left' | 'top'>): ZoomStyle {
   return {

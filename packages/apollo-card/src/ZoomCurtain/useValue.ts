@@ -1,15 +1,15 @@
-import { type MouseEventHandler, useCallback, useEffect, useReducer } from 'react'
-import { shouldIgnoreZoomClick } from '../shouldIgnoreZoomClick'
+import { type MouseEventHandler, useCallback, useEffect, useMemo, useReducer } from 'react'
+import { shouldIgnoreZoomClick } from './shouldIgnoreZoomClick'
 import { ZOOM_AUTO_DISMISS_MS, ZOOM_EXPAND_DURATION_MS } from './zoomConstants'
 import { expandedZoomStyle, zoomStyleFromRect } from './zoomStyles'
-import { zoomReducer } from './zoomReducer'
+import { zoomReducer } from './reducer'
 
 type UseZoomOptions = {
   allowZoom: boolean
   onZoom?: () => void
 }
 
-export function useZoom({ allowZoom, onZoom }: UseZoomOptions) {
+export function useValue({ allowZoom, onZoom }: UseZoomOptions) {
   const [zoom, dispatch] = useReducer(zoomReducer, { active: false })
 
   const startZoomOut = useCallback(() => {
@@ -50,20 +50,24 @@ export function useZoom({ allowZoom, onZoom }: UseZoomOptions) {
     return () => clearTimeout(timeoutId)
   }, [zoom.active, startZoomOut])
 
-  const handleClick = useCallback<MouseEventHandler<HTMLDivElement>>(
+  const handleCardClick = useCallback<MouseEventHandler<HTMLDivElement>>(
     ev => {
-      if (!allowZoom || shouldIgnoreZoomClick(ev.target)) {
+      if (!allowZoom || shouldIgnoreZoomClick(ev.target) || zoom.active) {
         return
       }
 
-      if (zoom.active) {
-        startZoomOut()
-      } else {
-        startZoomIn(ev.currentTarget)
-      }
+      startZoomIn(ev.currentTarget)
     },
-    [allowZoom, startZoomIn, startZoomOut, zoom.active],
+    [allowZoom, startZoomIn, zoom.active],
   )
 
-  return { zoom, handleClick }
+  const handleBackdropClick = useCallback<MouseEventHandler<HTMLDivElement>>(() => {
+    if (!allowZoom || !zoom.active) {
+      return
+    }
+
+    startZoomOut()
+  }, [allowZoom, startZoomOut, zoom.active])
+
+  return useMemo(() => ({ zoom, handleCardClick, handleBackdropClick }), [zoom, handleCardClick, handleBackdropClick])
 }

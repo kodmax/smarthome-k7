@@ -1,14 +1,13 @@
 import { Box, Card, CardContent, Typography, styled } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
-import { ZOOM_SCALE } from './ZoomContext/zoomConstants'
+import { ZOOM_SCALE } from './ZoomCurtain/zoomConstants'
 
 const { font } = designTokens
 
 const apolloCardRowHeight = font.body.size * font.body.lineHeight + 3
 const CARD_CONTENT_PADDING_Y_PX = 0.666 * 16 * 2
 
-export const apolloCardContentHeight = (rows: number) =>
-  `${rows * apolloCardRowHeight + CARD_CONTENT_PADDING_Y_PX}px`
+export const apolloCardContentHeight = (rows: number) => `${rows * apolloCardRowHeight + CARD_CONTENT_PADDING_Y_PX}px`
 
 export const ApolloCardHeader = styled(Box)(({ theme }) => ({
   display: 'flex',

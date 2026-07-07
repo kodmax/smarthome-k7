@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import { StockMarketIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
-import { ApolloCard, ZoomContext } from '@repo/apollo-card'
+import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
 import { StockMarketFeed } from '@repo/types'
@@ -17,6 +17,7 @@ const tableHeaderGap = designTokens.space[3]
 const headerRowSx = { '& .MuiTableCell-root': { pb: `${tableHeaderGap}px` } }
 
 export const StockMarket: FC<Record<string, never>> = () => {
+  const zoom = useZoom('stock-market')
   const feed = useFeed<StockMarketFeed>('stock-market')
   const tickers = useSortedTickers(feed)
   const marketSession = useMarketSession(feed?.marketInfo)
@@ -33,29 +34,25 @@ export const StockMarket: FC<Record<string, never>> = () => {
 
   return (
     <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9} headingInfo={headingInfo}>
-      <ZoomContext.Consumer>
-        {zoom => (
-          <StockMarketTable style={{ fontSize: cardTableFontSize, lineHeight: zoom.active ? 1.2 : undefined }}>
-            {zoom.active ? (
-              <TableHead>
-                <TableRow sx={headerRowSx}>
-                  <ApolloTableCell sx={{ width: '1em' }} />
-                  <ApolloTableCell>Symbol</ApolloTableCell>
-                  <ApolloTableCell>Do wyników</ApolloTableCell>
-                  <ApolloTableCell>Do celu</ApolloTableCell>
-                  <ApolloTableCell>C/Z@Cel</ApolloTableCell>
-                  <ApolloTableCell>Notowanie</ApolloTableCell>
-                </TableRow>
-              </TableHead>
-            ) : null}
-            <TableBody>
-              {tickers.map(item => (
-                <Ticker key={item.symbol} ticker={item} zoom={zoom.active} />
-              ))}
-            </TableBody>
-          </StockMarketTable>
-        )}
-      </ZoomContext.Consumer>
+      <StockMarketTable style={{ fontSize: cardTableFontSize, lineHeight: zoom ? 1.2 : undefined }}>
+        {zoom ? (
+          <TableHead>
+            <TableRow sx={headerRowSx}>
+              <ApolloTableCell sx={{ width: '1em' }} />
+              <ApolloTableCell>Symbol</ApolloTableCell>
+              <ApolloTableCell>Do wyników</ApolloTableCell>
+              <ApolloTableCell>Do celu</ApolloTableCell>
+              <ApolloTableCell>C/Z@Cel</ApolloTableCell>
+              <ApolloTableCell>Notowanie</ApolloTableCell>
+            </TableRow>
+          </TableHead>
+        ) : null}
+        <TableBody>
+          {tickers.map(item => (
+            <Ticker key={item.symbol} ticker={item} zoom={zoom} />
+          ))}
+        </TableBody>
+      </StockMarketTable>
     </ApolloCard>
   )
 }

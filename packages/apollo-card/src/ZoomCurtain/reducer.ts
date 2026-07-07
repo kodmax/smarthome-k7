@@ -1,29 +1,7 @@
-export type ZoomStyle = {
-  transition: string
-  bottom: number | string
-  right: number | string
-  left: number | string
-  top: number | string
-}
+import { Reducer } from 'react'
+import { ZoomAction, ZoomSetup } from './types'
 
-export type ZoomSetup =
-  | { active: false }
-  | {
-      style: ZoomStyle
-      focusStyle: ZoomStyle
-      active: true
-    }
-
-export type ZoomAction =
-  | {
-      method: 'zoom-out' | 'collapse'
-    }
-  | {
-      method: 'focus' | 'expand'
-      style: ZoomStyle
-    }
-
-export function zoomReducer(state: ZoomSetup, action: ZoomAction): ZoomSetup {
+export const zoomReducer: Reducer<ZoomSetup, ZoomAction> = (state, action) => {
   switch (action.method) {
     case 'expand':
       if (!state.active) {

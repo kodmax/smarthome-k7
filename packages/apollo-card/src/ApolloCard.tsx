@@ -11,8 +11,8 @@ import {
   ApolloCardTitle,
   apolloCardContentHeight,
 } from './styled'
-import { ZoomContext } from './ZoomContext/ZoomContext'
-import { ZoomCurtain } from './ZoomContext/ZoomCurtain'
+import { ZoomCurtain } from './ZoomCurtain'
+import { useZoom } from './useZoom'
 
 type ApolloCardProps = {
   title: string
@@ -26,7 +26,7 @@ type ApolloCardProps = {
   headingInfo?: ReactNode
 }
 
-const ApolloCard: FC<ApolloCardProps> = ({
+export const ApolloCard: FC<ApolloCardProps> = ({
   height = 4,
   children,
   title,
@@ -37,43 +37,36 @@ const ApolloCard: FC<ApolloCardProps> = ({
   onEditPreferences,
   headingInfo,
 }) => {
+  const zoom = useZoom(cardId)
   return (
     <ZoomCurtain cardId={cardId} allowZoom={allowZoom} onZoom={onZoom}>
-      <ZoomContext.Consumer>
-        {zoom => (
-          <ApolloCardRoot zoom={zoom.active}>
-            <ApolloCardHeader>
-              <Icon
-                size={designTokens.icon.sizeSm}
-                strokeWidth={designTokens.icon.strokeWidth}
-                glow='default'
-                aria-hidden
-              />
-              <ApolloCardTitle variant='h3'>{title}</ApolloCardTitle>
-              <ApolloCardHeadingInfo>{headingInfo}</ApolloCardHeadingInfo>
-              {zoom.active && onEditPreferences !== undefined ? (
-                <Actions>
-                  <IconButton aria-label='Edit preferences' onClick={onEditPreferences} size='small'>
-                    <SettingsIcon size={designTokens.icon.sizeSm} strokeWidth={designTokens.icon.strokeWidth} />
-                  </IconButton>
-                </Actions>
-              ) : null}
-            </ApolloCardHeader>
+      <ApolloCardRoot zoom={zoom}>
+        <ApolloCardHeader>
+          <Icon
+            size={designTokens.icon.sizeSm}
+            strokeWidth={designTokens.icon.strokeWidth}
+            glow='default'
+            aria-hidden
+          />
+          <ApolloCardTitle variant='h3'>{title}</ApolloCardTitle>
+          <ApolloCardHeadingInfo>{headingInfo}</ApolloCardHeadingInfo>
+          {zoom && onEditPreferences !== undefined ? (
+            <Actions>
+              <IconButton aria-label='Edit preferences' onClick={onEditPreferences} size='small'>
+                <SettingsIcon size={designTokens.icon.sizeSm} strokeWidth={designTokens.icon.strokeWidth} />
+              </IconButton>
+            </Actions>
+          ) : null}
+        </ApolloCardHeader>
 
-            <ApolloCardContent
-              sx={
-                zoom.active
-                  ? { flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }
-                  : { height: apolloCardContentHeight(height) }
-              }
-            >
-              {children}
-            </ApolloCardContent>
-          </ApolloCardRoot>
-        )}
-      </ZoomContext.Consumer>
+        <ApolloCardContent
+          sx={
+            zoom ? { flex: '1 1 auto', minHeight: 0, overflowY: 'auto' } : { height: apolloCardContentHeight(height) }
+          }
+        >
+          {children}
+        </ApolloCardContent>
+      </ApolloCardRoot>
     </ZoomCurtain>
   )
 }
-
-export default ApolloCard

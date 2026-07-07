@@ -4,7 +4,7 @@ import { WeatherIcon as WeatherCardIcon } from '@repo/assets'
 import { ApolloDataTable, HoursBars, Reading, TablePlaceholder } from '@/card-components'
 import { beaufortLevelLabel, beaufortScale } from './beaufort'
 import { optimalHumidityRange } from './optimalHumidityRange'
-import { ApolloCard, ZoomContext } from '@repo/apollo-card'
+import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { designTokens } from '@repo/design-tokens'
 import { ArrowUp } from 'lucide-react'
 import { getPosition, getMoonPosition } from 'suncalc'
@@ -14,6 +14,7 @@ import { sunTimes } from './sunTimes'
 import { toMetersPerSecond } from './windSpeed'
 
 export const Weather: FC<Record<string, never>> = () => {
+  const zoom = useZoom('current-weather')
   const feed = useFeed<WeatherFeed>('weather')
 
   if (feed === undefined) {
@@ -34,72 +35,64 @@ export const Weather: FC<Record<string, never>> = () => {
 
   return (
     <ApolloCard cardId='current-weather' title='Pogoda' icon={WeatherCardIcon}>
-      <ZoomContext.Consumer>
-        {zoom => (
-          <ApolloDataTable>
-            <TableBody>
-              <Reading
-                title='Temperatura'
-                graph={<HoursBars data={feed.outdoorTemp} highest={30} lowest={15} optimal={24} color />}
-                displayValue={Number(feed.instant.temp).toFixed(0)}
-                unit='°C'
-                colorIndicatorRange={{ optimal: 21, highest: 30, lowest: 15 }}
-                value={feed.instant.temp}
-              />
-              <Reading
-                title='Indeks UV'
-                displayValue={String(feed.instant.uv)}
-                colorIndicatorRange={{ optimal: 4, highest: 8, lowest: 0 }}
-                value={feed.instant.uv}
-              />
-              <Reading
-                title='Wilgotność'
-                displayValue={hum.toFixed(0)}
-                unit='%'
-                colorIndicatorRange={optimalHumidityRange}
-                value={hum}
-              />
-              <Reading
-                title='Predkość wiatru'
-                graph={
-                  <span style={{ fontSize: '0.5em' }}>
-                    {zoom.active ? `${bs} - ${beaufortLevelLabel(bs)}` : `${bs} B`}
-                  </span>
-                }
-                extraInfo={
-                  zoom.active ? (
-                    <ArrowUp
-                      size={designTokens.icon.sizeXs - 4}
-                      strokeWidth={designTokens.icon.strokeWidth}
-                      style={{
-                        transform: `rotate(${feed.instant.wind.angle}deg)`,
-                        marginRight: '0.25em',
-                        verticalAlign: 'middle',
-                      }}
-                    />
-                  ) : undefined
-                }
-                displayValue={String(windSpeed)}
-                unit='m/s'
-                colorIndicatorRange={{ lowest: 0, highest: 7, optimal: 1 }}
-                value={bs}
-              />
-              {!zoom.active ? null : <Reading title='Porywy wiatru' displayValue={String(windMaxSpeed)} unit='m/s' />}
-              {!zoom.active ? null : sun.timeOfDay === 'day' ? (
-                <Reading
-                  title='Wysokość słońca'
-                  displayValue={Number(sunAlt).toFixed(0)}
-                  unit='°'
-                  colorIndicatorRange={{ lowest: -6, optimal: 30, highest: 50 }}
-                  value={sunAlt}
+      <ApolloDataTable>
+        <TableBody>
+          <Reading
+            title='Temperatura'
+            graph={<HoursBars data={feed.outdoorTemp} highest={30} lowest={15} optimal={24} color />}
+            displayValue={Number(feed.instant.temp).toFixed(0)}
+            unit='°C'
+            colorIndicatorRange={{ optimal: 21, highest: 30, lowest: 15 }}
+            value={feed.instant.temp}
+          />
+          <Reading
+            title='Indeks UV'
+            displayValue={String(feed.instant.uv)}
+            colorIndicatorRange={{ optimal: 4, highest: 8, lowest: 0 }}
+            value={feed.instant.uv}
+          />
+          <Reading
+            title='Wilgotność'
+            displayValue={hum.toFixed(0)}
+            unit='%'
+            colorIndicatorRange={optimalHumidityRange}
+            value={hum}
+          />
+          <Reading
+            title='Predkość wiatru'
+            graph={<span style={{ fontSize: '0.5em' }}>{zoom ? `${bs} - ${beaufortLevelLabel(bs)}` : `${bs} B`}</span>}
+            extraInfo={
+              zoom ? (
+                <ArrowUp
+                  size={designTokens.icon.sizeXs - 4}
+                  strokeWidth={designTokens.icon.strokeWidth}
+                  style={{
+                    transform: `rotate(${feed.instant.wind.angle}deg)`,
+                    marginRight: '0.25em',
+                    verticalAlign: 'middle',
+                  }}
                 />
-              ) : (
-                <Reading title='Wysokość księżyca' displayValue={Number(moonAlt).toFixed(0)} unit='°' />
-              )}
-            </TableBody>
-          </ApolloDataTable>
-        )}
-      </ZoomContext.Consumer>
+              ) : undefined
+            }
+            displayValue={String(windSpeed)}
+            unit='m/s'
+            colorIndicatorRange={{ lowest: 0, highest: 7, optimal: 1 }}
+            value={bs}
+          />
+          {!zoom ? null : <Reading title='Porywy wiatru' displayValue={String(windMaxSpeed)} unit='m/s' />}
+          {!zoom ? null : sun.timeOfDay === 'day' ? (
+            <Reading
+              title='Wysokość słońca'
+              displayValue={Number(sunAlt).toFixed(0)}
+              unit='°'
+              colorIndicatorRange={{ lowest: -6, optimal: 30, highest: 50 }}
+              value={sunAlt}
+            />
+          ) : (
+            <Reading title='Wysokość księżyca' displayValue={Number(moonAlt).toFixed(0)} unit='°' />
+          )}
+        </TableBody>
+      </ApolloDataTable>
     </ApolloCard>
   )
 }

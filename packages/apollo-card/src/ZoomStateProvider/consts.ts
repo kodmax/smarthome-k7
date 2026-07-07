@@ -1,0 +1,1 @@
+export const ZOOM_AUTO_DISMISS_MS = 300_000

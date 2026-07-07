@@ -1,4 +1,4 @@
-import { ZOOM_IGNORE_CLICK_TAGS } from './ZoomContext/zoomConstants'
+import { ZOOM_IGNORE_CLICK_TAGS } from './zoomConstants'
 
 export function shouldIgnoreZoomClick(target: EventTarget | null): boolean {
   for (let node: Node | null = target as Node; node; node = node.parentNode) {

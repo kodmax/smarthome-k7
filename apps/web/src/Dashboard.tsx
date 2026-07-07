@@ -8,10 +8,11 @@ import { type FC } from 'react'
 import { Jobs } from './cards/Jobs'
 import { StockMarket } from './cards/stock-market'
 import { News } from './cards/News'
+import { ZoomStateProvider } from '@repo/apollo-card'
 
 export const Dashboard: FC<Record<string, never>> = () => {
   return (
-    <div>
+    <ZoomStateProvider>
       <Grid container spacing={3} sx={{ width: '100%' }}>
         <Grid size={{ xs: 12, md: 3 }}>
           <Energy />
@@ -44,6 +45,6 @@ export const Dashboard: FC<Record<string, never>> = () => {
           <News />
         </Grid>
       </Grid>
-    </div>
+    </ZoomStateProvider>
   )
 }

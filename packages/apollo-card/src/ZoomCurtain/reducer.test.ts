@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { zoomReducer } from './zoomReducer'
+import { zoomReducer } from './reducer'
 
 const style = {
   transition: 'left 0.7s ease-out',
