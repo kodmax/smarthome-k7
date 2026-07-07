@@ -1,6 +1,6 @@
 import { Day, WeekContainer } from './Day'
 import { WeatherIcon as WeatherCardIcon } from '@repo/assets'
-import { ApolloCard } from '@/apollo-card'
+import { ApolloCard } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { type FC } from 'react'
 import { DayWeatherForecast, WeatherFeed } from '@repo/types'

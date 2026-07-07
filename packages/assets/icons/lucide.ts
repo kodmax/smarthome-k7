@@ -9,6 +9,7 @@ import {
   Clapperboard,
   CloudRain,
   CloudSun,
+  Cog,
   Copy,
   Droplets,
   Flame,
@@ -21,7 +22,6 @@ import {
   List,
   Moon,
   Newspaper,
-  Settings,
   ShieldCheck,
   Snowflake,
   Sun,
@@ -71,7 +71,7 @@ export const MoviesIcon = createStyledIcon(Clapperboard, iconStyles.neutral)
 export const CameraIcon = createStyledIcon(Camera, iconStyles.warning)
 export const JobsIcon = createStyledIcon(BriefcaseBusiness, iconStyles.neutral)
 export const ListIcon = createStyledIcon(List, iconStyles.muted)
-export const SettingsIcon = createStyledIcon(Settings, iconStyles.muted)
+export const SettingsIcon = createStyledIcon(Cog, iconStyles.muted)
 export const SecurityIcon = createStyledIcon(ShieldCheck, iconStyles.air)
 export const AlertIcon = createStyledIcon(TriangleAlert, iconStyles.warning)
 export const SuccessIcon = createStyledIcon(CircleCheck, iconStyles.energy)

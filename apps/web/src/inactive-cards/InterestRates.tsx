@@ -1,5 +1,5 @@
 import { TableBody } from '@mui/material'
-import { ApolloCard } from '@/apollo-card'
+import { ApolloCard } from '@repo/apollo-card'
 import { TrendUpIcon } from '@repo/assets'
 import { ApolloDataTable, ApolloTableCell, ApolloTableRow, Graph, TablePlaceholder } from '@/card-components'
 import { useFeed } from '@repo/feed-client'

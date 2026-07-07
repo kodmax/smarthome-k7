@@ -2,7 +2,7 @@ import { TableBody } from '@mui/material'
 import { type FC } from 'react'
 import { AirVentIcon, HeaterIcon, HeatingIcon, NightIcon, SunIcon, TemperatureIcon } from '@repo/assets'
 import { ApolloDataTable, KnxReading, KnxStateIcon } from '@/card-components'
-import { ApolloCard, ZoomContext } from '@/apollo-card'
+import { ApolloCard, ZoomContext } from '@repo/apollo-card'
 import type { LucideIcon } from 'lucide-react'
 import { TemperatureData } from '@repo/types'
 

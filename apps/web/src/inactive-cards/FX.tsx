@@ -3,7 +3,7 @@ import { useCallback, type FC } from 'react'
 import { TrendUpIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloDataTable, ApolloTableCell, ApolloTableRow, Graph, TablePlaceholder } from '@/card-components'
-import { ApolloCard, ZoomContext } from '@/apollo-card'
+import { ApolloCard, ZoomContext } from '@repo/apollo-card'
 import { FXFeed, FXRates } from '@repo/types'
 
 const moreFx: Array<keyof FXRates> = ['EUR/PLN', 'USD/PLN', 'CHF/PLN', 'EUR/UAH', 'GBP/PLN', 'PLN/UAH', 'PLN/RUB']

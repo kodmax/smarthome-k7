@@ -1,5 +1,5 @@
 import { type MouseEventHandler, useCallback, useEffect, useReducer } from 'react'
-import { shouldIgnoreZoomClick } from './shouldIgnoreZoomClick'
+import { shouldIgnoreZoomClick } from '../shouldIgnoreZoomClick'
 import { ZOOM_AUTO_DISMISS_MS, ZOOM_EXPAND_DURATION_MS } from './zoomConstants'
 import { expandedZoomStyle, zoomStyleFromRect } from './zoomStyles'
 import { zoomReducer } from './zoomReducer'

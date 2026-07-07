@@ -1,6 +1,6 @@
 import { type FC } from 'react'
 import { WeatherIcon as WeatherCardIcon } from '@repo/assets'
-import { ApolloCard, ZoomContext } from '@/apollo-card'
+import { ApolloCard, ZoomContext } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { HourWeatherForecast, WeatherFeed } from '@repo/types'
 import { ForecastRow, ScrollArea } from './styled'

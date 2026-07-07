@@ -1,7 +1,7 @@
 import { TableBody } from '@mui/material'
 import { type FC } from 'react'
 import { JobsIcon } from '@repo/assets'
-import { ApolloCard, ZoomContext } from '@/apollo-card'
+import { ApolloCard, ZoomContext } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { ApolloDataTable, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'

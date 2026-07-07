@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import { StockMarketIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
-import { ApolloCard, ZoomContext } from '@/apollo-card'
+import { ApolloCard, ZoomContext } from '@repo/apollo-card'
 import { ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
 import { StockMarketFeed } from '@repo/types'

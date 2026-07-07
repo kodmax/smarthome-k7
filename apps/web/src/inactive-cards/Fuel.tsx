@@ -1,6 +1,6 @@
 import { TableBody } from '@mui/material'
 import { HeatingIcon } from '@repo/assets'
-import { ApolloCard } from '@/apollo-card'
+import { ApolloCard } from '@repo/apollo-card'
 import { ApolloDataTable, ApolloTableCell, ApolloTableRow, Graph, TablePlaceholder } from '@/card-components'
 import { useFeed } from '@repo/feed-client'
 

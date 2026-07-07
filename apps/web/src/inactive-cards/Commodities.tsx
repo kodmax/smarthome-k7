@@ -2,7 +2,7 @@ import { TableBody } from '@mui/material'
 import { type FC, useCallback } from 'react'
 import { ConsumptionIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
-import { ApolloCard, ZoomContext } from '@/apollo-card'
+import { ApolloCard, ZoomContext } from '@repo/apollo-card'
 import { ApolloDataTable, ApolloTableCell, ApolloTableRow, Graph, TablePlaceholder } from '@/card-components'
 import { CommoditiesFeed } from '@repo/types'
 

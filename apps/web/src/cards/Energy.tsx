@@ -2,7 +2,7 @@ import { TableBody } from '@mui/material'
 import { type FC, useCallback } from 'react'
 import { EnergyIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
-import { ApolloCard, ZoomContext } from '@/apollo-card'
+import { ApolloCard, ZoomContext } from '@repo/apollo-card'
 import { ApolloDataTable, KnxReading, Reading, TablePlaceholder } from '@/card-components'
 import { EnergyFeed } from '@repo/types'
 

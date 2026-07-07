@@ -57,6 +57,9 @@
     },
     {
       "path": "packages/db"
+    },
+    {
+      "path": "packages/apollo-card"
     }
   ],
   "settings": {

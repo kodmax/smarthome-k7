@@ -17,6 +17,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^7.0.0",
     "@mui/system": "^7.0.0",
+    "@repo/apollo-card": "*",
     "@repo/assets": "*",
     "@repo/design-tokens": "*",
     "@repo/feed-client": "*",

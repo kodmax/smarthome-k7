@@ -44,6 +44,7 @@ The backend (`apps/service`) must be running for cards to receive data.
 
 | Package                                          | Role                                    |
 | ------------------------------------------------ | --------------------------------------- |
+| `@repo/apollo-card`                              | Zoomable dashboard card shell           |
 | `@repo/feed-client`                              | `useFeed`, `useCommand`, `refreshFeeds` |
 | `@repo/types`                                    | Feed payload types                      |
 | `@repo/assets`                                   | Lucide icons and weather SVGs in cards  |

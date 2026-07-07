@@ -3,7 +3,7 @@ import { type FC, useCallback } from 'react'
 import { AirQualityIcon, AlertIcon } from '@repo/assets'
 
 import { ApolloDataTable, KnxReading, KnxStateIcon, Reading, TablePlaceholder } from '@/card-components'
-import { ApolloCard } from '@/apollo-card'
+import { ApolloCard } from '@repo/apollo-card'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { Co2Data, WeatherFeed } from '@repo/types'
 import { optimalHumidityRange } from './Weather/optimalHumidityRange'

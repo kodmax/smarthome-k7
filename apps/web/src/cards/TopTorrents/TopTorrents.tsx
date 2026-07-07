@@ -1,7 +1,7 @@
 import { TableBody } from '@mui/material'
 import { type FC } from 'react'
 import { MoviesIcon } from '@repo/assets'
-import { ApolloCard, ZoomContext } from '@/apollo-card'
+import { ApolloCard, ZoomContext } from '@repo/apollo-card'
 import {
   ApolloDataTable,
   ApolloTableCell,
