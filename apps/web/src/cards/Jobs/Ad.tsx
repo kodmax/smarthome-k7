@@ -23,39 +23,47 @@ export const Ad: FC<{
 }> = ({ ad, zoom, editMode, onApplied, onHide, onRestore, onFav, onUnfav }) => {
   const favSkills = useMemo(() => ad.requiredSkills.filter(isFavSkill), [ad])
   const { monthlySalaryFrom, monthlySalaryTo, b2bHourlyRateEquivalent } = useMemo(() => formatJobSalary(ad), [ad])
-  const appliedIndicator = !editMode && ad.applied ? (
-    <MailCheck
-      size={iconSize}
-      strokeWidth={designTokens.icon.strokeWidth}
-      aria-label='Złożone'
-      style={{
-        marginRight: '0.35em',
-        verticalAlign: 'middle',
-        display: 'inline',
-        color: 'var(--mui-palette-success-main)',
-      }}
-    />
-  ) : null
-  const favIndicator = !editMode && ad.fav ? (
-    <FavStarIcon
-      size={iconSize}
-      strokeWidth={designTokens.icon.strokeWidth}
-      glow='default'
-      aria-label='Ulubione'
-      style={{
-        marginRight: '0.35em',
-        verticalAlign: 'middle',
-        display: 'inline',
-      }}
-    />
-  ) : null
+  const appliedIndicator =
+    !editMode && ad.applied ? (
+      <MailCheck
+        size={iconSize}
+        strokeWidth={designTokens.icon.strokeWidth}
+        aria-label='Złożone'
+        style={{
+          marginRight: '0.35em',
+          verticalAlign: 'middle',
+          display: 'inline',
+          color: 'var(--mui-palette-success-main)',
+        }}
+      />
+    ) : null
+  const favIndicator =
+    !editMode && ad.fav ? (
+      <FavStarIcon
+        size={iconSize}
+        strokeWidth={designTokens.icon.strokeWidth}
+        glow='default'
+        aria-label='Ulubione'
+        style={{
+          marginRight: '0.35em',
+          verticalAlign: 'middle',
+          display: 'inline',
+        }}
+      />
+    ) : null
 
   return (
     <ApolloTableRow>
       {zoom ? <LinkOpen href={ad.advertUrl} /> : null}
       {zoom && editMode ? (
         <ApolloTableCell
-          sx={{ verticalAlign: 'middle', boxSizing: 'border-box', width: '6em', textOverflow: 'clip', whiteSpace: 'nowrap' }}
+          sx={{
+            verticalAlign: 'middle',
+            boxSizing: 'border-box',
+            width: '6em',
+            textOverflow: 'clip',
+            whiteSpace: 'nowrap',
+          }}
         >
           {ad.hide ? (
             <IconButton aria-label='Przywróć ofertę' onClick={() => onRestore(ad.id)} size='small'>

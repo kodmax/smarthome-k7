@@ -5,17 +5,19 @@ import { jobAd } from '@/test/fixtures/jobs'
 import { renderInTableBody } from '@/test/renderInTable'
 import { Ad } from './Ad'
 
+const noop = () => undefined
+
 function renderAd(ad: JobAd, zoom: boolean, editMode = false) {
   return renderInTableBody(
     <Ad
       ad={ad}
       zoom={zoom}
       editMode={editMode}
-      onApplied={() => {}}
-      onHide={() => {}}
-      onRestore={() => {}}
-      onFav={() => {}}
-      onUnfav={() => {}}
+      onApplied={noop}
+      onHide={noop}
+      onRestore={noop}
+      onFav={noop}
+      onUnfav={noop}
     />,
   )
 }

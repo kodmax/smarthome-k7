@@ -11,31 +11,38 @@ const COOKIES = `SOCS=${config.google.socs_cookie}`
 
 export class NewsSource extends DataSourceDefinition<NewsFeed> {
   public async handleCommand(command: string, args: string, recentContent?: NewsFeed): Promise<void> {
-    if (command === 'read') {
-      await this.markRead(args)
+    switch (command) {
+      case 'read':
+        await this.commandRead(args, recentContent)
+        break
+      case 'unread':
+        await this.commandUnread(args, recentContent)
+        break
+    }
+  }
 
-      if (recentContent !== undefined) {
-        this.push({
-          articles: recentContent.articles.map(article =>
-            article.uid === args ? { ...article, read: true } : article,
-          ),
-        })
-      }
+  private async commandRead(itemUid: string, recentContent?: NewsFeed): Promise<void> {
+    await this.markMeta(itemUid, 'read', true)
+    this.pushArticleUpdate(itemUid, recentContent, { read: true })
+  }
 
+  private async commandUnread(itemUid: string, recentContent?: NewsFeed): Promise<void> {
+    await this.unmarkMeta(itemUid, 'read')
+    this.pushArticleUpdate(itemUid, recentContent, { read: false })
+  }
+
+  private pushArticleUpdate(
+    itemUid: string,
+    recentContent: NewsFeed | undefined,
+    patch: Partial<Pick<Article, 'read'>>,
+  ): void {
+    if (recentContent === undefined) {
       return
     }
 
-    if (command === 'unread') {
-      await this.markUnread(args)
-
-      if (recentContent !== undefined) {
-        this.push({
-          articles: recentContent.articles.map(article =>
-            article.uid === args ? { ...article, read: false } : article,
-          ),
-        })
-      }
-    }
+    this.push({
+      articles: recentContent.articles.map(article => (article.uid === itemUid ? { ...article, ...patch } : article)),
+    })
   }
 
   getId() {
@@ -52,7 +59,7 @@ export class NewsSource extends DataSourceDefinition<NewsFeed> {
 
   async getData() {
     return {
-      articles: await this.withReadState(await this.fetchArticles()),
+      articles: await this.withMetaState(await this.fetchArticles()),
     }
   }
 
@@ -71,7 +78,7 @@ export class NewsSource extends DataSourceDefinition<NewsFeed> {
     })
   }
 
-  private async withReadState(articles: Article[]): Promise<Article[]> {
+  private async withMetaState(articles: Article[]): Promise<Article[]> {
     if (articles.length === 0) {
       return []
     }
@@ -80,38 +87,41 @@ export class NewsSource extends DataSourceDefinition<NewsFeed> {
     try {
       const uids = articles.map(article => article.uid)
       const rows = (await conn.query(
-        `select item_uid from meta
+        `select item_uid, attribute_name from meta
          where attribute_name = 'read'
            and item_uid in (?)
            and value = true`,
         [uids],
-      )) as Array<{ item_uid: string }>
+      )) as Array<{ item_uid: string; attribute_name: string }>
       const readUids = new Set(rows.map(row => row.item_uid))
 
-      return articles.map(article => (readUids.has(article.uid) ? { ...article, read: true } : article))
+      return articles.map(article => ({
+        ...article,
+        read: readUids.has(article.uid),
+      }))
     } finally {
       conn.release()
     }
   }
 
-  private async markRead(itemUid: string): Promise<void> {
+  private async markMeta(itemUid: string, attributeName: string, value: boolean): Promise<void> {
     const conn = await db.getConnection()
     try {
       await conn.query(
         `insert into meta (item_uid, attribute_name, value)
          values (?, ?, ?)
          on duplicate key update value = values(value)`,
-        [itemUid, 'read', true],
+        [itemUid, attributeName, value],
       )
     } finally {
       conn.release()
     }
   }
 
-  private async markUnread(itemUid: string): Promise<void> {
+  private async unmarkMeta(itemUid: string, attributeName: string): Promise<void> {
     const conn = await db.getConnection()
     try {
-      await conn.query(`delete from meta where item_uid = ? and attribute_name = 'read'`, [itemUid])
+      await conn.query(`delete from meta where item_uid = ? and attribute_name = ?`, [itemUid, attributeName])
     } finally {
       conn.release()
     }

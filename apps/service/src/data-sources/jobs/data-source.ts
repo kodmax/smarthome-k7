@@ -7,63 +7,62 @@ import { addAds } from './filters'
 
 export class JobsSource extends DataSourceDefinition<JobsFeed> {
   public async handleCommand(command: string, args: string, recentContent?: JobsFeed): Promise<void> {
-    if (command === 'applied') {
-      await this.markMeta(args, 'applied', true)
+    switch (command) {
+      case 'applied':
+        await this.commandApplied(args, recentContent)
+        break
+      case 'hide':
+        await this.commandHide(args, recentContent)
+        break
+      case 'restore':
+        await this.commandRestore(args, recentContent)
+        break
+      case 'fav':
+        await this.commandFav(args, recentContent)
+        break
+      case 'unfav':
+        await this.commandUnfav(args, recentContent)
+        break
+    }
+  }
 
-      if (recentContent !== undefined) {
-        this.push({
-          ads: recentContent.ads.map(ad => (ad.id === args ? { ...ad, applied: true } : ad)),
-        })
-      }
+  private async commandApplied(itemId: string, recentContent?: JobsFeed): Promise<void> {
+    await this.markMeta(itemId, 'applied', true)
+    this.pushAdUpdate(itemId, recentContent, { applied: true })
+  }
 
+  private async commandHide(itemId: string, recentContent?: JobsFeed): Promise<void> {
+    await this.markMeta(itemId, 'hide', true)
+    this.pushAdUpdate(itemId, recentContent, { hide: true })
+  }
+
+  private async commandRestore(itemId: string, recentContent?: JobsFeed): Promise<void> {
+    await this.unmarkMeta(itemId, 'hide')
+    this.pushAdUpdate(itemId, recentContent, { hide: false })
+  }
+
+  private async commandFav(itemId: string, recentContent?: JobsFeed): Promise<void> {
+    await this.markMeta(itemId, 'fav', true)
+    this.pushAdUpdate(itemId, recentContent, { fav: true })
+  }
+
+  private async commandUnfav(itemId: string, recentContent?: JobsFeed): Promise<void> {
+    await this.unmarkMeta(itemId, 'fav')
+    this.pushAdUpdate(itemId, recentContent, { fav: false })
+  }
+
+  private pushAdUpdate(
+    itemId: string,
+    recentContent: JobsFeed | undefined,
+    patch: Partial<Pick<JobAd, 'applied' | 'hide' | 'fav'>>,
+  ): void {
+    if (recentContent === undefined) {
       return
     }
 
-    if (command === 'hide') {
-      await this.markMeta(args, 'hide', true)
-
-      if (recentContent !== undefined) {
-        this.push({
-          ads: recentContent.ads.map(ad => (ad.id === args ? { ...ad, hide: true } : ad)),
-        })
-      }
-
-      return
-    }
-
-    if (command === 'restore') {
-      await this.unmarkMeta(args, 'hide')
-
-      if (recentContent !== undefined) {
-        this.push({
-          ads: recentContent.ads.map(ad => (ad.id === args ? { ...ad, hide: false } : ad)),
-        })
-      }
-
-      return
-    }
-
-    if (command === 'fav') {
-      await this.markMeta(args, 'fav', true)
-
-      if (recentContent !== undefined) {
-        this.push({
-          ads: recentContent.ads.map(ad => (ad.id === args ? { ...ad, fav: true } : ad)),
-        })
-      }
-
-      return
-    }
-
-    if (command === 'unfav') {
-      await this.unmarkMeta(args, 'fav')
-
-      if (recentContent !== undefined) {
-        this.push({
-          ads: recentContent.ads.map(ad => (ad.id === args ? { ...ad, fav: false } : ad)),
-        })
-      }
-    }
+    this.push({
+      ads: recentContent.ads.map(ad => (ad.id === itemId ? { ...ad, ...patch } : ad)),
+    })
   }
 
   getId() {
