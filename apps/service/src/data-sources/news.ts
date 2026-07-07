@@ -11,19 +11,31 @@ const COOKIES = `SOCS=${config.google.socs_cookie}`
 
 export class NewsSource extends DataSourceDefinition<NewsFeed> {
   public async handleCommand(command: string, args: string, recentContent?: NewsFeed): Promise<void> {
-    if (command !== 'read') {
+    if (command === 'read') {
+      await this.markRead(args)
+
+      if (recentContent !== undefined) {
+        this.push({
+          articles: recentContent.articles.map(article =>
+            article.uid === args ? { ...article, read: true } : article,
+          ),
+        })
+      }
+
       return
     }
 
-    await this.markRead(args)
+    if (command === 'unread') {
+      await this.markUnread(args)
 
-    if (recentContent === undefined) {
-      return
+      if (recentContent !== undefined) {
+        this.push({
+          articles: recentContent.articles.map(article =>
+            article.uid === args ? { ...article, read: false } : article,
+          ),
+        })
+      }
     }
-
-    this.push({
-      articles: recentContent.articles.map(article => (article.uid === args ? { ...article, read: true } : article)),
-    })
   }
 
   getId() {
@@ -91,6 +103,15 @@ export class NewsSource extends DataSourceDefinition<NewsFeed> {
          on duplicate key update value = values(value)`,
         [itemUid, 'read', true],
       )
+    } finally {
+      conn.release()
+    }
+  }
+
+  private async markUnread(itemUid: string): Promise<void> {
+    const conn = await db.getConnection()
+    try {
+      await conn.query(`delete from meta where item_uid = ? and attribute_name = 'read'`, [itemUid])
     } finally {
       conn.release()
     }
