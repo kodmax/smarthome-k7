@@ -52,6 +52,9 @@ const theprotocol: () => Promise<JobAd[]> = async () => {
       monthlySalaryRangeAfterTaxes: bestContractType.salaryRange,
       isUnwantedCompany: isUnwantedCompany(ad.employer),
       origin: 'theprotocol',
+      applied: false,
+      hide: false,
+      fav: false,
     })
   }
 

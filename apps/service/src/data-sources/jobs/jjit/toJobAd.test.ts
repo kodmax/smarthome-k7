@@ -117,6 +117,9 @@ describe('toJobAd', () => {
       workplaceType: 'hybrid',
       employmentType: 'permanent',
       origin: 'jj',
+      applied: false,
+      hide: false,
+      fav: false,
       monthlySalaryRangeAfterTaxes: {
         from: 30000,
         to: 40200,

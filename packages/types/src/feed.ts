@@ -285,6 +285,9 @@ export type JobAd = {
   monthlySalaryRangeAfterTaxes?: SalaryRange
   isUnwantedCompany: boolean
   origin: 'jj' | 'nfj' | 'theprotocol'
+  applied: boolean
+  hide: boolean
+  fav: boolean
 }
 
 export type JobsFeed = {

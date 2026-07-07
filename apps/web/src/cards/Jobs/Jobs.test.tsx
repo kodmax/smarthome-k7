@@ -7,6 +7,7 @@ import { Jobs } from './Jobs'
 
 vi.mock('@repo/feed-client', () => ({
   useFeed: vi.fn(),
+  useCommand: vi.fn(() => vi.fn()),
 }))
 
 const mockedUseFeed = vi.mocked(useFeed)

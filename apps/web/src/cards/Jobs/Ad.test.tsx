@@ -5,8 +5,19 @@ import { jobAd } from '@/test/fixtures/jobs'
 import { renderInTableBody } from '@/test/renderInTable'
 import { Ad } from './Ad'
 
-function renderAd(ad: JobAd, zoom: boolean) {
-  return renderInTableBody(<Ad ad={ad} zoom={zoom} />)
+function renderAd(ad: JobAd, zoom: boolean, editMode = false) {
+  return renderInTableBody(
+    <Ad
+      ad={ad}
+      zoom={zoom}
+      editMode={editMode}
+      onApplied={() => {}}
+      onHide={() => {}}
+      onRestore={() => {}}
+      onFav={() => {}}
+      onUnfav={() => {}}
+    />,
+  )
 }
 
 describe('Ad', () => {
@@ -38,5 +49,41 @@ describe('Ad', () => {
     expect(screen.queryByText('[Java]')).not.toBeInTheDocument()
     expect(screen.getByText(/20k — 28k/)).toBeInTheDocument()
     expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
+  })
+
+  it('shows a green mail-check icon before the title when applied outside edit mode', () => {
+    renderAd(jobAd({ id: '3', title: 'Applied Role', applied: true }), true)
+
+    expect(screen.getByLabelText('Złożone')).toBeInTheDocument()
+  })
+
+  it('shows a star icon before the title when favourite outside edit mode', () => {
+    renderAd(jobAd({ id: '3b', title: 'Favourite Role', fav: true }), true)
+
+    expect(screen.getByLabelText('Ulubione')).toBeInTheDocument()
+  })
+
+  it('disables the apply button when the ad is already applied in edit mode', () => {
+    renderAd(jobAd({ id: '4', title: 'Already Applied', applied: true }), true, true)
+
+    expect(screen.getByRole('button', { name: 'Oznacz jako złożone' })).toBeDisabled()
+  })
+
+  it('shows a restore button for hidden ads in edit mode', () => {
+    renderAd(jobAd({ id: '5', title: 'Hidden Role', hide: true }), true, true)
+
+    expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
+    expect(screen.getByRole('button', { name: 'Przywróć ofertę' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Ukryj ofertę' })).not.toBeInTheDocument()
+  })
+
+  it('keeps action buttons and swaps fav for unfav when favourite in edit mode', () => {
+    renderAd(jobAd({ id: '6', title: 'Favourite Role', fav: true }), true, true)
+
+    expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
+    expect(screen.getByRole('button', { name: 'Oznacz jako złożone' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Ukryj ofertę' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Usuń z ulubionych' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Dodaj do ulubionych' })).not.toBeInTheDocument()
   })
 })

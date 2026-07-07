@@ -24,6 +24,7 @@ import {
   Newspaper,
   ShieldCheck,
   Snowflake,
+  Star,
   Sun,
   SunMedium,
   Sunrise,
@@ -78,3 +79,4 @@ export const SuccessIcon = createStyledIcon(CircleCheck, iconStyles.energy)
 export const InfoIcon = createStyledIcon(Info, iconStyles.weather)
 export const IconLink = createStyledIcon(Link, iconStyles.link)
 export const IconCopy = createStyledIcon(Copy, iconStyles.link)
+export const FavStarIcon = createStyledIcon(Star, iconStyles.fav)

@@ -12,4 +12,5 @@ export const iconStyles = {
   neutral: { color: 'var(--mui-palette-text-primary)' },
   muted: { color: 'var(--mui-palette-text-secondary)' },
   link: { color: paletteMain('primary') },
+  fav: { color: '#EAB308' },
 } as const satisfies Record<string, StyledIconOptions>

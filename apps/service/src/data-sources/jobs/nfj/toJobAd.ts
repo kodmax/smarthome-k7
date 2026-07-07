@@ -2,10 +2,11 @@ import { JobAd } from '@repo/types'
 import { NoFluffJobsAd } from './types'
 import { isUnwantedCompany } from '../filters/filters'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
+import { digestNfjId } from './digestNfjId'
 
 export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {
   return {
-    id: ad.id,
+    id: digestNfjId(ad.id),
     origin: 'nfj',
     title: ad.title,
     advertUrl: `https://nofluffjobs.com/pl/job/${ad.url}`,
@@ -15,6 +16,9 @@ export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {
     workplaceType: hybridIds.has(ad.id) ? 'hybrid' : ad.location.fullyRemote ? 'remote' : 'office',
     employmentType: ad.salary.type === 'permanent' ? 'permanent' : 'b2b',
     isUnwantedCompany: isUnwantedCompany(ad.name),
+    applied: false,
+    hide: false,
+    fav: false,
     monthlySalaryRangeAfterTaxes:
       ad.salary.from !== undefined && ad.salary.to !== undefined
         ? getMonthlySalaryAfterTax(ad.salary.type, 'Month', ad.salary.from, ad.salary.to)

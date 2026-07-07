@@ -11,6 +11,9 @@ export function jobAd(overrides: JobAdOverrides): JobAd {
     workplaceType: 'remote',
     employmentType: 'permanent',
     isUnwantedCompany: false,
+    applied: false,
+    hide: false,
+    fav: false,
     origin: 'jj',
     ...overrides,
   }

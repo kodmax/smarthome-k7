@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { digestNfjId } from './digestNfjId'
 import { toJobAd } from './toJobAd'
 import { NoFluffJobsAd } from './types'
 
@@ -22,7 +23,7 @@ const baseNfjAd: NoFluffJobsAd = {
 describe('toJobAd', () => {
   it('converts a standard NFJ ad to JobAd', () => {
     expect(toJobAd(baseNfjAd, new Set())).toEqual({
-      id: 'nfj-123',
+      id: digestNfjId('nfj-123'),
       origin: 'nfj',
       title: 'Senior React Developer',
       advertUrl: 'https://nofluffjobs.com/pl/job/senior-react-developer-acme',
@@ -32,6 +33,9 @@ describe('toJobAd', () => {
       workplaceType: 'office',
       employmentType: 'permanent',
       isUnwantedCompany: false,
+      applied: false,
+      hide: false,
+      fav: false,
       monthlySalaryRangeAfterTaxes: { from: 18_000, to: 24_000 },
     })
   })
