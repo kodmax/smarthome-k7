@@ -35,7 +35,11 @@ const ZoomCurtain: FC<{ children: ReactNode; cardId: string; allowZoom: boolean;
         style={zoom.active ? { position: 'fixed', opacity: 0.9, zIndex: 10 } : { width: '100%' }}
       />
 
-      <div onClick={handleCardClick} style={zoom.active ? activeZoomWrapperStyle(zoom.style) : idleZoomWrapperStyle()}>
+      <div
+        data-testid='zoom-wrapper'
+        onClick={zoom.active ? handleBackdropClick : handleCardClick}
+        style={zoom.active ? activeZoomWrapperStyle(zoom.style) : idleZoomWrapperStyle()}
+      >
         {children}
       </div>
     </>

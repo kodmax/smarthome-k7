@@ -61,13 +61,16 @@ export function useValue({ allowZoom, onZoom }: UseZoomOptions) {
     [allowZoom, startZoomIn, zoom.active],
   )
 
-  const handleBackdropClick = useCallback<MouseEventHandler<HTMLDivElement>>(() => {
-    if (!allowZoom || !zoom.active) {
-      return
-    }
+  const handleBackdropClick = useCallback<MouseEventHandler<HTMLDivElement>>(
+    ev => {
+      if (!allowZoom || !zoom.active || ev.target !== ev.currentTarget) {
+        return
+      }
 
-    startZoomOut()
-  }, [allowZoom, startZoomOut, zoom.active])
+      startZoomOut()
+    },
+    [allowZoom, startZoomOut, zoom.active],
+  )
 
   return useMemo(() => ({ zoom, handleCardClick, handleBackdropClick }), [zoom, handleCardClick, handleBackdropClick])
 }

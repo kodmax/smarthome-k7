@@ -75,6 +75,25 @@ describe('ZoomCurtain', () => {
     expect(screen.getByTestId('zoom-state')).toHaveTextContent('idle')
   })
 
+  it('closes zoom when clicking the active wrapper outside the card surface', () => {
+    vi.useFakeTimers()
+    mockBoundingClientRect()
+
+    renderWithZoomState()
+
+    fireEvent.click(screen.getByTestId('card-surface'))
+
+    expect(screen.getByTestId('zoom-state')).toHaveTextContent('active')
+
+    fireEvent.click(screen.getByTestId('zoom-wrapper'))
+
+    act(() => {
+      vi.advanceTimersByTime(ZOOM_EXPAND_DURATION_MS)
+    })
+
+    expect(screen.getByTestId('zoom-state')).toHaveTextContent('idle')
+  })
+
   it('does not zoom when allowZoom is false', () => {
     renderWithZoomState(false)
 
