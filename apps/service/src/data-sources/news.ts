@@ -68,11 +68,12 @@ export class NewsSource extends DataSourceDefinition<NewsFeed> {
 
     return Array.from(document.querySelectorAll('a[href^="./read"][aria-label]')).map(anchor => {
       const href = new URL(anchor.getAttribute('href') ?? '', 'https://news.google.com').toString()
+      const title = anchor.textContent ?? ''
 
       return {
         href,
-        uid: this.digestUrl(href),
-        title: anchor.textContent ?? '',
+        uid: this.digestTitle(title),
+        title,
         read: false,
       }
     })
@@ -127,7 +128,7 @@ export class NewsSource extends DataSourceDefinition<NewsFeed> {
     }
   }
 
-  private digestUrl(url: string): string {
-    return createHash('sha256').update(url).digest('hex')
+  private digestTitle(title: string): string {
+    return createHash('sha256').update(title).digest('hex')
   }
 }
