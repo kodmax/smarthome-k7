@@ -50,6 +50,7 @@ export const Weather: FC<Record<string, never>> = () => {
             displayValue={String(feed.instant.uv)}
             colorIndicatorRange={{ optimal: 4, highest: 8, lowest: 0 }}
             value={feed.instant.uv}
+            unit='UVI'
           />
           <Reading
             title='Wilgotność'

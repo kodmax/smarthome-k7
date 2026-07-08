@@ -4,7 +4,7 @@ import { JobAd } from '@repo/types'
 import { EyeOff, MailCheck, StarPlus, StarX, Undo2 } from 'lucide-react'
 import { FC, useMemo } from 'react'
 import { designTokens } from '@repo/design-tokens'
-import { ApolloTableCell, ApolloTableRow, LinkOpen } from '@/card-components'
+import { ApolloTableCell, ApolloTableRow, LinkOpen, ReadingValue } from '@/card-components'
 import { JobTitle, Salary } from './styled'
 import { formatJobSalary } from './formatJobSalary'
 import { isFavSkill } from './isFavSkill'
@@ -115,13 +115,15 @@ export const Ad: FC<{
       </JobTitle>
       <Salary>
         {ad.monthlySalaryRangeAfterTaxes !== undefined ? (
-          <>
-            {monthlySalaryFrom}k — {monthlySalaryTo}k
-          </>
+          <ReadingValue displayValue={`${monthlySalaryFrom} — ${monthlySalaryTo}`} unit='kPLN' />
         ) : null}
       </Salary>
       {zoom ? (
-        <Salary>{ad.monthlySalaryRangeAfterTaxes !== undefined ? <>{b2bHourlyRateEquivalent}/h</> : null}</Salary>
+        <Salary>
+          {b2bHourlyRateEquivalent !== null ? (
+            <ReadingValue displayValue={b2bHourlyRateEquivalent} unit='PLN/h' />
+          ) : null}
+        </Salary>
       ) : null}
     </ApolloTableRow>
   )
