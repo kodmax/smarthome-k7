@@ -71,14 +71,6 @@ export const Ad: FC<{
             </IconButton>
           ) : (
             <>
-              <IconButton
-                aria-label='Oznacz jako złożone'
-                disabled={ad.applied}
-                onClick={() => onApplied(ad.id)}
-                size='small'
-              >
-                <MailCheck size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
-              </IconButton>
               <IconButton aria-label='Ukryj ofertę' onClick={() => onHide(ad.id)} size='small'>
                 <EyeOff size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
               </IconButton>
@@ -91,6 +83,14 @@ export const Ad: FC<{
                   <StarPlus size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
                 </IconButton>
               )}
+              <IconButton
+                aria-label='Oznacz jako złożone'
+                disabled={ad.applied}
+                onClick={() => onApplied(ad.id)}
+                size='small'
+              >
+                <MailCheck size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
+              </IconButton>
             </>
           )}
         </ApolloTableCell>
@@ -98,8 +98,8 @@ export const Ad: FC<{
       <JobTitle>
         {zoom ? (
           <>
-            {appliedIndicator}
             {favIndicator}
+            {appliedIndicator}
             {ad.title} {ad.employmentType === 'permanent' ? '[Perm]' : '[B2B]'} [{ad.workplaceType}]{' '}
             {favSkills.map(skillName => (
               <span key={skillName}>[{skillName}]</span>
@@ -107,8 +107,8 @@ export const Ad: FC<{
           </>
         ) : (
           <>
-            {appliedIndicator}
             {favIndicator}
+            {appliedIndicator}
             {ad.title}
           </>
         )}
