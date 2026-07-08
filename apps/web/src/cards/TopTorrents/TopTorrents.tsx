@@ -1,30 +1,21 @@
-import { TableBody } from '@mui/material'
 import { type FC } from 'react'
 import { MoviesIcon } from '@repo/assets'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
-import {
-  ApolloDataTable,
-  ApolloTableCell,
-  ApolloTableRow,
-  Copy,
-  TablePlaceholder,
-  TorrentSearch,
-} from '@/card-components'
+import { TablePlaceholder, TorrentSearch } from '@/card-components'
 import { useFeed } from '@repo/feed-client'
-import { designTokens } from '@repo/design-tokens'
-import styled from '@emotion/styled'
 import { Torrent } from '@repo/types'
-
-const cardTableFontSize = designTokens.font.body.size
-
-const TorrentsTable = styled(ApolloDataTable)({
-  tableLayout: 'fixed',
-  fontSize: cardTableFontSize,
-})
+import { TopTitlesTable } from './TopTitlesTable'
+import { TorrentsLoader } from './TorrentsLoader'
+import { TorrentsTableView } from './TorrentsTableView'
+import { useTopTitles } from './useTopTitles'
+import { useTorrentSearch } from './useTorrentSearch'
 
 export const TopTorrents: FC<Record<string, never>> = () => {
   const zoom = useZoom('the-pirate')
   const feed = useFeed<Torrent[]>('top-torrents')
+  const { query, lastQuery, loading, onQuery, onSearch, onClear, onTitleSearch } = useTorrentSearch(feed)
+  const topTitles = useTopTitles(feed, lastQuery)
+  const topTitlesMode = lastQuery === '' && !loading
 
   if (feed === undefined) {
     return (
@@ -37,41 +28,16 @@ export const TopTorrents: FC<Record<string, never>> = () => {
   return (
     <ApolloCard cardId='the-pirate' title='Torrenty' icon={MoviesIcon} height={4}>
       <div>
-        <div>{zoom ? <TorrentSearch /> : null}</div>
-        <TorrentsTable>
-          <TableBody>
-            {feed.map(torrent => (
-              <ApolloTableRow key={torrent.info_hash}>
-                {!zoom ? null : (
-                  <>
-                    <ApolloTableCell sx={{ width: '1.5em' }}>
-                      <Copy text={`magnet:?xt=urn:btih:${torrent.info_hash}&dn=${encodeURIComponent(torrent.name)}`} />
-                    </ApolloTableCell>
-                    {zoom ? (
-                      <ApolloTableCell data-no-close sx={{ width: '5em' }}>
-                        S: {torrent.seeders}
-                      </ApolloTableCell>
-                    ) : null}
-                    <ApolloTableCell sx={{ width: '4rem', textAlign: 'right', paddingRight: '0.5em' }}>
-                      {Number(+torrent.size / 2 ** 30).toFixed(1)} GB
-                    </ApolloTableCell>
-                  </>
-                )}
-                <ApolloTableCell sx={{ textAlign: 'left' }}>{torrent.name}</ApolloTableCell>
-                {zoom ? (
-                  <>
-                    <ApolloTableCell data-no-close sx={{ width: '4em' }}>
-                      <a href={`https://www.imdb.com/title/${torrent.imdb}/`}>Imdb</a>
-                    </ApolloTableCell>
-                    <ApolloTableCell data-no-close sx={{ width: '15em', fontSize: 5 }}>
-                      {`magnet:?xt=urn:btih:${torrent.info_hash}&dn=${encodeURIComponent(torrent.name)}`}
-                    </ApolloTableCell>
-                  </>
-                ) : null}
-              </ApolloTableRow>
-            ))}
-          </TableBody>
-        </TorrentsTable>
+        <div>
+          {zoom ? <TorrentSearch query={query} onQuery={onQuery} onSearch={onSearch} onClear={onClear} /> : null}
+        </div>
+        {topTitlesMode ? (
+          <TopTitlesTable topTitles={topTitles} onTitleSearch={onTitleSearch} />
+        ) : loading ? (
+          <TorrentsLoader />
+        ) : (
+          <TorrentsTableView torrents={feed} zoom={zoom} />
+        )}
       </div>
     </ApolloCard>
   )

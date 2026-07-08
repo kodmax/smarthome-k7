@@ -112,7 +112,7 @@ export type Torrent = {
   added: string
   category: string
   id: string
-  imdb: string
+  imdb: string | null
   info_hash: string
   leechers: string
   name: string
