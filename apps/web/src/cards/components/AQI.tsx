@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import { useFeed } from '@repo/feed-client'
 import { ColorIndicator } from './ColorIndication'
-import { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
+import { ApolloTableCell, ApolloTableRow, ApolloValueCell } from './ApolloDataTable'
 import ValuePlaceholder from './ValuePlaceholder'
 import { WeatherFeed } from '@repo/types'
 
@@ -14,10 +14,10 @@ const AQI: FC<{ label: string }> = ({ label }) => {
         <ApolloTableCell>{label}</ApolloTableCell>
         <ApolloTableCell />
         <ApolloTableCell />
-        <ApolloTableCell>
+        <ApolloValueCell>
           <ColorIndicator instant={feed.aq.aqi} range={{ optimal: 0, highest: 150 }} />
           {feed.aq.aqi} AQI
-        </ApolloTableCell>
+        </ApolloValueCell>
       </ApolloTableRow>
     )
   }

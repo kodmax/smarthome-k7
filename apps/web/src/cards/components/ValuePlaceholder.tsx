@@ -1,5 +1,5 @@
 import { ReactNode, type FC } from 'react'
-import { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
+import { ApolloTableCell, ApolloTableRow, ApolloValueCell } from './ApolloDataTable'
 
 type ValuePlaceholderProps = {
   label: ReactNode
@@ -10,7 +10,7 @@ const ValuePlaceholder: FC<ValuePlaceholderProps> = ({ label }) => (
     <ApolloTableCell>{label}</ApolloTableCell>
     <ApolloTableCell />
     <ApolloTableCell />
-    <ApolloTableCell sx={{ color: 'text.disabled' }}>--</ApolloTableCell>
+    <ApolloValueCell sx={{ color: 'text.disabled' }}>--</ApolloValueCell>
   </ApolloTableRow>
 )
 

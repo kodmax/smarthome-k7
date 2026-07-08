@@ -1,6 +1,6 @@
 import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import ApolloDataTable, { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
+import ApolloDataTable, { ApolloTableCell, ApolloTableRow, ApolloValueCell } from './ApolloDataTable'
 
 const TablePlaceholder: FC<{ rows: number; graph: boolean; value: boolean }> = ({ rows, graph, value }) => {
   return (
@@ -27,11 +27,11 @@ const TablePlaceholder: FC<{ rows: number; graph: boolean; value: boolean }> = (
               </ApolloTableCell>
             )}
             {!value ? null : (
-              <ApolloTableCell sx={{ width: '20%' }}>
+              <ApolloValueCell sx={{ width: '20%' }}>
                 <span style={{ background: 'hsl(0deg 0% 50% / 10%)', width: '80%', display: 'inline-block' }}>
                   &nbsp;
                 </span>
-              </ApolloTableCell>
+              </ApolloValueCell>
             )}
           </ApolloTableRow>
         ))}

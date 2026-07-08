@@ -11,6 +11,7 @@ export const Salary = styled(ApolloTableCell)({
   width: '6em',
   padding: 0,
   borderBottom: 'none',
+  textAlign: 'right',
 })
 
 export const SkillsList = styled('ul')({

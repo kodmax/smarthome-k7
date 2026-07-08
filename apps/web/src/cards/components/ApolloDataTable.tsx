@@ -26,10 +26,10 @@ export const ApolloTableCell = styled(TableCell)(({ theme }) => ({
   '&:not(.MuiTableCell-head)': {
     fontSize: 'inherit',
   },
-  '&:last-of-type:not(:first-of-type)': {
-    textAlign: 'right',
-    color: theme.vars.palette.text.primary,
-  },
 }))
+
+export const ApolloValueCell = styled(ApolloTableCell)({
+  textAlign: 'right',
+})
 
 export default ApolloDataTable

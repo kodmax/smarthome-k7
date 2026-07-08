@@ -2,6 +2,7 @@ export {
   default as ApolloDataTable,
   ApolloTableCell,
   ApolloTableRow,
+  ApolloValueCell,
   apolloDataTableRowHeight,
 } from './ApolloDataTable'
 export { default as AQI } from './AQI'

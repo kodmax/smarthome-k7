@@ -1,7 +1,7 @@
 import { styled } from '@mui/material'
 import { FC, type ReactNode } from 'react'
 import { ColorIndicator, type ColorIndicationRange } from './ColorIndication'
-import { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
+import { ApolloTableCell, ApolloTableRow, ApolloValueCell } from './ApolloDataTable'
 import Copy from './Copy'
 import ValuePlaceholder from './ValuePlaceholder'
 
@@ -40,7 +40,7 @@ export const Reading: FC<Props> = ({
       <ApolloTableCell>{title}</ApolloTableCell>
       <ApolloTableCell>{graph}</ApolloTableCell>
       <ApolloTableCell>{extraInfo}</ApolloTableCell>
-      <ApolloTableCell>
+      <ApolloValueCell>
         {colorIndicatorRange !== undefined && value !== undefined ? (
           <ColorIndicator instant={value} range={colorIndicatorRange} />
         ) : null}
@@ -52,7 +52,7 @@ export const Reading: FC<Props> = ({
             <Unit>{unit}</Unit>
           </>
         ) : null}
-      </ApolloTableCell>
+      </ApolloValueCell>
     </ApolloTableRow>
   )
 }

@@ -1,6 +1,6 @@
 import { type FC } from 'react'
 import { useFeed } from '@repo/feed-client'
-import { ApolloTableCell, ApolloTableRow } from './ApolloDataTable'
+import { ApolloTableCell, ApolloTableRow, ApolloValueCell } from './ApolloDataTable'
 import { Graph } from './Graph'
 import ValuePlaceholder from './ValuePlaceholder'
 import { WeatherFeed } from '@repo/types'
@@ -26,7 +26,7 @@ const Pressure: FC = () => {
         />
       </ApolloTableCell>
       <ApolloTableCell />
-      <ApolloTableCell>{Number(feed.pressure.instant).toFixed(0)} hPa</ApolloTableCell>
+      <ApolloValueCell>{Number(feed.pressure.instant).toFixed(0)} hPa</ApolloValueCell>
     </ApolloTableRow>
   )
 }

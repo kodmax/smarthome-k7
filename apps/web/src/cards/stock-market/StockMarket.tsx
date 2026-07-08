@@ -2,11 +2,10 @@ import { type FC } from 'react'
 import { StockMarketIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
-import { ApolloTableCell, TablePlaceholder } from '@/card-components'
+import { ApolloDataTable, ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
 import { StockMarketFeed } from '@repo/types'
 import { Ticker } from './Ticker'
-import { StockMarketTable } from './styled'
 import { TableBody, TableHead, TableRow } from '@mui/material'
 import { useSortedTickers } from './useSortedTickers'
 import { useMarketSession } from './useMarketSession'
@@ -34,7 +33,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
 
   return (
     <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9} headingInfo={headingInfo}>
-      <StockMarketTable style={{ fontSize: cardTableFontSize, lineHeight: zoom ? 1.2 : undefined }}>
+      <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: zoom ? 1.2 : undefined }}>
         {zoom ? (
           <TableHead>
             <TableRow sx={headerRowSx}>
@@ -52,7 +51,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
             <Ticker key={item.symbol} ticker={item} zoom={zoom} />
           ))}
         </TableBody>
-      </StockMarketTable>
+      </ApolloDataTable>
     </ApolloCard>
   )
 }

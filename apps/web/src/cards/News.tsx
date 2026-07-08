@@ -118,7 +118,7 @@ export const News: FC<Record<string, never>> = () => {
                 </ApolloTableRow>
               ) : (
                 <ApolloTableRow key={article.uid}>
-                  <ApolloTableCell sx={{ textAlign: 'left' }}>{article.title}</ApolloTableCell>
+                  <ApolloTableCell>{article.title}</ApolloTableCell>
                 </ApolloTableRow>
               ),
             )}

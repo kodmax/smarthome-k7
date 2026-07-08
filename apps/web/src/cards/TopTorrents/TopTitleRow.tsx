@@ -15,7 +15,7 @@ type TopTitleRowProps = {
 export const TopTitleRow: FC<TopTitleRowProps> = ({ topTitle: { title, imdb }, onTitleSearch }) => (
   <ApolloTableRow>
     {imdb ? <LinkOpen href={`https://www.imdb.com/title/${imdb}/`} /> : <ApolloTableCell />}
-    <ApolloTableCell sx={{ textAlign: 'left !important' }}>
+    <ApolloTableCell>
       {title}
       <IconButton
         aria-label={`Search torrents for ${title}`}
