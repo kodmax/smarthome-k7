@@ -49,7 +49,8 @@ describe('Ad', () => {
     expect(screen.getByText('[TypeScript]')).toBeInTheDocument()
     expect(screen.getByText('[React]')).toBeInTheDocument()
     expect(screen.queryByText('[Java]')).not.toBeInTheDocument()
-    expect(screen.getByText(/20k — 28k/)).toBeInTheDocument()
+    expect(screen.getByText('20 — 28')).toBeInTheDocument()
+    expect(screen.getByText('kPLN')).toBeInTheDocument()
     expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
   })
 
