@@ -5,7 +5,14 @@ import { NewsIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
 import { refreshFeeds, useCommand, useFeed } from '@repo/feed-client'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
-import { ApolloDataTable, ApolloTableCell, ApolloTableRow, LinkOpen, TablePlaceholder } from '@/card-components'
+import {
+  ApolloDataTable,
+  ApolloTableCell,
+  ApolloTableRow,
+  LinkOpen,
+  TableEmptyMessage,
+  TablePlaceholder,
+} from '@/card-components'
 import { NewsFeed } from '@repo/types'
 
 const iconSize = designTokens.icon.sizeXs - 4
@@ -68,6 +75,8 @@ export const News: FC<Record<string, never>> = () => {
     >
       {!articles ? (
         <TablePlaceholder rows={10} graph={false} value={false} />
+      ) : articles.length === 0 ? (
+        <TableEmptyMessage>Na razie nie ma tu nic nowego</TableEmptyMessage>
       ) : (
         <ApolloDataTable style={{ tableLayout: 'fixed' }}>
           <TableBody>

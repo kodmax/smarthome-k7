@@ -3,7 +3,7 @@ import { type FC, useCallback, useEffect, useState } from 'react'
 import { JobsIcon } from '@repo/assets'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { useCommand, useFeed } from '@repo/feed-client'
-import { ApolloDataTable, TablePlaceholder } from '@/card-components'
+import { ApolloDataTable, TableEmptyMessage, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
 import { JobsFeed } from '@repo/types'
 import { Ad } from './Ad'
@@ -66,6 +66,8 @@ export const Jobs: FC<Record<string, never>> = () => {
     }
   }, [zoom])
 
+  const ads = feed?.ads.filter(ad => !ad.hide || editMode) ?? []
+
   return (
     <ApolloCard
       cardId='jobs'
@@ -77,28 +79,26 @@ export const Jobs: FC<Record<string, never>> = () => {
     >
       {!feed ? (
         <TablePlaceholder rows={12} graph={true} value={true} />
+      ) : ads.length === 0 ? (
+        <TableEmptyMessage>Na razie nie ma tu nic nowego</TableEmptyMessage>
       ) : (
-        <>
-          <ApolloDataTable style={{ fontSize: cardTableFontSize, tableLayout: 'fixed', width: '100%' }}>
-            <TableBody>
-              {feed.ads
-                .filter(ad => !ad.hide || editMode)
-                .map(ad => (
-                  <Ad
-                    key={ad.id}
-                    ad={ad}
-                    zoom={zoom}
-                    editMode={editMode}
-                    onApplied={onAppliedJob}
-                    onHide={onHideJob}
-                    onRestore={onRestoreJob}
-                    onFav={onFavJob}
-                    onUnfav={onUnfavJob}
-                  />
-                ))}
-            </TableBody>
-          </ApolloDataTable>
-        </>
+        <ApolloDataTable style={{ fontSize: cardTableFontSize, tableLayout: 'fixed', width: '100%' }}>
+          <TableBody>
+            {ads.map(ad => (
+              <Ad
+                key={ad.id}
+                ad={ad}
+                zoom={zoom}
+                editMode={editMode}
+                onApplied={onAppliedJob}
+                onHide={onHideJob}
+                onRestore={onRestoreJob}
+                onFav={onFavJob}
+                onUnfav={onUnfavJob}
+              />
+            ))}
+          </TableBody>
+        </ApolloDataTable>
       )}
     </ApolloCard>
   )
