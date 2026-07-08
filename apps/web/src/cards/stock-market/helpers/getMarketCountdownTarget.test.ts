@@ -76,6 +76,12 @@ describe('getMarketCountdownTarget', () => {
     expect(getEffectiveMarketStatus({ ...marketInfo, status: 'Open' }, 1783454400001)).toBe('After-Hours')
   })
 
+  it('treats market as closed after after-hours ends even when feed still says closed overnight', () => {
+    const oneMinuteAfterAfterHoursClose = marketInfo.afterHoursMarketClosingTime + 60_000
+
+    expect(getEffectiveMarketStatus({ ...marketInfo, status: 'Closed' }, oneMinuteAfterAfterHoursClose)).toBe('Closed')
+  })
+
   it('never shows negative countdown values when feed timestamps are in the past', () => {
     expect(getMarketCountdownRemaining(marketInfo, 1783600000000)).toBe(0)
     expect(getMarketCountdownTarget(marketInfo, 1783600000000)).toEqual({
