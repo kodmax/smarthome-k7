@@ -33,7 +33,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
 
   return (
     <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9} headingInfo={headingInfo}>
-      <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: zoom ? 1.2 : undefined }}>
+      <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: zoom ? 2 : undefined }}>
         {zoom ? (
           <TableHead>
             <TableRow sx={headerRowSx}>
