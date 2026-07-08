@@ -1,5 +1,5 @@
 import { IconButton, TableBody } from '@mui/material'
-import { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { EyeOff, Undo2 } from 'lucide-react'
 import { NewsIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
@@ -47,6 +47,16 @@ export const News: FC<Record<string, never>> = () => {
     }
   }, [zoom])
 
+  const articles = useMemo(() => {
+    if (news === undefined) {
+      return undefined
+    }
+
+    return editMode
+      ? news.articles.slice().sort((a, b) => +a.read - +b.read)
+      : news.articles.filter(article => !article.read)
+  }, [editMode, news])
+
   return (
     <ApolloCard
       cardId='news'
@@ -56,55 +66,53 @@ export const News: FC<Record<string, never>> = () => {
       onZoom={onZoom}
       onEditPreferences={onEditPreferences}
     >
-      {!news ? (
+      {!articles ? (
         <TablePlaceholder rows={10} graph={false} value={false} />
       ) : (
         <ApolloDataTable style={{ tableLayout: 'fixed' }}>
           <TableBody>
-            {news.articles
-              .filter(article => (editMode ? true : !article.read))
-              .map(article =>
-                zoom ? (
-                  <ApolloTableRow key={article.uid}>
-                    <LinkOpen href={article.href} onClick={() => onOpenArticle(article.uid)} />
-                    {editMode ? (
-                      <ApolloTableCell
-                        sx={{
-                          verticalAlign: 'middle',
-                          boxSizing: 'border-box',
-                          width: '4em',
-                          textOverflow: 'clip',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {article.read ? (
-                          <IconButton
-                            aria-label='Oznacz jako nieprzeczytane'
-                            onClick={() => onUnreadArticle(article.uid)}
-                            size='small'
-                          >
-                            <Undo2 size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
-                          </IconButton>
-                        ) : (
-                          <IconButton
-                            aria-label='Oznacz jako przeczytane'
-                            onClick={() => onOpenArticle(article.uid)}
-                            size='small'
-                          >
-                            <EyeOff size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
-                          </IconButton>
-                        )}
-                      </ApolloTableCell>
-                    ) : null}
-                    <ApolloTableCell>{article.title}</ApolloTableCell>
-                    <ApolloTableCell sx={{ width: 0 }}></ApolloTableCell>
-                  </ApolloTableRow>
-                ) : (
-                  <ApolloTableRow key={article.uid}>
-                    <ApolloTableCell sx={{ textAlign: 'left' }}>{article.title}</ApolloTableCell>
-                  </ApolloTableRow>
-                ),
-              )}
+            {articles.map(article =>
+              zoom ? (
+                <ApolloTableRow key={article.uid}>
+                  <LinkOpen href={article.href} onClick={() => onOpenArticle(article.uid)} />
+                  {editMode ? (
+                    <ApolloTableCell
+                      sx={{
+                        verticalAlign: 'middle',
+                        boxSizing: 'border-box',
+                        width: '4em',
+                        textOverflow: 'clip',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {article.read ? (
+                        <IconButton
+                          aria-label='Oznacz jako nieprzeczytane'
+                          onClick={() => onUnreadArticle(article.uid)}
+                          size='small'
+                        >
+                          <Undo2 size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          aria-label='Oznacz jako przeczytane'
+                          onClick={() => onOpenArticle(article.uid)}
+                          size='small'
+                        >
+                          <EyeOff size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
+                        </IconButton>
+                      )}
+                    </ApolloTableCell>
+                  ) : null}
+                  <ApolloTableCell>{article.title}</ApolloTableCell>
+                  <ApolloTableCell sx={{ width: 0 }}></ApolloTableCell>
+                </ApolloTableRow>
+              ) : (
+                <ApolloTableRow key={article.uid}>
+                  <ApolloTableCell sx={{ textAlign: 'left' }}>{article.title}</ApolloTableCell>
+                </ApolloTableRow>
+              ),
+            )}
           </TableBody>
         </ApolloDataTable>
       )}
