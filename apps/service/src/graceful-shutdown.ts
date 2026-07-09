@@ -30,12 +30,19 @@ const closeConnections = async (): Promise<void> => {
     apolloFeeds.close()
   }
 
-  if (apolloServer !== undefined) {
-    await apolloServer.close()
+  const knx = knxLink
+  knxLink = undefined
+
+  if (knx !== undefined) {
+    try {
+      await knx.disconnect()
+    } catch (err) {
+      console.error('KNX disconnect failed:', err)
+    }
   }
 
-  if (knxLink !== undefined) {
-    await knxLink.disconnect()
+  if (apolloServer !== undefined) {
+    await apolloServer.close()
   }
 
   await closeDbPool()
