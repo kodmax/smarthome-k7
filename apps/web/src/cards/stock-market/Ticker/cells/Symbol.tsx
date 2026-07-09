@@ -10,7 +10,7 @@ const Ticker = styled('strong')<{ zoom: boolean }>(({ zoom }) => ({
 export const Symbol: FC<{ ticker: TickerData; zoom: boolean }> = ({ ticker, zoom }) => {
   return (
     <>
-      {zoom ? <LinkOpen href={`https://finance.yahoo.com/quote/${ticker.symbol}/`} /> : null}
+      <LinkOpen href={`https://finance.yahoo.com/quote/${ticker.symbol}/`} />
       <ApolloTableCell>
         <Ticker zoom={zoom}>{ticker.symbol}</Ticker>
       </ApolloTableCell>
