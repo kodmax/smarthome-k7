@@ -17,8 +17,8 @@ export function buildHoursBarHeights(
   const range = highest - lowest
 
   for (const dp of dataPoints) {
-    const v = range === 0 ? 0 : ((dp.value - lowest) / range) * barHeight
-    bars[dp.hour] = v
+    const scaled = range === 0 ? 0 : ((dp.value - lowest) / range) * barHeight
+    bars[dp.hour] = Math.max(0, Math.min(barHeight, scaled))
   }
 
   return bars

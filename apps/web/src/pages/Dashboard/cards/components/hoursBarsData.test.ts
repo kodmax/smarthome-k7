@@ -26,4 +26,16 @@ describe('buildHoursBarHeights', () => {
 
     expect(bars[8]).toBeCloseTo(28.571, 2)
   })
+
+  it('clamps values below lowest to zero height', () => {
+    const bars = buildHoursBarHeights([{ hour: 6, value: 14 }], 30, 15)
+
+    expect(bars[6]).toBe(0)
+  })
+
+  it('clamps values above highest to full height', () => {
+    const bars = buildHoursBarHeights([{ hour: 18, value: 35 }], 30, 15)
+
+    expect(bars[18]).toBe(100)
+  })
 })
