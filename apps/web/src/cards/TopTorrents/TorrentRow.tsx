@@ -31,11 +31,7 @@ export const TorrentRow: FC<TorrentRowProps> = ({ torrent, zoom, onDownload }) =
     )}
     <ApolloTableCell>{torrent.name}</ApolloTableCell>
     <ApolloTableCell sx={{ width: '2.5em' }}>
-      <IconButton
-        aria-label={`Download ${torrent.name}`}
-        onClick={() => onDownload(magnetLink(torrent))}
-        size='small'
-      >
+      <IconButton aria-label={`Download ${torrent.name}`} onClick={() => onDownload(magnetLink(torrent))} size='small'>
         <Download size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
       </IconButton>
     </ApolloTableCell>

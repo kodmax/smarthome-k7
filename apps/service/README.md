@@ -24,17 +24,17 @@ The WebSocket server listens on port **3678**.
 
 Copy `.env.example` and fill in:
 
-| Variable                                         | Description                                      |
-| ------------------------------------------------ | ------------------------------------------------ |
-| `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_SCHEMA` | MariaDB runtime pool (`@repo/db`)                |
-| `KNX_HOST`                                       | KNX gateway address (required unless `NO_KNX=1`) |
-| `NO_KNX`                                         | `1` — disables KNX feeds and cron jobs           |
-| `NO_CRON`                                        | `1` — disables KNX cron jobs (requires KNX)      |
-| `CACHE_DIR`                                      | Feed cache directory (default `.cache`)          |
-| `LOCATION_LAT`, `LOCATION_LONG`                  | Coordinates (weather, suncalc)                   |
-| `GOOGLE_SOCS_COOKIE`                             | Cookie for Google weather scraping               |
-| `NFJ_COOKIE`, `THEPROTOCOL_COOKIE`               | Cookies for job board scraping                   |
-| `TRANSMISSION_URL`, `TRANSMISSION_USERNAME`, `TRANSMISSION_PASSWORD` | Transmission RPC (`@repo/transmission`) |
+| Variable                                                             | Description                                      |
+| -------------------------------------------------------------------- | ------------------------------------------------ |
+| `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_SCHEMA`                     | MariaDB runtime pool (`@repo/db`)                |
+| `KNX_HOST`                                                           | KNX gateway address (required unless `NO_KNX=1`) |
+| `NO_KNX`                                                             | `1` — disables KNX feeds and cron jobs           |
+| `NO_CRON`                                                            | `1` — disables KNX cron jobs (requires KNX)      |
+| `CACHE_DIR`                                                          | Feed cache directory (default `.cache`)          |
+| `LOCATION_LAT`, `LOCATION_LONG`                                      | Coordinates (weather, suncalc)                   |
+| `GOOGLE_SOCS_COOKIE`                                                 | Cookie for Google weather scraping               |
+| `NFJ_COOKIE`, `THEPROTOCOL_COOKIE`                                   | Cookies for job board scraping                   |
+| `TRANSMISSION_URL`, `TRANSMISSION_USERNAME`, `TRANSMISSION_PASSWORD` | Transmission RPC (`@repo/transmission`)          |
 
 ## Feeds
 
