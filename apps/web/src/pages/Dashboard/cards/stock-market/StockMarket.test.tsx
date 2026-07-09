@@ -1,7 +1,7 @@
 import { renderWithTheme as render, screen } from '@/test/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useFeed } from '@repo/feed-client'
-import { stockMarketFeed, ticker } from '@/test/fixtures/stockMarket'
+import { stockMarketFeed, ticker } from '@/pages/Dashboard/test/fixtures/stockMarket'
 import { StockMarket } from './StockMarket'
 
 vi.mock('@repo/feed-client', () => ({

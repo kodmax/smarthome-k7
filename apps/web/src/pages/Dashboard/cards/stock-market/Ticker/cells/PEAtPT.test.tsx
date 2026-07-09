@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { ticker } from '@/test/fixtures/stockMarket'
-import { renderInTableRow } from '@/test/renderInTable'
+import { ticker } from '@/pages/Dashboard/test/fixtures/stockMarket'
+import { renderInTableRow } from '@/pages/Dashboard/test/renderInTable'
 import { PEAtPT } from './PEAtPT'
 
 describe('PEAtPT', () => {

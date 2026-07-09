@@ -1,7 +1,7 @@
 import { renderWithTheme as render, screen } from '@/test/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useFeed } from '@repo/feed-client'
-import { weatherFeed } from '@/test/fixtures/weather'
+import { weatherFeed } from '@/pages/Dashboard/test/fixtures/weather'
 import { Weather } from './Weather'
 
 vi.mock('@repo/feed-client', () => ({

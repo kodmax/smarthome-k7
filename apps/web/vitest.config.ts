@@ -12,7 +12,7 @@ export default mergeConfig(
       alias: [
         {
           find: '@/card-components',
-          replacement: path.resolve(srcDir, 'src/cards/components'),
+          replacement: path.resolve(srcDir, 'src/pages/Dashboard/cards/components'),
         },
         {
           find: '@',

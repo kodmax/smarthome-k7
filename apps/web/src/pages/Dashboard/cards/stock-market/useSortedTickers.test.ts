@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { stockMarketFeed, ticker } from '@/test/fixtures/stockMarket'
+import { stockMarketFeed, ticker } from '@/pages/Dashboard/test/fixtures/stockMarket'
 import { useSortedTickers } from './useSortedTickers'
 
 describe('useSortedTickers', () => {

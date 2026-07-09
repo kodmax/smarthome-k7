@@ -51,7 +51,7 @@ The backend (`apps/service`) must be running for cards to receive data.
 | `@repo/design-tokens`                            | Shared MUI theme                        |
 | `@repo/eslint-config`, `@repo/typescript-config` | Tooling                                 |
 
-Cards in `src/cards/` map WebSocket topics to UI components. App entry point: `src/main.tsx`.
+Cards in `src/pages/Dashboard/cards/` map WebSocket topics to UI components. App entry point: `src/main.tsx`.
 
 ## Theming
 

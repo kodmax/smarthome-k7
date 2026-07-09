@@ -8,7 +8,7 @@ export default defineConfig({
     alias: [
       {
         find: '@/card-components',
-        replacement: fileURLToPath(new URL('./src/cards/components', import.meta.url)),
+        replacement: fileURLToPath(new URL('./src/pages/Dashboard/cards/components', import.meta.url)),
       },
       {
         find: '@',

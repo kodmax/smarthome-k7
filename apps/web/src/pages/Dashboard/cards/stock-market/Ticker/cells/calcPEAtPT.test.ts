@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ticker } from '@/test/fixtures/stockMarket'
+import { ticker } from '@/pages/Dashboard/test/fixtures/stockMarket'
 import { calcPEAtPT } from './calcPEAtPT'
 
 describe('calcPEAtPT', () => {

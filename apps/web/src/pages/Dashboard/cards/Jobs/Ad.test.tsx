@@ -1,8 +1,8 @@
 import { type JobAd } from '@repo/types'
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { jobAd } from '@/test/fixtures/jobs'
-import { renderInTableBody } from '@/test/renderInTable'
+import { jobAd } from '@/pages/Dashboard/test/fixtures/jobs'
+import { renderInTableBody } from '@/pages/Dashboard/test/renderInTable'
 import { Ad } from './Ad'
 
 const noop = () => undefined

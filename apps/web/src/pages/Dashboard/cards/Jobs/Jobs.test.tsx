@@ -1,8 +1,8 @@
 import { renderWithTheme as render, screen } from '@/test/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useFeed } from '@repo/feed-client'
-import { jobAd } from '@/test/fixtures/jobs'
-import { jobsFeed } from '@/test/fixtures/jobsFeed'
+import { jobAd } from '@/pages/Dashboard/test/fixtures/jobs'
+import { jobsFeed } from '@/pages/Dashboard/test/fixtures/jobsFeed'
 import { Jobs } from './Jobs'
 
 vi.mock('@repo/feed-client', () => ({
