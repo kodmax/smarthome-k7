@@ -5,6 +5,7 @@ import './theme.types'
 const { shared, schemes } = tokens
 const darkScheme = schemes.dark
 const { font, radius, layout, breakpoint, borderWidth } = shared
+const { bodyPadding } = layout
 
 type SchemeTokens = typeof darkScheme
 
@@ -156,18 +157,12 @@ export const theme = createTheme({
         body: {
           backgroundColor: 'var(--mui-palette-background-default)',
           color: 'var(--mui-palette-text-primary)',
-          padding: layout.paddingMobile,
+          padding: `${bodyPadding.top}px ${bodyPadding.right}px ${bodyPadding.bottom}px ${bodyPadding.left}px`,
           fontSize: font.body.size,
           lineHeight: font.body.lineHeight,
           maxWidth: layout.containerMax,
           margin: '0 auto',
           minHeight: '100%',
-          [`@media (min-width:${breakpoint.md}px)`]: {
-            padding: layout.paddingTablet,
-          },
-          [`@media (min-width:${breakpoint.lg}px)`]: {
-            padding: layout.paddingDesktop,
-          },
         },
       },
     },

@@ -30,7 +30,6 @@ export const SideMenuToggle: FC<SideMenuToggleProps> = ({ open, onToggle }) => {
         border: '1px solid',
         borderColor: open ? 'divider' : TOGGLE_CLOSED_BORDER_COLOR,
         bgcolor: 'background.paper',
-        boxShadow: open ? designTokens.shadow.sm : designTokens.shadow.card,
         transition: `left ${designTokens.transition.normal}, top ${designTokens.transition.normal}, width ${designTokens.transition.normal}, height ${designTokens.transition.normal}, border-radius ${designTokens.transition.normal}`,
         '&:hover': {
           bgcolor: 'surfaceElevated.main',

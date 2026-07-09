@@ -1,6 +1,6 @@
 export const DRAWER_WIDTH = 272
 export const TOGGLE_OPEN_SIZE = 24
-export const TOGGLE_CLOSED_SIZE = 32
+export const TOGGLE_CLOSED_SIZE = 40
 export const TOGGLE_CLOSED_OFFSET = 8
 export const TOGGLE_CLOSED_Z_INDEX = 100
 export const TOGGLE_OFFSET_Y = 8
