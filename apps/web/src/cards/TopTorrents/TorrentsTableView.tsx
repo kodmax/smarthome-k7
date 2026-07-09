@@ -7,13 +7,14 @@ import { TorrentsTable } from './styled'
 type TorrentsTableViewProps = {
   torrents: Torrent[]
   zoom: boolean
+  onDownload: (magnetLink: string) => void
 }
 
-export const TorrentsTableView: FC<TorrentsTableViewProps> = ({ torrents, zoom }) => (
+export const TorrentsTableView: FC<TorrentsTableViewProps> = ({ torrents, zoom, onDownload }) => (
   <TorrentsTable>
     <TableBody>
       {torrents.map(torrent => (
-        <TorrentRow key={torrent.info_hash} torrent={torrent} zoom={zoom} />
+        <TorrentRow key={torrent.info_hash} torrent={torrent} zoom={zoom} onDownload={onDownload} />
       ))}
     </TableBody>
   </TorrentsTable>

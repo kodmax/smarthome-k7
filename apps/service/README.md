@@ -6,7 +6,7 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 
 - Node.js (CommonJS), TypeScript
 - Bun (bundling)
-- `@repo/apollo-ws`, `js-knx`, `@repo/db`, Vitest
+- `@repo/apollo-ws`, `js-knx`, `@repo/db`, `@repo/transmission`, Vitest
 
 ## Running
 
@@ -34,6 +34,7 @@ Copy `.env.example` and fill in:
 | `LOCATION_LAT`, `LOCATION_LONG`                  | Coordinates (weather, suncalc)                   |
 | `GOOGLE_SOCS_COOKIE`                             | Cookie for Google weather scraping               |
 | `NFJ_COOKIE`, `THEPROTOCOL_COOKIE`               | Cookies for job board scraping                   |
+| `TRANSMISSION_URL`, `TRANSMISSION_USERNAME`, `TRANSMISSION_PASSWORD` | Transmission RPC (`@repo/transmission`) |
 
 ## Feeds
 
@@ -61,6 +62,7 @@ KNX cron jobs (energy logging, clock sync, indoor readings) run in-process via `
 | `@repo/apollo-ws`    | WebSocket server, cache, feed registry |
 | `@repo/cron-scripts` | KNX scheduled jobs (in-process)        |
 | `@repo/db`           | Shared MariaDB pool + migrations       |
+| `@repo/transmission` | Transmission BitTorrent RPC client     |
 | `@repo/knx-schema`   | KNX group address map                  |
 | `@repo/types`        | Feed payload type contracts            |
 

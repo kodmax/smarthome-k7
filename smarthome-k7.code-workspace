@@ -60,6 +60,9 @@
     },
     {
       "path": "packages/apollo-card"
+    },
+    {
+      "path": "packages/transmission"
     }
   ],
   "settings": {

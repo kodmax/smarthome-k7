@@ -10,6 +10,9 @@ export const setupEnv = {
   GOOGLE_SOCS_COOKIE: 'test',
   NFJ_COOKIE: 'test',
   THEPROTOCOL_COOKIE: 'test',
+  TRANSMISSION_URL: 'http://localhost:9091/transmission/rpc',
+  TRANSMISSION_USERNAME: 'test',
+  TRANSMISSION_PASSWORD: 'test',
   NO_KNX: '1',
   NO_CRON: '1',
 } as const

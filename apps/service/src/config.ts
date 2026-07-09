@@ -48,4 +48,9 @@ export const config = {
   cron: {
     disabled: cronDisabled,
   },
+  transmission: {
+    url: getString('TRANSMISSION_URL'),
+    username: getString('TRANSMISSION_USERNAME'),
+    password: getString('TRANSMISSION_PASSWORD'),
+  },
 }
