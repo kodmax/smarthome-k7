@@ -12,31 +12,18 @@ const formatSpeedMbitPerSec = (bytesPerSec: number): string => ((bytesPerSec * 8
 const downloadFlow = keyframes`
   0%, 100% {
     transform: translateY(0);
-    filter: drop-shadow(0 0 0 transparent);
   }
   50% {
     transform: translateY(2px);
-    filter: drop-shadow(0 0 5px var(--mui-palette-weather-main));
   }
 `
 
 const uploadFlow = keyframes`
   0%, 100% {
     transform: translateY(0);
-    filter: drop-shadow(0 0 0 transparent);
   }
   50% {
     transform: translateY(-2px);
-    filter: drop-shadow(0 0 5px var(--mui-palette-energy-main));
-  }
-`
-
-const speedGlow = keyframes`
-  0%, 100% {
-    opacity: 0.75;
-  }
-  50% {
-    opacity: 1;
   }
 `
 
@@ -56,17 +43,11 @@ const SpeedIcon = styled.span<{ $active: boolean; $direction: 'down' | 'up' }>`
       : 'none'};
 `
 
-const SpeedValue = styled.span<{ $active: boolean }>`
+const SpeedValue = styled.span`
   display: inline-flex;
   align-items: baseline;
   gap: 0.15em;
   font-family: monospace;
-  animation: ${({ $active }) =>
-    $active
-      ? css`
-          ${speedGlow} 1.4s ease-in-out infinite
-        `
-      : 'none'};
 `
 
 const SpeedUnit = styled(Unit)`
@@ -87,7 +68,7 @@ export const Speed: FC<SpeedProps> = ({ icon: Icon, speed, direction }) => {
       <SpeedIcon $active={active} $direction={direction}>
         <Icon size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
       </SpeedIcon>
-      <SpeedValue $active={active}>
+      <SpeedValue>
         {formatSpeedMbitPerSec(speed)}
         <SpeedUnit>Mb/s</SpeedUnit>
       </SpeedValue>
