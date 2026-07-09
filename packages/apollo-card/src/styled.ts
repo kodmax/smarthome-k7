@@ -30,9 +30,9 @@ export const ApolloCardTitle = styled(Typography)({
 
 export const ApolloCardHeadingInfo = styled(Box)(({ theme }) => ({
   fontSize: designTokens.font.h3.size - 6,
-  fontWeight: designTokens.font.h3.weight,
+  fontWeight: 500,
   lineHeight: designTokens.font.h3.lineHeight,
-  color: theme.vars.palette.text.disabled,
+  color: theme.vars.palette.text.secondary,
   flex: 1,
   overflow: 'hidden',
   textOverflow: 'ellipsis',

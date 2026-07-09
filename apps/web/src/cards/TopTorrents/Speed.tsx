@@ -52,6 +52,7 @@ const SpeedValue = styled.span`
 
 const SpeedUnit = styled(Unit)`
   line-height: 1;
+  color: var(--mui-palette-text-disabled);
 `
 
 type SpeedProps = {
