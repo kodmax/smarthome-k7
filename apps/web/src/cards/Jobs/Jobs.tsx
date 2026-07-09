@@ -1,7 +1,7 @@
 import { TableBody } from '@mui/material'
 import { type FC, useCallback, useEffect, useState } from 'react'
-import { JobsIcon } from '@repo/assets'
-import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { JobsIcon, SettingsIcon } from '@repo/assets'
+import { ApolloCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
 import { useCommand, useFeed } from '@repo/feed-client'
 import { ApolloDataTable, TableEmptyMessage, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
@@ -75,7 +75,7 @@ export const Jobs: FC<Record<string, never>> = () => {
       icon={JobsIcon}
       height={6}
       headingInfo={feed?.ads.filter(ad => !ad.hide).length}
-      onEditPreferences={onEditPreferences}
+      actions={<ApolloCardAction title='Edit preferences' onClick={onEditPreferences} Icon={SettingsIcon} />}
     >
       {!feed ? (
         <TablePlaceholder rows={12} graph={true} value={true} />

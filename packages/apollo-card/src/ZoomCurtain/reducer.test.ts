@@ -20,7 +20,10 @@ describe('zoomReducer', () => {
 
     const expandedStyle = { ...style, bottom: '10vh' }
     expect(
-      zoomReducer({ active: true, style, focusStyle: style, transition: true }, { method: 'expand', style: expandedStyle }),
+      zoomReducer(
+        { active: true, style, focusStyle: style, transition: true },
+        { method: 'expand', style: expandedStyle },
+      ),
     ).toEqual({
       active: true,
       style: expandedStyle,

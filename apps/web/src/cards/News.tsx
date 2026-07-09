@@ -1,10 +1,10 @@
 import { IconButton, TableBody } from '@mui/material'
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { EyeOff, Undo2 } from 'lucide-react'
-import { NewsIcon } from '@repo/assets'
+import { NewsIcon, SettingsIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
 import { refreshFeeds, useCommand, useFeed } from '@repo/feed-client'
-import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { ApolloCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
 import {
   ApolloDataTable,
   ApolloTableCell,
@@ -71,7 +71,7 @@ export const News: FC<Record<string, never>> = () => {
       icon={NewsIcon}
       height={6}
       onZoom={onZoom}
-      onEditPreferences={onEditPreferences}
+      actions={<ApolloCardAction title='Edit preferences' onClick={onEditPreferences} Icon={SettingsIcon} />}
     >
       {!articles ? (
         <TablePlaceholder rows={10} graph={false} value={false} />

@@ -1,5 +1,5 @@
 import { IconButton } from '@mui/material'
-import { BackIcon, SettingsIcon, type StyledLucideIcon } from '@repo/assets'
+import { BackIcon, type StyledLucideIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
 import { type FC, type ReactNode } from 'react'
 import {
@@ -21,7 +21,7 @@ type ApolloCardProps = {
   height?: number
   allowZoom?: boolean
   onZoom?: () => void
-  onEditPreferences?: () => void
+  actions?: ReactNode
   headingInfo?: ReactNode
 }
 
@@ -33,8 +33,8 @@ export const ApolloCard: FC<ApolloCardProps> = ({
   cardId,
   onZoom,
   allowZoom = true,
-  onEditPreferences,
   headingInfo,
+  actions,
 }) => {
   return (
     <ZoomCurtain cardId={cardId} allowZoom={allowZoom} onZoom={onZoom}>
@@ -54,13 +54,7 @@ export const ApolloCard: FC<ApolloCardProps> = ({
             />
             <ApolloCardTitle variant='h3'>{title}</ApolloCardTitle>
             <ApolloCardHeadingInfo>{headingInfo}</ApolloCardHeadingInfo>
-            {zoom && onEditPreferences !== undefined ? (
-              <Actions>
-                <IconButton aria-label='Edit preferences' onClick={onEditPreferences} size='small'>
-                  <SettingsIcon size={designTokens.icon.sizeSm} strokeWidth={designTokens.icon.strokeWidth} />
-                </IconButton>
-              </Actions>
-            ) : null}
+            {zoom && actions !== undefined ? <Actions>{actions}</Actions> : null}
           </ApolloCardHeader>
 
           <ApolloCardContent
