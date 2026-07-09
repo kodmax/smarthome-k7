@@ -3,7 +3,7 @@ import { MoviesIcon } from '@repo/assets'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { TablePlaceholder, TorrentSearch } from '@/card-components'
 import { useCommand, useFeed } from '@repo/feed-client'
-import { Torrent } from '@repo/types'
+import { Torrent, TransmissionFeed } from '@repo/types'
 import { TopTitlesTable } from './TopTitlesTable'
 import { TorrentsLoader } from './TorrentsLoader'
 import { TorrentsTableView } from './TorrentsTableView'
@@ -13,11 +13,12 @@ import { useTorrentSearch } from './useTorrentSearch'
 export const TopTorrents: FC<Record<string, never>> = () => {
   const zoom = useZoom('the-pirate')
   const feed = useFeed<Torrent[]>('top-torrents')
-  const download = useCommand('torrents', 'download')
+  const transmission = useFeed<TransmissionFeed>('transmission')
+  const download = useCommand('transmission', 'download')
   const { query, lastQuery, loading, onQuery, onSearch, onClear, onTitleSearch } = useTorrentSearch(feed)
   const topTitles = useTopTitles(feed, lastQuery)
   const topTitlesMode = lastQuery === '' && !loading
-
+console.log(transmission)
   const onDownload = useCallback(
     (magnetLink: string) => {
       download(magnetLink)

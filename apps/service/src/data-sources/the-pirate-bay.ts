@@ -1,28 +1,15 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { Torrent } from '@repo/types'
-import { Transmission3 } from '@repo/transmission'
-import { config } from '@/config'
 import { fetchJSON } from '@/fetch'
 
 export class TorrentSource extends DataSourceDefinition<Torrent[]> {
-  private transmission: Transmission3
   private query = ''
-
-  constructor(push: (content: Torrent[]) => void, reportError: (e: Error) => void) {
-    super(push, reportError)
-
-    this.transmission = new Transmission3(config.transmission)
-  }
 
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'search':
         this.query = args
         this.push(await this.getData())
-        return
-      
-      case 'download':
-        await this.transmission.addTorrent(args)
         return
     }
   }

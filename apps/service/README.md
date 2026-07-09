@@ -38,7 +38,7 @@ Copy `.env.example` and fill in:
 
 ## Feeds
 
-**Web (scraping):** `weather`, `stock-market`, `news`, `jobs`, `top-torrents`
+**Web (scraping):** `weather`, `stock-market`, `news`, `jobs`, `top-torrents`, `transmission`
 
 **KNX:** energy, heating, CO₂, humidity, room temperatures
 

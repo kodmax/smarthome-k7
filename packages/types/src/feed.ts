@@ -123,6 +123,16 @@ export type Torrent = {
   username: string
 }
 
+export type TransmissionSessionStats = {
+  downloadSpeed: number
+  torrentCount: number
+  uploadSpeed: number
+}
+
+export type TransmissionFeed = {
+  sessionStats: TransmissionSessionStats
+}
+
 export type DayWeatherForecast = {
   temp: { high: number; low: number }
   date: string
