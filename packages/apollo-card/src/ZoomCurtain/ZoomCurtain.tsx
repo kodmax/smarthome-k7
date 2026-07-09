@@ -1,5 +1,6 @@
 import { styled } from '@mui/material'
 import { useContext, useEffect, useMemo, type FC, type ReactNode } from 'react'
+import { ZOOM_CURTAIN_Z_INDEX } from './zoomConstants'
 import { useValue } from './useValue'
 import { activeZoomWrapperStyle, idleZoomWrapperStyle } from './zoomStyles'
 import { ZoomStateContext } from '../ZoomStateProvider'
@@ -49,7 +50,7 @@ const ZoomCurtain: FC<{ children: ZoomCurtainChildFn; cardId: string; allowZoom:
       <Curtain
         data-testid='zoom-curtain'
         onClick={state.active ? handleBackdropClick : undefined}
-        style={state.active ? { position: 'fixed', opacity: 0.9, zIndex: 10 } : { width: '100%' }}
+        style={state.active ? { position: 'fixed', opacity: 0.9, zIndex: ZOOM_CURTAIN_Z_INDEX } : { width: '100%' }}
       />
 
       <div

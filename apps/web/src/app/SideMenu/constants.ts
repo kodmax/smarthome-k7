@@ -1,0 +1,11 @@
+export const DRAWER_WIDTH = 272
+export const TOGGLE_OPEN_SIZE = 24
+export const TOGGLE_CLOSED_SIZE = 32
+export const TOGGLE_CLOSED_OFFSET = 8
+export const TOGGLE_CLOSED_Z_INDEX = 100
+export const TOGGLE_OFFSET_Y = 8
+export const TOGGLE_OPEN_OFFSET_Y = 8
+export const TOGGLE_OPEN_OFFSET_X = 20
+export const ACTIVE_NAV_COLOR = '#E67E22'
+export const ACTIVE_NAV_BG = 'rgba(230, 126, 34, 0.14)'
+export const TOGGLE_CLOSED_BORDER_COLOR = '#D97706'

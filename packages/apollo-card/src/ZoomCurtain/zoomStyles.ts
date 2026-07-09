@@ -1,5 +1,5 @@
 import { ZoomStyle } from './types'
-import { zoomCardTransition } from './zoomConstants'
+import { ZOOM_CARD_Z_INDEX, zoomCardTransition } from './zoomConstants'
 
 function baseZoomStyle(overrides: Pick<ZoomStyle, 'bottom' | 'right' | 'left' | 'top'>): ZoomStyle {
   return {
@@ -31,5 +31,5 @@ export function idleZoomWrapperStyle() {
 }
 
 export function activeZoomWrapperStyle(style: ZoomStyle) {
-  return { position: 'fixed' as const, zIndex: 11, ...style }
+  return { position: 'fixed' as const, zIndex: ZOOM_CARD_Z_INDEX, ...style }
 }

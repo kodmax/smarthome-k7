@@ -20,6 +20,7 @@ import {
   Leaf,
   Link,
   List,
+  Menu,
   Moon,
   Newspaper,
   ShieldCheck,
@@ -36,6 +37,9 @@ import {
   Wind,
   Zap,
   ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react'
 import { createStyledIcon } from './createStyledIcon'
 import { iconStyles } from './iconStyles'
@@ -82,3 +86,7 @@ export const IconLink = createStyledIcon(Link, iconStyles.link)
 export const IconCopy = createStyledIcon(Copy, iconStyles.link)
 export const FavStarIcon = createStyledIcon(Star, iconStyles.fav)
 export const BackIcon = createStyledIcon(ChevronLeft, iconStyles.neutral)
+export const ChevronRightIcon = createStyledIcon(ChevronRight, iconStyles.neutral)
+export const CollapseMenuIcon = createStyledIcon(ChevronsLeft, iconStyles.muted)
+export const ExpandMenuIcon = createStyledIcon(ChevronsRight, iconStyles.muted)
+export const MenuIcon = createStyledIcon(Menu, iconStyles.neutral)

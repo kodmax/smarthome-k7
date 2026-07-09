@@ -5,7 +5,7 @@ import { RouterProvider } from 'react-router-dom'
 import './style.css'
 import { preventPinchZoom } from './preventPinchZoom'
 import { theme } from '@repo/design-tokens'
-import { router } from './router'
+import { router } from './app/router'
 
 preventPinchZoom()
 
