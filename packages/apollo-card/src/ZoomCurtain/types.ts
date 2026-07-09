@@ -9,6 +9,7 @@ export type ZoomStyle = {
 export type ZoomSetup =
   | { active: false }
   | {
+      transition: boolean
       style: ZoomStyle
       focusStyle: ZoomStyle
       active: true

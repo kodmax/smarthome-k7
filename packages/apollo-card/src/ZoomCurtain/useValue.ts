@@ -10,7 +10,7 @@ type UseZoomOptions = {
 }
 
 export function useValue({ allowZoom, onZoom }: UseZoomOptions) {
-  const [zoom, dispatch] = useReducer(zoomReducer, { active: false })
+  const [state, dispatch] = useReducer(zoomReducer, { active: false })
 
   const startZoomOut = useCallback(() => {
     dispatch({ method: 'collapse' })
@@ -35,42 +35,45 @@ export function useValue({ allowZoom, onZoom }: UseZoomOptions) {
   }, [])
 
   useEffect(() => {
-    if (zoom.active && onZoom !== undefined) {
+    if (state.active && onZoom !== undefined) {
       onZoom()
     }
-  }, [zoom.active, onZoom])
+  }, [state.active, onZoom])
 
   useEffect(() => {
-    if (!zoom.active) {
+    if (!state.active) {
       return
     }
 
     const timeoutId = setTimeout(startZoomOut, ZOOM_EXPAND_DURATION_MS + ZOOM_AUTO_DISMISS_MS)
 
     return () => clearTimeout(timeoutId)
-  }, [zoom.active, startZoomOut])
+  }, [state.active, startZoomOut])
 
   const handleCardClick = useCallback<MouseEventHandler<HTMLDivElement>>(
     ev => {
-      if (!allowZoom || shouldIgnoreZoomClick(ev.target) || zoom.active) {
+      if (!allowZoom || shouldIgnoreZoomClick(ev.target) || state.active) {
         return
       }
 
       startZoomIn(ev.currentTarget)
     },
-    [allowZoom, startZoomIn, zoom.active],
+    [allowZoom, startZoomIn, state.active],
   )
 
   const handleBackdropClick = useCallback<MouseEventHandler<HTMLDivElement>>(
     ev => {
-      if (!allowZoom || !zoom.active || ev.target !== ev.currentTarget) {
+      if (!allowZoom || !state.active || ev.target !== ev.currentTarget) {
         return
       }
 
       startZoomOut()
     },
-    [allowZoom, startZoomOut, zoom.active],
+    [allowZoom, startZoomOut, state.active],
   )
 
-  return useMemo(() => ({ zoom, handleCardClick, handleBackdropClick }), [zoom, handleCardClick, handleBackdropClick])
+  return useMemo(
+    () => ({ state, handleCardClick, handleBackdropClick, startZoomOut }),
+    [state, handleCardClick, handleBackdropClick, startZoomOut],
+  )
 }

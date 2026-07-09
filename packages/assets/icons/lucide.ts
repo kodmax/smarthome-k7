@@ -35,6 +35,7 @@ import {
   TriangleAlert,
   Wind,
   Zap,
+  ChevronLeft,
 } from 'lucide-react'
 import { createStyledIcon } from './createStyledIcon'
 import { iconStyles } from './iconStyles'
@@ -80,3 +81,4 @@ export const InfoIcon = createStyledIcon(Info, iconStyles.weather)
 export const IconLink = createStyledIcon(Link, iconStyles.link)
 export const IconCopy = createStyledIcon(Copy, iconStyles.link)
 export const FavStarIcon = createStyledIcon(Star, iconStyles.fav)
+export const BackIcon = createStyledIcon(ChevronLeft, iconStyles.neutral)

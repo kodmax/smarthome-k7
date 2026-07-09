@@ -1,5 +1,5 @@
 import { styled } from '@mui/material'
-import { useContext, useEffect, type FC, type ReactNode } from 'react'
+import { useContext, useEffect, useMemo, type FC, type ReactNode } from 'react'
 import { useValue } from './useValue'
 import { activeZoomWrapperStyle, idleZoomWrapperStyle } from './zoomStyles'
 import { ZoomStateContext } from '../ZoomStateProvider'
@@ -14,33 +14,50 @@ const Curtain = styled('div')({
   opacity: 0,
 })
 
-const ZoomCurtain: FC<{ children: ReactNode; cardId: string; allowZoom: boolean; onZoom?: () => void }> = ({
+export type ZoomCurtainFnProps = { zoom: boolean; zoomClose: () => void }
+export type ZoomCurtainChildFn = (props: ZoomCurtainFnProps) => ReactNode
+
+const ZoomCurtain: FC<{ children: ZoomCurtainChildFn; cardId: string; allowZoom: boolean; onZoom?: () => void }> = ({
   children,
   allowZoom,
   onZoom,
   cardId,
 }) => {
-  const { dispatch } = useContext(ZoomStateContext)
-  const { zoom, handleCardClick, handleBackdropClick } = useValue({ allowZoom, onZoom })
+  const { zoomedCardId, dispatch } = useContext(ZoomStateContext)
+  const { state, handleCardClick, handleBackdropClick, startZoomOut } = useValue({ allowZoom, onZoom })
 
   useEffect(() => {
-    zoom.active ? dispatch({ id: 'zoom-in', cardId }) : dispatch({ id: 'zoom-out' })
-  }, [zoom, cardId])
+    state.active ? dispatch({ id: 'zoom-in', cardId }) : dispatch({ id: 'zoom-out' })
+  }, [state, cardId])
+
+  useEffect(() => {
+    if (zoomedCardId === undefined && state.active && !state.transition) {
+      startZoomOut()
+    }
+  }, [zoomedCardId, state, cardId, startZoomOut])
+
+  const fnProps = useMemo<ZoomCurtainFnProps>(
+    () => ({
+      zoom: state.active,
+      zoomClose: startZoomOut,
+    }),
+    [state, startZoomOut],
+  )
 
   return (
     <>
       <Curtain
         data-testid='zoom-curtain'
-        onClick={zoom.active ? handleBackdropClick : undefined}
-        style={zoom.active ? { position: 'fixed', opacity: 0.9, zIndex: 10 } : { width: '100%' }}
+        onClick={state.active ? handleBackdropClick : undefined}
+        style={state.active ? { position: 'fixed', opacity: 0.9, zIndex: 10 } : { width: '100%' }}
       />
 
       <div
         data-testid='zoom-wrapper'
-        onClick={zoom.active ? handleBackdropClick : handleCardClick}
-        style={zoom.active ? activeZoomWrapperStyle(zoom.style) : idleZoomWrapperStyle()}
+        onClick={state.active ? handleBackdropClick : handleCardClick}
+        style={state.active ? activeZoomWrapperStyle(state.style) : idleZoomWrapperStyle()}
       >
-        {children}
+        {children(fnProps)}
       </div>
     </>
   )

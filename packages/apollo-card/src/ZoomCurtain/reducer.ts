@@ -12,6 +12,7 @@ export const zoomReducer: Reducer<ZoomSetup, ZoomAction> = (state, action) => {
         active: true,
         style: action.style,
         focusStyle: state.focusStyle,
+        transition: false,
       }
 
     case 'focus':
@@ -19,6 +20,7 @@ export const zoomReducer: Reducer<ZoomSetup, ZoomAction> = (state, action) => {
         active: true,
         style: action.style,
         focusStyle: action.style,
+        transition: true,
       }
 
     case 'collapse':
@@ -30,6 +32,7 @@ export const zoomReducer: Reducer<ZoomSetup, ZoomAction> = (state, action) => {
         active: true,
         style: state.focusStyle,
         focusStyle: state.focusStyle,
+        transition: true,
       }
 
     case 'zoom-out':

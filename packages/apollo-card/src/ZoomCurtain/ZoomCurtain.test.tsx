@@ -36,7 +36,7 @@ function renderWithZoomState(allowZoom = true) {
   return render(
     <ZoomStateProvider>
       <ZoomCurtain cardId={cardId} allowZoom={allowZoom}>
-        <CardSurface />
+        {() => <CardSurface />}
       </ZoomCurtain>
     </ZoomStateProvider>,
   )
