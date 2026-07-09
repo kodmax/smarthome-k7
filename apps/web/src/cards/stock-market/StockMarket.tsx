@@ -23,7 +23,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
 
   if (feed === undefined || tickers === undefined || marketSession === undefined) {
     return (
-      <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9}>
+      <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={6}>
         <TablePlaceholder rows={12} graph={false} value={true} />
       </ApolloCard>
     )
@@ -32,7 +32,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
   const headingInfo = `${marketStatusTitles[marketSession.status]} · ${marketSession.countdown}`
 
   return (
-    <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={9} headingInfo={headingInfo}>
+    <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={6} headingInfo={headingInfo}>
       <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: zoom ? 2 : undefined }}>
         {zoom ? (
           <TableHead>

@@ -8,7 +8,7 @@ export const JobTitle = styled(ApolloTableCell)({
 })
 
 export const Salary = styled(ApolloTableCell)({
-  width: '6em',
+  width: '9em',
   padding: 0,
   borderBottom: 'none',
   textAlign: 'right',

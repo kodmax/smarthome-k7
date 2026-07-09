@@ -69,7 +69,7 @@ export const News: FC<Record<string, never>> = () => {
       cardId='news'
       title='Wiadomości'
       icon={NewsIcon}
-      height={9}
+      height={6}
       onZoom={onZoom}
       onEditPreferences={onEditPreferences}
     >

@@ -73,7 +73,7 @@ export const Jobs: FC<Record<string, never>> = () => {
       cardId='jobs'
       title='Oferty pracy'
       icon={JobsIcon}
-      height={9}
+      height={6}
       headingInfo={feed?.ads.filter(ad => !ad.hide).length}
       onEditPreferences={onEditPreferences}
     >
