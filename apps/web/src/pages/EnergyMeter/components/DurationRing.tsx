@@ -8,6 +8,8 @@ import { SectionLabel } from './SectionLabel'
 type DurationRingProps = {
   duration: string
   progress: number
+  onStart?: () => void
+  onStop?: () => void
 }
 
 const { progressRing } = designTokens.components
@@ -20,12 +22,18 @@ const ARC_LENGTH = CIRCUMFERENCE * (ARC_DEGREES / 360)
 const GAP_DEGREES = 360 - ARC_DEGREES
 const RING_ROTATION = 90 + GAP_DEGREES / 2
 
-export const DurationRing: FC<DurationRingProps> = ({ duration, progress }) => {
+export const DurationRing: FC<DurationRingProps> = ({ duration, progress, onStart, onStop }) => {
   const [isRunning, setIsRunning] = useState(false)
 
   const handleToggle = useCallback(() => {
-    setIsRunning(current => !current)
-  }, [])
+    if (isRunning) {
+      onStop?.()
+      setIsRunning(false)
+    } else {
+      onStart?.()
+      setIsRunning(true)
+    }
+  }, [isRunning, onStart, onStop])
 
   const progressLength = ARC_LENGTH * progress
   const center = SIZE / 2

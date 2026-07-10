@@ -1,12 +1,12 @@
 import { Box, Card, CircularProgress, Grid } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
-import { type FC } from 'react'
+import { useEffect, type FC } from 'react'
 import { CardHeader } from './components/CardHeader'
 import { CurrentPowerPanel } from './components/CurrentPowerPanel'
 import { DurationPanel } from './components/DurationPanel'
 import { StatsRow } from './components/StatsRow'
 import { TimerPanel } from './components/TimerPanel'
-import { useFeed } from '@repo/feed-client'
+import { useCommand, useFeed } from '@repo/feed-client'
 import { EnergyFeed } from '@repo/types'
 
 const cardSx = {
@@ -19,6 +19,16 @@ const cardSx = {
 
 export const EnergyMeterCard: FC<Record<string, never>> = () => {
   const feed = useFeed<EnergyFeed>('energy')
+  const requestReadings = useCommand('energy.meter', 'request-readings')
+  const start = useCommand('energy.meter', 'start')
+  const stop = useCommand('energy.meter', 'stop')
+
+  useEffect(() => {
+    const id = setInterval(() => requestReadings(''), 1000)
+    return () => {
+      clearInterval(id)
+    }
+  }, [])
 
   if (feed === undefined) {
     return (
@@ -46,7 +56,7 @@ export const EnergyMeterCard: FC<Record<string, never>> = () => {
           <CurrentPowerPanel currentPower={feed.instant.reading.value} />
         </Grid>
         <Grid size={{ xs: 12, lg: 6 }}>
-          <DurationPanel />
+          <DurationPanel onStart={() => start('')} onStop={() => stop('')} />
         </Grid>
         <Grid size={{ xs: 12, lg: 3 }}>
           <TimerPanel />

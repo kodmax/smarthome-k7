@@ -28,7 +28,7 @@ export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> 
     })
   }
 
-  async handleCommand(command: string, _args: string): Promise<void> {
+  async handleCommand(command: string): Promise<void> {
     switch (command) {
       case 'start':
         await this.stop.write(1)

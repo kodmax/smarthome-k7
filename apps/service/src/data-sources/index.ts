@@ -1,5 +1,6 @@
 export { IndoorTempHistorySource, type TempHistory } from './indoor-temp-history'
 export { EnergyHourlySource, EnergyCostSource } from './energy'
+export { EnergyMeterSource } from './knx/energy-meter'
 export { TorrentSource } from './the-pirate-bay'
 export { TransmissionSource } from './transmission'
 export { CommoditiesSource } from './commodities'
