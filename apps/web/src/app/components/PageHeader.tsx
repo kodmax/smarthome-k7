@@ -10,6 +10,8 @@ type PageHeaderProps = {
   iconColor?: string
 }
 
+const { pageHeader } = designTokens.components
+
 export const PageHeader: FC<PageHeaderProps> = ({ title, description, icon: Icon, iconColor }) => (
   <Box sx={{ mb: 4 }}>
     <Box
@@ -23,13 +25,13 @@ export const PageHeader: FC<PageHeaderProps> = ({ title, description, icon: Icon
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
-        <Icon size={32} strokeWidth={designTokens.icon.strokeWidth} color={iconColor} />
+        <Icon size={pageHeader.iconSize} strokeWidth={designTokens.icon.strokeWidth} color={iconColor} />
         <Typography
           component='h1'
           sx={{
-            fontSize: { xs: 28, md: 36 },
-            fontWeight: 700,
-            lineHeight: 1.15,
+            fontSize: { xs: designTokens.font.h1.size, md: designTokens.font.display2.size },
+            fontWeight: pageHeader.titleWeight,
+            lineHeight: pageHeader.titleLineHeight,
           }}
         >
           {title}

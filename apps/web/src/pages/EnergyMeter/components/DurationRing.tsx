@@ -2,6 +2,7 @@ import { Box, Button, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { RotateCcw, Square } from 'lucide-react'
 import { type FC } from 'react'
+import { timerValueSx } from './styles'
 import { SectionLabel } from './SectionLabel'
 
 type DurationRingProps = {
@@ -9,11 +10,12 @@ type DurationRingProps = {
   progress: number
 }
 
-const SIZE = 340
-const STROKE = 14
+const { progressRing } = designTokens.components
+const SIZE = progressRing.size
+const STROKE = progressRing.strokeWidth
 const RADIUS = (SIZE - STROKE) / 2
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
-const ARC_DEGREES = 270
+const ARC_DEGREES = progressRing.arcDegrees
 const ARC_LENGTH = CIRCUMFERENCE * (ARC_DEGREES / 360)
 const GAP_DEGREES = 360 - ARC_DEGREES
 const RING_ROTATION = 90 + GAP_DEGREES / 2
@@ -81,28 +83,23 @@ export const DurationRing: FC<DurationRingProps> = ({ duration, progress }) => {
       >
         <SectionLabel>Czas trwania</SectionLabel>
 
-        <Typography
-          sx={{
-            fontSize: 36,
-            fontWeight: 700,
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-            mb: 0.5,
-          }}
-        >
-          {duration}
-        </Typography>
+        <Typography sx={{ ...timerValueSx, mb: 0.5 }}>{duration}</Typography>
 
         <Typography variant='caption' sx={{ color: 'text.secondary', mb: 2 }}>
           godz : min : sek
         </Typography>
 
-        <Box sx={{ px: '3em', pt: '2em' }}>
+        <Box
+          sx={{
+            px: `${progressRing.controlsPaddingX}px`,
+            pt: `${progressRing.controlsPaddingTop}px`,
+          }}
+        >
           <Button
             variant='contained'
             color='error'
             fullWidth
-            startIcon={<Square size={16} fill='currentColor' strokeWidth={0} />}
+            startIcon={<Square size={designTokens.icon.sizeAction} fill='currentColor' strokeWidth={0} />}
             sx={{
               mb: 1.5,
               py: 1.25,
@@ -116,10 +113,10 @@ export const DurationRing: FC<DurationRingProps> = ({ duration, progress }) => {
           <Button
             variant='outlined'
             fullWidth
-            startIcon={<RotateCcw size={16} />}
+            startIcon={<RotateCcw size={designTokens.icon.sizeAction} />}
             sx={{
               py: 1,
-              fontWeight: 600,
+              fontWeight: designTokens.components.sectionLabel.fontWeight,
               borderRadius: `${designTokens.radius.xl}px`,
               borderColor: 'divider',
               color: 'text.primary',

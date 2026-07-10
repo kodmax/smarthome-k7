@@ -3,6 +3,7 @@ import { designTokens } from '@repo/design-tokens'
 import { Pencil } from 'lucide-react'
 import { type FC } from 'react'
 import { BorderedPanel } from './BorderedPanel'
+import { fontSx } from './styles'
 import { SectionField } from './SectionField'
 
 export const TimerPanel: FC<Record<string, never>> = () => (
@@ -23,7 +24,7 @@ export const TimerPanel: FC<Record<string, never>> = () => (
             border: 'none',
             borderRadius: `${designTokens.radius.full}px`,
             textTransform: 'none',
-            fontWeight: 600,
+            fontWeight: designTokens.components.sectionLabel.fontWeight,
             py: 1,
             color: 'text.secondary',
             '&.Mui-selected': {
@@ -45,14 +46,13 @@ export const TimerPanel: FC<Record<string, never>> = () => (
       <Button
         variant='outlined'
         fullWidth
-        endIcon={<Pencil size={16} />}
+        endIcon={<Pencil size={designTokens.icon.sizeAction} />}
         sx={{
           justifyContent: 'space-between',
           px: 2,
           py: 1.5,
           mb: 2,
-          fontWeight: 600,
-          fontSize: 18,
+          ...fontSx('status'),
           borderColor: 'divider',
           color: 'text.primary',
           borderRadius: `${designTokens.radius.lg}px`,

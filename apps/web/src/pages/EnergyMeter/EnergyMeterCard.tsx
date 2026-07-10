@@ -12,7 +12,10 @@ export const EnergyMeterCard: FC<Record<string, never>> = () => (
   <Card
     sx={{
       borderRadius: `${designTokens.radius['2xl']}px`,
-      p: { xs: 2.5, md: 4 },
+      p: {
+        xs: `${designTokens.layout.paddingMobile}px`,
+        md: `${designTokens.layout.paddingTablet}px`,
+      },
     }}
   >
     <CardHeader />
@@ -28,7 +31,7 @@ export const EnergyMeterCard: FC<Record<string, never>> = () => (
         <TimerPanel />
       </Grid>
     </Grid>
-    <Box sx={{ pb: '4em' }} />
+    <Box sx={{ pb: `${designTokens.components.statsRow.bottomSpacing}px` }} />
     <StatsRow />
   </Card>
 )

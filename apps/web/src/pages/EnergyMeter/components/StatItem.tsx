@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
+import { metricValueSx } from './styles'
 import { SectionLabel } from './SectionLabel'
 
 type StatItemProps = {
@@ -9,12 +10,14 @@ type StatItemProps = {
   value: string
 }
 
+const { statIcon } = designTokens.components
+
 export const StatItem: FC<StatItemProps> = ({ icon: Icon, label, value }) => (
   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
     <Box
       sx={{
-        width: 48,
-        height: 48,
+        width: statIcon.size,
+        height: statIcon.size,
         borderRadius: '50%',
         bgcolor: theme => `${theme.vars.palette.energy.main}18`,
         color: 'energy.main',
@@ -24,11 +27,11 @@ export const StatItem: FC<StatItemProps> = ({ icon: Icon, label, value }) => (
         flexShrink: 0,
       }}
     >
-      <Icon size={22} strokeWidth={designTokens.icon.strokeWidth} />
+      <Icon size={statIcon.glyphSize} strokeWidth={designTokens.icon.strokeWidth} />
     </Box>
     <Box>
       <SectionLabel>{label}</SectionLabel>
-      <Typography sx={{ fontSize: 20, fontWeight: 700, lineHeight: 1.2 }}>{value}</Typography>
+      <Typography sx={metricValueSx}>{value}</Typography>
     </Box>
   </Box>
 )

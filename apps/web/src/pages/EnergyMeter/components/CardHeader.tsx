@@ -1,6 +1,8 @@
 import { Box, IconButton, Typography } from '@mui/material'
+import { designTokens } from '@repo/design-tokens'
 import { Pencil } from 'lucide-react'
 import { type FC } from 'react'
+import { metricValueSx, statusSx } from './styles'
 import { SectionField } from './SectionField'
 
 export const CardHeader: FC<Record<string, never>> = () => (
@@ -18,13 +20,13 @@ export const CardHeader: FC<Record<string, never>> = () => (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Box
           sx={{
-            width: 10,
-            height: 10,
+            width: designTokens.components.statusDot.size,
+            height: designTokens.components.statusDot.size,
             borderRadius: '50%',
             bgcolor: 'energy.main',
           }}
         />
-        <Typography sx={{ color: 'energy.main', fontWeight: 700, fontSize: 18 }}>Aktywny</Typography>
+        <Typography sx={statusSx}>Aktywny</Typography>
       </Box>
     </SectionField>
 
@@ -32,9 +34,9 @@ export const CardHeader: FC<Record<string, never>> = () => (
       <Box
         sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}
       >
-        <Typography sx={{ fontSize: 20, fontWeight: 700 }}>0,85 zł / kWh</Typography>
+        <Typography sx={metricValueSx}>0,85 zł / kWh</Typography>
         <IconButton size='small' aria-label='Edytuj taryfę'>
-          <Pencil size={16} />
+          <Pencil size={designTokens.icon.sizeAction} />
         </IconButton>
       </Box>
     </SectionField>
