@@ -11,12 +11,9 @@ const energyMeterOffset = 12307130 + 181000
 export const addEnergyFeed = (feeds: Feeds, knx: KnxLink): void => {
   const schema = knxSchema.home.energy
   const energyReadings = {
-    total: knxEnergy(
-      'home.energy-consumption.meter-total-reading',
-      knx.getDatapoint(schema.consumption.meterTotalReading),
-    ),
-    instant: knxPower('home.power-draw', knx.getDatapoint(schema.powerDraw)),
-    meter: knxEnergy('energy.meter', knx.getDatapoint(schema.consumption.meter)),
+    total: knxEnergy('home.energy-consumption.meter-total-reading', knx.group(schema.consumption.meterTotalReading)),
+    instant: knxPower('home.power-draw', knx.group(schema.powerDraw)),
+    meter: knxEnergy('energy.meter', knx.group(schema.consumption.meter)),
   }
 
   feeds.addFeed(

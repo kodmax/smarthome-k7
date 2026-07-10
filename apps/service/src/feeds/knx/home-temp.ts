@@ -12,10 +12,10 @@ export type HomeTempRoomSchema = {
 }
 
 export const addHomeTempFeed = (feeds: Feeds, knx: KnxLink, feed: string, schema: HomeTempRoomSchema): void => {
-  const reading = knxTemp(`temp.${feed}`, knx.getDatapoint(schema.reading))
+  const reading = knxTemp(`temp.${feed}`, knx.group(schema.reading))
 
   if (schema.setpoint) {
-    const setpoint = knxTemp(`temp.${feed}.setpoint`, knx.getDatapoint(schema.setpoint))
+    const setpoint = knxTemp(`temp.${feed}.setpoint`, knx.group(schema.setpoint))
     feeds.addFeed(
       `home.temp.${feed}`,
       { reading, setpoint, indoorTempHistory: IndoorTempHistorySource },

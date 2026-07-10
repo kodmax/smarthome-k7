@@ -11,7 +11,7 @@ export const addHomeAirQualityHumidityFeed = (feeds: Feeds, knx: KnxLink): void 
     'home.air-quality.humidity',
     {
       humidityHourly: HumidityHourlySource,
-      humidityReading: knxHumidity('home.air-quality.humidity', knx.getDatapoint(schema.reading)),
+      humidityReading: knxHumidity('home.air-quality.humidity', knx.group(schema.reading)),
     },
     ({ humidityReading, humidityHourly }) => ({
       reading: humidityReading,

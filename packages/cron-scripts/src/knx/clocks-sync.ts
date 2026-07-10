@@ -7,7 +7,7 @@ export async function clocksSync(knx: KnxLink): Promise<void> {
   const time = now.toString().substring(16, 24)
   const schema = knxSchema.system.clock
 
-  await knx.getDatapoint(schema.dateTime).write(DPT_DateTime.setDateTime(date, time, DPT_DateTime.isDST(now)))
-  await knx.getDatapoint(schema.date).write(date)
-  await knx.getDatapoint(schema.time).write(time)
+  await knx.group(schema.dateTime).write(DPT_DateTime.setDateTime(date, time, DPT_DateTime.isDST(now)))
+  await knx.group(schema.date).write(date)
+  await knx.group(schema.time).write(time)
 }

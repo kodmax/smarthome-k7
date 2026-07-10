@@ -7,8 +7,8 @@ import knxCo2 from '@/data-sources/knx/co2'
 
 export const addHomeAirQualityCo2Feed = (feeds: Feeds, knx: KnxLink): void => {
   const schema = knxSchema.home.airQuality.co2
-  const co2Level = knxCo2('home.air-quality.co2', knx.getDatapoint(schema.reading))
-  const co2Alert = knxB1('home.air-quality.co2-alert', knx.getDatapoint(schema.alert))
+  const co2Level = knxCo2('home.air-quality.co2', knx.group(schema.reading))
+  const co2Alert = knxB1('home.air-quality.co2-alert', knx.group(schema.alert))
 
   feeds.addFeed(
     'home.air-quality.co2',

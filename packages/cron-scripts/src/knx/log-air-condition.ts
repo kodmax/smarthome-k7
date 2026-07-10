@@ -8,13 +8,13 @@ export async function logAirCondition(knx: KnxLink): Promise<void> {
   try {
     const schema = knxSchema.home
     const [bathroomFloorTemp, bedroomTemp, livingroomTemp, bathroomTemp, humidity, dewPoint, co2] = await Promise.all([
-      knx.getDatapoint(schema.temp.bathroomFloor.reading).read(),
-      knx.getDatapoint(schema.temp.bedroom.reading).read(),
-      knx.getDatapoint(schema.temp.livingRoom.reading).read(),
-      knx.getDatapoint(schema.temp.bathroom.reading).read(),
-      knx.getDatapoint(schema.airQuality.humidity.reading).read(),
-      knx.getDatapoint(schema.airQuality.dewPoint.reading).read(),
-      knx.getDatapoint(schema.airQuality.co2.reading).read(),
+      knx.group(schema.temp.bathroomFloor.reading).read(),
+      knx.group(schema.temp.bedroom.reading).read(),
+      knx.group(schema.temp.livingRoom.reading).read(),
+      knx.group(schema.temp.bathroom.reading).read(),
+      knx.group(schema.airQuality.humidity.reading).read(),
+      knx.group(schema.airQuality.dewPoint.reading).read(),
+      knx.group(schema.airQuality.co2.reading).read(),
     ])
 
     const timestamp = new Date()

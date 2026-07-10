@@ -13,7 +13,7 @@ export async function logHourlyConsumption(knx: KnxLink): Promise<void> {
   }
 
   try {
-    const total = await knx.getDatapoint(knxSchema.home.energy.consumption.meterTotalReading).read()
+    const total = await knx.group(knxSchema.home.energy.consumption.meterTotalReading).read()
     const thisHour = new Date(now - (now % 3_600_000))
 
     await db.query('insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)', [
