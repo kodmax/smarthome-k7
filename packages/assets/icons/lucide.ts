@@ -28,6 +28,7 @@ import {
   Star,
   Sun,
   SunMedium,
+  SunMoon,
   Sunrise,
   Sunset,
   Thermometer,
@@ -78,6 +79,7 @@ export const CameraIcon = createStyledIcon(Camera, iconStyles.warning)
 export const JobsIcon = createStyledIcon(BriefcaseBusiness, iconStyles.neutral)
 export const ListIcon = createStyledIcon(List, iconStyles.muted)
 export const SettingsIcon = createStyledIcon(Cog, iconStyles.muted)
+export const SunMoonIcon = createStyledIcon(SunMoon, iconStyles.muted)
 export const SecurityIcon = createStyledIcon(ShieldCheck, iconStyles.air)
 export const AlertIcon = createStyledIcon(TriangleAlert, iconStyles.warning)
 export const SuccessIcon = createStyledIcon(CircleCheck, iconStyles.energy)

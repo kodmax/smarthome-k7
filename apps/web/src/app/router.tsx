@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
 import { PersistentPages } from './PersistentPages'
 import { Appearance } from '@/pages/Appearance/Appearance'
+import { EnergyMeter } from '@/pages/EnergyMeter/EnergyMeter'
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'energy-meter',
+            element: <EnergyMeter />,
           },
           {
             path: 'appearance',

@@ -1,4 +1,4 @@
-import { DashboardIcon, EnergyIcon, InfoIcon, SettingsIcon, type StyledLucideIcon } from '@repo/assets'
+import { DashboardIcon, EnergyIcon, InfoIcon, SunMoonIcon, type StyledLucideIcon } from '@repo/assets'
 
 export type NavItem = {
   label: string
@@ -20,7 +20,7 @@ export const mainNavSections: NavSection[] = [
   },
   {
     title: 'Ustawienia',
-    items: [{ label: 'Wygląd', path: '/appearance', icon: SettingsIcon }],
+    items: [{ label: 'Wygląd', path: '/appearance', icon: SunMoonIcon }],
   },
 ]
 

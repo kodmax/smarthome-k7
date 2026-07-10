@@ -1,6 +1,9 @@
 import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { useColorScheme } from '@mui/material/styles'
+import { iconStyles, SunMoonIcon } from '@repo/assets'
 import { type FC, type MouseEvent } from 'react'
+import { PageHeader } from '@/app/components/PageHeader'
+import { PageWrapper } from '@/app/components/PageWrapper'
 import { type AppColorMode } from '@/app/theme/colorMode'
 
 export const Appearance: FC<Record<string, never>> = () => {
@@ -15,13 +18,13 @@ export const Appearance: FC<Record<string, never>> = () => {
   const selectedMode: AppColorMode = mode === 'light' || mode === 'dark' || mode === 'system' ? mode : 'system'
 
   return (
-    <Box sx={{ maxWidth: 480 }}>
-      <Typography variant='h1' sx={{ mb: 1 }}>
-        Wygląd
-      </Typography>
-      <Typography variant='body1' sx={{ color: 'text.secondary', mb: 4 }}>
-        Ustawienia wyglądu aplikacji.
-      </Typography>
+    <PageWrapper>
+      <PageHeader
+        icon={SunMoonIcon}
+        iconColor={iconStyles.fav.color}
+        title='Wygląd'
+        description='Ustawienia wyglądu aplikacji.'
+      />
 
       <Box>
         <Typography variant='h3' sx={{ mb: 2 }}>
@@ -39,6 +42,6 @@ export const Appearance: FC<Record<string, never>> = () => {
           </ToggleButton>
         </ToggleButtonGroup>
       </Box>
-    </Box>
+    </PageWrapper>
   )
 }
