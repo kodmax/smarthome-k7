@@ -13,7 +13,7 @@ export const PersistentPages: FC<Record<string, never>> = () => {
         <Dashboard />
       </Box>
 
-      {!isDashboard ? <Outlet /> : null}
+      <Outlet />
     </>
   )
 }

@@ -18,6 +18,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'dashboard',
+            element: null,
           },
           {
             path: 'energy-meter',
