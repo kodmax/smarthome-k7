@@ -4,7 +4,7 @@ import { DPT_Value_AirQuality, KnxReading } from 'js-knx'
 export default (id: string, dp: DPT_Value_AirQuality): DataSourceDefinitionClass<KnxReading<number>> => {
   return class KnxCo2Source extends DataSourceDefinition<KnxReading<number>> {
     protected init(): void {
-      dp.addValueListener(reading => {
+      dp.addWriteListener(reading => {
         this.push(reading)
       })
     }

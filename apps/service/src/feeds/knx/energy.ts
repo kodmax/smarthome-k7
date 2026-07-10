@@ -1,7 +1,7 @@
 import { Feeds } from '@repo/apollo-ws'
 import { knxSchema } from '@repo/knx-schema'
 import { EnergyFeed } from '@repo/types'
-import { EnergyCostSource, EnergyHourlySource } from '@/data-sources'
+import { EnergyCostSource, EnergyHourlySource, EnergyMeterSource } from '@/data-sources'
 import knxEnergy from '@/data-sources/knx/energy'
 import knxPower from '@/data-sources/knx/power'
 import type { KnxLink } from 'js-knx'
@@ -13,7 +13,7 @@ export const addEnergyFeed = (feeds: Feeds, knx: KnxLink): void => {
   const energyReadings = {
     total: knxEnergy('home.energy-consumption.meter-total-reading', knx.group(schema.consumption.meterTotalReading)),
     instant: knxPower('home.power-draw', knx.group(schema.powerDraw)),
-    meter: knxEnergy('energy.meter', knx.group(schema.consumption.meter)),
+    meter: EnergyMeterSource,
   }
 
   feeds.addFeed(

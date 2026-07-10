@@ -4,7 +4,7 @@ import { DPT_ActiveEnergy, KnxReading } from 'js-knx'
 export default (id: string, dp: DPT_ActiveEnergy): DataSourceDefinitionClass<KnxReading<number>> => {
   return class KnxEnergySource extends DataSourceDefinition<KnxReading<number>> {
     protected init(): void {
-      dp.addValueListener(reading => {
+      dp.addWriteListener(reading => {
         this.push(reading)
       })
     }
