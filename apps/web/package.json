@@ -40,7 +40,7 @@
     "@types/suncalc": "^1.9.2",
     "@vitejs/plugin-react": "^6.0.3",
     "eslint": "^8.57.0",
-    "js-knx": "^2.20.1",
+    "js-knx": "^2.20.2",
     "jsdom": "^28.1.0",
     "typescript": "5.5.4",
     "vite": "^8.1.0",

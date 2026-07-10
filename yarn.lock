@@ -2661,10 +2661,10 @@ isexe@^2.0.0:
   resolved "https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz"
   integrity sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==
 
-js-knx@^2.20.1:
-  version "2.20.1"
-  resolved "https://registry.yarnpkg.com/js-knx/-/js-knx-2.20.1.tgz#6ed5412cbe4f4d058da4981465d62d41453fea6b"
-  integrity sha512-BaknJT3AKzI8bv8ky6FEPDcZ0mbg85lh2bmC/ouaB0xToJna0DIx7DMBV97hf462VHseo+Uupsb2JeJUdBO99w==
+js-knx@^2.20.2:
+  version "2.20.2"
+  resolved "https://registry.yarnpkg.com/js-knx/-/js-knx-2.20.2.tgz#34c6613353fc39d2d8547a7f900b625b3b430b98"
+  integrity sha512-Ij/EXF172YtlIDWsOTJIGrm1YqE4Za+jOy4HMif46yB4W4F+fV2bv3TJMzNMDGHHI2nmDV2Y3+0/PPA+2JtBYA==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
