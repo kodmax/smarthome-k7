@@ -1,6 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../../DateTime'
-import db from '../../db'
+import { Inject } from '@/di'
+import type { Pool } from 'mariadb'
 import { EnergyHourConsumption } from '@repo/types'
 import { dayStart, getStartOfDayReading, METER_TOTAL_READING } from './helpers'
 
@@ -9,6 +10,8 @@ export class EnergyHourlySource extends DataSourceDefinition<{
   bars: EnergyHourConsumption[]
   startOfDayValue: number
 }> {
+  @Inject('db')
+  declare private db: Pool
   getId() {
     return 'energy-hourly'
   }
@@ -22,7 +25,7 @@ export class EnergyHourlySource extends DataSourceDefinition<{
   }
 
   async getData() {
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
     try {
       const today = DateTime.now().getDate()
       const yesterday = DateTime.shift(-1, CacheAgeUnit.DAYS).getDate()

@@ -1,6 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../DateTime'
-import db from '../db'
+import { Inject } from '@/di'
+import type { Pool } from 'mariadb'
 
 type RoomTempHistory = Array<{
   hour: number
@@ -28,6 +29,8 @@ const readingToHistory: Record<string, keyof TempHistory> = {
 }
 
 export class IndoorTempHistorySource extends DataSourceDefinition<TempHistory> {
+  @Inject('db')
+  declare private db: Pool
   getId() {
     return 'indoor-temp-history'
   }
@@ -45,7 +48,7 @@ export class IndoorTempHistorySource extends DataSourceDefinition<TempHistory> {
   }
 
   async getData() {
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
     try {
       const history = (await conn.query(
         `select

@@ -1,14 +1,18 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import db from '../../db'
 import DateTime from '../../DateTime'
+import { Inject } from '@/di'
 import * as suncalc from 'suncalc'
 import { WeatherFeed } from '@repo/types'
-import { config } from '../../config'
+import type { config as AppConfig } from '../../config'
+import type { Pool } from 'mariadb'
 import { parseAirQuality, parseAllergens, parseForecast, parseHourly, parseInstant } from './parsers'
 
-const { long, lat } = config.geoLocation
-
 export class WeatherSource extends DataSourceDefinition<WeatherFeed> {
+  @Inject('db')
+  declare private db: Pool
+
+  @Inject('config')
+  declare private config: typeof AppConfig
   getId() {
     return 'weather'
   }
@@ -22,6 +26,7 @@ export class WeatherSource extends DataSourceDefinition<WeatherFeed> {
   }
 
   async getData() {
+    const { long, lat } = this.config.geoLocation
     const [forecast, instant, allergens, hourly, aq] = await Promise.all([
       parseForecast(),
       parseInstant(),
@@ -31,7 +36,7 @@ export class WeatherSource extends DataSourceDefinition<WeatherFeed> {
     ])
 
     const datetime = DateTime.now()
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
     try {
       await conn.query('insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)', [
         datetime.getDateTime(),

@@ -1,9 +1,13 @@
 import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
 import DateTime from '../DateTime'
-import db from '../db'
+import { Inject } from '../di'
 import { Co2HistoryRecord } from '@repo/types'
+import type { Pool } from 'mariadb'
 
 export class Co2HourlySource extends DataSourceDefinition<{ date: string; today: Co2HistoryRecord[] }> {
+  @Inject('db')
+  declare private db: Pool
+
   getId() {
     return 'co2-hourly'
   }
@@ -17,7 +21,7 @@ export class Co2HourlySource extends DataSourceDefinition<{ date: string; today:
   }
 
   async getData() {
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
     try {
       return {
         today: await conn.query(

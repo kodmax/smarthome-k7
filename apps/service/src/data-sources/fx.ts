@@ -1,11 +1,14 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { fetchDocument } from '@/fetch'
-import db from '../db'
+import { Inject } from '@/di'
 import DateTime from '../DateTime'
+import type { Pool } from 'mariadb'
 import { getTextContent } from '@/utils/get-text-context'
 import { FXFeed, FXRateHistory, FXRates } from '@repo/types'
 
 export class FxSource extends DataSourceDefinition<FXFeed> {
+  @Inject('db')
+  declare private db: Pool
   getId() {
     return 'fx'
   }
@@ -58,7 +61,7 @@ export class FxSource extends DataSourceDefinition<FXFeed> {
 
     const timeWindow = DateTime.shift(-30, CacheAgeUnit.DAYS).getDateTime()
     const now = DateTime.now().getDateTime()
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
 
     const history: FXRateHistory<FXRates> = {
       'EUR/USD': [],

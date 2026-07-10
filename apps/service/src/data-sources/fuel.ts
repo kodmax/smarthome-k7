@@ -1,11 +1,14 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../DateTime'
-import db from '../db'
+import { Inject } from '@/di'
+import type { Pool } from 'mariadb'
 import { fetchDocument } from '@/fetch'
 import { getTextContent } from '@/utils/get-text-context'
 import { FuelPricesFeed } from '@repo/types'
 
 export class FuelSource extends DataSourceDefinition<FuelPricesFeed> {
+  @Inject('db')
+  declare private db: Pool
   getId() {
     return 'fossil-fuels'
   }
@@ -35,7 +38,7 @@ export class FuelSource extends DataSourceDefinition<FuelPricesFeed> {
 
         const timeWindow = DateTime.shift(-30, CacheAgeUnit.DAYS).getDateTime()
         const now = DateTime.now().getDateTime()
-        const conn = await db.getConnection()
+        const conn = await this.db.getConnection()
 
         const prices: FuelPricesFeed = {}
         try {

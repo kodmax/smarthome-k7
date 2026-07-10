@@ -1,11 +1,14 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import db from '@/db'
+import { Inject } from '@/di'
+import type { Pool } from 'mariadb'
 import { jjit } from './jjit/jjit'
 import { JobAd, JobsFeed } from '@repo/types'
 import { nfj } from './nfj/nfj'
 import { addAds } from './filters'
 
 export class JobsSource extends DataSourceDefinition<JobsFeed> {
+  @Inject('db')
+  declare private db: Pool
   public async handleCommand(command: string, args: string, recentContent?: JobsFeed): Promise<void> {
     switch (command) {
       case 'applied':
@@ -98,7 +101,7 @@ export class JobsSource extends DataSourceDefinition<JobsFeed> {
       return []
     }
 
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
     try {
       const ids = ads.map(ad => ad.id)
       const rows = (await conn.query(
@@ -124,7 +127,7 @@ export class JobsSource extends DataSourceDefinition<JobsFeed> {
   }
 
   private async markMeta(itemUid: string, attributeName: string, value: boolean): Promise<void> {
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
     try {
       await conn.query(
         `insert into meta (item_uid, attribute_name, value)
@@ -138,7 +141,7 @@ export class JobsSource extends DataSourceDefinition<JobsFeed> {
   }
 
   private async unmarkMeta(itemUid: string, attributeName: string): Promise<void> {
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
     try {
       await conn.query(`delete from meta where item_uid = ? and attribute_name = ?`, [itemUid, attributeName])
     } finally {

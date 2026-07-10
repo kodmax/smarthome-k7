@@ -1,11 +1,14 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../DateTime'
-import db from '../db'
+import { Inject } from '@/di'
+import type { Pool } from 'mariadb'
 import { fetchDocument } from '@/fetch'
 import { INTEREST_RATES, InterestRateData, InterestRatesFeed } from '@repo/types'
 import { parseNbpRatesFromDocument, parseWiborFromHtml } from './interest-rates/parse'
 
 export class InterestRatesSource extends DataSourceDefinition<InterestRatesFeed> {
+  @Inject('db')
+  declare private db: Pool
   getId() {
     return 'interest-rates'
   }
@@ -29,7 +32,7 @@ export class InterestRatesSource extends DataSourceDefinition<InterestRatesFeed>
 
     const timeWindow = DateTime.shift(-30, CacheAgeUnit.DAYS).getDateTime()
     const now = DateTime.now().getDateTime()
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
 
     try {
       const irs: Record<string, InterestRateData> = {}

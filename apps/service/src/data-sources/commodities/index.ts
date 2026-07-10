@@ -1,6 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../../DateTime'
-import db from '../../db'
+import { Inject } from '@/di'
+import type { Pool } from 'mariadb'
 import { fetchBtcPrice } from './btc'
 import { fetchCoalPrice } from './coal'
 import { fetchGoldPrice } from './gold'
@@ -10,6 +11,8 @@ import { fetchOilPrice } from './oil'
 import { Commodities } from './types'
 
 export class CommoditiesSource extends DataSourceDefinition<Commodities> {
+  @Inject('db')
+  declare private db: Pool
   getId() {
     return 'commodities'
   }
@@ -34,7 +37,7 @@ export class CommoditiesSource extends DataSourceDefinition<Commodities> {
 
     const timeWindow = DateTime.shift(-30, CacheAgeUnit.DAYS).getDateTime()
     const now = DateTime.now().getDateTime()
-    const conn = await db.getConnection()
+    const conn = await this.db.getConnection()
 
     try {
       await conn.query('insert into commodities (datetime, name, price) values (?, ?, ?)', [now, 'OIL/l', oil.l])

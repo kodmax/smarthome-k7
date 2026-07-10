@@ -1,16 +1,20 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { TransmissionFeed } from '@repo/types'
 import { Transmission3 } from '@repo/transmission'
-import { config } from '@/config'
+import { Inject } from '@/di'
+import type { config as AppConfig } from '@/config'
 
 export class TransmissionSource extends DataSourceDefinition<TransmissionFeed> {
+  @Inject('config')
+  declare private config: typeof AppConfig
+
   private transmission: Transmission3
   private pollTimer: ReturnType<typeof setTimeout> | undefined
 
   constructor(push: (content: TransmissionFeed) => void, reportError: (e: Error) => void) {
     super(push, reportError)
 
-    this.transmission = new Transmission3(config.transmission)
+    this.transmission = new Transmission3(this.config.transmission)
   }
 
   public async handleCommand(command: string, args: string): Promise<void> {
