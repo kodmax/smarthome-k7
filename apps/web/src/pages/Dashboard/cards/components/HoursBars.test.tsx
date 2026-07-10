@@ -1,6 +1,6 @@
 import { renderWithTheme as render, screen } from '@/test/test-utils'
 import { describe, expect, it } from 'vitest'
-import { chooseColor } from './chooseColor'
+import { colorForValueInRange } from './colorForValueInRange'
 import { Graph } from './Graph'
 import { HoursBars } from './HoursBars'
 
@@ -42,7 +42,11 @@ describe('HoursBars', () => {
 
     const range = { highest: 30, lowest: 15, optimal: 21 }
     const fills = [...container.querySelectorAll('rect')].map(rect => rect.getAttribute('fill'))
-    expect(fills).toEqual([chooseColor(15, range), chooseColor(21, range), chooseColor(30, range)])
+    expect(fills).toEqual([
+      colorForValueInRange(15, range),
+      colorForValueInRange(21, range),
+      colorForValueInRange(30, range),
+    ])
   })
 
   it('renders gray bars by default', () => {

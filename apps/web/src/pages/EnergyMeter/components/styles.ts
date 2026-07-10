@@ -29,9 +29,10 @@ export const borderedPanelSx = {
 } as const
 
 export const metricValueSx = fontSx('h3')
-export const metricLgSx = { ...fontSx('metricLg'), color: 'energy.main' }
+export const metricLgSx = { ...fontSx('metricLg') }
 export const statusSx = { ...fontSx('status'), color: 'energy.main' }
 export const timerValueSx = {
   ...fontSx('display2'),
   letterSpacing: components.progressRing.timerLetterSpacing,
+  fontFamily: designTokens.font.familyMono,
 }

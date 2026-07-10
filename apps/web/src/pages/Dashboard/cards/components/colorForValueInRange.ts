@@ -8,16 +8,19 @@ export const INDICATOR_LIGHTNESS = 60
 
 const hsl = (deg: number): string => `hsl(${deg}deg ${INDICATOR_SATURATION}% ${INDICATOR_LIGHTNESS}%)`
 
-export function chooseColor(instant: number, { lowest, optimal, highest, reverse }: ColorIndicationRange): string {
+export function colorForValueInRange(
+  value: number,
+  { lowest, optimal, highest, reverse }: ColorIndicationRange,
+): string {
   if (optimal !== undefined) {
-    if (instant > optimal && highest !== undefined) {
-      return instant > highest
+    if (value > optimal && highest !== undefined) {
+      return value > highest
         ? hsl(reverse ? 240 : 0)
-        : hsl(120 - ((instant - optimal) / (highest - optimal)) * (reverse ? -120 : 120))
-    } else if (instant < optimal && lowest !== undefined) {
-      return instant < lowest
+        : hsl(120 - ((value - optimal) / (highest - optimal)) * (reverse ? -120 : 120))
+    } else if (value < optimal && lowest !== undefined) {
+      return value < lowest
         ? hsl(reverse ? 0 : 240)
-        : hsl(120 + ((optimal - instant) / (optimal - lowest)) * (reverse ? -120 : 120))
+        : hsl(120 + ((optimal - value) / (optimal - lowest)) * (reverse ? -120 : 120))
     } else {
       return hsl(120)
     }

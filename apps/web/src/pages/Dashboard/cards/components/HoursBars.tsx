@@ -1,6 +1,6 @@
 import { styled } from '@mui/material'
 import { type FC } from 'react'
-import { chooseColor } from './chooseColor'
+import { colorForValueInRange } from './colorForValueInRange'
 import { buildHoursBarHeights, toHoursBarDataPoints } from './hoursBarsData'
 
 const grayColor = 'hsl(0deg 0% 50%)'
@@ -86,7 +86,7 @@ export const HoursBars: FC<HoursBarsProps> = ({
                 y={height - v}
                 width='10'
                 height={v}
-                fill={color ? chooseColor(value, range) : grayColor}
+                fill={color ? colorForValueInRange(value, range) : grayColor}
               />
             )
           })}

@@ -1,6 +1,6 @@
 import { styled } from '@mui/material'
 import type { FC } from 'react'
-import { chooseColor } from './chooseColor'
+import { colorForValueInRange } from './colorForValueInRange'
 
 export type ColorIndicationRange = {
   optimal?: number
@@ -21,6 +21,6 @@ export const ColorIndicator: FC<{ instant: number; range: ColorIndicationRange }
   if (range.optimal === undefined) {
     return <span></span>
   } else {
-    return <Indicator style={{ backgroundColor: chooseColor(instant, range) }} />
+    return <Indicator style={{ backgroundColor: colorForValueInRange(instant, range) }} />
   }
 }

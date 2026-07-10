@@ -8,6 +8,7 @@ export {
 export { default as AQI } from './AQI'
 export { ColorIndicator } from './ColorIndication'
 export type { ColorIndicationRange } from './ColorIndication'
+export { colorForValueInRange } from './colorForValueInRange'
 export { default as Copy } from './Copy'
 export { Graph } from './Graph'
 export type { DataPoint as GraphDataPoint, GraphProps, Record as GraphRecord } from './Graph'
