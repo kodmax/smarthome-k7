@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
-import { RotateCcw, Square } from 'lucide-react'
-import { type FC } from 'react'
+import { Play, Square } from 'lucide-react'
+import { type FC, useCallback, useState } from 'react'
 import { timerValueSx } from './styles'
 import { SectionLabel } from './SectionLabel'
 
@@ -21,6 +21,12 @@ const GAP_DEGREES = 360 - ARC_DEGREES
 const RING_ROTATION = 90 + GAP_DEGREES / 2
 
 export const DurationRing: FC<DurationRingProps> = ({ duration, progress }) => {
+  const [isRunning, setIsRunning] = useState(false)
+
+  const handleToggle = useCallback(() => {
+    setIsRunning(current => !current)
+  }, [])
+
   const progressLength = ARC_LENGTH * progress
   const center = SIZE / 2
   const ringTransform = `rotate(${RING_ROTATION} ${center} ${center})`
@@ -97,32 +103,32 @@ export const DurationRing: FC<DurationRingProps> = ({ duration, progress }) => {
         >
           <Button
             variant='contained'
-            color='error'
+            color={isRunning ? 'error' : undefined}
             fullWidth
-            startIcon={<Square size={designTokens.icon.sizeAction} fill='currentColor' strokeWidth={0} />}
+            onClick={handleToggle}
+            startIcon={
+              isRunning ? (
+                <Square size={designTokens.icon.sizeAction} fill='currentColor' strokeWidth={0} />
+              ) : (
+                <Play size={designTokens.icon.sizeAction} fill='currentColor' strokeWidth={0} />
+              )
+            }
             sx={{
               mb: 1.5,
               py: 1.25,
               fontWeight: 700,
               borderRadius: `${designTokens.radius.xl}px`,
+              ...(!isRunning && {
+                bgcolor: 'temperature.main',
+                color: 'common.white',
+                '&:hover': {
+                  bgcolor: 'temperature.main',
+                  filter: 'brightness(0.92)',
+                },
+              }),
             }}
           >
-            STOP
-          </Button>
-
-          <Button
-            variant='outlined'
-            fullWidth
-            startIcon={<RotateCcw size={designTokens.icon.sizeAction} />}
-            sx={{
-              py: 1,
-              fontWeight: designTokens.components.sectionLabel.fontWeight,
-              borderRadius: `${designTokens.radius.xl}px`,
-              borderColor: 'divider',
-              color: 'text.primary',
-            }}
-          >
-            ZERUJ
+            {isRunning ? 'STOP' : 'START'}
           </Button>
         </Box>
       </Box>

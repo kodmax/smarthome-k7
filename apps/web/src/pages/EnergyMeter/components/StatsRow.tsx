@@ -8,7 +8,7 @@ import { KnxReading } from 'js-knx'
 import { formatNumber } from '@/helpers/formatNumber'
 import { EnergyRates } from '@repo/types'
 
-export const StatsRow: FC<{ meterReading: KnxReading<number> | undefined; energyRates: EnergyRates | undefined }> = ({
+export const StatsRow: FC<{ meterReading: KnxReading<number>; energyRates: EnergyRates }> = ({
   meterReading,
   energyRates,
 }) => {

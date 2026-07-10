@@ -8,7 +8,7 @@ import { metricLgSx } from './styles'
 import { SectionField } from './SectionField'
 const currentPowerRange: ColorIndicationRange = { optimal: 400, lowest: 100, highest: 2400 }
 
-export const CurrentPowerPanel: FC<{ currentPower: number | undefined }> = ({ currentPower }) => (
+export const CurrentPowerPanel: FC<{ currentPower: number }> = ({ currentPower }) => (
   <BorderedPanel>
     <SectionField label='Aktualna moc'>
       <Box sx={{ textAlign: 'center', mb: 3, mt: 3 }}>

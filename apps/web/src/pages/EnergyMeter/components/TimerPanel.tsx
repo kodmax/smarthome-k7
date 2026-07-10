@@ -1,69 +1,66 @@
-import { Button, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
-import { Pencil } from 'lucide-react'
-import { type FC } from 'react'
+import { type FC, type MouseEvent, useCallback, useState } from 'react'
 import { BorderedPanel } from './BorderedPanel'
-import { fontSx } from './styles'
 import { SectionField } from './SectionField'
+import { TargetTimePicker } from './TargetTimePicker'
 
-export const TimerPanel: FC<Record<string, never>> = () => (
-  <BorderedPanel>
-    <SectionField label='Timer'>
-      <ToggleButtonGroup
-        exclusive
-        value='with-timer'
-        aria-label='Tryb timera'
-        fullWidth
-        sx={{
-          mb: 3,
-          bgcolor: 'background.default',
-          borderRadius: `${designTokens.radius.full}px`,
-          p: 0.5,
-          '& .MuiToggleButton-root': {
-            flex: 1,
-            border: 'none',
+type TimerMode = 'no-limit' | 'with-timer'
+
+const DEFAULT_TARGET_TIME = '02:00:00'
+
+export const TimerPanel: FC<Record<string, never>> = () => {
+  const [timerMode, setTimerMode] = useState<TimerMode>('with-timer')
+  const [targetTime, setTargetTime] = useState(DEFAULT_TARGET_TIME)
+
+  const handleModeChange = useCallback((_event: MouseEvent<HTMLElement>, value: TimerMode | null) => {
+    if (value !== null) {
+      setTimerMode(value)
+    }
+  }, [])
+
+  return (
+    <BorderedPanel>
+      <SectionField label='Timer'>
+        <ToggleButtonGroup
+          exclusive
+          value={timerMode}
+          onChange={handleModeChange}
+          aria-label='Tryb timera'
+          fullWidth
+          sx={{
+            mb: 3,
+            bgcolor: 'background.default',
             borderRadius: `${designTokens.radius.full}px`,
-            textTransform: 'none',
-            fontWeight: designTokens.components.sectionLabel.fontWeight,
-            py: 1,
-            color: 'text.secondary',
-            '&.Mui-selected': {
-              bgcolor: 'energy.main',
-              color: 'common.white',
-              '&:hover': {
+            p: 0.5,
+            '& .MuiToggleButton-root': {
+              flex: 1,
+              border: 'none',
+              borderRadius: `${designTokens.radius.full}px`,
+              textTransform: 'none',
+              fontWeight: designTokens.components.sectionLabel.fontWeight,
+              py: 1,
+              color: 'text.secondary',
+              '&.Mui-selected': {
                 bgcolor: 'energy.main',
+                color: 'common.white',
+                '&:hover': {
+                  bgcolor: 'energy.main',
+                },
               },
             },
-          },
-        }}
-      >
-        <ToggleButton value='no-limit'>Bez limitu</ToggleButton>
-        <ToggleButton value='with-timer'>Z timerem</ToggleButton>
-      </ToggleButtonGroup>
-    </SectionField>
+          }}
+        >
+          <ToggleButton value='no-limit'>Bez limitu</ToggleButton>
+          <ToggleButton value='with-timer'>Z timerem</ToggleButton>
+        </ToggleButtonGroup>
+      </SectionField>
 
-    <SectionField label='Czas docelowy'>
-      <Button
-        variant='outlined'
-        fullWidth
-        endIcon={<Pencil size={designTokens.icon.sizeAction} />}
-        sx={{
-          justifyContent: 'space-between',
-          px: 2,
-          py: 1.5,
-          mb: 2,
-          ...fontSx('status'),
-          borderColor: 'divider',
-          color: 'text.primary',
-          borderRadius: `${designTokens.radius.lg}px`,
-        }}
-      >
-        02:00:00
-      </Button>
-
-      <Typography variant='caption' sx={{ color: 'text.secondary' }}>
-        Postęp pierścienia względem czasu docelowego.
-      </Typography>
-    </SectionField>
-  </BorderedPanel>
-)
+      {timerMode === 'with-timer' ? (
+        <SectionField label='Czas docelowy'>
+          <TargetTimePicker value={targetTime} onChange={setTargetTime} />
+        </SectionField>
+      ) : null}
+    </BorderedPanel>
+  )
+}
