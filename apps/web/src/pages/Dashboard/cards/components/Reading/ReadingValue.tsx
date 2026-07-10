@@ -13,8 +13,8 @@ type ReadingValueProps = {
 
 export const ReadingValue: FC<ReadingValueProps> = ({ displayValue, unit, colorIndicatorRange, value, copy }) => (
   <>
-    {copy !== undefined ? <Copy text={copy} /> : null}
     <ValueLayout>
+      {copy !== undefined ? <Copy text={copy} /> : null}
       <ValueSlot>{displayValue}</ValueSlot>
       <UnitSlot>{unit ?? ''}</UnitSlot>
       <IndicatorSlot>

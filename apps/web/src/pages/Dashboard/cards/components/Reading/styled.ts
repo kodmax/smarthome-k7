@@ -25,7 +25,7 @@ export const IndicatorSlot = styled('span')({
 })
 
 export const ValueSlot = styled('span')({
-  flex: '0 0 3em',
+  flex: '0 0 4em',
   textAlign: 'right',
   textOverflow: 'ellipsis',
 })
