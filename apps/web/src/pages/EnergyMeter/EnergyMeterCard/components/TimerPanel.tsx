@@ -1,9 +1,7 @@
 import { ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { type FC, type MouseEvent, useCallback, useEffect, useState } from 'react'
-import { BorderedPanel } from './BorderedPanel'
-import { SectionField } from './SectionField'
-import { parseTargetTime, TargetTimePicker } from './TargetTimePicker'
+import { BorderedPanel, parseTargetTime, SectionField, TargetTimePicker } from './components'
 
 type TimerMode = 'no-limit' | 'with-timer'
 

@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
-import { Play, Square } from 'lucide-react'
+import { Play, RotateCcw, Square } from 'lucide-react'
 import { type FC, useCallback } from 'react'
 import { timerValueSx } from './styles'
 import { SectionLabel } from './SectionLabel'
@@ -11,6 +11,7 @@ type DurationRingProps = {
   isRunning: boolean
   onStart?: () => void
   onStop?: () => void
+  onReset?: () => void
 }
 
 const { progressRing } = designTokens.components
@@ -31,7 +32,7 @@ const formatStopwatch = (elapsedSeconds: number): string => {
   return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':')
 }
 
-export const DurationRing: FC<DurationRingProps> = ({ duration, progress, isRunning, onStart, onStop }) => {
+export const DurationRing: FC<DurationRingProps> = ({ duration, progress, isRunning, onStart, onStop, onReset }) => {
   const handleToggle = useCallback(() => {
     if (isRunning) {
       onStop?.()
@@ -144,6 +145,24 @@ export const DurationRing: FC<DurationRingProps> = ({ duration, progress, isRunn
             }}
           >
             {isRunning ? 'STOP' : 'START'}
+          </Button>
+          <Button
+            variant='text'
+            fullWidth
+            onClick={onReset}
+            disabled={isRunning}
+            startIcon={<RotateCcw size={designTokens.icon.sizeAction} strokeWidth={designTokens.icon.strokeWidth} />}
+            sx={{
+              py: 1,
+              fontWeight: 500,
+              borderRadius: `${designTokens.radius.xl}px`,
+              color: 'text.secondary',
+              '&:hover': {
+                bgcolor: 'action.hover',
+              },
+            }}
+          >
+            Zeruj
           </Button>
         </Box>
       </Box>

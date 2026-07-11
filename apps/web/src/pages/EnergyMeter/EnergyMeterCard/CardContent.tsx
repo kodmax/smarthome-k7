@@ -1,34 +1,21 @@
-import { Box, Card, CircularProgress, Grid } from '@mui/material'
+import { Box, Grid } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { useCallback, useEffect, useState, type FC } from 'react'
-import { CardHeader } from './components/CardHeader'
-import { CurrentPowerPanel } from './components/CurrentPowerPanel'
-import { DurationPanel } from './components/DurationPanel'
-import { StatsRow } from './components/StatsRow'
-import { TimerPanel } from './components/TimerPanel'
-import { useCommand, useFeed } from '@repo/feed-client'
+import { CardHeader, CurrentPowerPanel, DurationPanel, StatsRow, TimerPanel } from './components'
+import { useCommand } from '@repo/feed-client'
 import { EnergyFeed } from '@repo/types'
-import { MeterStatus } from './types'
-import { useStopwatch } from './useStopwatch'
-
-const cardSx = {
-  borderRadius: `${designTokens.radius['2xl']}px`,
-  p: {
-    xs: `${designTokens.layout.paddingMobile}px`,
-    md: `${designTokens.layout.paddingTablet}px`,
-  },
-} as const
+import { MeterStatus } from '../types'
+import { useStopwatch } from '../useStopwatch'
 
 const REFRESH_INTERVAL = 3000
 
-export const EnergyMeterCard: FC<Record<string, never>> = () => {
+export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
   const [timeLimit, setTimeLimit] = useState<number>()
   const [progress, setProgress] = useState<number>()
 
-  const [status, setStatus] = useState<MeterStatus>('stopped')
+  const [status, setStatus] = useState<MeterStatus>('reset')
   const duration = useStopwatch(status)
 
-  const feed = useFeed<EnergyFeed>('energy')
   const requestReadings = useCommand('energy.meter', 'request-readings')
 
   const reset = useCommand('energy.meter', 'reset')
@@ -37,7 +24,6 @@ export const EnergyMeterCard: FC<Record<string, never>> = () => {
 
   const onStart = useCallback(() => {
     setStatus('started')
-    reset()
     start()
   }, [start])
 
@@ -46,20 +32,21 @@ export const EnergyMeterCard: FC<Record<string, never>> = () => {
     stop()
   }, [stop])
 
+  const onReset = useCallback(() => {
+    setStatus('reset')
+    reset()
+  }, [reset])
+
   useEffect(() => {
     reset()
   }, [])
 
   useEffect(() => {
-    if (feed === undefined) {
-      return
-    }
-
     const id = setInterval(() => requestReadings(''), REFRESH_INTERVAL)
     return () => {
       clearInterval(id)
     }
-  }, [feed])
+  }, [])
 
   useEffect(() => {
     if (timeLimit === undefined) {
@@ -67,7 +54,7 @@ export const EnergyMeterCard: FC<Record<string, never>> = () => {
       return
     }
 
-    if (duration >= timeLimit) {
+    if (status === 'started' && duration >= timeLimit) {
       setProgress(1)
       onStop()
       return
@@ -76,25 +63,8 @@ export const EnergyMeterCard: FC<Record<string, never>> = () => {
     setProgress(status === 'started' ? duration / timeLimit : 0)
   }, [timeLimit, duration, status, stop])
 
-  if (feed === undefined) {
-    return (
-      <Card sx={cardSx}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: 420,
-          }}
-        >
-          <CircularProgress size={32} />
-        </Box>
-      </Card>
-    )
-  }
-
   return (
-    <Card sx={cardSx}>
+    <>
       <CardHeader energyRates={feed.cost.rates} status={status} />
 
       <Grid container spacing={3} sx={{ mb: 4, alignItems: 'center' }}>
@@ -106,6 +76,7 @@ export const EnergyMeterCard: FC<Record<string, never>> = () => {
             duration={duration}
             progress={progress}
             isRunning={status === 'started'}
+            onReset={onReset}
             onStart={onStart}
             onStop={onStop}
           />
@@ -116,6 +87,6 @@ export const EnergyMeterCard: FC<Record<string, never>> = () => {
       </Grid>
       <Box sx={{ pb: `${designTokens.components.statsRow.bottomSpacing}px` }} />
       <StatsRow meterReading={feed.meter.reading} energyRates={feed.cost.rates} />
-    </Card>
+    </>
   )
 }

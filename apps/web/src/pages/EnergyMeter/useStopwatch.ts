@@ -1,19 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { MeterStatus } from './types'
 
 export const useStopwatch = (meterStatus: MeterStatus): number => {
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0)
+  const baselineTime = useRef<number>(undefined)
+  const elapsedTime = useRef<number>(0)
 
   useEffect(() => {
-    if (meterStatus !== 'started') {
+    if (meterStatus === 'stopped') {
       return
     }
 
-    const startedAt = Date.now()
-    setElapsedSeconds(0)
+    if (meterStatus === 'reset') {
+      baselineTime.current = undefined
+      elapsedTime.current = 0
+      setElapsedSeconds(0)
+      return
+    }
 
+    // started
+    baselineTime.current = Date.now() - elapsedTime.current
     const id = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000))
+      elapsedTime.current = baselineTime.current !== undefined ? Date.now() - baselineTime.current : 0
+      setElapsedSeconds(Math.floor(elapsedTime.current / 1000))
     }, 100)
 
     return () => {

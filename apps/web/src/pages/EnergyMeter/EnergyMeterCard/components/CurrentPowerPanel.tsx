@@ -3,9 +3,7 @@ import { designTokens } from '@repo/design-tokens'
 import { Zap } from 'lucide-react'
 import { type FC } from 'react'
 import { colorForValueInRange, type ColorIndicationRange } from '@/card-components'
-import { BorderedPanel } from './BorderedPanel'
-import { metricLgSx } from './styles'
-import { SectionField } from './SectionField'
+import { BorderedPanel, metricLgSx, SectionField } from './components'
 const currentPowerRange: ColorIndicationRange = { optimal: 400, lowest: 100, highest: 2400 }
 
 export const CurrentPowerPanel: FC<{ currentPower: number }> = ({ currentPower }) => (

@@ -33,7 +33,7 @@ const buildPalette = (scheme: SchemeTokens) => {
       contrastText: '#FFFFFF',
     },
     secondary: {
-      main: color.purple,
+      main: color.weather,
       contrastText: '#FFFFFF',
     },
     error: {

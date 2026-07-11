@@ -1,1 +1,1 @@
-export type MeterStatus = 'started' | 'stopped'
+export type MeterStatus = 'reset' | 'started' | 'stopped'

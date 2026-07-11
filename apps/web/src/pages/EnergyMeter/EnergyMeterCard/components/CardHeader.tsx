@@ -1,10 +1,8 @@
 import { Box, Typography } from '@mui/material'
 import { type FC } from 'react'
-import { metricValueSx } from './styles'
-import { MeterStatusDisplay } from './MeterStatusDisplay'
-import { SectionField } from './SectionField'
+import { metricValueSx, MeterStatusDisplay, SectionField } from './components'
 import { EnergyRates } from '@repo/types'
-import { type MeterStatus } from '../types'
+import { type MeterStatus } from '../../types'
 
 export const CardHeader: FC<{ energyRates: EnergyRates; status: MeterStatus }> = ({ energyRates, status }) => {
   const grossPrice = (energyRates.distribution + energyRates.energy) * energyRates.vat
