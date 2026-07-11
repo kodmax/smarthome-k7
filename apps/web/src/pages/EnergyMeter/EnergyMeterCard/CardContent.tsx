@@ -11,6 +11,7 @@ const REFRESH_INTERVAL = 3000
 
 export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
   const [adjustedMeterReading, setAdjustedMeterReading] = useState<number>(0)
+  const [adjustMeterReading, setAdjustMeterReading] = useState<boolean>(true)
   const [baselinePower, setBaselinePower] = useState<number>(0)
   const [timeLimit, setTimeLimit] = useState<number>()
   const [progress, setProgress] = useState<number>()
@@ -22,6 +23,10 @@ export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
   const reset = useCommand('energy.meter', 'reset')
   const start = useCommand('energy.meter', 'start')
   const stop = useCommand('energy.meter', 'stop')
+
+  const onBaselinePowerClick = useCallback(() => {
+    setAdjustMeterReading(adjust => !adjust)
+  }, [])
 
   useEffect(() => {
     const total = feed.meter.reading.value
@@ -77,7 +82,7 @@ export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
     }
 
     setProgress(status === 'started' ? elapsed / timeLimit : 0)
-  }, [timeLimit, elapsed, status, stop])
+  }, [timeLimit, elapsed, status, onStop])
 
   return (
     <>
@@ -85,7 +90,12 @@ export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
 
       <Grid container spacing={3} sx={{ mb: 4, alignItems: 'center' }}>
         <Grid size={{ xs: 12, lg: 3 }}>
-          <CurrentPowerPanel currentPower={feed.instant.reading.value} baselinePower={baselinePower} />
+          <CurrentPowerPanel
+            currentPower={feed.instant.reading.value}
+            baselinePower={baselinePower}
+            adjustMeterReading={adjustMeterReading}
+            onBaselinePowerClick={onBaselinePowerClick}
+          />
         </Grid>
         <Grid size={{ xs: 12, lg: 6 }}>
           <DurationPanel
@@ -102,7 +112,11 @@ export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
         </Grid>
       </Grid>
       <Box sx={{ pb: `${designTokens.components.statsRow.bottomSpacing}px` }} />
-      <StatsRow meterReading={adjustedMeterReading} energyRates={feed.cost.rates} />
+      <StatsRow
+        meterReading={adjustMeterReading ? adjustedMeterReading : feed.meter.reading.value}
+        energyRates={feed.cost.rates}
+        elapsed={elapsed}
+      />
     </>
   )
 }
