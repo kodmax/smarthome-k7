@@ -3,7 +3,7 @@ import { type FC } from 'react'
 import { DurationRing } from './components'
 
 type DurationPanelProps = {
-  duration: number
+  elapsed: number
   progress: number | undefined
   isRunning: boolean
   onReset: () => void
@@ -11,15 +11,17 @@ type DurationPanelProps = {
   onStop: () => void
 }
 
-export const DurationPanel: FC<DurationPanelProps> = ({ duration, progress, isRunning, onStart, onStop, onReset }) => (
-  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: { xs: 1, lg: 0 } }}>
-    <DurationRing
-      duration={duration}
-      progress={progress}
-      isRunning={isRunning}
-      onStart={onStart}
-      onStop={onStop}
-      onReset={onReset}
-    />
-  </Box>
-)
+export const DurationPanel: FC<DurationPanelProps> = ({ elapsed, progress, isRunning, onStart, onStop, onReset }) => {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: { xs: 1, lg: 0 } }}>
+      <DurationRing
+        elapsedSeconds={elapsed}
+        progress={progress}
+        isRunning={isRunning}
+        onStart={onStart}
+        onStop={onStop}
+        onReset={onReset}
+      />
+    </Box>
+  )
+}

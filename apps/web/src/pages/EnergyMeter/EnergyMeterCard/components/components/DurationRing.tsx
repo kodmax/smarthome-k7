@@ -6,7 +6,7 @@ import { timerValueSx } from './styles'
 import { SectionLabel } from './SectionLabel'
 
 type DurationRingProps = {
-  duration: number
+  elapsedSeconds: number
   progress: number | undefined
   isRunning: boolean
   onStart?: () => void
@@ -32,7 +32,14 @@ const formatStopwatch = (elapsedSeconds: number): string => {
   return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':')
 }
 
-export const DurationRing: FC<DurationRingProps> = ({ duration, progress, isRunning, onStart, onStop, onReset }) => {
+export const DurationRing: FC<DurationRingProps> = ({
+  elapsedSeconds,
+  progress,
+  isRunning,
+  onStart,
+  onStop,
+  onReset,
+}) => {
   const handleToggle = useCallback(() => {
     if (isRunning) {
       onStop?.()
@@ -105,7 +112,7 @@ export const DurationRing: FC<DurationRingProps> = ({ duration, progress, isRunn
       >
         <SectionLabel>Czas trwania</SectionLabel>
 
-        <Typography sx={{ ...timerValueSx, mb: 0.5 }}>{formatStopwatch(duration)}</Typography>
+        <Typography sx={{ ...timerValueSx, mb: 0.5 }}>{formatStopwatch(elapsedSeconds)}</Typography>
 
         <Typography variant='caption' sx={{ color: 'text.secondary', mb: 2 }}>
           godz : min : sek

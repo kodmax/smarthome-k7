@@ -4,12 +4,11 @@ import { ConsumptionIcon } from '@repo/assets'
 import { Banknote } from 'lucide-react'
 import { type FC } from 'react'
 import { StatItem } from './components'
-import { KnxReading } from 'js-knx'
 import { formatNumber } from '@/helpers/formatNumber'
 import { EnergyRates } from '@repo/types'
 
 type Props = {
-  meterReading: KnxReading<number>
+  meterReading: number
   energyRates: EnergyRates
 }
 
@@ -19,10 +18,10 @@ export const StatsRow: FC<Props> = ({ meterReading, energyRates }) => {
 
   const cost =
     meterReading !== undefined && grossPrice !== undefined
-      ? formatNumber((meterReading.value / 1000) * grossPrice, { fractionDigits: 4 })
+      ? formatNumber((meterReading / 1000) * grossPrice, { fractionDigits: 4 })
       : undefined
 
-  const consumedEnergy = meterReading !== undefined ? formatNumber(meterReading.value) : '--'
+  const consumedEnergy = meterReading !== undefined ? formatNumber(meterReading) : '--'
   return (
     <Box sx={{ display: 'flex', gap: `${designTokens.components.statsRow.gap}px`, justifyContent: 'center' }}>
       <StatItem icon={ConsumptionIcon} label='Zużyta energia' value={`${consumedEnergy} Wh`} />

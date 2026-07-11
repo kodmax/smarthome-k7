@@ -10,17 +10,33 @@ import { useStopwatch } from '../useStopwatch'
 const REFRESH_INTERVAL = 3000
 
 export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
+  const [adjustedMeterReading, setAdjustedMeterReading] = useState<number>(0)
+  const [baselinePower, setBaselinePower] = useState<number>(0)
   const [timeLimit, setTimeLimit] = useState<number>()
   const [progress, setProgress] = useState<number>()
-
   const [status, setStatus] = useState<MeterStatus>('reset')
-  const duration = useStopwatch(status)
+  const elapsed = useStopwatch(status)
 
   const requestReadings = useCommand('energy.meter', 'request-readings')
 
   const reset = useCommand('energy.meter', 'reset')
   const start = useCommand('energy.meter', 'start')
   const stop = useCommand('energy.meter', 'stop')
+
+  useEffect(() => {
+    const total = feed.meter.reading.value
+    const baseline = (baselinePower * elapsed) / 3600
+    const adjusted = Math.floor(total - baseline)
+
+    setAdjustedMeterReading(reading => (adjusted > reading ? adjusted : reading))
+  }, [feed.meter.reading, elapsed, baselinePower])
+
+  useEffect(() => {
+    if (status === 'reset') {
+      setBaselinePower(feed.instant.reading.value)
+      setAdjustedMeterReading(0)
+    }
+  }, [feed, status])
 
   const onStart = useCallback(() => {
     setStatus('started')
@@ -54,14 +70,14 @@ export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
       return
     }
 
-    if (status === 'started' && duration >= timeLimit) {
+    if (status === 'started' && elapsed >= timeLimit) {
       setProgress(1)
       onStop()
       return
     }
 
-    setProgress(status === 'started' ? duration / timeLimit : 0)
-  }, [timeLimit, duration, status, stop])
+    setProgress(status === 'started' ? elapsed / timeLimit : 0)
+  }, [timeLimit, elapsed, status, stop])
 
   return (
     <>
@@ -69,11 +85,11 @@ export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
 
       <Grid container spacing={3} sx={{ mb: 4, alignItems: 'center' }}>
         <Grid size={{ xs: 12, lg: 3 }}>
-          <CurrentPowerPanel currentPower={feed.instant.reading.value} />
+          <CurrentPowerPanel currentPower={feed.instant.reading.value} baselinePower={baselinePower} />
         </Grid>
         <Grid size={{ xs: 12, lg: 6 }}>
           <DurationPanel
-            duration={duration}
+            elapsed={elapsed}
             progress={progress}
             isRunning={status === 'started'}
             onReset={onReset}
@@ -86,7 +102,7 @@ export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
         </Grid>
       </Grid>
       <Box sx={{ pb: `${designTokens.components.statsRow.bottomSpacing}px` }} />
-      <StatsRow meterReading={feed.meter.reading} energyRates={feed.cost.rates} />
+      <StatsRow meterReading={adjustedMeterReading} energyRates={feed.cost.rates} />
     </>
   )
 }
