@@ -32,8 +32,8 @@ const subscribe: (topic: string, subscriber: TopicSubscriber<unknown>) => () => 
   }
 }
 
-const sendCommand: (sourceId: string, name: string, args: string) => void = (sourceId, name, args) => {
-  wsClient.command({ sourceId, name, args })
+const sendCommand: (sourceId: string, name: string, args?: string) => void = (sourceId, name, args) => {
+  wsClient.command({ sourceId, name, args: args ?? '' })
 }
 
 const refreshFeeds = (feeds: string[]): void => {

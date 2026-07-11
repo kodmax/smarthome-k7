@@ -1,17 +1,19 @@
 import { Box } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { ConsumptionIcon } from '@repo/assets'
-import { Banknote, Zap } from 'lucide-react'
+import { Banknote } from 'lucide-react'
 import { type FC } from 'react'
 import { StatItem } from './StatItem'
 import { KnxReading } from 'js-knx'
 import { formatNumber } from '@/helpers/formatNumber'
 import { EnergyRates } from '@repo/types'
 
-export const StatsRow: FC<{ meterReading: KnxReading<number>; energyRates: EnergyRates }> = ({
-  meterReading,
-  energyRates,
-}) => {
+type Props = {
+  meterReading: KnxReading<number>
+  energyRates: EnergyRates
+}
+
+export const StatsRow: FC<Props> = ({ meterReading, energyRates }) => {
   const grossPrice =
     energyRates !== undefined ? (energyRates.distribution + energyRates.energy) * energyRates.vat : undefined
 
@@ -25,7 +27,6 @@ export const StatsRow: FC<{ meterReading: KnxReading<number>; energyRates: Energ
     <Box sx={{ display: 'flex', gap: `${designTokens.components.statsRow.gap}px`, justifyContent: 'center' }}>
       <StatItem icon={ConsumptionIcon} label='Zużyta energia' value={`${consumedEnergy} Wh`} />
       <StatItem icon={Banknote} label='Łączny koszt' value={`${cost} zł`} />
-      <StatItem icon={Zap} label='Średnia moc' value='127 W' />
     </Box>
   )
 }

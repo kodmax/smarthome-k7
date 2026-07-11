@@ -29,7 +29,7 @@ export const CurrentPowerPanel: FC<{ currentPower: number }> = ({ currentPower }
     </SectionField>
 
     <FormControlLabel
-      control={<Checkbox defaultChecked={false} />}
+      control={<Checkbox disabled defaultChecked={false} />}
       label={
         <Typography variant='body2' sx={{ color: 'text.secondary' }}>
           Nie uwzględniaj w pomiarze

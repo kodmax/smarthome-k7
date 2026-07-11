@@ -1,4 +1,4 @@
-import { DPT_ActiveEnergy, DPT_StartStop, KnxLink } from 'js-knx'
+import { DPT_StartStop, KnxLink } from 'js-knx'
 import { config } from '../src/config'
 
 const main = async () => {
@@ -11,20 +11,25 @@ const main = async () => {
     DataType: DPT_StartStop,
   })
 
-  const stop = knx.group({
-    DataType: DPT_StartStop,
-    address: '5/2/4',
-  })
+  // const stop = knx.group({
+  //   DataType: DPT_StartStop,
+  //   address: '5/2/4',
+  // })
 
-  const reading = knx.group({
-    DataType: DPT_ActiveEnergy,
-    address: '5/2/2',
-  })
+  // const reset = knx.group({
+  //   DataType: DPT_StartStop,
+  //   address: '5/2/6'
+  // })
+
+  // const reading = knx.group({
+  //   DataType: DPT_ActiveEnergy,
+  //   address: '5/2/2',
+  // })
 
   // await stop.write(1)
-  // await start.write(1)
-  // await start.write(1)
-  await reading.requestValue()
+  await start.write(1)
+  await start.write(1)
+  // await reading.requestValue()
 
   await knx.disconnect()
 }

@@ -4,16 +4,23 @@ import { Inject } from '../../di'
 
 export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> {
   @Inject('knx')
-  declare private knx: KnxLink
+  declare private readonly knx: KnxLink
 
-  declare private intermediateReading: DPT_ActiveEnergy
-  declare private start: DPT_StartStop
-  declare private stop: DPT_StartStop
+  declare private readonly intermediateReading: DPT_ActiveEnergy
+  declare private readonly reset: DPT_StartStop
+  declare private readonly start: DPT_StartStop
+  declare private readonly stop: DPT_StartStop
 
-  protected init(): void {
+  public constructor(push: (content: KnxReading<number>) => void, reportError: (e: Error) => void) {
+    super(push, reportError)
+
     this.intermediateReading = this.knx.group({
       address: '5/2/2',
       DataType: DPT_ActiveEnergy,
+    })
+    this.reset = this.knx.group({
+      address: '5/2/6',
+      DataType: DPT_StartStop,
     })
     this.start = this.knx.group({
       address: '5/2/1',
@@ -30,14 +37,21 @@ export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> 
 
   async handleCommand(command: string): Promise<void> {
     switch (command) {
-      case 'start':
+      case 'reset':
         await this.stop.write(1)
+        await this.reset.write(1)
+        return
+
+      case 'start':
+        await this.reset.write(1)
         await this.start.write(1)
         await this.start.write(1)
         return
+
       case 'stop':
         await this.stop.write(1)
         return
+
       case 'request-readings':
         await this.intermediateReading.requestValue()
         return

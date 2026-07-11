@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 import { sendCommand } from './feed'
 
-const useCommand = (sourceId: string, name: string): ((args: string) => void) => {
+const useCommand = (sourceId: string, name: string): ((args?: string) => void) => {
   return useCallback(
-    (args: string) => {
+    (args?: string) => {
       sendCommand(sourceId, name, args)
     },
     [sourceId, name],

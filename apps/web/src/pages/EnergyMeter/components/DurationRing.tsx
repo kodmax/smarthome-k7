@@ -1,13 +1,14 @@
 import { Box, Button, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { Play, Square } from 'lucide-react'
-import { type FC, useCallback, useState } from 'react'
+import { type FC, useCallback } from 'react'
 import { timerValueSx } from './styles'
 import { SectionLabel } from './SectionLabel'
 
 type DurationRingProps = {
-  duration: string
-  progress: number
+  duration: number
+  progress: number | undefined
+  isRunning: boolean
   onStart?: () => void
   onStop?: () => void
 }
@@ -22,24 +23,28 @@ const ARC_LENGTH = CIRCUMFERENCE * (ARC_DEGREES / 360)
 const GAP_DEGREES = 360 - ARC_DEGREES
 const RING_ROTATION = 90 + GAP_DEGREES / 2
 
-export const DurationRing: FC<DurationRingProps> = ({ duration, progress, onStart, onStop }) => {
-  const [isRunning, setIsRunning] = useState(false)
+const formatStopwatch = (elapsedSeconds: number): string => {
+  const hours = Math.floor(elapsedSeconds / 3600)
+  const minutes = Math.floor((elapsedSeconds % 3600) / 60)
+  const seconds = elapsedSeconds % 60
 
+  return [hours, minutes, seconds].map(part => String(part).padStart(2, '0')).join(':')
+}
+
+export const DurationRing: FC<DurationRingProps> = ({ duration, progress, isRunning, onStart, onStop }) => {
   const handleToggle = useCallback(() => {
     if (isRunning) {
       onStop?.()
-      setIsRunning(false)
     } else {
       onStart?.()
-      setIsRunning(true)
     }
   }, [isRunning, onStart, onStop])
 
-  const progressLength = ARC_LENGTH * progress
+  const progressLength = progress !== undefined ? ARC_LENGTH * progress : undefined
   const center = SIZE / 2
   const ringTransform = `rotate(${RING_ROTATION} ${center} ${center})`
   const ringDasharray = `${ARC_LENGTH} ${CIRCUMFERENCE}`
-  const progressDasharray = `${progressLength} ${CIRCUMFERENCE}`
+  const progressDasharray = progressLength !== undefined ? `${progressLength} ${CIRCUMFERENCE}` : undefined
 
   return (
     <Box
@@ -70,17 +75,19 @@ export const DurationRing: FC<DurationRingProps> = ({ duration, progress, onStar
           strokeDasharray={ringDasharray}
           transform={ringTransform}
         />
-        <circle
-          cx={center}
-          cy={center}
-          r={RADIUS}
-          fill='none'
-          stroke='var(--mui-palette-energy-main)'
-          strokeWidth={STROKE}
-          strokeLinecap='round'
-          strokeDasharray={progressDasharray}
-          transform={ringTransform}
-        />
+        {progressDasharray !== undefined ? (
+          <circle
+            cx={center}
+            cy={center}
+            r={RADIUS}
+            fill='none'
+            stroke='var(--mui-palette-energy-main)'
+            strokeWidth={STROKE}
+            strokeLinecap='round'
+            strokeDasharray={progressDasharray}
+            transform={ringTransform}
+          />
+        ) : null}
       </Box>
 
       <Box
@@ -97,7 +104,7 @@ export const DurationRing: FC<DurationRingProps> = ({ duration, progress, onStar
       >
         <SectionLabel>Czas trwania</SectionLabel>
 
-        <Typography sx={{ ...timerValueSx, mb: 0.5 }}>{duration}</Typography>
+        <Typography sx={{ ...timerValueSx, mb: 0.5 }}>{formatStopwatch(duration)}</Typography>
 
         <Typography variant='caption' sx={{ color: 'text.secondary', mb: 2 }}>
           godz : min : sek

@@ -23,7 +23,7 @@ export const Energy: FC<Record<string, never>> = () => {
   }
 
   const grossPrice = (feed.cost.rates.distribution + feed.cost.rates.energy) * feed.cost.rates.vat
-  const cost = (feed.meter.reading.value / 1000) * grossPrice + feed.cost.rates.added
+  const cost = (feed.meter.reading.value / 1000) * grossPrice
 
   const avgDailyConsumption = feed.cost.avg / 1000
   const avgMonthlyConsumption = (feed.cost.avg * 30) / 1000

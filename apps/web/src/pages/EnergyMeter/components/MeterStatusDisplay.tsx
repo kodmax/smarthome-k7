@@ -2,13 +2,14 @@ import { Box, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
 import { statusSx } from './styles'
+import { MeterStatus } from '../types'
 
 type MeterStatusProps = {
-  total: number
+  status: MeterStatus
 }
 
-export const MeterStatus: FC<MeterStatusProps> = ({ total }) => {
-  const isActive = total > 0
+export const MeterStatusDisplay: FC<MeterStatusProps> = ({ status }) => {
+  const isActive = status === 'started'
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
