@@ -152,8 +152,8 @@ export const ru: Translations = {
       status: {
         afterHours: 'После закрытия',
         preMarket: 'Предторговый период',
-        closed: 'Закрыт',
-        open: 'Открыт',
+        closed: 'Рынок закрыт',
+        open: 'Рынок открыт',
       },
       openingIn: 'Открытие через',
       closingIn: 'Закрытие через',
