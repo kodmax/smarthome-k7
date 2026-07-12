@@ -169,4 +169,9 @@ export const en: Translations = {
       searchFor: 'Search torrents for',
     },
   },
+  dateTime: {
+    todayShort: 'Today',
+    tomorrowShort: 'Tomorrow',
+    weekdayShort: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  },
 }

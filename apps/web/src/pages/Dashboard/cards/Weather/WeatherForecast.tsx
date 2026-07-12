@@ -4,10 +4,7 @@ import { ApolloCard } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { type FC } from 'react'
 import { DayWeatherForecast, WeatherFeed } from '@repo/types'
-import { useTranslations } from '@/i18n'
-import {} from './Day/styled'
-
-const dows = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'niedz.']
+import { formatForecastDayLabel, mondayBasedWeekdayIndex, parseForecastDate, useTranslations } from '@/i18n'
 
 export const WeatherForecast: FC<Record<string, never>> = () => {
   const feed = useFeed<WeatherFeed>('weather')
@@ -29,7 +26,8 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
     )
   }
 
-  const passedDays = new Array(dows.indexOf(feed.forecast[0].dow)).fill(undefined)
+  const firstDayIndex = mondayBasedWeekdayIndex(parseForecastDate(feed.forecast[0].date))
+  const passedDays = new Array(firstDayIndex).fill(undefined)
 
   return (
     <ApolloCard cardId='weather-forecast' title={title} icon={WeatherCardIcon} height={7} allowZoom={false}>
@@ -39,7 +37,7 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
             <Day key={i} />
           ))}
           {feed.forecast.map((day: DayWeatherForecast) => (
-            <Day key={day.date} forecast={day} />
+            <Day key={day.date} forecast={day} dayLabel={formatForecastDayLabel(day.date, t)} />
           ))}
         </WeekContainer>
       </div>

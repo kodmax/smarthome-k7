@@ -167,4 +167,9 @@ export type Translations = {
       searchFor: string
     }
   }
+  dateTime: {
+    todayShort: string
+    tomorrowShort: string
+    weekdayShort: readonly [string, string, string, string, string, string, string]
+  }
 }

@@ -12,3 +12,10 @@ export const { I18nProvider, useLocale, useTranslations } = createI18n<AppLocale
 
 export { APP_LOCALES, LOCALE_LABELS, LOCALE_STORAGE_KEY, type AppLocale } from './locale'
 export type { Translations } from './translations/types'
+export {
+  formatForecastDayLabel,
+  formatIsoWeekdayShort,
+  mondayBasedWeekdayIndex,
+  parseForecastDate,
+  parseIsoDate,
+} from './formatForecastDayLabel'

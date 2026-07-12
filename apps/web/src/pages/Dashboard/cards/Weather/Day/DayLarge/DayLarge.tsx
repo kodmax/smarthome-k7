@@ -3,7 +3,7 @@ import WeatherIcon from '../../WeatherIcon'
 import { DayWrapper } from './styled'
 import { DayWeatherForecast } from '@repo/types'
 
-export const DayLarge: FC<{ forecast: DayWeatherForecast }> = ({ forecast }) => {
+export const DayLarge: FC<{ forecast: DayWeatherForecast; dayLabel: string }> = ({ forecast, dayLabel }) => {
   return (
     <DayWrapper>
       <div style={{ paddingRight: '1em' }}>
@@ -14,7 +14,7 @@ export const DayLarge: FC<{ forecast: DayWeatherForecast }> = ({ forecast }) => 
           {Number(forecast.temp.low).toFixed(0)} – {Number(forecast.temp.high).toFixed(0)} °C
         </div>
         <div style={{ fontSize: '0.7em' }}>
-          {forecast.dow} {forecast.date}
+          {dayLabel} {forecast.date}
         </div>
       </div>
     </DayWrapper>

@@ -169,4 +169,9 @@ export const ru: Translations = {
       searchFor: 'Искать торренты для',
     },
   },
+  dateTime: {
+    todayShort: 'Сегодня',
+    tomorrowShort: 'Завтра',
+    weekdayShort: ['пн.', 'вт.', 'ср.', 'чт.', 'пт.', 'сб.', 'вс.'],
+  },
 }

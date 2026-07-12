@@ -3,7 +3,7 @@ import { designTokens } from '@repo/design-tokens'
 
 const { font, space } = designTokens
 
-export const HOUR_COLUMN_WIDTH = 64
+export const HOUR_COLUMN_WIDTH = 76
 export const HOUR_GAP = space[4]
 export const HOUR_ROW_GAP = 4
 export const WEATHER_ICON_SIZE = 32

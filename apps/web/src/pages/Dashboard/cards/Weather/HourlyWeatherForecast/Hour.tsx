@@ -3,10 +3,16 @@ import WeatherIcon from '../WeatherIcon'
 import { HourColumn, IconSlot, PRECIP_ICON_SIZE, PrecipRow, RowText, SunText, WEATHER_ICON_SIZE } from './styled'
 import { HourWeatherForecast } from '@repo/types'
 
-export const Hour: FC<{ fc: HourWeatherForecast; zoom: boolean }> = ({ fc, zoom }) => {
+export const Hour: FC<{ fc: HourWeatherForecast; zoom: boolean; weekdayLabel: string }> = ({
+  fc,
+  zoom,
+  weekdayLabel,
+}) => {
   return (
     <HourColumn>
-      <RowText>{fc.hour}:00</RowText>
+      <RowText>
+        {weekdayLabel} {fc.hour}:00
+      </RowText>
       <IconSlot>
         <WeatherIcon icon={fc.icon} width={`${WEATHER_ICON_SIZE}px`} height={`${WEATHER_ICON_SIZE}px`} />
       </IconSlot>
