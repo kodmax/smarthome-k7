@@ -14,6 +14,7 @@ import {
   TablePlaceholder,
 } from '@/card-components'
 import { NewsFeed } from '@repo/types'
+import { useTranslations } from '@/i18n'
 
 const iconSize = designTokens.icon.sizeXs - 4
 
@@ -22,6 +23,8 @@ export const News: FC<Record<string, never>> = () => {
 
   const zoom = useZoom('news')
   const news = useFeed<NewsFeed>('news')
+  const { t } = useTranslations()
+  const labels = t.dashboard.news
 
   const read = useCommand('news', 'read')
   const unread = useCommand('news', 'unread')
@@ -67,16 +70,18 @@ export const News: FC<Record<string, never>> = () => {
   return (
     <ApolloCard
       cardId='news'
-      title='Wiadomości'
+      title={labels.title}
       icon={NewsIcon}
       height={6}
       onZoom={onZoom}
-      actions={<ApolloCardAction title='Edit preferences' onClick={onEditPreferences} Icon={SettingsIcon} />}
+      actions={
+        <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />
+      }
     >
       {!articles ? (
         <TablePlaceholder rows={10} graph={false} value={false} />
       ) : articles.length === 0 ? (
-        <TableEmptyMessage>Na razie nie ma tu nic nowego</TableEmptyMessage>
+        <TableEmptyMessage>{t.dashboard.common.emptyMessage}</TableEmptyMessage>
       ) : (
         <ApolloDataTable style={{ tableLayout: 'fixed' }}>
           <TableBody>
@@ -96,7 +101,7 @@ export const News: FC<Record<string, never>> = () => {
                     >
                       {article.read ? (
                         <IconButton
-                          aria-label='Oznacz jako nieprzeczytane'
+                          aria-label={labels.markAsUnread}
                           onClick={() => onUnreadArticle(article.uid)}
                           size='small'
                         >
@@ -104,7 +109,7 @@ export const News: FC<Record<string, never>> = () => {
                         </IconButton>
                       ) : (
                         <IconButton
-                          aria-label='Oznacz jako przeczytane'
+                          aria-label={labels.markAsRead}
                           onClick={() => onOpenArticle(article.uid)}
                           size='small'
                         >

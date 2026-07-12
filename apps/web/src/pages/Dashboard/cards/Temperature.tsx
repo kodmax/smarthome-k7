@@ -5,6 +5,7 @@ import { ApolloDataTable, KnxReading, KnxStateIcon } from '@/card-components'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
 import type { LucideIcon } from 'lucide-react'
 import { TemperatureData } from '@repo/types'
+import { useTranslations } from '@/i18n'
 
 const icons: Record<string, LucideIcon> = {
   FrostProtection: AirVentIcon,
@@ -15,16 +16,18 @@ const icons: Record<string, LucideIcon> = {
 
 export const Temperature: FC<Record<string, never>> = () => {
   const zoom = useZoom('indoor-temp')
+  const { t } = useTranslations()
+  const labels = t.dashboard.temperature
 
   return (
-    <ApolloCard cardId='indoor-temp' title='Temperatura' icon={TemperatureIcon}>
+    <ApolloCard cardId='indoor-temp' title={labels.title} icon={TemperatureIcon}>
       <ApolloDataTable>
         <TableBody>
           <KnxReading
             bars={{ historyKey: 'today', highest: 30, lowest: 20, optimal: 24, color: true }}
             precision={2}
             feed='home.temp.bathroom-floor'
-            label='Podłoga łazienki'
+            label={labels.bathroomFloor}
             range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
               zoom ? (
@@ -41,7 +44,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             precision={2}
             feed='home.temp.livingroom'
             target={zoom ? payload => Number(payload.setpoint).toFixed(1) : undefined}
-            label='Salon'
+            label={labels.livingRoom}
             range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
               zoom ? (
@@ -58,7 +61,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             precision={2}
             feed='home.temp.bedroom'
             target={zoom ? payload => Number(payload.setpoint).toFixed(1) : undefined}
-            label='Sypialnia'
+            label={labels.bedroom}
             range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
               zoom ? (
@@ -75,7 +78,7 @@ export const Temperature: FC<Record<string, never>> = () => {
             precision={2}
             feed='home.temp.bathroom'
             target={zoom ? payload => Number(payload.setpoint).toFixed(1) : undefined}
-            label='Łazienka'
+            label={labels.bathroom}
             range={{ optimal: 25, lowest: 21, highest: 30 }}
             icon={
               zoom ? (

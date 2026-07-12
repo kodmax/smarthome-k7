@@ -6,6 +6,7 @@ import { useCommand, useFeed } from '@repo/feed-client'
 import { ApolloDataTable, TableEmptyMessage, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
 import { JobsFeed } from '@repo/types'
+import { useTranslations } from '@/i18n'
 import { Ad } from './Ad'
 
 const cardTableFontSize = designTokens.font.body.size
@@ -15,6 +16,8 @@ export const Jobs: FC<Record<string, never>> = () => {
 
   const zoom = useZoom('jobs')
   const feed = useFeed<JobsFeed>('jobs')
+  const { t } = useTranslations()
+  const labels = t.dashboard.jobs
   const applied = useCommand('jobs', 'applied')
   const hide = useCommand('jobs', 'hide')
   const restore = useCommand('jobs', 'restore')
@@ -71,16 +74,18 @@ export const Jobs: FC<Record<string, never>> = () => {
   return (
     <ApolloCard
       cardId='jobs'
-      title='Oferty pracy'
+      title={labels.title}
       icon={JobsIcon}
       height={6}
       headingInfo={feed?.ads.filter(ad => !ad.hide).length}
-      actions={<ApolloCardAction title='Edit preferences' onClick={onEditPreferences} Icon={SettingsIcon} />}
+      actions={
+        <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />
+      }
     >
       {!feed ? (
         <TablePlaceholder rows={12} graph={true} value={true} />
       ) : ads.length === 0 ? (
-        <TableEmptyMessage>Na razie nie ma tu nic nowego</TableEmptyMessage>
+        <TableEmptyMessage>{t.dashboard.common.emptyMessage}</TableEmptyMessage>
       ) : (
         <ApolloDataTable style={{ fontSize: cardTableFontSize, tableLayout: 'fixed', width: '100%' }}>
           <TableBody>

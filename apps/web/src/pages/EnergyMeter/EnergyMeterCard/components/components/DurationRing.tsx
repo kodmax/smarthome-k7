@@ -2,6 +2,7 @@ import { Box, Button, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { Play, RotateCcw, Square } from 'lucide-react'
 import { type FC, useCallback } from 'react'
+import { useTranslations } from '@/i18n'
 import { SectionLabel } from './SectionLabel'
 
 type DurationRingProps = {
@@ -39,6 +40,8 @@ export const DurationRing: FC<DurationRingProps> = ({
   onStop,
   onReset,
 }) => {
+  const { t } = useTranslations()
+  const labels = t.energyMeter.duration
   const handleToggle = useCallback(() => {
     if (isRunning) {
       onStop?.()
@@ -110,14 +113,14 @@ export const DurationRing: FC<DurationRingProps> = ({
           pt: 8,
         }}
       >
-        <SectionLabel>Czas trwania</SectionLabel>
+        <SectionLabel>{labels.label}</SectionLabel>
 
         <Typography variant='timerValue' sx={{ mb: 0.5 }}>
           {formatStopwatch(elapsedSeconds)}
         </Typography>
 
         <Typography variant='caption' sx={{ mb: 2 }}>
-          godz : min : sek
+          {labels.units}
         </Typography>
 
         <Box
@@ -149,7 +152,7 @@ export const DurationRing: FC<DurationRingProps> = ({
               }),
             }}
           >
-            {isRunning ? 'STOP' : 'START'}
+            {isRunning ? labels.stop : labels.start}
           </Button>
           <Button
             variant='text'
@@ -166,7 +169,7 @@ export const DurationRing: FC<DurationRingProps> = ({
               },
             }}
           >
-            Zeruj
+            {labels.reset}
           </Button>
         </Box>
       </Box>

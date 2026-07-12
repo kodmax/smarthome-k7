@@ -4,6 +4,7 @@ import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { TablePlaceholder, TorrentSearch } from '@/card-components'
 import { useCommand, useFeed } from '@repo/feed-client'
 import { Torrent } from '@repo/types'
+import { useTranslations } from '@/i18n'
 import { DownloadsInfo } from './DownloadsInfo'
 import { TopTitlesTable } from './TopTitlesTable'
 import { TorrentsLoader } from './TorrentsLoader'
@@ -14,6 +15,8 @@ import { useTorrentSearch } from './useTorrentSearch'
 export const TopTorrents: FC<Record<string, never>> = () => {
   const zoom = useZoom('the-pirate')
   const feed = useFeed<Torrent[]>('top-torrents')
+  const { t } = useTranslations()
+  const title = t.dashboard.torrents.title
   const download = useCommand('transmission', 'download')
   const { query, lastQuery, loading, onQuery, onSearch, onClear, onTitleSearch } = useTorrentSearch(feed)
   const topTitles = useTopTitles(feed, lastQuery)
@@ -27,14 +30,14 @@ export const TopTorrents: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='the-pirate' title='Torrenty' icon={MoviesIcon} height={4} headingInfo={<DownloadsInfo />}>
+      <ApolloCard cardId='the-pirate' title={title} icon={MoviesIcon} height={4} headingInfo={<DownloadsInfo />}>
         <TablePlaceholder rows={12} graph={false} value={false} />
       </ApolloCard>
     )
   }
 
   return (
-    <ApolloCard cardId='the-pirate' title='Torrenty' icon={MoviesIcon} height={4} headingInfo={<DownloadsInfo />}>
+    <ApolloCard cardId='the-pirate' title={title} icon={MoviesIcon} height={4} headingInfo={<DownloadsInfo />}>
       <div>
         <div>
           {zoom ? <TorrentSearch query={query} onQuery={onQuery} onSearch={onSearch} onClear={onClear} /> : null}

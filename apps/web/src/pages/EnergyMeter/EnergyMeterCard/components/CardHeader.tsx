@@ -1,10 +1,13 @@
 import { Box, Typography } from '@mui/material'
 import { type FC } from 'react'
+import { useTranslations } from '@/i18n'
 import { MeterStatusDisplay, SectionField } from './components'
 import { EnergyRates } from '@repo/types'
 import { type MeterStatus } from '../../types'
 
 export const CardHeader: FC<{ energyRates: EnergyRates; status: MeterStatus }> = ({ energyRates, status }) => {
+  const { t } = useTranslations()
+  const labels = t.energyMeter
   const grossPrice = (energyRates.distribution + energyRates.energy) * energyRates.vat
 
   return (
@@ -18,11 +21,11 @@ export const CardHeader: FC<{ energyRates: EnergyRates; status: MeterStatus }> =
         mb: 4,
       }}
     >
-      <SectionField label='Status'>
+      <SectionField label={labels.status}>
         <MeterStatusDisplay status={status} />
       </SectionField>
 
-      <SectionField label='Taryfa energii' align='right'>
+      <SectionField label={labels.energyTariff} align='right'>
         <Box
           sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}
         >

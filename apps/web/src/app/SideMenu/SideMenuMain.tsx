@@ -40,7 +40,7 @@ export const SideMenuMain: FC<SideMenuMainProps> = ({ sections, onNavigate }) =>
         {section.title !== undefined ? <SectionTitle isFirst={sectionIndex === 0}>{section.title}</SectionTitle> : null}
         <List disablePadding>
           {section.items.map(item => (
-            <SideMenuNavItem key={item.label} item={item} onNavigate={onNavigate} />
+            <SideMenuNavItem key={item.id} item={item} onNavigate={onNavigate} />
           ))}
         </List>
       </Box>

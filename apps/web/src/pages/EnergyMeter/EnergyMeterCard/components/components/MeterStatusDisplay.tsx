@@ -1,16 +1,11 @@
 import { Box, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
+import { useTranslations } from '@/i18n'
 import { MeterStatus } from '../../../types'
 
 type MeterStatusProps = {
   status: MeterStatus
-}
-
-const statusText: Record<MeterStatus, string> = {
-  reset: 'Wyzerowany',
-  started: 'Pomiar',
-  stopped: 'Zatrzymany',
 }
 
 const statusColor: Record<MeterStatus, string> = {
@@ -20,6 +15,9 @@ const statusColor: Record<MeterStatus, string> = {
 }
 
 export const MeterStatusDisplay: FC<MeterStatusProps> = ({ status }) => {
+  const { t } = useTranslations()
+  const statusText = t.energyMeter.meterStatus[status]
+
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
       <Box
@@ -31,7 +29,7 @@ export const MeterStatusDisplay: FC<MeterStatusProps> = ({ status }) => {
         }}
       />
       <Typography variant='status' sx={{ color: statusColor[status] }}>
-        {statusText[status]}
+        {statusText}
       </Typography>
     </Box>
   )

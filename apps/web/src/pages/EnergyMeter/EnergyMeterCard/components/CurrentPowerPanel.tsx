@@ -3,6 +3,7 @@ import { designTokens } from '@repo/design-tokens'
 import { Zap } from 'lucide-react'
 import { type FC } from 'react'
 import { colorForValueInRange, type ColorIndicationRange } from '@/card-components'
+import { useTranslations } from '@/i18n'
 import { BorderedPanel, SectionField } from './components'
 import { formatNumber } from '@/helpers/formatNumber'
 const currentPowerRange: ColorIndicationRange = { optimal: 400, lowest: 100, highest: 2400 }
@@ -20,6 +21,8 @@ export const CurrentPowerPanel: FC<Props> = ({
   onBaselinePowerClick,
   adjustMeterReading,
 }) => {
+  const { t } = useTranslations()
+  const labels = t.energyMeter.currentPower
   const adjustedPower = adjustMeterReading
     ? currentPower - baselinePower > 0
       ? currentPower - baselinePower
@@ -28,7 +31,7 @@ export const CurrentPowerPanel: FC<Props> = ({
 
   return (
     <BorderedPanel>
-      <SectionField label='Aktualna moc'>
+      <SectionField label={labels.label}>
         <Box sx={{ textAlign: 'center', mb: 3, mt: 3 }}>
           <Typography variant='metricLg' component='span'>
             {formatNumber(adjustedPower, { fractionDigits: 0 })} W{' '}
@@ -53,7 +56,7 @@ export const CurrentPowerPanel: FC<Props> = ({
         control={<Checkbox checked={adjustMeterReading} onClick={onBaselinePowerClick} />}
         label={
           <Typography variant='body2' sx={{ color: 'text.secondary' }}>
-            Odliczaj moc bazową od wyniku
+            {labels.subtractBaseline}
           </Typography>
         }
       />

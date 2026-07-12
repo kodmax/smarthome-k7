@@ -5,11 +5,12 @@ import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { ApolloDataTable, ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
 import { StockMarketFeed } from '@repo/types'
+import { useTranslations } from '@/i18n'
 import { Ticker } from './Ticker'
 import { TableBody, TableHead, TableRow } from '@mui/material'
 import { useSortedTickers } from './useSortedTickers'
 import { useMarketSession } from './useMarketSession'
-import { marketStatusTitles } from './consts'
+import { getMarketStatusTitle } from './helpers/getMarketStatusTitle'
 
 const cardTableFontSize = designTokens.font.body.size
 const tableHeaderGap = designTokens.space[3]
@@ -20,29 +21,31 @@ export const StockMarket: FC<Record<string, never>> = () => {
   const feed = useFeed<StockMarketFeed>('stock-market')
   const tickers = useSortedTickers(feed)
   const marketSession = useMarketSession(feed?.marketInfo)
+  const { t } = useTranslations()
+  const labels = t.dashboard.stockMarket
 
   if (feed === undefined || tickers === undefined || marketSession === undefined) {
     return (
-      <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={6}>
+      <ApolloCard cardId='stock-market' title={labels.title} icon={StockMarketIcon} height={6}>
         <TablePlaceholder rows={12} graph={false} value={true} />
       </ApolloCard>
     )
   }
 
-  const headingInfo = `${marketStatusTitles[marketSession.status]} · ${marketSession.countdown}`
+  const headingInfo = `${getMarketStatusTitle(marketSession.status, labels.status)} · ${marketSession.countdown}`
 
   return (
-    <ApolloCard cardId='stock-market' title='Giełda' icon={StockMarketIcon} height={6} headingInfo={headingInfo}>
+    <ApolloCard cardId='stock-market' title={labels.title} icon={StockMarketIcon} height={6} headingInfo={headingInfo}>
       <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: zoom ? 2 : undefined }}>
         {zoom ? (
           <TableHead>
             <TableRow sx={headerRowSx}>
               <ApolloTableCell sx={{ width: '1em' }} />
-              <ApolloTableCell>Symbol</ApolloTableCell>
-              <ApolloTableCell>Do wyników</ApolloTableCell>
-              <ApolloTableCell>Do celu</ApolloTableCell>
-              <ApolloTableCell>C/Z@Cel</ApolloTableCell>
-              <ApolloTableCell>Notowanie</ApolloTableCell>
+              <ApolloTableCell>{labels.symbol}</ApolloTableCell>
+              <ApolloTableCell>{labels.earnings}</ApolloTableCell>
+              <ApolloTableCell>{labels.priceTarget}</ApolloTableCell>
+              <ApolloTableCell>{labels.peAtTarget}</ApolloTableCell>
+              <ApolloTableCell>{labels.quote}</ApolloTableCell>
             </TableRow>
           </TableHead>
         ) : null}

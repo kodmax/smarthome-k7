@@ -10,16 +10,19 @@ import { ArrowUp } from 'lucide-react'
 import { getPosition, getMoonPosition } from 'suncalc'
 import { useFeed } from '@repo/feed-client'
 import { WeatherFeed } from '@repo/types'
+import { useTranslations } from '@/i18n'
 import { sunTimes } from './sunTimes'
 import { toMetersPerSecond } from './windSpeed'
 
 export const Weather: FC<Record<string, never>> = () => {
   const zoom = useZoom('current-weather')
   const feed = useFeed<WeatherFeed>('weather')
+  const { t } = useTranslations()
+  const labels = t.dashboard.weather
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='current-weather' title='Pogoda' icon={WeatherCardIcon}>
+      <ApolloCard cardId='current-weather' title={labels.title} icon={WeatherCardIcon}>
         <TablePlaceholder rows={4} graph={true} value={true} />
       </ApolloCard>
     )
@@ -34,11 +37,11 @@ export const Weather: FC<Record<string, never>> = () => {
   const windSpeed = toMetersPerSecond(feed.instant.wind.speed, feed.instant.wind.speedUnit)
 
   return (
-    <ApolloCard cardId='current-weather' title='Pogoda' icon={WeatherCardIcon}>
+    <ApolloCard cardId='current-weather' title={labels.title} icon={WeatherCardIcon}>
       <ApolloDataTable>
         <TableBody>
           <Reading
-            title='Temperatura'
+            title={labels.temperature}
             graph={<HoursBars data={feed.outdoorTemp} highest={30} lowest={15} optimal={24} color />}
             displayValue={Number(feed.instant.temp).toFixed(0)}
             unit='°C'
@@ -46,22 +49,26 @@ export const Weather: FC<Record<string, never>> = () => {
             value={feed.instant.temp}
           />
           <Reading
-            title='Indeks UV'
+            title={labels.uvIndex}
             displayValue={String(feed.instant.uv)}
             colorIndicatorRange={{ optimal: 4, highest: 8, lowest: 0 }}
             value={feed.instant.uv}
             unit='UVI'
           />
           <Reading
-            title='Wilgotność'
+            title={labels.humidity}
             displayValue={hum.toFixed(0)}
             unit='%'
             colorIndicatorRange={optimalHumidityRange}
             value={hum}
           />
           <Reading
-            title='Predkość wiatru'
-            graph={<span style={{ fontSize: '0.5em' }}>{zoom ? `${bs} - ${beaufortLevelLabel(bs)}` : `${bs} B`}</span>}
+            title={labels.windSpeed}
+            graph={
+              <span style={{ fontSize: '0.5em' }}>
+                {zoom ? `${bs} - ${beaufortLevelLabel(bs, labels.beaufortScale)}` : `${bs} B`}
+              </span>
+            }
             extraInfo={
               zoom ? (
                 <ArrowUp
@@ -80,17 +87,17 @@ export const Weather: FC<Record<string, never>> = () => {
             colorIndicatorRange={{ lowest: 0, highest: 7, optimal: 1 }}
             value={bs}
           />
-          {!zoom ? null : <Reading title='Porywy wiatru' displayValue={String(windMaxSpeed)} unit='m/s' />}
+          {!zoom ? null : <Reading title={labels.windGusts} displayValue={String(windMaxSpeed)} unit='m/s' />}
           {!zoom ? null : sun.timeOfDay === 'day' ? (
             <Reading
-              title='Wysokość słońca'
+              title={labels.sunAltitude}
               displayValue={Number(sunAlt).toFixed(0)}
               unit='°'
               colorIndicatorRange={{ lowest: -6, optimal: 30, highest: 50 }}
               value={sunAlt}
             />
           ) : (
-            <Reading title='Wysokość księżyca' displayValue={Number(moonAlt).toFixed(0)} unit='°' />
+            <Reading title={labels.moonAltitude} displayValue={Number(moonAlt).toFixed(0)} unit='°' />
           )}
         </TableBody>
       </ApolloDataTable>

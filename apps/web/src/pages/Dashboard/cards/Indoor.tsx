@@ -6,11 +6,14 @@ import { ApolloDataTable, KnxReading, KnxStateIcon, Reading, TablePlaceholder } 
 import { ApolloCard } from '@repo/apollo-card'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { Co2Data, WeatherFeed } from '@repo/types'
+import { useTranslations } from '@/i18n'
 import { optimalHumidityRange } from './Weather/optimalHumidityRange'
 import { sunTimes } from './Weather/sunTimes'
 
 export const Indoor: FC<Record<string, never>> = () => {
   const feed = useFeed<WeatherFeed>('weather')
+  const { t } = useTranslations()
+  const labels = t.dashboard.indoor
 
   const onZoom = useCallback(() => {
     refreshFeeds(['weather', 'home.air-quality.co2', 'home.air-quality.humidity'])
@@ -18,7 +21,7 @@ export const Indoor: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='air-quality' title='Jakość powietrza' icon={AirQualityIcon}>
+      <ApolloCard cardId='air-quality' title={labels.title} icon={AirQualityIcon}>
         <TablePlaceholder rows={4} graph={false} value={true} />
       </ApolloCard>
     )
@@ -27,12 +30,12 @@ export const Indoor: FC<Record<string, never>> = () => {
   const sun = sunTimes(feed)
 
   return (
-    <ApolloCard cardId='air-quality' title='Jakość powietrza' icon={AirQualityIcon} onZoom={onZoom}>
+    <ApolloCard cardId='air-quality' title={labels.title} icon={AirQualityIcon} onZoom={onZoom}>
       <ApolloDataTable>
         <TableBody>
           <KnxReading
             feed='home.air-quality.co2'
-            label='Poziom CO₂'
+            label={labels.co2Level}
             range={{ optimal: 400, highest: 1500 }}
             bars={{ historyKey: 'today', highest: 2000, lowest: 400, optimal: 600, color: true }}
             icon={
@@ -45,18 +48,18 @@ export const Indoor: FC<Record<string, never>> = () => {
           />
           <KnxReading
             feed='home.air-quality.humidity'
-            label='Wilgotność'
+            label={labels.humidity}
             range={optimalHumidityRange}
             bars={{ historyKey: 'today', color: true, ...optimalHumidityRange }}
           />
           <Reading
-            title='Jakość powietrza'
+            title={labels.airQuality}
             displayValue={String(feed.aq.aqi)}
             unit='AQI'
             colorIndicatorRange={{ optimal: 0, highest: 150 }}
             value={feed.aq.aqi}
           />
-          <Reading title={sun.timeOfDay === 'day' ? 'Zmierzch' : 'Świt'} displayValue={sun.time} />
+          <Reading title={sun.timeOfDay === 'day' ? labels.dusk : labels.dawn} displayValue={sun.time} />
         </TableBody>
       </ApolloDataTable>
     </ApolloCard>

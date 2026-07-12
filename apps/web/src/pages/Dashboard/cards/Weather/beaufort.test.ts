@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { pl } from '@/i18n/translations/pl'
 import { beaufortLevelLabel, beaufortScale } from './beaufort'
+
+const beaufortLabels = pl.dashboard.weather.beaufortScale
 
 describe('beaufortScale', () => {
   it('returns 0 for calm wind', () => {
@@ -17,7 +20,7 @@ describe('beaufortScale', () => {
 
 describe('beaufortLevelLabel', () => {
   it('returns the Polish label for a known level', () => {
-    expect(beaufortLevelLabel(0)).toBe('Cisza, flauta')
-    expect(beaufortLevelLabel(12)).toBe('Huragan')
+    expect(beaufortLevelLabel(0, beaufortLabels)).toBe('Cisza, flauta')
+    expect(beaufortLevelLabel(12, beaufortLabels)).toBe('Huragan')
   })
 })

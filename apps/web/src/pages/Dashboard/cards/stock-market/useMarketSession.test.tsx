@@ -1,6 +1,8 @@
 import { renderHook, act } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { type ReactNode } from 'react'
 import { type MarketInfo } from '@repo/types'
+import { I18nProvider } from '@/i18n'
 import { getNextSessionOpeningTime } from './helpers/getNextSessionOpeningTime'
 import { formatMarketDuration } from './helpers/formatMarketDuration'
 import { useMarketSession } from './useMarketSession'
@@ -23,6 +25,8 @@ const marketInfo: MarketInfo = {
   afterHoursMarketClosingTime: 1783468800000,
 }
 
+const wrapper = ({ children }: { children: ReactNode }) => <I18nProvider initialLocale='pl'>{children}</I18nProvider>
+
 describe('useMarketSession', () => {
   beforeEach(() => {
     vi.useFakeTimers()
@@ -34,13 +38,13 @@ describe('useMarketSession', () => {
   })
 
   it('returns undefined when market info is unavailable', () => {
-    const { result } = renderHook(() => useMarketSession(undefined))
+    const { result } = renderHook(() => useMarketSession(undefined), { wrapper })
 
     expect(result.current).toBeUndefined()
   })
 
   it('counts down to market close when market is open', () => {
-    const { result } = renderHook(() => useMarketSession(marketInfo))
+    const { result } = renderHook(() => useMarketSession(marketInfo), { wrapper })
 
     expect(result.current).toEqual({
       status: 'Open',
@@ -51,7 +55,7 @@ describe('useMarketSession', () => {
   it('derives closed status before opening even when feed status is stale', () => {
     vi.setSystemTime(1783430000000)
 
-    const { result } = renderHook(() => useMarketSession({ ...marketInfo, status: 'Open' }))
+    const { result } = renderHook(() => useMarketSession({ ...marketInfo, status: 'Open' }), { wrapper })
 
     expect(result.current).toEqual({
       status: 'Pre-Market',
@@ -62,7 +66,7 @@ describe('useMarketSession', () => {
   it('switches to after-hours and counts down to the next opening after regular close', () => {
     vi.setSystemTime(1783454400000)
 
-    const { result } = renderHook(() => useMarketSession(marketInfo))
+    const { result } = renderHook(() => useMarketSession(marketInfo), { wrapper })
 
     expect(result.current?.status).toBe('After-Hours')
     expect(result.current?.countdown).toBe('Zamknięcie za 0s')
@@ -75,6 +79,6 @@ describe('useMarketSession', () => {
     const nextOpening = getNextSessionOpeningTime(marketInfo)
 
     expect(result.current?.status).toBe('After-Hours')
-    expect(result.current?.countdown).toBe(`Otwarcie za ${formatMarketDuration(nextOpening - 1783454400001)}`)
+    expect(result.current?.countdown).toBe(`Otwarcie za ${formatMarketDuration(nextOpening - 1783454400001, 'g')}`)
   })
 })

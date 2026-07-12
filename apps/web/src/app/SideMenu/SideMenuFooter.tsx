@@ -34,7 +34,7 @@ export const SideMenuFooter: FC<SideMenuFooterProps> = ({ items, onNavigate }) =
     <Divider sx={footerDividerSx} />
     <List disablePadding>
       {items.map(item => (
-        <SideMenuNavItem key={item.label} item={item} onNavigate={onNavigate} />
+        <SideMenuNavItem key={item.id} item={item} onNavigate={onNavigate} />
       ))}
     </List>
   </Box>

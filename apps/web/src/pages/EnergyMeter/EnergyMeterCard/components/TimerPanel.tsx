@@ -1,5 +1,6 @@
 import { ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { type FC, type MouseEvent, useCallback, useEffect, useState } from 'react'
+import { useTranslations } from '@/i18n'
 import { BorderedPanel, parseTargetTime, SectionField, TargetTimePicker } from './components'
 
 type TimerMode = 'no-limit' | 'with-timer'
@@ -28,6 +29,8 @@ type TimerPanelProps = {
 }
 
 export const TimerPanel: FC<TimerPanelProps> = ({ onChange, noLimit = false }) => {
+  const { t } = useTranslations()
+  const labels = t.energyMeter.timer
   const [timerMode, setTimerMode] = useState<TimerMode>(noLimit ? 'no-limit' : 'with-timer')
   const [targetTime, setTargetTime] = useState(DEFAULT_TARGET_TIME)
 
@@ -60,7 +63,7 @@ export const TimerPanel: FC<TimerPanelProps> = ({ onChange, noLimit = false }) =
 
   return (
     <BorderedPanel>
-      <SectionField label='Timer'>
+      <SectionField label={labels.label}>
         <ToggleButtonGroup
           exclusive
           size='large'
@@ -68,17 +71,17 @@ export const TimerPanel: FC<TimerPanelProps> = ({ onChange, noLimit = false }) =
           disabled={noLimit}
           value={timerMode}
           onChange={handleModeChange}
-          aria-label='Tryb timera'
+          aria-label={labels.modeAriaLabel}
           fullWidth
           sx={{ mb: 3 }}
         >
-          <ToggleButton value='no-limit'>Bez limitu</ToggleButton>
-          <ToggleButton value='with-timer'>Z timerem</ToggleButton>
+          <ToggleButton value='no-limit'>{labels.noLimit}</ToggleButton>
+          <ToggleButton value='with-timer'>{labels.withTimer}</ToggleButton>
         </ToggleButtonGroup>
       </SectionField>
 
       {timerMode === 'with-timer' ? (
-        <SectionField label='Czas docelowy'>
+        <SectionField label={labels.targetTime}>
           <TargetTimePicker value={targetTime} onChange={handleTargetTimeChange} />
         </SectionField>
       ) : null}

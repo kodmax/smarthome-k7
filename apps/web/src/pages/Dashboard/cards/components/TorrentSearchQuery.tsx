@@ -3,6 +3,7 @@ import { styled } from '@mui/system'
 import { designTokens } from '@repo/design-tokens'
 import { X } from 'lucide-react'
 import { type ChangeEventHandler, type FC, type KeyboardEventHandler, useCallback } from 'react'
+import { useTranslations } from '@/i18n'
 
 const Query = styled(TextField)({
   flex: '100% 1 1',
@@ -18,6 +19,9 @@ type TorrentSearchQueryProps = {
 }
 
 export const TorrentSearchQuery: FC<TorrentSearchQueryProps> = ({ query, onQuery, onSearch, onClear }) => {
+  const { t } = useTranslations()
+  const labels = t.dashboard.torrents
+
   const onKeyDown = useCallback<KeyboardEventHandler<HTMLDivElement>>(
     e => {
       if (e.key === 'Enter') {
@@ -36,7 +40,7 @@ export const TorrentSearchQuery: FC<TorrentSearchQueryProps> = ({ query, onQuery
 
   return (
     <Query
-      label='Search torrents'
+      label={labels.searchTorrents}
       variant='outlined'
       value={query}
       onKeyDown={onKeyDown}
@@ -46,7 +50,7 @@ export const TorrentSearchQuery: FC<TorrentSearchQueryProps> = ({ query, onQuery
           endAdornment:
             query !== '' ? (
               <InputAdornment position='end'>
-                <IconButton aria-label='Clear search' onClick={onClear} size='small' edge='end'>
+                <IconButton aria-label={labels.clearSearch} onClick={onClear} size='small' edge='end'>
                   <X size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
                 </IconButton>
               </InputAdornment>

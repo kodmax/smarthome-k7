@@ -2,6 +2,7 @@ import { styled } from '@mui/material'
 import { IconCopy } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
+import { useTranslations } from '@/i18n'
 
 const { icon } = designTokens
 
@@ -29,8 +30,15 @@ const CopyButton = styled('button')({
 })
 
 const Copy: FC<{ text: string }> = ({ text }) => {
+  const { t } = useTranslations()
+
   return (
-    <CopyButton type='button' disabled={!isSecureContext} aria-label='Kopiuj' onClick={() => void copyText(text)}>
+    <CopyButton
+      type='button'
+      disabled={!isSecureContext}
+      aria-label={t.dashboard.common.copy}
+      onClick={() => void copyText(text)}
+    >
       <IconCopy size={icon.sizeXs} strokeWidth={icon.strokeWidth} aria-hidden />
     </CopyButton>
   )

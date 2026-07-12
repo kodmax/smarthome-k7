@@ -4,6 +4,11 @@ import { getEffectiveMarketStatus } from './getEffectiveMarketStatus'
 import { getMarketCountdownRemaining, getMarketCountdownTarget } from './getMarketCountdownTarget'
 import { getNextSessionOpeningTime } from './getNextSessionOpeningTime'
 
+const countdownLabels = {
+  openingIn: 'Otwarcie za',
+  closingIn: 'Zamknięcie za',
+}
+
 const marketInfo: MarketInfo = {
   country: 'U.S.',
   status: 'Closed',
@@ -24,7 +29,7 @@ const marketInfo: MarketInfo = {
 
 describe('getMarketCountdownTarget', () => {
   it('targets market opening before regular session starts', () => {
-    expect(getMarketCountdownTarget(marketInfo, 1783430000000)).toEqual({
+    expect(getMarketCountdownTarget(marketInfo, 1783430000000, countdownLabels)).toEqual({
       target: 1783431000000,
       prefix: 'Otwarcie za',
     })
@@ -32,7 +37,7 @@ describe('getMarketCountdownTarget', () => {
 
   it('targets market closing during regular session even when feed status is stale', () => {
     expect(getEffectiveMarketStatus({ ...marketInfo, status: 'Closed' }, 1783440000000)).toBe('Open')
-    expect(getMarketCountdownTarget(marketInfo, 1783440000000)).toEqual({
+    expect(getMarketCountdownTarget(marketInfo, 1783440000000, countdownLabels)).toEqual({
       target: 1783454400000,
       prefix: 'Zamknięcie za',
     })
@@ -42,7 +47,7 @@ describe('getMarketCountdownTarget', () => {
     const oneMinuteAfterOpen = marketInfo.marketOpeningTime + 60_000
 
     expect(getEffectiveMarketStatus({ ...marketInfo, status: 'Pre-Market' }, oneMinuteAfterOpen)).toBe('Open')
-    expect(getMarketCountdownTarget(marketInfo, oneMinuteAfterOpen)).toEqual({
+    expect(getMarketCountdownTarget(marketInfo, oneMinuteAfterOpen, countdownLabels)).toEqual({
       target: marketInfo.marketClosingTime,
       prefix: 'Zamknięcie za',
     })
@@ -52,24 +57,24 @@ describe('getMarketCountdownTarget', () => {
     const oneMinuteAfterClose = marketInfo.marketClosingTime + 60_000
 
     expect(getEffectiveMarketStatus({ ...marketInfo, status: 'Open' }, oneMinuteAfterClose)).toBe('After-Hours')
-    expect(getMarketCountdownTarget(marketInfo, oneMinuteAfterClose)).toEqual({
+    expect(getMarketCountdownTarget(marketInfo, oneMinuteAfterClose, countdownLabels)).toEqual({
       target: getNextSessionOpeningTime(marketInfo),
       prefix: 'Otwarcie za',
     })
   })
 
   it('shows zero remaining at the exact regular close', () => {
-    expect(getMarketCountdownTarget(marketInfo, 1783454400000)).toEqual({
+    expect(getMarketCountdownTarget(marketInfo, 1783454400000, countdownLabels)).toEqual({
       target: 1783454400000,
       prefix: 'Zamknięcie za',
     })
-    expect(getMarketCountdownRemaining(marketInfo, 1783454400000)).toBe(0)
+    expect(getMarketCountdownRemaining(marketInfo, 1783454400000, countdownLabels)).toBe(0)
   })
 
   it('counts down to the next opening after regular close instead of after-hours', () => {
     const nextOpening = getNextSessionOpeningTime(marketInfo)
 
-    expect(getMarketCountdownTarget(marketInfo, 1783454400001)).toEqual({
+    expect(getMarketCountdownTarget(marketInfo, 1783454400001, countdownLabels)).toEqual({
       target: nextOpening,
       prefix: 'Otwarcie za',
     })
@@ -83,8 +88,8 @@ describe('getMarketCountdownTarget', () => {
   })
 
   it('never shows negative countdown values when feed timestamps are in the past', () => {
-    expect(getMarketCountdownRemaining(marketInfo, 1783600000000)).toBe(0)
-    expect(getMarketCountdownTarget(marketInfo, 1783600000000)).toEqual({
+    expect(getMarketCountdownRemaining(marketInfo, 1783600000000, countdownLabels)).toBe(0)
+    expect(getMarketCountdownTarget(marketInfo, 1783600000000, countdownLabels)).toEqual({
       target: getNextSessionOpeningTime(marketInfo),
       prefix: 'Otwarcie za',
     })

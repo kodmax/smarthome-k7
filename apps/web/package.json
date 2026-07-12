@@ -21,6 +21,7 @@
     "@repo/assets": "*",
     "@repo/design-tokens": "*",
     "@repo/feed-client": "*",
+    "@repo/i18n-react": "*",
     "dotenv": "^17.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

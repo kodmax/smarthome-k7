@@ -10,7 +10,7 @@ describe('formatMarketDuration', () => {
   it('omits seconds at one minute and above', () => {
     expect(formatMarketDuration(60_000)).toBe('1m')
     expect(formatMarketDuration(90_000)).toBe('1m')
-    expect(formatMarketDuration(3_661_000)).toBe('1g 1m')
-    expect(formatMarketDuration(90_061_000)).toBe('1d 1g 1m')
+    expect(formatMarketDuration(3_661_000, 'g')).toBe('1g 1m')
+    expect(formatMarketDuration(90_061_000, 'g')).toBe('1d 1g 1m')
   })
 })

@@ -1,7 +1,8 @@
 import { Box, IconButton, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { type FC, useCallback } from 'react'
+import { type FC, useCallback, useMemo } from 'react'
+import { useTranslations } from '@/i18n'
 
 type DurationParts = {
   hours: number
@@ -20,12 +21,6 @@ const UNIT_LIMITS: Record<DurationUnit, { min: number; max: number }> = {
   hours: { min: 0, max: 99 },
   minutes: { min: 0, max: 59 },
   seconds: { min: 0, max: 59 },
-}
-
-const UNIT_LABELS: Record<DurationUnit, string> = {
-  hours: 'godz',
-  minutes: 'min',
-  seconds: 'sek',
 }
 
 export const parseTargetTime = (value: string): DurationParts => {
@@ -61,6 +56,9 @@ type DurationStepperProps = {
 }
 
 const DurationStepper: FC<DurationStepperProps> = ({ unit, value, onChange }) => {
+  const { t } = useTranslations()
+  const timeUnit = t.energyMeter.timeUnit
+  const unitLabel = timeUnit[unit]
   const { min, max } = UNIT_LIMITS[unit]
 
   const handleStep = useCallback(
@@ -73,7 +71,7 @@ const DurationStepper: FC<DurationStepperProps> = ({ unit, value, onChange }) =>
   return (
     <Box sx={{ flex: '0 0 3em', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
       <IconButton
-        aria-label={`Zwiększ ${UNIT_LABELS[unit]}`}
+        aria-label={`${timeUnit.increase} ${unitLabel}`}
         onClick={() => handleStep(1)}
         size='large'
         sx={{
@@ -87,7 +85,7 @@ const DurationStepper: FC<DurationStepperProps> = ({ unit, value, onChange }) =>
       </IconButton>
 
       <Typography
-        aria-label={`${UNIT_LABELS[unit]}: ${String(value).padStart(2, '0')}`}
+        aria-label={`${unitLabel}: ${String(value).padStart(2, '0')}`}
         variant='timerDigit'
         sx={{
           minWidth: '2.5ch',
@@ -100,7 +98,7 @@ const DurationStepper: FC<DurationStepperProps> = ({ unit, value, onChange }) =>
       </Typography>
 
       <IconButton
-        aria-label={`Zmniejsz ${UNIT_LABELS[unit]}`}
+        aria-label={`${timeUnit.decrease} ${unitLabel}`}
         onClick={() => handleStep(-1)}
         size='large'
         sx={{
@@ -114,14 +112,14 @@ const DurationStepper: FC<DurationStepperProps> = ({ unit, value, onChange }) =>
       </IconButton>
 
       <Typography variant='caption' sx={{ mt: 0.5 }}>
-        {UNIT_LABELS[unit]}
+        {unitLabel}
       </Typography>
     </Box>
   )
 }
 
 export const TargetTimePicker: FC<TargetTimePickerProps> = ({ value, onChange }) => {
-  const duration = parseTargetTime(value)
+  const duration = useMemo(() => parseTargetTime(value), [value])
 
   const handleUnitChange = useCallback(
     (unit: DurationUnit, nextValue: number) => {

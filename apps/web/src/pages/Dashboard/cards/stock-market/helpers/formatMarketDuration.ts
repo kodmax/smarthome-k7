@@ -1,4 +1,4 @@
-export const formatMarketDuration = (remainingMs: number): string => {
+export const formatMarketDuration = (remainingMs: number, hourSuffix = 'h'): string => {
   const totalSeconds = Math.max(0, Math.floor(remainingMs / 1000))
 
   if (totalSeconds < 60) {
@@ -15,7 +15,7 @@ export const formatMarketDuration = (remainingMs: number): string => {
   }
 
   if (hours > 0) {
-    parts.push(`${hours}g`)
+    parts.push(`${hours}${hourSuffix}`)
   }
 
   if (minutes > 0) {

@@ -1,5 +1,6 @@
-import { MarketInfo } from '@repo/types'
 import { useCallback, useMemo } from 'react'
+import { MarketInfo } from '@repo/types'
+import { useTranslations } from '@/i18n'
 import { formatMarketDuration } from './helpers/formatMarketDuration'
 import { getEffectiveMarketStatus } from './helpers/getEffectiveMarketStatus'
 import { getMarketCountdownRemaining, getMarketCountdownTarget } from './helpers/getMarketCountdownTarget'
@@ -11,9 +12,20 @@ export type MarketSession = {
 }
 
 export const useMarketSession = (marketInfo: MarketInfo | undefined): MarketSession | undefined => {
+  const { t } = useTranslations()
+  const stockMarket = t.dashboard.stockMarket
+
+  const countdownLabels = useMemo(
+    () => ({
+      openingIn: stockMarket.openingIn,
+      closingIn: stockMarket.closingIn,
+    }),
+    [stockMarket.closingIn, stockMarket.openingIn],
+  )
+
   const getRemaining = useCallback(
-    (now: number) => (marketInfo === undefined ? 0 : getMarketCountdownRemaining(marketInfo, now)),
-    [marketInfo],
+    (now: number) => (marketInfo === undefined ? 0 : getMarketCountdownRemaining(marketInfo, now, countdownLabels)),
+    [countdownLabels, marketInfo],
   )
 
   const now = useAlignedTimeoutLoop({
@@ -26,12 +38,12 @@ export const useMarketSession = (marketInfo: MarketInfo | undefined): MarketSess
       return undefined
     }
 
-    const { prefix } = getMarketCountdownTarget(marketInfo, now)
-    const remaining = getMarketCountdownRemaining(marketInfo, now)
+    const { prefix } = getMarketCountdownTarget(marketInfo, now, countdownLabels)
+    const remaining = getMarketCountdownRemaining(marketInfo, now, countdownLabels)
 
     return {
       status: getEffectiveMarketStatus(marketInfo, now),
-      countdown: `${prefix} ${formatMarketDuration(remaining)}`,
+      countdown: `${prefix} ${formatMarketDuration(remaining, stockMarket.durationHourSuffix)}`,
     }
-  }, [marketInfo, now])
+  }, [countdownLabels, marketInfo, now, stockMarket.durationHourSuffix])
 }

@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { type FC } from 'react'
 import { ApolloTableCell, ApolloTableRow, LinkOpen } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
+import { useTranslations } from '@/i18n'
 import { type TopTitle } from './getTopTitles'
 
 const iconSize = designTokens.icon.sizeXs - 4
@@ -12,19 +13,24 @@ type TopTitleRowProps = {
   onTitleSearch: (title: string) => void
 }
 
-export const TopTitleRow: FC<TopTitleRowProps> = ({ topTitle: { title, imdb }, onTitleSearch }) => (
-  <ApolloTableRow>
-    {imdb ? <LinkOpen href={`https://www.imdb.com/title/${imdb}/`} /> : <ApolloTableCell />}
-    <ApolloTableCell>
-      {title}
-      <IconButton
-        aria-label={`Search torrents for ${title}`}
-        onClick={() => onTitleSearch(title)}
-        size='small'
-        sx={{ marginLeft: '0.35em', verticalAlign: 'middle' }}
-      >
-        <ArrowRight size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
-      </IconButton>
-    </ApolloTableCell>
-  </ApolloTableRow>
-)
+export const TopTitleRow: FC<TopTitleRowProps> = ({ topTitle: { title, imdb }, onTitleSearch }) => {
+  const { t } = useTranslations()
+  const searchLabel = `${t.dashboard.torrents.searchFor} ${title}`
+
+  return (
+    <ApolloTableRow>
+      {imdb ? <LinkOpen href={`https://www.imdb.com/title/${imdb}/`} /> : <ApolloTableCell />}
+      <ApolloTableCell>
+        {title}
+        <IconButton
+          aria-label={searchLabel}
+          onClick={() => onTitleSearch(title)}
+          size='small'
+          sx={{ marginLeft: '0.35em', verticalAlign: 'middle' }}
+        >
+          <ArrowRight size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
+        </IconButton>
+      </ApolloTableCell>
+    </ApolloTableRow>
+  )
+}

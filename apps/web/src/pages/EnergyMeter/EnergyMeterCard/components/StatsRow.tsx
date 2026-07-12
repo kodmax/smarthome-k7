@@ -3,6 +3,7 @@ import { designTokens } from '@repo/design-tokens'
 import { ConsumptionIcon } from '@repo/assets'
 import { Banknote, Zap } from 'lucide-react'
 import { useMemo, useRef, type FC } from 'react'
+import { useTranslations } from '@/i18n'
 import { StatItem } from './components'
 import { formatNumber } from '@/helpers/formatNumber'
 import { EnergyRates } from '@repo/types'
@@ -14,6 +15,8 @@ type Props = {
 }
 
 export const StatsRow: FC<Props> = ({ meterReading, energyRates, elapsed }) => {
+  const { t } = useTranslations()
+  const labels = t.energyMeter.stats
   const elapsedRef = useRef(elapsed)
   elapsedRef.current = elapsed
 
@@ -35,9 +38,9 @@ export const StatsRow: FC<Props> = ({ meterReading, energyRates, elapsed }) => {
 
   return (
     <Box sx={{ display: 'flex', gap: `${designTokens.components.statsRow.gap}px`, justifyContent: 'center' }}>
-      <StatItem icon={ConsumptionIcon} label='Zużyta energia' value={`${consumedEnergy} Wh`} />
-      <StatItem icon={Banknote} label='Łączny koszt' value={`${cost} zł`} />
-      {avgPower !== undefined ? <StatItem icon={Zap} label='Średnia moc' value={`${avgPower} W`} /> : null}
+      <StatItem icon={ConsumptionIcon} label={labels.consumedEnergy} value={`${consumedEnergy} Wh`} />
+      <StatItem icon={Banknote} label={labels.totalCost} value={`${cost} zł`} />
+      {avgPower !== undefined ? <StatItem icon={Zap} label={labels.avgPower} value={`${avgPower} W`} /> : null}
     </Box>
   )
 }

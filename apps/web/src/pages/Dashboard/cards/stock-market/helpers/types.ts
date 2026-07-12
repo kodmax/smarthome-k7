@@ -1,6 +1,6 @@
 export type MarketCountdownTarget = {
   target: number
-  prefix: 'Otwarcie za' | 'Zamknięcie za'
+  prefix: string
 }
 
 export type EffectiveSessionTimes = {
