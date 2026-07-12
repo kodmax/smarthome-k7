@@ -1,7 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
-import { metricValueSx } from './styles'
 import { SectionLabel } from './SectionLabel'
 
 type StatItemProps = {
@@ -31,7 +30,7 @@ export const StatItem: FC<StatItemProps> = ({ icon: Icon, label, value }) => (
     </Box>
     <Box>
       <SectionLabel>{label}</SectionLabel>
-      <Typography sx={metricValueSx}>{value}</Typography>
+      <Typography variant='metric'>{value}</Typography>
     </Box>
   </Box>
 )

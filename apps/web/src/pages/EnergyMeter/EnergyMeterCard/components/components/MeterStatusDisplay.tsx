@@ -1,7 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
-import { statusSx } from './styles'
 import { MeterStatus } from '../../../types'
 
 type MeterStatusProps = {
@@ -31,7 +30,9 @@ export const MeterStatusDisplay: FC<MeterStatusProps> = ({ status }) => {
           bgcolor: statusColor[status],
         }}
       />
-      <Typography sx={{ ...statusSx, color: statusColor[status] }}>{statusText[status]}</Typography>
+      <Typography variant='status' sx={{ color: statusColor[status] }}>
+        {statusText[status]}
+      </Typography>
     </Box>
   )
 }

@@ -2,7 +2,6 @@ import { Box, Button, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { Play, RotateCcw, Square } from 'lucide-react'
 import { type FC, useCallback } from 'react'
-import { timerValueSx } from './styles'
 import { SectionLabel } from './SectionLabel'
 
 type DurationRingProps = {
@@ -108,14 +107,16 @@ export const DurationRing: FC<DurationRingProps> = ({
           justifyContent: 'center',
           px: 5,
           textAlign: 'center',
-          pt: '32px',
+          pt: 8,
         }}
       >
         <SectionLabel>Czas trwania</SectionLabel>
 
-        <Typography sx={{ ...timerValueSx, mb: 0.5 }}>{formatStopwatch(elapsedSeconds)}</Typography>
+        <Typography variant='timerValue' sx={{ mb: 0.5 }}>
+          {formatStopwatch(elapsedSeconds)}
+        </Typography>
 
-        <Typography variant='caption' sx={{ color: 'text.secondary', mb: 2 }}>
+        <Typography variant='caption' sx={{ mb: 2 }}>
           godz : min : sek
         </Typography>
 
@@ -127,7 +128,7 @@ export const DurationRing: FC<DurationRingProps> = ({
         >
           <Button
             variant='contained'
-            color={isRunning ? 'error' : undefined}
+            color={isRunning ? 'error' : 'temperature'}
             size='large'
             fullWidth
             onClick={handleToggle}
@@ -141,12 +142,8 @@ export const DurationRing: FC<DurationRingProps> = ({
             sx={{
               mb: 1.5,
               fontWeight: 700,
-              borderRadius: `${designTokens.radius.xl}px`,
               ...(!isRunning && {
-                bgcolor: 'temperature.main',
-                color: 'common.white',
                 '&:hover': {
-                  bgcolor: 'temperature.main',
                   filter: 'brightness(0.92)',
                 },
               }),
@@ -163,7 +160,6 @@ export const DurationRing: FC<DurationRingProps> = ({
             startIcon={<RotateCcw size={designTokens.icon.sizeAction} strokeWidth={designTokens.icon.strokeWidth} />}
             sx={{
               fontWeight: 500,
-              borderRadius: `${designTokens.radius.xl}px`,
               color: 'text.secondary',
               '&:hover': {
                 bgcolor: 'action.hover',

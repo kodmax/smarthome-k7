@@ -3,7 +3,7 @@ import { designTokens } from '@repo/design-tokens'
 import { Zap } from 'lucide-react'
 import { type FC } from 'react'
 import { colorForValueInRange, type ColorIndicationRange } from '@/card-components'
-import { BorderedPanel, fontSx, metricLgSx, SectionField } from './components'
+import { BorderedPanel, SectionField } from './components'
 import { formatNumber } from '@/helpers/formatNumber'
 const currentPowerRange: ColorIndicationRange = { optimal: 400, lowest: 100, highest: 2400 }
 
@@ -30,10 +30,10 @@ export const CurrentPowerPanel: FC<Props> = ({
     <BorderedPanel>
       <SectionField label='Aktualna moc'>
         <Box sx={{ textAlign: 'center', mb: 3, mt: 3 }}>
-          <Typography sx={metricLgSx} component='span'>
+          <Typography variant='metricLg' component='span'>
             {formatNumber(adjustedPower, { fractionDigits: 0 })} W{' '}
             {adjustMeterReading ? (
-              <Typography component='span' sx={{ ...fontSx('h3'), color: 'text.secondary' }}>
+              <Typography variant='metric' component='span' sx={{ color: 'text.secondary' }}>
                 (+{formatNumber(baselinePower, { fractionDigits: 0 })} W)
               </Typography>
             ) : null}

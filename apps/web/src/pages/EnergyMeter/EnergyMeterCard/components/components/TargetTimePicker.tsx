@@ -2,7 +2,6 @@ import { Box, IconButton, Typography } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { type FC, useCallback } from 'react'
-import { fontSx } from './styles'
 
 type DurationParts = {
   hours: number
@@ -89,10 +88,8 @@ const DurationStepper: FC<DurationStepperProps> = ({ unit, value, onChange }) =>
 
       <Typography
         aria-label={`${UNIT_LABELS[unit]}: ${String(value).padStart(2, '0')}`}
+        variant='timerDigit'
         sx={{
-          ...fontSx('status'),
-          fontFamily: designTokens.font.familyMono,
-          letterSpacing: designTokens.components.progressRing.timerLetterSpacing,
           minWidth: '2.5ch',
           textAlign: 'center',
           mt: 1,
@@ -116,7 +113,7 @@ const DurationStepper: FC<DurationStepperProps> = ({ unit, value, onChange }) =>
         <ChevronDown size={designTokens.icon.sizeAction} strokeWidth={designTokens.icon.strokeWidth} />
       </IconButton>
 
-      <Typography variant='caption' sx={{ color: 'text.secondary', mt: 0.5 }}>
+      <Typography variant='caption' sx={{ mt: 0.5 }}>
         {UNIT_LABELS[unit]}
       </Typography>
     </Box>
@@ -155,14 +152,7 @@ export const TargetTimePicker: FC<TargetTimePickerProps> = ({ value, onChange })
         onChange={nextValue => handleUnitChange('hours', nextValue)}
       />
 
-      <Typography
-        sx={{
-          ...fontSx('status'),
-          fontFamily: designTokens.font.familyMono,
-          color: 'text.secondary',
-          pb: 5,
-        }}
-      >
+      <Typography variant='timerDigit' sx={{ color: 'text.secondary', pb: 5 }}>
         :
       </Typography>
 
@@ -172,14 +162,7 @@ export const TargetTimePicker: FC<TargetTimePickerProps> = ({ value, onChange })
         onChange={nextValue => handleUnitChange('minutes', nextValue)}
       />
 
-      {/* <Typography
-        sx={{
-          ...fontSx('status'),
-          fontFamily: designTokens.font.familyMono,
-          color: 'text.secondary',
-          pb: 5,
-        }}
-      >
+      {/* <Typography variant='timerDigit' sx={{ color: 'text.secondary', pb: 5 }}>
         :
       </Typography>
 

@@ -1,5 +1,4 @@
 import { ToggleButton, ToggleButtonGroup } from '@mui/material'
-import { designTokens } from '@repo/design-tokens'
 import { type FC, type MouseEvent, useCallback, useEffect, useState } from 'react'
 import { BorderedPanel, parseTargetTime, SectionField, TargetTimePicker } from './components'
 
@@ -65,31 +64,13 @@ export const TimerPanel: FC<TimerPanelProps> = ({ onChange, noLimit = false }) =
         <ToggleButtonGroup
           exclusive
           size='large'
+          pill
           disabled={noLimit}
           value={timerMode}
           onChange={handleModeChange}
           aria-label='Tryb timera'
           fullWidth
-          sx={{
-            mb: 3,
-            bgcolor: 'background.default',
-            borderRadius: `${designTokens.radius.full}px`,
-            p: 0.5,
-            '& .MuiToggleButton-root': {
-              flex: 1,
-              border: 'none',
-              borderRadius: `${designTokens.radius.full}px`,
-              fontWeight: designTokens.components.sectionLabel.fontWeight,
-              color: 'text.secondary',
-              '&.Mui-selected': {
-                bgcolor: 'energy.main',
-                color: 'common.white',
-                '&:hover': {
-                  bgcolor: 'energy.main',
-                },
-              },
-            },
-          }}
+          sx={{ mb: 3 }}
         >
           <ToggleButton value='no-limit'>Bez limitu</ToggleButton>
           <ToggleButton value='with-timer'>Z timerem</ToggleButton>

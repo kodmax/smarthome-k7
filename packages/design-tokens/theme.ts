@@ -4,7 +4,7 @@ import './theme.types'
 
 const { shared, schemes } = tokens
 const darkScheme = schemes.dark
-const { font, radius, layout, breakpoint, borderWidth, icon } = shared
+const { font, radius, layout, breakpoint, borderWidth, icon, components } = shared
 const { bodyPadding } = layout
 
 const below2xlMediaQuery = `@media (max-width:${breakpoint['2xl'] - 0.05}px)`
@@ -45,7 +45,7 @@ const iconTouchTargetBelow2xl = (variant: 'medium' | 'small') => {
   }
 }
 
-const domainColor = (main: string) => ({ main })
+const domainColor = (main: string) => ({ main, contrastText: '#FFFFFF' })
 
 const buildPalette = (scheme: SchemeTokens) => {
   const { color, card } = scheme
@@ -158,7 +158,30 @@ export const theme = createTheme({
     body2: fontVariant(font.bodySmall),
     subtitle1: fontVariant(font.bodyLarge),
     subtitle2: fontVariant(font.bodySmall),
-    caption: fontVariant(font.caption),
+    caption: {
+      ...fontVariant(font.caption),
+      color: 'var(--mui-palette-text-secondary)',
+    },
+    metric: fontVariant(font.h3),
+    metricLg: fontVariant(font.metricLg),
+    status: fontVariant(font.status),
+    timerDigit: {
+      ...fontVariant(font.status),
+      fontFamily: font.familyMono,
+      letterSpacing: components.progressRing.timerLetterSpacing,
+    },
+    timerValue: {
+      ...fontVariant(font.display2),
+      fontFamily: font.familyMono,
+      letterSpacing: components.progressRing.timerLetterSpacing,
+    },
+    sectionLabel: {
+      color: 'var(--mui-palette-text-secondary)',
+      fontWeight: components.sectionLabel.fontWeight,
+      letterSpacing: components.sectionLabel.letterSpacing,
+      textTransform: 'uppercase',
+      fontSize: font.caption.size,
+    },
     fontSize: font.body.size,
   },
   spacing: 4,
@@ -223,6 +246,50 @@ export const theme = createTheme({
           [theme.breakpoints.down('2xl')]: touchTargetBelow2xl(theme),
         }),
       },
+    },
+    MuiToggleButtonGroup: {
+      variants: [
+        {
+          props: { pill: true },
+          style: ({ theme }: { theme: Theme }) => ({
+            backgroundColor: theme.vars.palette.background.default,
+            borderRadius: `${radius.full}px`,
+            padding: theme.spacing(0.5),
+            '& .MuiToggleButton-root': {
+              flex: 1,
+              border: 'none',
+              borderRadius: `${radius.full}px`,
+              fontWeight: components.sectionLabel.fontWeight,
+              color: theme.vars.palette.text.secondary,
+              '&.Mui-selected': {
+                backgroundColor: theme.vars.palette.energy.main,
+                color: theme.vars.palette.common.white,
+                '&:hover': {
+                  backgroundColor: theme.vars.palette.energy.main,
+                },
+              },
+            },
+          }),
+        },
+      ],
+    },
+    MuiPaper: {
+      defaultProps: {
+        elevation: 0,
+      },
+      variants: [
+        {
+          props: { variant: 'panel' },
+          style: ({ theme }: { theme: Theme }) => ({
+            border: '1px solid',
+            borderColor: theme.vars.palette.divider,
+            borderRadius: `${components.panel.borderRadius}px`,
+            backgroundColor: theme.vars.palette.background.paper,
+            padding: `${components.panel.padding}px`,
+            height: '100%',
+          }),
+        },
+      ],
     },
     MuiIconButton: {
       styleOverrides: {

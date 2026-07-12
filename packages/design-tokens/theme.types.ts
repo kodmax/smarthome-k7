@@ -43,11 +43,23 @@ declare module '@mui/material/styles' {
   interface TypographyVariants {
     display1: CSSProperties
     display2: CSSProperties
+    metric: CSSProperties
+    metricLg: CSSProperties
+    status: CSSProperties
+    timerDigit: CSSProperties
+    timerValue: CSSProperties
+    sectionLabel: CSSProperties
   }
 
   interface TypographyVariantsOptions {
     display1?: CSSProperties
     display2?: CSSProperties
+    metric?: CSSProperties
+    metricLg?: CSSProperties
+    status?: CSSProperties
+    timerDigit?: CSSProperties
+    timerValue?: CSSProperties
+    sectionLabel?: CSSProperties
   }
 
   interface BreakpointOverrides {
@@ -64,6 +76,37 @@ declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     display1: true
     display2: true
+    metric: true
+    metricLg: true
+    status: true
+    timerDigit: true
+    timerValue: true
+    sectionLabel: true
+  }
+}
+
+declare module '@mui/material/Paper' {
+  interface PaperPropsVariantOverrides {
+    panel: true
+  }
+}
+
+declare module '@mui/material/ToggleButtonGroup' {
+  interface ToggleButtonGroupProps {
+    pill?: boolean
+  }
+}
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsColorOverrides {
+    energy: true
+    temperature: true
+    humidity: true
+    air: true
+    weather: true
+    media: true
+    news: true
+    jobs: true
   }
 }
 

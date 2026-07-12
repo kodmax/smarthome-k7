@@ -16,16 +16,16 @@ export const SideMenuToggle: FC<SideMenuToggleProps> = ({ open, onToggle }) => {
       aria-label={open ? 'Zwiń menu' : 'Otwórz menu'}
       aria-expanded={open}
       onClick={onToggle}
-      size='small'
+      size={open ? 'small' : 'large'}
       sx={theme => ({
         position: 'fixed',
         top: open ? toggleTopOpen : toggleTopClosed,
         left: open ? toggleLeft(open) : toggleLeftClosed,
         transform: open ? 'translateX(-50%)' : 'none',
         zIndex: open ? theme.zIndex.drawer + 1 : TOGGLE_CLOSED_Z_INDEX,
-        width: open ? TOGGLE_OPEN_SIZE : undefined,
-        height: open ? TOGGLE_OPEN_SIZE : undefined,
-        minWidth: open ? TOGGLE_OPEN_SIZE : 0,
+        width: open ? TOGGLE_OPEN_SIZE : TOGGLE_CLOSED_SIZE,
+        height: open ? TOGGLE_OPEN_SIZE : TOGGLE_CLOSED_SIZE,
+        minWidth: open ? TOGGLE_OPEN_SIZE : TOGGLE_CLOSED_SIZE,
         px: 0,
         borderRadius: open ? `${designTokens.radius.sm}px` : `${designTokens.radius.md}px`,
         border: '1px solid',
@@ -34,12 +34,6 @@ export const SideMenuToggle: FC<SideMenuToggleProps> = ({ open, onToggle }) => {
         transition: `left ${designTokens.transition.normal}, top ${designTokens.transition.normal}, width ${designTokens.transition.normal}, height ${designTokens.transition.normal}, border-radius ${designTokens.transition.normal}`,
         '&:hover': {
           bgcolor: 'surfaceElevated.main',
-        },
-        [theme.breakpoints.up('2xl')]: {
-          ...(!open && {
-            width: TOGGLE_CLOSED_SIZE,
-            height: TOGGLE_CLOSED_SIZE,
-          }),
         },
       })}
     >
