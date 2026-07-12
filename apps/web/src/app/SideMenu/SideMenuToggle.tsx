@@ -16,15 +16,16 @@ export const SideMenuToggle: FC<SideMenuToggleProps> = ({ open, onToggle }) => {
       aria-label={open ? 'Zwiń menu' : 'Otwórz menu'}
       aria-expanded={open}
       onClick={onToggle}
-      sx={{
+      size='small'
+      sx={theme => ({
         position: 'fixed',
         top: open ? toggleTopOpen : toggleTopClosed,
         left: open ? toggleLeft(open) : toggleLeftClosed,
         transform: open ? 'translateX(-50%)' : 'none',
-        zIndex: theme => (open ? theme.zIndex.drawer + 1 : TOGGLE_CLOSED_Z_INDEX),
-        width: open ? TOGGLE_OPEN_SIZE : TOGGLE_CLOSED_SIZE,
-        height: open ? TOGGLE_OPEN_SIZE : TOGGLE_CLOSED_SIZE,
-        minWidth: 0,
+        zIndex: open ? theme.zIndex.drawer + 1 : TOGGLE_CLOSED_Z_INDEX,
+        width: open ? TOGGLE_OPEN_SIZE : undefined,
+        height: open ? TOGGLE_OPEN_SIZE : undefined,
+        minWidth: open ? TOGGLE_OPEN_SIZE : 0,
         px: 0,
         borderRadius: open ? `${designTokens.radius.sm}px` : `${designTokens.radius.md}px`,
         border: '1px solid',
@@ -34,7 +35,13 @@ export const SideMenuToggle: FC<SideMenuToggleProps> = ({ open, onToggle }) => {
         '&:hover': {
           bgcolor: 'surfaceElevated.main',
         },
-      }}
+        [theme.breakpoints.up('2xl')]: {
+          ...(!open && {
+            width: TOGGLE_CLOSED_SIZE,
+            height: TOGGLE_CLOSED_SIZE,
+          }),
+        },
+      })}
     >
       {open ? (
         <CollapseMenuIcon size={designTokens.icon.sizeXs} strokeWidth={designTokens.icon.strokeWidth} />

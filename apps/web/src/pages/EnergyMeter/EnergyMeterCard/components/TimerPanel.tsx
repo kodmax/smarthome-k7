@@ -64,6 +64,7 @@ export const TimerPanel: FC<TimerPanelProps> = ({ onChange, noLimit = false }) =
       <SectionField label='Timer'>
         <ToggleButtonGroup
           exclusive
+          size='large'
           disabled={noLimit}
           value={timerMode}
           onChange={handleModeChange}
@@ -78,9 +79,7 @@ export const TimerPanel: FC<TimerPanelProps> = ({ onChange, noLimit = false }) =
               flex: 1,
               border: 'none',
               borderRadius: `${designTokens.radius.full}px`,
-              textTransform: 'none',
               fontWeight: designTokens.components.sectionLabel.fontWeight,
-              py: 1,
               color: 'text.secondary',
               '&.Mui-selected': {
                 bgcolor: 'energy.main',

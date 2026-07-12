@@ -108,6 +108,7 @@ export const DurationRing: FC<DurationRingProps> = ({
           justifyContent: 'center',
           px: 5,
           textAlign: 'center',
+          pt: '32px',
         }}
       >
         <SectionLabel>Czas trwania</SectionLabel>
@@ -127,6 +128,7 @@ export const DurationRing: FC<DurationRingProps> = ({
           <Button
             variant='contained'
             color={isRunning ? 'error' : undefined}
+            size='large'
             fullWidth
             onClick={handleToggle}
             startIcon={
@@ -138,7 +140,6 @@ export const DurationRing: FC<DurationRingProps> = ({
             }
             sx={{
               mb: 1.5,
-              py: 1.25,
               fontWeight: 700,
               borderRadius: `${designTokens.radius.xl}px`,
               ...(!isRunning && {
@@ -155,12 +156,12 @@ export const DurationRing: FC<DurationRingProps> = ({
           </Button>
           <Button
             variant='text'
+            size='large'
             fullWidth
             onClick={onReset}
             disabled={isRunning}
             startIcon={<RotateCcw size={designTokens.icon.sizeAction} strokeWidth={designTokens.icon.strokeWidth} />}
             sx={{
-              py: 1,
               fontWeight: 500,
               borderRadius: `${designTokens.radius.xl}px`,
               color: 'text.secondary',

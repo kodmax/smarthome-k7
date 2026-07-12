@@ -4,8 +4,10 @@ import './theme.types'
 
 const { shared, schemes } = tokens
 const darkScheme = schemes.dark
-const { font, radius, layout, breakpoint, borderWidth } = shared
+const { font, radius, layout, breakpoint, borderWidth, icon } = shared
 const { bodyPadding } = layout
+
+const below2xlMediaQuery = `@media (max-width:${breakpoint['2xl'] - 0.05}px)`
 
 type SchemeTokens = typeof darkScheme
 
@@ -19,6 +21,29 @@ const headingVariant = (variant: { size: number; weight: number; lineHeight: num
   ...fontVariant(variant),
   color: 'var(--mui-palette-text-secondary)',
 })
+
+const touchTargetBelow2xl = (theme: Theme) => ({
+  minHeight: 72,
+  paddingTop: theme.spacing(2.5),
+  paddingBottom: theme.spacing(2.5),
+  fontSize: font.bodyLarge.size,
+})
+
+const iconTouchTargetBelow2xl = (variant: 'medium' | 'small') => {
+  const buttonSize = Math.round((variant === 'small' ? 34 : 40) * 1.5)
+  const iconSize = Math.round((variant === 'small' ? 20 : 24) * 1.5)
+
+  return {
+    width: buttonSize,
+    height: buttonSize,
+    minWidth: buttonSize,
+    minHeight: buttonSize,
+    '& svg': {
+      width: iconSize,
+      height: iconSize,
+    },
+  }
+}
 
 const domainColor = (main: string) => ({ main })
 
@@ -163,6 +188,9 @@ export const theme = createTheme({
           maxWidth: layout.containerMax,
           margin: '0 auto',
           minHeight: '100%',
+          [below2xlMediaQuery]: {
+            padding: `${bodyPadding.top}px ${bodyPadding.right}px ${bodyPadding.bottom}px ${bodyPadding.leftBelow2xl}px`,
+          },
         },
       },
     },
@@ -175,6 +203,32 @@ export const theme = createTheme({
           borderRadius: radius.xl,
           textTransform: 'none',
         },
+        sizeLarge: ({ theme }: { theme: Theme }) => ({
+          [theme.breakpoints.down('2xl')]: {
+            ...touchTargetBelow2xl(theme),
+            '& .MuiButton-startIcon svg': {
+              width: icon.sizeMd,
+              height: icon.sizeMd,
+            },
+          },
+        }),
+      },
+    },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+        },
+        sizeLarge: ({ theme }: { theme: Theme }) => ({
+          [theme.breakpoints.down('2xl')]: touchTargetBelow2xl(theme),
+        }),
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        sizeLarge: ({ theme }: { theme: Theme }) => ({
+          [theme.breakpoints.down('2xl')]: iconTouchTargetBelow2xl('small'),
+        }),
       },
     },
     MuiCard: {

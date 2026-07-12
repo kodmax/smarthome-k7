@@ -30,7 +30,13 @@ export const Appearance: FC<Record<string, never>> = () => {
         <Typography variant='h3' sx={{ mb: 2 }}>
           Motyw
         </Typography>
-        <ToggleButtonGroup exclusive value={selectedMode} onChange={handleModeChange} aria-label='Motyw aplikacji'>
+        <ToggleButtonGroup
+          exclusive
+          size='large'
+          value={selectedMode}
+          onChange={handleModeChange}
+          aria-label='Motyw aplikacji'
+        >
           <ToggleButton value='system' aria-label='Motyw systemowy'>
             Systemowy
           </ToggleButton>

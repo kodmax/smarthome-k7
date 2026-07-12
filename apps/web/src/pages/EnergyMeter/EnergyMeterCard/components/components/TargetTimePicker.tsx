@@ -76,7 +76,7 @@ const DurationStepper: FC<DurationStepperProps> = ({ unit, value, onChange }) =>
       <IconButton
         aria-label={`Zwiększ ${UNIT_LABELS[unit]}`}
         onClick={() => handleStep(1)}
-        size='small'
+        size='large'
         sx={{
           color: 'text.secondary',
           border: '1px solid',
@@ -105,7 +105,7 @@ const DurationStepper: FC<DurationStepperProps> = ({ unit, value, onChange }) =>
       <IconButton
         aria-label={`Zmniejsz ${UNIT_LABELS[unit]}`}
         onClick={() => handleStep(-1)}
-        size='small'
+        size='large'
         sx={{
           color: 'text.secondary',
           border: '1px solid',
