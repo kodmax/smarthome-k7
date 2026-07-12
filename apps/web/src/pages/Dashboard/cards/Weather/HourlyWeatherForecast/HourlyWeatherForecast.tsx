@@ -17,12 +17,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
       <ScrollArea>
         <ForecastRow>
           {forecast?.hourly.map((fc: HourWeatherForecast) => (
-            <Hour
-              key={`${fc.date}-${fc.hour}`}
-              fc={fc}
-              zoom={zoom}
-              weekdayLabel={formatIsoWeekdayShort(fc.date, t)}
-            />
+            <Hour key={`${fc.date}-${fc.hour}`} fc={fc} zoom={zoom} weekdayLabel={formatIsoWeekdayShort(fc.date, t)} />
           ))}
         </ForecastRow>
       </ScrollArea>

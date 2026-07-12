@@ -45,7 +45,19 @@ export const parseHourlyFromDocument = (
   })
 
 export const parseHourly = async (latitude: number, longitude: number): Promise<HourWeatherForecast[]> => {
-  const todayDate = DateTime.now()
+  const warsawHour = Number(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Warsaw',
+      hour: 'numeric',
+      hour12: false,
+    }).format(new Date()),
+  )
+
+  let todayDate = DateTime.now()
+  if (warsawHour >= 23) {
+    todayDate = todayDate.shifted(1, CacheAgeUnit.DAYS)
+  }
+
   const tomorrowDate = todayDate.shifted(1, CacheAgeUnit.DAYS)
   const today = parseHourlyFromDocument(
     await fetchDocument(weatherPageUrls.hourly),

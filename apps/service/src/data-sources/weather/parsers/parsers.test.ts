@@ -188,6 +188,15 @@ describe('parseHourly', () => {
     expect(result[1]).toMatchObject({ date: '2025-06-29', hour: '14' })
   })
 
+  it('uses the next day as today after 23:00 in Europe/Warsaw', async () => {
+    vi.setSystemTime(new Date('2025-06-29T21:30:00.000Z'))
+
+    const result = await parseHourly(52.23, 21.01)
+
+    expect(result[0]).toMatchObject({ date: '2025-06-30', hour: '14' })
+    expect(result[1]).toMatchObject({ date: '2025-07-01', hour: '14' })
+  })
+
   it('fetches today and tomorrow hourly pages', async () => {
     await parseHourly(52.23, 21.01)
 
