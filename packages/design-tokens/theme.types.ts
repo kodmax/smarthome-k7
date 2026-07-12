@@ -49,6 +49,10 @@ declare module '@mui/material/styles' {
     timerDigit: CSSProperties
     timerValue: CSSProperties
     sectionLabel: CSSProperties
+    sideMenuLogo: CSSProperties
+    sideMenuBrandTitle: CSSProperties
+    sideMenuBrandSubtitle: CSSProperties
+    sideMenuSectionLabel: CSSProperties
   }
 
   interface TypographyVariantsOptions {
@@ -60,6 +64,10 @@ declare module '@mui/material/styles' {
     timerDigit?: CSSProperties
     timerValue?: CSSProperties
     sectionLabel?: CSSProperties
+    sideMenuLogo?: CSSProperties
+    sideMenuBrandTitle?: CSSProperties
+    sideMenuBrandSubtitle?: CSSProperties
+    sideMenuSectionLabel?: CSSProperties
   }
 
   interface BreakpointOverrides {
@@ -82,12 +90,17 @@ declare module '@mui/material/Typography' {
     timerDigit: true
     timerValue: true
     sectionLabel: true
+    sideMenuLogo: true
+    sideMenuBrandTitle: true
+    sideMenuBrandSubtitle: true
+    sideMenuSectionLabel: true
   }
 }
 
 declare module '@mui/material/Paper' {
   interface PaperPropsVariantOverrides {
     panel: true
+    sideMenu: true
   }
 }
 

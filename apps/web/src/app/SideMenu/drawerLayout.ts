@@ -1,13 +1,7 @@
-import { designTokens } from '@repo/design-tokens'
-import {
-  DRAWER_WIDTH,
-  TOGGLE_CLOSED_OFFSET,
-  TOGGLE_OFFSET_Y,
-  TOGGLE_OPEN_OFFSET_X,
-  TOGGLE_OPEN_OFFSET_Y,
-} from './constants'
+import { designTokens, scaleBelow2xl } from '@repo/design-tokens'
 
-const { layout, breakpoint } = designTokens
+const { layout, breakpoint, shadow } = designTokens
+const sideMenu = designTokens.components.sideMenu
 
 export const drawerTop = {
   xs: `${layout.paddingMobile}px`,
@@ -23,34 +17,42 @@ export const drawerHeight = {
   lg: `calc(100dvh - ${layout.paddingDesktop * 2}px)`,
 }
 
-export const toggleTopClosed = `${TOGGLE_CLOSED_OFFSET}px`
+export const toggleTopClosed = `${sideMenu.toggleClosedOffset}px`
 
-export const toggleLeftClosed = `${TOGGLE_CLOSED_OFFSET}px`
+export const toggleTopClosedBelow2xl = `${scaleBelow2xl(sideMenu.toggleClosedOffset)}px`
+
+export const toggleLeftClosed = `${sideMenu.toggleClosedOffset}px`
+
+export const toggleLeftClosedBelow2xl = `${scaleBelow2xl(sideMenu.toggleClosedOffset)}px`
 
 export const toggleTopOpen = {
-  xs: `${layout.paddingMobile + TOGGLE_OFFSET_Y + TOGGLE_OPEN_OFFSET_Y}px`,
-  md: `${layout.paddingTablet + TOGGLE_OFFSET_Y + TOGGLE_OPEN_OFFSET_Y}px`,
-  lg: `${layout.paddingDesktop + TOGGLE_OFFSET_Y + TOGGLE_OPEN_OFFSET_Y}px`,
+  xs: `${layout.paddingMobile + sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY}px`,
+  md: `${layout.paddingTablet + sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY}px`,
+  lg: `${layout.paddingDesktop + sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY}px`,
 }
 
-export const toggleLeft = (open: boolean) => ({
-  xs: open ? `${layout.paddingMobile + DRAWER_WIDTH - TOGGLE_OPEN_OFFSET_X}px` : toggleLeftClosed,
-  md: open ? `${layout.paddingTablet + DRAWER_WIDTH - TOGGLE_OPEN_OFFSET_X}px` : toggleLeftClosed,
-  lg: open ? `${layout.paddingDesktop + DRAWER_WIDTH - TOGGLE_OPEN_OFFSET_X}px` : toggleLeftClosed,
+export const toggleTopOpenBelow2xl = {
+  xs: `${layout.paddingMobile + scaleBelow2xl(sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY)}px`,
+  md: `${layout.paddingTablet + scaleBelow2xl(sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY)}px`,
+  lg: `${layout.paddingDesktop + scaleBelow2xl(sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY)}px`,
+}
+
+const toggleLeftOpen = (drawerWidth: number, toggleOffsetX: number) => ({
+  xs: `${layout.paddingMobile + drawerWidth - toggleOffsetX}px`,
+  md: `${layout.paddingTablet + drawerWidth - toggleOffsetX}px`,
+  lg: `${layout.paddingDesktop + drawerWidth - toggleOffsetX}px`,
 })
 
+export const toggleLeftOpenFromWidth = (drawerWidth: number) => toggleLeftOpen(drawerWidth, sideMenu.toggleOpenOffsetX)
+
+export const toggleLeftOpenFromWidthBelow2xl = (drawerWidth: number) =>
+  toggleLeftOpen(drawerWidth, scaleBelow2xl(sideMenu.toggleOpenOffsetX))
+
 export const drawerPaperSx = {
-  width: DRAWER_WIDTH,
   top: drawerTop,
   left: drawerLeft,
   height: drawerHeight,
-  borderRadius: `${designTokens.radius.xl}px`,
-  border: '1px solid',
-  borderColor: 'divider',
-  bgcolor: 'background.paper',
-  boxShadow: designTokens.shadow.md,
-  overflow: 'hidden',
-  boxSizing: 'border-box',
+  boxShadow: shadow.md,
   [`@media (min-width:${breakpoint.md}px)`]: {
     top: drawerTop.md,
     left: drawerLeft.md,

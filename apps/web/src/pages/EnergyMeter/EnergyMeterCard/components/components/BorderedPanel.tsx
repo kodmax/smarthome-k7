@@ -5,6 +5,4 @@ type BorderedPanelProps = {
   children: ReactNode
 }
 
-export const BorderedPanel: FC<BorderedPanelProps> = ({ children }) => (
-  <Paper variant='panel'>{children}</Paper>
-)
+export const BorderedPanel: FC<BorderedPanelProps> = ({ children }) => <Paper variant='panel'>{children}</Paper>

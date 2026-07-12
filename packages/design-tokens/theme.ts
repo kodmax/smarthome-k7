@@ -4,10 +4,14 @@ import './theme.types'
 
 const { shared, schemes } = tokens
 const darkScheme = schemes.dark
-const { font, radius, layout, breakpoint, borderWidth, icon, components } = shared
+const { font, radius, layout, breakpoint, borderWidth, icon, components, space, transition } = shared
 const { bodyPadding } = layout
 
 const below2xlMediaQuery = `@media (max-width:${breakpoint['2xl'] - 0.05}px)`
+
+const scaleBelow2xl = (value: number) => Math.round(value * components.sideMenu.below2xlScale)
+
+export { scaleBelow2xl }
 
 type SchemeTokens = typeof darkScheme
 
@@ -181,6 +185,49 @@ export const theme = createTheme({
       letterSpacing: components.sectionLabel.letterSpacing,
       textTransform: 'uppercase',
       fontSize: font.caption.size,
+      marginBottom: `${components.sectionLabel.marginBottom}px`,
+      display: 'block',
+    },
+    sideMenuLogo: {
+      fontWeight: 700,
+      fontSize: components.sideMenu.logoFontSize,
+      color: 'var(--mui-palette-text-primary)',
+      lineHeight: 1,
+      [below2xlMediaQuery]: {
+        fontSize: scaleBelow2xl(components.sideMenu.logoFontSize),
+      },
+    },
+    sideMenuBrandTitle: {
+      fontWeight: 600,
+      fontSize: font.bodyLarge.size,
+      lineHeight: 1.2,
+      display: 'block',
+      whiteSpace: 'nowrap',
+      [below2xlMediaQuery]: {
+        fontSize: scaleBelow2xl(font.bodyLarge.size),
+      },
+    },
+    sideMenuBrandSubtitle: {
+      color: 'var(--mui-palette-text-secondary)',
+      fontSize: font.bodySmall.size,
+      lineHeight: 1.3,
+      display: 'block',
+      whiteSpace: 'nowrap',
+      [below2xlMediaQuery]: {
+        fontSize: scaleBelow2xl(font.bodySmall.size),
+      },
+    },
+    sideMenuSectionLabel: {
+      color: 'var(--mui-palette-text-disabled)',
+      fontWeight: components.sectionLabel.fontWeight,
+      letterSpacing: components.sectionLabel.letterSpacing,
+      textTransform: 'uppercase',
+      fontSize: font.caption.size,
+      display: 'block',
+      whiteSpace: 'nowrap',
+      [below2xlMediaQuery]: {
+        fontSize: scaleBelow2xl(font.caption.size),
+      },
     },
     fontSize: font.body.size,
   },
@@ -289,10 +336,133 @@ export const theme = createTheme({
             height: '100%',
           }),
         },
+        {
+          props: { variant: 'sideMenu' },
+          style: ({ theme }: { theme: Theme }) => {
+            const { sideMenu } = components
+            const scaled = scaleBelow2xl
+
+            return {
+              width: 'max-content',
+              minWidth: sideMenu.drawerWidth,
+              borderRadius: `${sideMenu.borderRadius}px`,
+              border: '1px solid',
+              borderColor: theme.vars.palette.divider,
+              backgroundColor: theme.vars.palette.background.paper,
+              overflow: 'hidden',
+              boxSizing: 'border-box',
+              [below2xlMediaQuery]: {
+                borderRadius: `${scaled(sideMenu.borderRadius)}px`,
+              },
+              '& .MuiListItem-root': {
+                marginBottom: theme.spacing(0.5),
+                [below2xlMediaQuery]: {
+                  marginBottom: theme.spacing(0.75),
+                },
+              },
+              '& .MuiListItemButton-root': {
+                borderRadius: `${radius.md}px`,
+                paddingTop: theme.spacing(1.5),
+                paddingBottom: theme.spacing(1.5),
+                paddingLeft: theme.spacing(2),
+                paddingRight: theme.spacing(4),
+                gap: theme.spacing(2),
+                [below2xlMediaQuery]: {
+                  borderRadius: `${scaled(radius.md)}px`,
+                  paddingTop: theme.spacing(2.25),
+                  paddingBottom: theme.spacing(2.25),
+                  paddingLeft: theme.spacing(3),
+                  paddingRight: theme.spacing(6),
+                  gap: scaled(space[2]),
+                },
+              },
+              '& .MuiListItemIcon-root': {
+                minWidth: sideMenu.navIconSize,
+                [below2xlMediaQuery]: {
+                  minWidth: scaled(sideMenu.navIconSize),
+                  '& svg': {
+                    width: scaled(sideMenu.navIconSize),
+                    height: scaled(sideMenu.navIconSize),
+                  },
+                },
+              },
+              '& .MuiListItemText-primary': {
+                fontSize: font.h3.size,
+                fontWeight: font.h3.weight,
+                lineHeight: font.h3.lineHeight,
+                whiteSpace: 'nowrap',
+                [below2xlMediaQuery]: {
+                  fontSize: scaled(font.h3.size),
+                },
+              },
+            }
+          },
+        },
       ],
     },
     MuiIconButton: {
       styleOverrides: {
+        root: ({ theme }: { theme: Theme }) => {
+          const { sideMenu } = components
+          const scaled = scaleBelow2xl
+
+          return {
+            '&[data-side-menu-toggle]': {
+              paddingLeft: 0,
+              paddingRight: 0,
+              border: '1px solid',
+              backgroundColor: theme.vars.palette.background.paper,
+              transition: `left ${transition.normal}, top ${transition.normal}, width ${transition.normal}, height ${transition.normal}, border-radius ${transition.normal}`,
+              '&:hover': {
+                backgroundColor: theme.vars.palette.surfaceElevated.main,
+              },
+              '&[data-open="true"]': {
+                width: sideMenu.toggleOpenSize,
+                height: sideMenu.toggleOpenSize,
+                minWidth: sideMenu.toggleOpenSize,
+                borderRadius: `${radius.sm}px`,
+                borderColor: theme.vars.palette.divider,
+                '& svg': {
+                  width: icon.sizeXs,
+                  height: icon.sizeXs,
+                },
+              },
+              '&[data-open="false"]': {
+                width: sideMenu.toggleClosedSize,
+                height: sideMenu.toggleClosedSize,
+                minWidth: sideMenu.toggleClosedSize,
+                borderRadius: `${radius.md}px`,
+                borderColor: sideMenu.toggleClosedBorderColor,
+                '& svg': {
+                  width: icon.sizeXs,
+                  height: icon.sizeXs,
+                },
+              },
+              [below2xlMediaQuery]: {
+                '&[data-open="true"]': {
+                  width: scaled(sideMenu.toggleOpenSize),
+                  height: scaled(sideMenu.toggleOpenSize),
+                  minWidth: scaled(sideMenu.toggleOpenSize),
+                  borderRadius: `${scaled(radius.sm)}px`,
+                  '& svg': {
+                    width: scaled(icon.sizeXs),
+                    height: scaled(icon.sizeXs),
+                  },
+                },
+                '&[data-open="false"]': {
+                  width: scaled(sideMenu.toggleClosedSize),
+                  height: scaled(sideMenu.toggleClosedSize),
+                  minWidth: scaled(sideMenu.toggleClosedSize),
+                  borderRadius: `${scaled(radius.md)}px`,
+                  '& svg': {
+                    width: scaled(icon.sizeXs),
+                    height: scaled(icon.sizeXs),
+                  },
+                },
+              },
+            },
+          }
+        },
         sizeLarge: ({ theme }: { theme: Theme }) => ({
           [theme.breakpoints.down('2xl')]: iconTouchTargetBelow2xl('small'),
         }),

@@ -38,7 +38,7 @@ export const CurrentPowerPanel: FC<Props> = ({
               </Typography>
             ) : null}
           </Typography>
-          <Box sx={{ mt: 1 }}>
+          <Box sx={{ mt: 4 }}>
             <Zap
               size={designTokens.icon.sizeLg}
               strokeWidth={1.5}

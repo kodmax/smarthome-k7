@@ -2,45 +2,50 @@ import { IconButton } from '@mui/material'
 import { CollapseMenuIcon, MenuIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
-import { TOGGLE_CLOSED_BORDER_COLOR, TOGGLE_CLOSED_SIZE, TOGGLE_CLOSED_Z_INDEX, TOGGLE_OPEN_SIZE } from './constants'
-import { toggleLeft, toggleLeftClosed, toggleTopClosed, toggleTopOpen } from './drawerLayout'
+import {
+  toggleLeftClosed,
+  toggleLeftClosedBelow2xl,
+  toggleLeftOpenFromWidth,
+  toggleLeftOpenFromWidthBelow2xl,
+  toggleTopClosed,
+  toggleTopClosedBelow2xl,
+  toggleTopOpen,
+  toggleTopOpenBelow2xl,
+} from './drawerLayout'
+
+const { sideMenu } = designTokens.components
+const { icon } = designTokens
 
 type SideMenuToggleProps = {
   open: boolean
+  drawerWidth: number
   onToggle: () => void
 }
 
-export const SideMenuToggle: FC<SideMenuToggleProps> = ({ open, onToggle }) => {
+export const SideMenuToggle: FC<SideMenuToggleProps> = ({ open, drawerWidth, onToggle }) => {
   return (
     <IconButton
       aria-label={open ? 'Zwiń menu' : 'Otwórz menu'}
       aria-expanded={open}
       onClick={onToggle}
-      size={open ? 'small' : 'large'}
+      data-side-menu-toggle=''
+      data-open={open}
       sx={theme => ({
         position: 'fixed',
         top: open ? toggleTopOpen : toggleTopClosed,
-        left: open ? toggleLeft(open) : toggleLeftClosed,
+        left: open ? toggleLeftOpenFromWidth(drawerWidth) : toggleLeftClosed,
         transform: open ? 'translateX(-50%)' : 'none',
-        zIndex: open ? theme.zIndex.drawer + 1 : TOGGLE_CLOSED_Z_INDEX,
-        width: open ? TOGGLE_OPEN_SIZE : TOGGLE_CLOSED_SIZE,
-        height: open ? TOGGLE_OPEN_SIZE : TOGGLE_CLOSED_SIZE,
-        minWidth: open ? TOGGLE_OPEN_SIZE : TOGGLE_CLOSED_SIZE,
-        px: 0,
-        borderRadius: open ? `${designTokens.radius.sm}px` : `${designTokens.radius.md}px`,
-        border: '1px solid',
-        borderColor: open ? 'divider' : TOGGLE_CLOSED_BORDER_COLOR,
-        bgcolor: 'background.paper',
-        transition: `left ${designTokens.transition.normal}, top ${designTokens.transition.normal}, width ${designTokens.transition.normal}, height ${designTokens.transition.normal}, border-radius ${designTokens.transition.normal}`,
-        '&:hover': {
-          bgcolor: 'surfaceElevated.main',
+        zIndex: open ? theme.zIndex.drawer + 1 : sideMenu.toggleClosedZIndex,
+        [theme.breakpoints.down('2xl')]: {
+          top: open ? toggleTopOpenBelow2xl : toggleTopClosedBelow2xl,
+          left: open ? toggleLeftOpenFromWidthBelow2xl(drawerWidth) : toggleLeftClosedBelow2xl,
         },
       })}
     >
       {open ? (
-        <CollapseMenuIcon size={designTokens.icon.sizeXs} strokeWidth={designTokens.icon.strokeWidth} />
+        <CollapseMenuIcon size={icon.sizeXs} strokeWidth={icon.strokeWidth} />
       ) : (
-        <MenuIcon size={designTokens.icon.sizeXs} strokeWidth={designTokens.icon.strokeWidth} />
+        <MenuIcon size={icon.sizeXs} strokeWidth={icon.strokeWidth} />
       )}
     </IconButton>
   )

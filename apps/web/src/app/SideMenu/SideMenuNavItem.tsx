@@ -1,17 +1,14 @@
 import { ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
+import type { Theme } from '@mui/material/styles'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { ACTIVE_NAV_BG, ACTIVE_NAV_COLOR } from './constants'
-import { type NavItem } from './navItems'
+import { type NavItem } from './SideMenuContent'
 
-const { font, icon, space } = designTokens
+const { sideMenu } = designTokens.components
+const { icon } = designTokens
 
-const navTitleSx = {
-  fontSize: font.h3.size,
-  fontWeight: font.h3.weight,
-  lineHeight: font.h3.lineHeight,
-}
+const activeNavBgSx = (theme: Theme) => ({ bgcolor: `${theme.vars.palette.temperature.main}24` })
 
 type SideMenuNavItemProps = {
   item: NavItem
@@ -23,59 +20,35 @@ export const SideMenuNavItem: FC<SideMenuNavItemProps> = ({ item, onNavigate }) 
   const location = useLocation()
   const isActive = path !== undefined && location.pathname === path
 
-  const sharedSx = {
-    borderRadius: `${designTokens.radius.md}px`,
-    py: 1.5,
-    gap: space[2],
-    ...(isActive
-      ? {
-          bgcolor: ACTIVE_NAV_BG,
-        }
-      : {}),
-  }
-
-  const iconSlot = (
-    <ListItemIcon sx={{ minWidth: icon.sizeSm }}>
-      <Icon
-        size={icon.sizeSm}
-        strokeWidth={icon.strokeWidth}
-        color={isActive ? ACTIVE_NAV_COLOR : 'var(--mui-palette-text-secondary)'}
-      />
-    </ListItemIcon>
-  )
+  const sharedSx = isActive ? activeNavBgSx : undefined
+  const textColor = isActive ? 'temperature.main' : 'text.secondary'
+  const iconColor = isActive ? 'var(--mui-palette-temperature-main)' : 'var(--mui-palette-text-secondary)'
 
   if (path === undefined) {
     return (
-      <ListItem disablePadding sx={{ mb: 0.5 }}>
-        <ListItemButton sx={{ ...sharedSx, cursor: 'default' }}>
-          <ListItemIcon sx={{ minWidth: icon.sizeSm }}>
-            <Icon size={icon.sizeSm} strokeWidth={icon.strokeWidth} color='var(--mui-palette-text-secondary)' />
+      <ListItem disablePadding>
+        <ListItemButton
+          sx={theme => ({
+            ...(isActive ? activeNavBgSx(theme) : {}),
+            cursor: 'default',
+          })}
+        >
+          <ListItemIcon>
+            <Icon size={sideMenu.navIconSize} strokeWidth={icon.strokeWidth} color={iconColor} />
           </ListItemIcon>
-          <ListItemText
-            primary={label}
-            slotProps={{ primary: { sx: { ...navTitleSx, color: 'text.secondary', fontWeight: font.h3.weight } } }}
-          />
+          <ListItemText primary={label} slotProps={{ primary: { sx: { color: textColor } } }} />
         </ListItemButton>
       </ListItem>
     )
   }
 
   return (
-    <ListItem disablePadding sx={{ mb: 0.5 }}>
+    <ListItem disablePadding>
       <ListItemButton component={NavLink} to={path} onClick={onNavigate} sx={sharedSx}>
-        {iconSlot}
-        <ListItemText
-          primary={label}
-          slotProps={{
-            primary: {
-              sx: {
-                ...navTitleSx,
-                color: isActive ? ACTIVE_NAV_COLOR : 'text.secondary',
-                fontWeight: font.h3.weight,
-              },
-            },
-          }}
-        />
+        <ListItemIcon>
+          <Icon size={sideMenu.navIconSize} strokeWidth={icon.strokeWidth} color={iconColor} />
+        </ListItemIcon>
+        <ListItemText primary={label} slotProps={{ primary: { sx: { color: textColor } } }} />
       </ListItemButton>
     </ListItem>
   )

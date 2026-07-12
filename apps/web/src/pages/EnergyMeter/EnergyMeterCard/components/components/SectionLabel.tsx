@@ -6,7 +6,5 @@ type SectionLabelProps = {
 }
 
 export const SectionLabel: FC<SectionLabelProps> = ({ children }) => (
-  <Typography variant='sectionLabel' sx={{ mb: 1 }}>
-    {children}
-  </Typography>
+  <Typography variant='sectionLabel'>{children}</Typography>
 )

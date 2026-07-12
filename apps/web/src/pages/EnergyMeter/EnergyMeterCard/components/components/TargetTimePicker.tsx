@@ -138,7 +138,7 @@ export const TargetTimePicker: FC<TargetTimePickerProps> = ({ value, onChange })
         justifyContent: 'center',
         gap: 1,
         px: 1,
-        py: 1.5,
+        py: 8,
         mb: 2,
         border: '1px solid',
         borderColor: 'divider',
