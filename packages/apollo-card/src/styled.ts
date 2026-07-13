@@ -88,9 +88,5 @@ export const ApolloCardContent = styled(CardContent)({
   boxSizing: 'border-box',
   overflowY: 'auto',
   fontSize: designTokens.font.body.size,
-  padding: `${CARD_CONTENT_PADDING_TOP}px ${CARD_CONTENT_PADDING_X}px`,
-  paddingBottom: 0,
-  ':last-child': {
-    paddingBottom: `${CARD_CONTENT_PADDING_BOTTOM}px`,
-  },
+  padding: `${CARD_CONTENT_PADDING_TOP}px ${CARD_CONTENT_PADDING_X}px ${CARD_CONTENT_PADDING_BOTTOM}px`,
 })
