@@ -40,7 +40,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
         {zoom ? (
           <TableHead>
             <TableRow sx={headerRowSx}>
-              <ApolloTableCell sx={{ width: '1em' }} />
+              <ApolloTableCell sx={{ width: '14px' }} />
               <ApolloTableCell>{labels.symbol}</ApolloTableCell>
               <ApolloTableCell>{labels.earnings}</ApolloTableCell>
               <ApolloTableCell>{labels.priceTarget}</ApolloTableCell>

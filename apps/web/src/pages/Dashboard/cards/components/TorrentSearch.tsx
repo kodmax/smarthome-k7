@@ -1,5 +1,6 @@
 import { Button } from '@mui/material'
 import { styled } from '@mui/system'
+import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
 import { useTranslations } from '@/i18n'
 import { TorrentSearchQuery } from './TorrentSearchQuery'
@@ -10,8 +11,8 @@ const TorrentSearchContainer = styled('div')({
 })
 
 const Search = styled(Button)({
-  margin: '0 2em',
-  flex: '7em',
+  margin: `0 ${designTokens.space[6]}px`,
+  flex: `${designTokens.space[24]}px`,
 })
 
 type TorrentSearchProps = {

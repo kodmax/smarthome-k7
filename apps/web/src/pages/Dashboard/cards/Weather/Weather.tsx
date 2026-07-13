@@ -75,7 +75,7 @@ export const Weather: FC<Record<string, never>> = () => {
                   strokeWidth={designTokens.icon.strokeWidth}
                   style={{
                     transform: `rotate(${feed.instant.wind.angle}deg)`,
-                    marginRight: '0.25em',
+                    marginRight: `${designTokens.space[1]}px`,
                     verticalAlign: 'middle',
                   }}
                 />

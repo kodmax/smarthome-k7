@@ -18,10 +18,10 @@ export const DownloadsInfo: FC<Record<string, never>> = () => {
   const { downloadSpeed, uploadSpeed, torrentCount } = transmission.sessionStats
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: `${designTokens.space[3]}px` }}>
       <Speed icon={CloudDownload} speed={downloadSpeed} direction='down' />
       <Speed icon={CloudUpload} speed={uploadSpeed} direction='up' />
-      <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.35em' }}>
+      <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: `${designTokens.space[1]}px` }}>
         <HardDrive size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
         <span>{torrentCount}</span>
       </Box>

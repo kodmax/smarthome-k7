@@ -94,7 +94,7 @@ export const News: FC<Record<string, never>> = () => {
                       sx={{
                         verticalAlign: 'middle',
                         boxSizing: 'border-box',
-                        width: '4em',
+                        width: '56px',
                         textOverflow: 'clip',
                         whiteSpace: 'nowrap',
                       }}

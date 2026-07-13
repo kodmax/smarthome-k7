@@ -13,16 +13,13 @@ export type DataPoint = {
   heating: boolean
 }
 
-const baseFontSize = 12
-
 const Vector = styled('span')({
   display: 'inline-block',
   verticalAlign: 'top',
   position: 'relative',
-  paddingLeft: '0.75em',
-
-  height: Number(12 / baseFontSize).toFixed(3) + 'em',
-  width: Number(48 / baseFontSize).toFixed(3) + 'em',
+  paddingLeft: '12px',
+  height: '12px',
+  width: '48px',
 })
 
 const Svg = styled('svg')({
@@ -36,7 +33,7 @@ const Min = styled('span')({
   fontSize: '0.25em',
   lineHeight: 1,
   left: 0,
-  bottom: '1em',
+  bottom: '12px',
 })
 
 const Max = styled('span')({
@@ -44,7 +41,7 @@ const Max = styled('span')({
   fontSize: '0.25em',
   lineHeight: 1,
   left: 0,
-  top: '1em',
+  top: '12px',
 })
 
 const height = 100

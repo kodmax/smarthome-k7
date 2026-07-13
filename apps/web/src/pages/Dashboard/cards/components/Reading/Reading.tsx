@@ -34,7 +34,7 @@ export const Reading: FC<Props> = ({
       <ApolloTableCell>{title}</ApolloTableCell>
       <ApolloTableCell>{graph}</ApolloTableCell>
       <ApolloTableCell>{extraInfo}</ApolloTableCell>
-      <ApolloValueCell sx={{ width: '56em' }}>
+      <ApolloValueCell sx={{ width: '784px' }}>
         <ReadingValue
           displayValue={displayValue}
           unit={unit}

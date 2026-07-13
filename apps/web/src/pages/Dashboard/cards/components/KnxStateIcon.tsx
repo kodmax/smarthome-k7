@@ -32,7 +32,7 @@ const KnxStateIcon = <T,>({
       strokeWidth={designTokens.icon.strokeWidth}
       color={isActive ? 'var(--mui-palette-temperature-main)' : 'var(--mui-palette-text-disabled)'}
       style={{
-        paddingRight: '0.1em',
+        paddingRight: `${designTokens.space[1] / 2}px`,
         visibility: visible(reading) ? 'visible' : 'hidden',
         opacity: opacity(reading),
       }}

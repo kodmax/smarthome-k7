@@ -20,7 +20,7 @@ const TablePlaceholder: FC<{ rows: number; graph: boolean; value: boolean }> = (
               </span>
             </ApolloTableCell>
             {!graph ? null : (
-              <ApolloTableCell sx={{ width: '4em' }}>
+              <ApolloTableCell sx={{ width: '56px' }}>
                 <span style={{ background: 'hsl(0deg 0% 50% / 10%)', width: '80%', display: 'inline-block' }}>
                   &nbsp;
                 </span>

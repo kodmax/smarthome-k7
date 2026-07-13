@@ -9,7 +9,7 @@ const { icon } = designTokens
 const OpenCell = styled(ApolloTableCell)({
   verticalAlign: 'middle',
   boxSizing: 'border-box',
-  width: '1em',
+  width: '14px',
   textOverflow: 'clip',
 })
 

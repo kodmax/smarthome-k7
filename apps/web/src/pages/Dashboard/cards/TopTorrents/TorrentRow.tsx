@@ -25,17 +25,17 @@ export const TorrentRow: FC<TorrentRowProps> = ({ torrent, zoom, onDownload }) =
     <ApolloTableRow>
       {!zoom ? null : (
         <>
-          <ApolloTableCell sx={{ width: '1.5em' }}>
+          <ApolloTableCell sx={{ width: '20px' }}>
             <Copy text={magnetLink(torrent)} />
           </ApolloTableCell>
-          <ApolloTableCell sx={{ width: '5em' }}>S: {torrent.seeders}</ApolloTableCell>
-          <ApolloValueCell sx={{ width: `${designTokens.space[16]}px`, paddingRight: '0.5em' }}>
+          <ApolloTableCell sx={{ width: '72px' }}>S: {torrent.seeders}</ApolloTableCell>
+          <ApolloValueCell sx={{ width: `${designTokens.space[16]}px`, paddingRight: `${designTokens.space[2]}px` }}>
             {Number(+torrent.size / 2 ** 30).toFixed(1)} GB
           </ApolloValueCell>
         </>
       )}
       <ApolloTableCell>{torrent.name}</ApolloTableCell>
-      <ApolloTableCell sx={{ width: '2.5em' }}>
+      <ApolloTableCell sx={{ width: '32px' }}>
         <IconButton aria-label={downloadLabel} onClick={() => onDownload(magnetLink(torrent))} size='small'>
           <Download size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
         </IconButton>

@@ -33,7 +33,7 @@ export const Ad: FC<{
         strokeWidth={designTokens.icon.strokeWidth}
         aria-label={labels.applied}
         style={{
-          marginRight: '0.35em',
+          marginRight: `${designTokens.space[1]}px`,
           verticalAlign: 'middle',
           display: 'inline',
           color: 'var(--mui-palette-success-main)',
@@ -48,7 +48,7 @@ export const Ad: FC<{
         glow='default'
         aria-label={labels.favourite}
         style={{
-          marginRight: '0.35em',
+          marginRight: `${designTokens.space[1]}px`,
           verticalAlign: 'middle',
           display: 'inline',
         }}
@@ -63,7 +63,7 @@ export const Ad: FC<{
           sx={{
             verticalAlign: 'middle',
             boxSizing: 'border-box',
-            width: '6em',
+            width: '84px',
             textOverflow: 'clip',
             whiteSpace: 'nowrap',
           }}

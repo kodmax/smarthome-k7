@@ -18,7 +18,7 @@ const CopyButton = styled('button')({
   verticalAlign: 'middle',
   lineHeight: 0,
   padding: 0,
-  marginRight: '0.25em',
+  marginRight: `${designTokens.space[1]}px`,
   border: 'none',
   background: 'none',
   cursor: 'pointer',

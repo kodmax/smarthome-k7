@@ -26,7 +26,7 @@ export const TopTitleRow: FC<TopTitleRowProps> = ({ topTitle: { title, imdb }, o
           aria-label={searchLabel}
           onClick={() => onTitleSearch(title)}
           size='small'
-          sx={{ marginLeft: '0.35em', verticalAlign: 'middle' }}
+          sx={{ marginLeft: `${designTokens.space[1]}px`, verticalAlign: 'middle' }}
         >
           <ArrowRight size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
         </IconButton>
