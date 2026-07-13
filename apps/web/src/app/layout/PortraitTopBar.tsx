@@ -6,6 +6,7 @@ import {
   portraitTopBarBottomPadding,
   portraitTopBarContentHeight,
   portraitTopBarSidePadding,
+  portraitTopBarTopPadding,
 } from './portraitTopBarLayout'
 import { useMenu } from '../SideMenu/MenuContext'
 
@@ -31,7 +32,7 @@ export const PortraitTopBar: FC<PortraitTopBarProps> = ({ visible }) => {
         zIndex: sideMenu.toggleClosedZIndex,
         display: 'flex',
         alignItems: 'center',
-        paddingTop: 'env(safe-area-inset-top)',
+        paddingTop: `calc(env(safe-area-inset-top) + ${portraitTopBarTopPadding}px)`,
         paddingLeft: `${portraitTopBarSidePadding}px`,
         paddingRight: theme.spacing(2),
         paddingBottom: `${portraitTopBarBottomPadding}px`,

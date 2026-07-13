@@ -27,19 +27,11 @@ export const drawerHeight = {
 
 export const toggleTopClosed = `${sideMenu.toggleClosedOffset}px`
 
-export const toggleTopClosedBelow2xl = `${scaleBelow2xl(sideMenu.toggleClosedOffset)}px`
+export const toggleTopClosedBelow2xl = toggleTopClosed
 
 export const toggleLeftClosed = offsetFromContainerLeft(sideMenu.toggleClosedOffset)
 
 export const toggleLeftClosedBelow2xl = offsetFromContainerLeft(scaleBelow2xl(sideMenu.toggleClosedOffset))
-
-export const toggleTopOnDrawer = `${sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY}px`
-
-export const toggleTopOnDrawerBelow2xl = `${scaleBelow2xl(sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY)}px`
-
-export const toggleCenterFromDrawerRight = `calc(100% - ${sideMenu.toggleOpenOffsetX}px)`
-
-export const toggleCenterFromDrawerRightBelow2xl = `calc(100% - ${scaleBelow2xl(sideMenu.toggleOpenOffsetX)}px)`
 
 export const drawerPaperSx = {
   top: drawerTop,
