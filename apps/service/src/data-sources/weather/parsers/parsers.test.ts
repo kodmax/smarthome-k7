@@ -102,7 +102,7 @@ describe('weather parsers', () => {
       temp: '21',
       precip: '10%',
       icon: '04.svg',
-      precipIcon: 'rain.svg',
+      precipType: 'none',
     })
     expect(hour.wind).toEqual({ direction: 'NE', speed: expect.closeTo(12 / 3.6) })
     expect(hour.uv).toBe(8)

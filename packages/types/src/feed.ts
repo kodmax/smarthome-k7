@@ -140,8 +140,10 @@ export type DayWeatherForecast = {
   icon: string
 }
 
+export type PrecipType = 'none' | 'rain' | 'snow' | 'hail' | 'sleet' | 'ice' | 'mixed'
+
 export type HourWeatherForecast = {
-  precipIcon: string
+  precipType: PrecipType
   precip: string
   temp: string
   icon: string

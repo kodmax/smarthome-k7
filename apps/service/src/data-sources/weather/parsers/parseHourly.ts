@@ -7,6 +7,7 @@ import { weatherPageUrls } from '../urls'
 import DateTime from '@/DateTime'
 import { CacheAgeUnit } from '@repo/apollo-ws'
 import { hourlyHourSelector, parseHourlyUv, parseHourlyWind } from './parseHourlyHelpers'
+import { parsePrecipType } from './parsePrecipType'
 
 export const parseHourlyFromDocument = (
   document: Document,
@@ -18,7 +19,6 @@ export const parseHourlyFromDocument = (
     const hours = requireElements(document, hourlyHourSelector, 'hourly forecast')
 
     return hours.map(item => {
-      const precipSrc = item.querySelector('.precip img.precip-icon')?.getAttribute('data-src') ?? ''
       const iconSrc = item.querySelector('.icon')?.getAttribute('src') ?? ''
       if (iconSrc === '') {
         throw new Error('missing ".icon" src in hourly forecast hour')
@@ -27,9 +27,11 @@ export const parseHourlyFromDocument = (
       const hour = requireText(item, '.date', 'hourly forecast hour')
       const sunPosition = suncalc.getPosition(new Date(`${date} ${hour}:00:00`), latitude, longitude)
 
+      const icon = basename(iconSrc)
+
       return {
-        precipIcon: basename(new URL(precipSrc, 'https://www.accuweather.com/').pathname),
-        icon: basename(iconSrc),
+        precipType: parsePrecipType(icon),
+        icon,
         temp: requireText(item, '.temp.metric', 'hourly forecast hour').replace(/[^\d-]/g, ''),
         precip: requireText(item, '.precip', 'hourly forecast hour'),
         hour,

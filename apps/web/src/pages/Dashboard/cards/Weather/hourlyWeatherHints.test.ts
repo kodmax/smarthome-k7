@@ -9,7 +9,7 @@ import {
 } from './hourlyWeatherHints'
 
 const hour = (overrides: Partial<HourWeatherForecast>): HourWeatherForecast => ({
-  precipIcon: 'rain.svg',
+  precipType: 'none',
   precip: '10%',
   temp: '22',
   icon: '1.svg',

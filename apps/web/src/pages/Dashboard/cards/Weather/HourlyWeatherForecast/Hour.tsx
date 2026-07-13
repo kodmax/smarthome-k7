@@ -20,6 +20,8 @@ const formatHourDisplay = (hour: string): string => (hour.includes(':') ? hour :
 const sunAltitudeColorRange = { lowest: -6, optimal: 30, highest: 50 } as const
 const civilTwilightAltitude = sunAltitudeColorRange.lowest
 
+const HOURLY_PRECIP_ICON = 'drop-icon.svg'
+
 export const Hour: FC<{ fc: HourWeatherForecast; zoom: boolean; weekdayLabel: string }> = ({ fc, weekdayLabel }) => {
   const sunAltitude = Number(fc.sun.altitude)
 
@@ -44,7 +46,7 @@ export const Hour: FC<{ fc: HourWeatherForecast; zoom: boolean; weekdayLabel: st
       </IconSlot>
       <RowText>{Number(fc.temp).toFixed(0)} °C</RowText>
       <PrecipRow>
-        <WeatherIcon icon={fc.precipIcon} width={`${PRECIP_ICON_SIZE}px`} height={`${PRECIP_ICON_SIZE}px`} />
+        <WeatherIcon icon={HOURLY_PRECIP_ICON} width={`${PRECIP_ICON_SIZE}px`} height={`${PRECIP_ICON_SIZE}px`} />
         <span> {fc.precip}</span>
       </PrecipRow>
     </HourColumn>
