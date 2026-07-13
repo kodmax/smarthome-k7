@@ -412,7 +412,7 @@ export const theme = createTheme({
               paddingRight: 0,
               border: '1px solid',
               backgroundColor: theme.vars.palette.background.paper,
-              transition: `left ${transition.normal}, top ${transition.normal}, width ${transition.normal}, height ${transition.normal}, border-radius ${transition.normal}`,
+              transition: `width ${transition.normal}, height ${transition.normal}, border-radius ${transition.normal}`,
               '&:hover': {
                 backgroundColor: theme.vars.palette.surfaceElevated.main,
               },

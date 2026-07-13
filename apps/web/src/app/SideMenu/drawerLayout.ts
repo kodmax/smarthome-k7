@@ -25,28 +25,13 @@ export const toggleLeftClosed = `${sideMenu.toggleClosedOffset}px`
 
 export const toggleLeftClosedBelow2xl = `${scaleBelow2xl(sideMenu.toggleClosedOffset)}px`
 
-export const toggleTopOpen = {
-  xs: `${layout.paddingMobile + sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY}px`,
-  md: `${layout.paddingTablet + sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY}px`,
-  lg: `${layout.paddingDesktop + sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY}px`,
-}
+export const toggleTopOnDrawer = `${sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY}px`
 
-export const toggleTopOpenBelow2xl = {
-  xs: `${layout.paddingMobile + scaleBelow2xl(sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY)}px`,
-  md: `${layout.paddingTablet + scaleBelow2xl(sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY)}px`,
-  lg: `${layout.paddingDesktop + scaleBelow2xl(sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY)}px`,
-}
+export const toggleTopOnDrawerBelow2xl = `${scaleBelow2xl(sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY)}px`
 
-const toggleLeftOpen = (drawerWidth: number, toggleOffsetX: number) => ({
-  xs: `${layout.paddingMobile + drawerWidth - toggleOffsetX}px`,
-  md: `${layout.paddingTablet + drawerWidth - toggleOffsetX}px`,
-  lg: `${layout.paddingDesktop + drawerWidth - toggleOffsetX}px`,
-})
+export const toggleCenterFromDrawerRight = `calc(100% - ${sideMenu.toggleOpenOffsetX}px)`
 
-export const toggleLeftOpenFromWidth = (drawerWidth: number) => toggleLeftOpen(drawerWidth, sideMenu.toggleOpenOffsetX)
-
-export const toggleLeftOpenFromWidthBelow2xl = (drawerWidth: number) =>
-  toggleLeftOpen(drawerWidth, scaleBelow2xl(sideMenu.toggleOpenOffsetX))
+export const toggleCenterFromDrawerRightBelow2xl = `calc(100% - ${scaleBelow2xl(sideMenu.toggleOpenOffsetX)}px)`
 
 export const drawerPaperSx = {
   top: drawerTop,
