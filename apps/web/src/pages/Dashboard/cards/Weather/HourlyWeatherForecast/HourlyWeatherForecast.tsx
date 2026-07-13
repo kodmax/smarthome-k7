@@ -1,5 +1,12 @@
 import { type FC } from 'react'
-import { RainIcon, ThermometerSunIcon, UVIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
+import {
+  CoolingIcon,
+  RainIcon,
+  ThermometerSunIcon,
+  UVIcon,
+  WeatherIcon as WeatherCardIcon,
+  WindIcon,
+} from '@repo/assets'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { HourWeatherForecast, WeatherFeed } from '@repo/types'
@@ -10,6 +17,8 @@ import {
   maxHourlyTemp,
   maxHourlyUv,
   maxHourlyWindSpeed,
+  minHourlyTemp,
+  shouldShowHourlyFrostHint,
   shouldShowHourlyHighUvHint,
   shouldShowHourlyHotHint,
   shouldShowHourlyRainHint,
@@ -31,6 +40,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
   const showHot = shouldShowHourlyHotHint(hourly)
   const showWind = shouldShowHourlyWindHint(hourly)
   const showHighUv = shouldShowHourlyHighUvHint(hourly)
+  const showFrost = shouldShowHourlyFrostHint(hourly)
 
   return (
     <ApolloCard
@@ -39,7 +49,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
       icon={WeatherCardIcon}
       height={6}
       headingInfo={
-        showRain || showHot || showWind || showHighUv ? (
+        showRain || showHot || showWind || showHighUv || showFrost ? (
           <CardHeadingHints>
             {showRain ? (
               <CardHintIcon
@@ -74,6 +84,14 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
                 variant='warning'
                 title={weatherLabels.highUv}
                 description={formatHintLine(hintExplanations.hourlyHighUv.line1, maxHourlyUv(hourly).toFixed(1))}
+              />
+            ) : null}
+            {showFrost ? (
+              <CardHintIcon
+                Icon={CoolingIcon}
+                variant='info'
+                title={weatherLabels.frost}
+                description={formatHintLine(hintExplanations.hourlyFrost.line1, minHourlyTemp(hourly).toFixed(0))}
               />
             ) : null}
           </CardHeadingHints>

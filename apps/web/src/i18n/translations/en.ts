@@ -85,6 +85,9 @@ export const en: Translations = {
       highUv: {
         line1: 'UV index is {value}.',
       },
+      frost: {
+        line1: 'Outdoor temperature is {value}°C.',
+      },
       hourlyRain: {
         line1: 'Precipitation chance reaches up to {value}%.',
       },
@@ -96,6 +99,9 @@ export const en: Translations = {
       },
       hourlyHighUv: {
         line1: 'UV index in the next few hours will reach {value}.',
+      },
+      hourlyFrost: {
+        line1: 'Temperature in the next few hours will drop to {value}°C.',
       },
       ventilate: {
         highCo2: 'CO₂ is high — ventilating will improve air quality.',
@@ -155,6 +161,7 @@ export const en: Translations = {
       strongWind: 'Strong wind',
       hotOutdoor: 'High outdoor temperature',
       highUv: 'High UV index',
+      frost: 'Frost',
       beaufortScale: [
         'Calm',
         'Light air',

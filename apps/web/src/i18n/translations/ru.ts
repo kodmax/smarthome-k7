@@ -85,6 +85,9 @@ export const ru: Translations = {
       highUv: {
         line1: 'Индекс УФ составляет {value}.',
       },
+      frost: {
+        line1: 'Температура на улице составляет {value}°C.',
+      },
       hourlyRain: {
         line1: 'Вероятность осадков достигает {value}%.',
       },
@@ -96,6 +99,9 @@ export const ru: Translations = {
       },
       hourlyHighUv: {
         line1: 'В ближайшие часы индекс УФ достигнет {value}.',
+      },
+      hourlyFrost: {
+        line1: 'В ближайшие часы температура опустится до {value}°C.',
       },
       ventilate: {
         highCo2: 'Высокий уровень CO₂ — проветривание улучшит качество воздуха.',
@@ -155,6 +161,7 @@ export const ru: Translations = {
       strongWind: 'Сильный ветер',
       hotOutdoor: 'Высокая температура на улице',
       highUv: 'Высокий индекс УФ',
+      frost: 'Мороз',
       beaufortScale: [
         'Штиль',
         'Тихий ветер',

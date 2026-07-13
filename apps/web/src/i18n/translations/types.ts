@@ -73,10 +73,12 @@ export type Translations = {
       strongWind: { line1: string }
       hotOutdoor: { line1: string }
       highUv: { line1: string }
+      frost: { line1: string }
       hourlyRain: { line1: string }
       hourlyHotOutdoor: { line1: string }
       hourlyStrongWind: { line1: string }
       hourlyHighUv: { line1: string }
+      hourlyFrost: { line1: string }
       ventilate: {
         highCo2: string
         elevatedCo2: string
@@ -135,6 +137,7 @@ export type Translations = {
       strongWind: string
       hotOutdoor: string
       highUv: string
+      frost: string
       beaufortScale: readonly [
         string,
         string,

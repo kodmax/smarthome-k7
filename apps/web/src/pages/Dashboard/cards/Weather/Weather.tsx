@@ -1,6 +1,6 @@
 import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import { ThermometerSunIcon, UVIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
+import { CoolingIcon, ThermometerSunIcon, UVIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
 import { ApolloDataTable, HoursBars, Reading, TablePlaceholder } from '@/card-components'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { designTokens } from '@repo/design-tokens'
@@ -13,7 +13,12 @@ import { CardHeadingHints, CardHintIcon, formatHintLine } from '../../hints'
 import { beaufortLevelLabel, beaufortScaleFromMetersPerSecond } from './beaufort'
 import { optimalHumidityRange } from './optimalHumidityRange'
 import { sunTimes } from './sunTimes'
-import { shouldShowHighUvHint, shouldShowHotOutdoorHint, shouldShowStrongWindHint } from './weatherHints'
+import {
+  shouldShowFrostHint,
+  shouldShowHighUvHint,
+  shouldShowHotOutdoorHint,
+  shouldShowStrongWindHint,
+} from './weatherHints'
 
 export const Weather: FC<Record<string, never>> = () => {
   const zoom = useZoom('current-weather')
@@ -41,6 +46,7 @@ export const Weather: FC<Record<string, never>> = () => {
   const showStrongWind = shouldShowStrongWindHint(feed.instant.wind.speed)
   const showHotOutdoor = shouldShowHotOutdoorHint(feed.instant.temp)
   const showHighUv = shouldShowHighUvHint(feed.instant.uv)
+  const showFrost = shouldShowFrostHint(feed.instant.temp)
 
   return (
     <ApolloCard
@@ -48,7 +54,7 @@ export const Weather: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={WeatherCardIcon}
       headingInfo={
-        showStrongWind || showHotOutdoor || showHighUv ? (
+        showStrongWind || showHotOutdoor || showHighUv || showFrost ? (
           <CardHeadingHints>
             {showStrongWind ? (
               <CardHintIcon
@@ -72,6 +78,14 @@ export const Weather: FC<Record<string, never>> = () => {
                 variant='warning'
                 title={labels.highUv}
                 description={formatHintLine(hintExplanations.highUv.line1, feed.instant.uv.toFixed(1))}
+              />
+            ) : null}
+            {showFrost ? (
+              <CardHintIcon
+                Icon={CoolingIcon}
+                variant='info'
+                title={labels.frost}
+                description={formatHintLine(hintExplanations.frost.line1, Number(feed.instant.temp).toFixed(0))}
               />
             ) : null}
           </CardHeadingHints>

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { shouldShowHighUvHint, shouldShowHotOutdoorHint, shouldShowStrongWindHint } from './weatherHints'
+import {
+  shouldShowFrostHint,
+  shouldShowHighUvHint,
+  shouldShowHotOutdoorHint,
+  shouldShowStrongWindHint,
+} from './weatherHints'
 
 describe('shouldShowStrongWindHint', () => {
   it('shows hint at 6 m/s and above', () => {
@@ -37,5 +42,17 @@ describe('shouldShowHighUvHint', () => {
   it('hides hint below UV 7', () => {
     expect(shouldShowHighUvHint(6.9)).toBe(false)
     expect(shouldShowHighUvHint(undefined)).toBe(false)
+  })
+})
+
+describe('shouldShowFrostHint', () => {
+  it('shows hint at 0°C and below', () => {
+    expect(shouldShowFrostHint(0)).toBe(true)
+    expect(shouldShowFrostHint(-5)).toBe(true)
+  })
+
+  it('hides hint above 0°C', () => {
+    expect(shouldShowFrostHint(1)).toBe(false)
+    expect(shouldShowFrostHint(undefined)).toBe(false)
   })
 })

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { HourWeatherForecast } from '@repo/types'
 import {
+  shouldShowHourlyFrostHint,
   shouldShowHourlyHighUvHint,
   shouldShowHourlyHotHint,
   shouldShowHourlyRainHint,
@@ -100,5 +101,23 @@ describe('shouldShowHourlyHighUvHint', () => {
 
   it('hides hint when UV stays below 7', () => {
     expect(shouldShowHourlyHighUvHint([hour({ uv: 6.9 }), hour({ uv: 2 })])).toBe(false)
+  })
+})
+
+describe('shouldShowHourlyFrostHint', () => {
+  it('shows hint when at least one of the next 3 hours reaches 0°C or below', () => {
+    expect(
+      shouldShowHourlyFrostHint([hour({ temp: '2' }), hour({ temp: '0' }), hour({ temp: '4' }), hour({ temp: '-3' })]),
+    ).toBe(true)
+  })
+
+  it('ignores hours beyond the next 3', () => {
+    expect(
+      shouldShowHourlyFrostHint([hour({ temp: '2' }), hour({ temp: '3' }), hour({ temp: '4' }), hour({ temp: '-1' })]),
+    ).toBe(false)
+  })
+
+  it('hides hint when all next hours stay above 0°C', () => {
+    expect(shouldShowHourlyFrostHint([hour({ temp: '1' }), hour({ temp: '5' })])).toBe(false)
   })
 })

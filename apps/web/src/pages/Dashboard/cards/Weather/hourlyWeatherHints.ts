@@ -1,5 +1,5 @@
 import type { HourWeatherForecast } from '@repo/types'
-import { HIGH_UV_MIN, HOT_OUTDOOR_MIN_C, STRONG_WIND_MIN_MS } from './weatherHints'
+import { FROST_MAX_C, HIGH_UV_MIN, HOT_OUTDOOR_MIN_C, STRONG_WIND_MIN_MS } from './weatherHints'
 
 export const HOURLY_LOOKAHEAD = 3
 export const PRECIP_CHANCE_MIN_PERCENT = 51
@@ -21,6 +21,9 @@ export const shouldShowHourlyWindHint = (hourly: HourWeatherForecast[] | undefin
 export const shouldShowHourlyHighUvHint = (hourly: HourWeatherForecast[] | undefined): boolean =>
   nextHours(hourly).some(hour => hour.uv >= HIGH_UV_MIN)
 
+export const shouldShowHourlyFrostHint = (hourly: HourWeatherForecast[] | undefined): boolean =>
+  nextHours(hourly).some(hour => Number(hour.temp) <= FROST_MAX_C)
+
 export const maxHourlyPrecipPercent = (hourly: HourWeatherForecast[] | undefined): number =>
   Math.max(0, ...nextHours(hourly).map(hour => parsePrecipPercent(hour.precip)))
 
@@ -32,3 +35,9 @@ export const maxHourlyWindSpeed = (hourly: HourWeatherForecast[] | undefined): n
 
 export const maxHourlyUv = (hourly: HourWeatherForecast[] | undefined): number =>
   Math.max(0, ...nextHours(hourly).map(hour => hour.uv))
+
+export const minHourlyTemp = (hourly: HourWeatherForecast[] | undefined): number => {
+  const temps = nextHours(hourly).map(hour => Number(hour.temp))
+
+  return temps.length === 0 ? Number.POSITIVE_INFINITY : Math.min(...temps)
+}
