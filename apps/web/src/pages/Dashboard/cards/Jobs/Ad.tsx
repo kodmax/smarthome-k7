@@ -69,9 +69,21 @@ export const Ad: FC<{
           }}
         >
           {ad.hide ? (
-            <IconButton aria-label={labels.restoreOffer} onClick={() => onRestore(ad.id)} size='small'>
-              <Undo2 size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
-            </IconButton>
+            <>
+              <IconButton aria-label={labels.restoreOffer} onClick={() => onRestore(ad.id)} size='small'>
+                <Undo2 size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
+              </IconButton>
+              {ad.applied ? (
+                <IconButton
+                  aria-label={labels.markAsApplied}
+                  disabled={ad.applied}
+                  onClick={() => onApplied(ad.id)}
+                  size='small'
+                >
+                  <MailCheck size={iconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
+                </IconButton>
+              ) : null}
+            </>
           ) : (
             <>
               <IconButton aria-label={labels.hideOffer} onClick={() => onHide(ad.id)} size='small'>
