@@ -8,6 +8,7 @@ import {
   toggleTopOnDrawer,
   toggleTopOnDrawerBelow2xl,
 } from './drawerLayout'
+import { sideMenuScaleMedia } from './sideMenuScaleMedia'
 
 const { icon } = designTokens
 
@@ -23,17 +24,17 @@ export const SideMenuCloseToggle: FC<SideMenuCloseToggleProps> = ({ onClose }) =
       onClick={onClose}
       data-side-menu-toggle=''
       data-open
-      sx={theme => ({
+      sx={{
         position: 'absolute',
         top: toggleTopOnDrawer,
         left: toggleCenterFromDrawerRight,
         transform: 'translateX(-50%)',
         zIndex: 1,
-        [theme.breakpoints.down('2xl')]: {
+        [sideMenuScaleMedia]: {
           top: toggleTopOnDrawerBelow2xl,
           left: toggleCenterFromDrawerRightBelow2xl,
         },
-      })}
+      }}
     >
       <CollapseMenuIcon size={icon.sizeXs} strokeWidth={icon.strokeWidth} />
     </IconButton>

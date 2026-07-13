@@ -1,15 +1,13 @@
 import { Typography } from '@mui/material'
-import type { Theme } from '@mui/material/styles'
 import { type FC, type ReactNode } from 'react'
+import { sideMenuScaleMedia } from './sideMenuScaleMedia'
 
-const below2xl = (theme: Theme) => theme.breakpoints.down('2xl')
-
-const sectionTitleSx = (theme: Theme, isFirst: boolean) => ({
+const sectionTitleSx = (isFirst: boolean) => ({
   pl: 1.5,
   pr: 3,
   pt: isFirst ? 0 : 1,
   pb: 1,
-  [below2xl(theme)]: {
+  [sideMenuScaleMedia]: {
     pl: 2.25,
     pr: 4.5,
     pt: isFirst ? 0 : 1.5,
@@ -23,7 +21,7 @@ type SectionTitleProps = {
 }
 
 export const SectionTitle: FC<SectionTitleProps> = ({ children, isFirst = false }) => (
-  <Typography variant='sideMenuSectionLabel' sx={theme => sectionTitleSx(theme, isFirst)}>
+  <Typography variant='sideMenuSectionLabel' sx={sectionTitleSx(isFirst)}>
     {children}
   </Typography>
 )

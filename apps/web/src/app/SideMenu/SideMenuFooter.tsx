@@ -1,25 +1,23 @@
 import { Box, Divider, List } from '@mui/material'
-import type { Theme } from '@mui/material/styles'
 import { type FC } from 'react'
 import { type NavItem } from './SideMenuContent'
 import { SideMenuNavItem } from './SideMenuNavItem'
+import { sideMenuScaleMedia } from './sideMenuScaleMedia'
 
-const below2xl = (theme: Theme) => theme.breakpoints.down('2xl')
-
-const footerSx = (theme: Theme) => ({
+const footerSx = () => ({
   pl: 2,
   pr: 4,
   pb: 2,
-  [below2xl(theme)]: {
+  [sideMenuScaleMedia]: {
     pl: 3,
     pr: 6,
     pb: 3,
   },
 })
 
-const footerDividerSx = (theme: Theme) => ({
+const footerDividerSx = () => ({
   mb: 2,
-  [below2xl(theme)]: {
+  [sideMenuScaleMedia]: {
     mb: 3,
   },
 })

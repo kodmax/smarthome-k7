@@ -30,14 +30,14 @@ export const TopTorrents: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='the-pirate' title={title} icon={MoviesIcon} height={4} headingInfo={<DownloadsInfo />}>
+      <ApolloCard cardId='the-pirate' title={title} icon={MoviesIcon} height={6} headingInfo={<DownloadsInfo />}>
         <TablePlaceholder rows={12} graph={false} value={false} />
       </ApolloCard>
     )
   }
 
   return (
-    <ApolloCard cardId='the-pirate' title={title} icon={MoviesIcon} height={4} headingInfo={<DownloadsInfo />}>
+    <ApolloCard cardId='the-pirate' title={title} icon={MoviesIcon} height={6} headingInfo={<DownloadsInfo />}>
       <div>
         <div>
           {zoom ? <TorrentSearch query={query} onQuery={onQuery} onSearch={onSearch} onClear={onClear} /> : null}

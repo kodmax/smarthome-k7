@@ -1,6 +1,6 @@
 import { IconButton } from '@mui/material'
 import { MenuIcon } from '@repo/assets'
-import { designTokens } from '@repo/design-tokens'
+import { designTokens, portraitMobileMediaQuery } from '@repo/design-tokens'
 import { type FC } from 'react'
 import { useMenu } from './MenuContext'
 import { toggleLeftClosed, toggleLeftClosedBelow2xl, toggleTopClosed, toggleTopClosedBelow2xl } from './drawerLayout'
@@ -30,6 +30,9 @@ export const SideMenuOpenToggle: FC<Record<string, never>> = () => {
         [theme.breakpoints.down('2xl')]: {
           top: toggleTopClosedBelow2xl,
           left: toggleLeftClosedBelow2xl,
+        },
+        [portraitMobileMediaQuery]: {
+          display: 'none',
         },
       })}
     >

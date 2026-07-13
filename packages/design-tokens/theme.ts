@@ -7,11 +7,39 @@ const darkScheme = schemes.dark
 const { font, radius, layout, breakpoint, borderWidth, icon, components, space, transition } = shared
 const { bodyPadding } = layout
 
+const portraitMobileSidePadding = Math.round(bodyPadding.right / 3)
+
 const below2xlMediaQuery = `@media (max-width:${breakpoint['2xl'] - 0.05}px)`
+
+// iPhone portrait only — top bar, symmetric body padding, desktop-sized side menu.
+const portraitMobileQuery = `(max-width:${breakpoint.sm - 0.05}px) and (orientation: portrait)`
+
+const portraitMobileMediaQuery = `@media ${portraitMobileQuery}`
+
+const phoneLandscapeQuery = `(max-height:${breakpoint.sm - 0.05}px) and (orientation: landscape)`
+
+const phoneLandscapeMediaQuery = `@media ${phoneLandscapeQuery}`
+
+const phoneLandscapeLeftPadding = Math.round(bodyPadding.leftBelow2xl * (2 / 3))
+
+// Tablets below 2xl — comma-separated OR (MQ Level 3, Safari/iPadOS-safe).
+const below2xlMaxWidth = `max-width:${breakpoint['2xl'] - 0.05}px`
+const below2xlSideMenuScaleQuery = [
+  `(${below2xlMaxWidth}) and (min-width:${breakpoint.sm}px) and (orientation: portrait)`,
+  `(${below2xlMaxWidth}) and (min-height:${breakpoint.sm}px) and (orientation: landscape)`,
+].join(', ')
+
+const below2xlSideMenuScaleMediaQuery = `@media ${below2xlSideMenuScaleQuery}`
 
 const scaleBelow2xl = (value: number) => Math.round(value * components.sideMenu.below2xlScale)
 
-export { scaleBelow2xl }
+export {
+  scaleBelow2xl,
+  portraitMobileQuery,
+  portraitMobileMediaQuery,
+  below2xlSideMenuScaleQuery,
+  below2xlSideMenuScaleMediaQuery,
+}
 
 type SchemeTokens = typeof darkScheme
 
@@ -193,7 +221,7 @@ export const theme = createTheme({
       fontSize: components.sideMenu.logoFontSize,
       color: 'var(--mui-palette-text-primary)',
       lineHeight: 1,
-      [below2xlMediaQuery]: {
+      [below2xlSideMenuScaleMediaQuery]: {
         fontSize: scaleBelow2xl(components.sideMenu.logoFontSize),
       },
     },
@@ -203,7 +231,7 @@ export const theme = createTheme({
       lineHeight: 1.2,
       display: 'block',
       whiteSpace: 'nowrap',
-      [below2xlMediaQuery]: {
+      [below2xlSideMenuScaleMediaQuery]: {
         fontSize: scaleBelow2xl(font.bodyLarge.size),
       },
     },
@@ -213,7 +241,7 @@ export const theme = createTheme({
       lineHeight: 1.3,
       display: 'block',
       whiteSpace: 'nowrap',
-      [below2xlMediaQuery]: {
+      [below2xlSideMenuScaleMediaQuery]: {
         fontSize: scaleBelow2xl(font.bodySmall.size),
       },
     },
@@ -225,7 +253,7 @@ export const theme = createTheme({
       fontSize: font.caption.size,
       display: 'block',
       whiteSpace: 'nowrap',
-      [below2xlMediaQuery]: {
+      [below2xlSideMenuScaleMediaQuery]: {
         fontSize: scaleBelow2xl(font.caption.size),
       },
     },
@@ -260,6 +288,12 @@ export const theme = createTheme({
           minHeight: '100%',
           [below2xlMediaQuery]: {
             padding: `${bodyPadding.top}px ${bodyPadding.right}px ${bodyPadding.bottom}px ${bodyPadding.leftBelow2xl}px`,
+          },
+          [phoneLandscapeMediaQuery]: {
+            paddingLeft: `${phoneLandscapeLeftPadding}px`,
+          },
+          [portraitMobileMediaQuery]: {
+            padding: `calc(${bodyPadding.top}px + var(--portrait-top-bar-offset, 0px)) ${portraitMobileSidePadding}px ${bodyPadding.bottom}px ${portraitMobileSidePadding}px`,
           },
         },
       },
@@ -351,12 +385,12 @@ export const theme = createTheme({
               backgroundColor: theme.vars.palette.background.paper,
               overflow: 'hidden',
               boxSizing: 'border-box',
-              [below2xlMediaQuery]: {
+              [below2xlSideMenuScaleMediaQuery]: {
                 borderRadius: `${scaled(sideMenu.borderRadius)}px`,
               },
               '& .MuiListItem-root': {
                 marginBottom: theme.spacing(0.5),
-                [below2xlMediaQuery]: {
+                [below2xlSideMenuScaleMediaQuery]: {
                   marginBottom: theme.spacing(0.75),
                 },
               },
@@ -367,7 +401,7 @@ export const theme = createTheme({
                 paddingLeft: theme.spacing(2),
                 paddingRight: theme.spacing(4),
                 gap: theme.spacing(2),
-                [below2xlMediaQuery]: {
+                [below2xlSideMenuScaleMediaQuery]: {
                   borderRadius: `${scaled(radius.md)}px`,
                   paddingTop: theme.spacing(2.25),
                   paddingBottom: theme.spacing(2.25),
@@ -378,7 +412,7 @@ export const theme = createTheme({
               },
               '& .MuiListItemIcon-root': {
                 minWidth: sideMenu.navIconSize,
-                [below2xlMediaQuery]: {
+                [below2xlSideMenuScaleMediaQuery]: {
                   minWidth: scaled(sideMenu.navIconSize),
                   '& svg': {
                     width: scaled(sideMenu.navIconSize),
@@ -391,7 +425,7 @@ export const theme = createTheme({
                 fontWeight: font.h3.weight,
                 lineHeight: font.h3.lineHeight,
                 whiteSpace: 'nowrap',
-                [below2xlMediaQuery]: {
+                [below2xlSideMenuScaleMediaQuery]: {
                   fontSize: scaled(font.h3.size),
                 },
               },
@@ -438,7 +472,7 @@ export const theme = createTheme({
                   height: icon.sizeXs,
                 },
               },
-              [below2xlMediaQuery]: {
+              [below2xlSideMenuScaleMediaQuery]: {
                 '&[data-open="true"]': {
                   width: scaled(sideMenu.toggleOpenSize),
                   height: scaled(sideMenu.toggleOpenSize),

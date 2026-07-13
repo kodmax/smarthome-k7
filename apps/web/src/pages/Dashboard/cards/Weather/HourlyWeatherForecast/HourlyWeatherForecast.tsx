@@ -13,7 +13,12 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
   const { t } = useTranslations()
 
   return (
-    <ApolloCard cardId='hourly-weather-forecast' title={t.dashboard.hourlyWeatherForecast.title} icon={WeatherCardIcon}>
+    <ApolloCard
+      cardId='hourly-weather-forecast'
+      title={t.dashboard.hourlyWeatherForecast.title}
+      icon={WeatherCardIcon}
+      height={6}
+    >
       <ScrollArea>
         <ForecastRow>
           {forecast?.hourly.map((fc: HourWeatherForecast) => (
