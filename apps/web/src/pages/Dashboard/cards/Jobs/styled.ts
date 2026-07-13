@@ -1,4 +1,5 @@
 import styled from '@emotion/styled'
+import { designTokens } from '@repo/design-tokens'
 import { ApolloTableCell } from '@/card-components'
 
 export const JobTitle = styled(ApolloTableCell)({
@@ -17,7 +18,7 @@ export const Salary = styled(ApolloTableCell)({
 export const SkillsList = styled('ul')({
   display: 'inline-block',
   padding: 0,
-  margin: '0 1rem',
+  margin: `0 ${designTokens.space[4]}px`,
 })
 
 export const Skill = styled('li')<{ level?: number }>(() => ({

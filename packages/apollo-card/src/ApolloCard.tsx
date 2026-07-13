@@ -4,6 +4,7 @@ import { designTokens } from '@repo/design-tokens'
 import { type FC, type ReactNode } from 'react'
 import {
   Actions,
+  ApolloCardBottomFade,
   ApolloCardContent,
   ApolloCardHeader,
   ApolloCardHeadingInfo,
@@ -64,6 +65,7 @@ export const ApolloCard: FC<ApolloCardProps> = ({
           >
             {children}
           </ApolloCardContent>
+          <ApolloCardBottomFade aria-hidden />
         </ApolloCardRoot>
       )}
     </ZoomCurtain>

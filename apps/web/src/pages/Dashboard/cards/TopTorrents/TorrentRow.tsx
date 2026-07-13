@@ -29,7 +29,7 @@ export const TorrentRow: FC<TorrentRowProps> = ({ torrent, zoom, onDownload }) =
             <Copy text={magnetLink(torrent)} />
           </ApolloTableCell>
           <ApolloTableCell sx={{ width: '5em' }}>S: {torrent.seeders}</ApolloTableCell>
-          <ApolloValueCell sx={{ width: '4rem', paddingRight: '0.5em' }}>
+          <ApolloValueCell sx={{ width: `${designTokens.space[16]}px`, paddingRight: '0.5em' }}>
             {Number(+torrent.size / 2 ** 30).toFixed(1)} GB
           </ApolloValueCell>
         </>

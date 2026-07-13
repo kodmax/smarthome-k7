@@ -15,13 +15,11 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
     const placeholders = new Array(15).fill(undefined)
     return (
       <ApolloCard cardId='weather-forecast' title={title} icon={WeatherCardIcon} height={7} allowZoom={false}>
-        <div style={{ paddingTop: '0.5em', paddingBottom: '1em' }}>
-          <WeekContainer>
-            {placeholders.map((_, i) => (
-              <Day key={i} />
-            ))}
-          </WeekContainer>
-        </div>
+        <WeekContainer>
+          {placeholders.map((_, i) => (
+            <Day key={i} />
+          ))}
+        </WeekContainer>
       </ApolloCard>
     )
   }
@@ -31,16 +29,14 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
 
   return (
     <ApolloCard cardId='weather-forecast' title={title} icon={WeatherCardIcon} height={7} allowZoom={false}>
-      <div style={{ paddingTop: '0.5em', paddingBottom: '1em' }}>
-        <WeekContainer>
-          {passedDays.map((_, i) => (
-            <Day key={i} />
-          ))}
-          {feed.forecast.map((day: DayWeatherForecast) => (
-            <Day key={day.date} forecast={day} dayLabel={formatForecastDayLabel(day.date, t)} />
-          ))}
-        </WeekContainer>
-      </div>
+      <WeekContainer>
+        {passedDays.map((_, i) => (
+          <Day key={i} />
+        ))}
+        {feed.forecast.map((day: DayWeatherForecast) => (
+          <Day key={day.date} forecast={day} dayLabel={formatForecastDayLabel(day.date, t)} />
+        ))}
+      </WeekContainer>
     </ApolloCard>
   )
 }

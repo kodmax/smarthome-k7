@@ -2,12 +2,16 @@ import { Box, Card, CardContent, Typography, styled } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
 import { ZOOM_SCALE } from './ZoomCurtain/zoomConstants'
 
-const { font } = designTokens
+const { font, space } = designTokens
 
-const apolloCardRowHeight = font.body.size * font.body.lineHeight + 3
-const CARD_CONTENT_PADDING_Y_PX = 0.666 * 16 * 2
+const CARD_CONTENT_PADDING_TOP = space[3]
+const CARD_CONTENT_PADDING_BOTTOM = space[3]
+const CARD_CONTENT_PADDING_X = space[4]
 
-export const apolloCardContentHeight = (rows: number) => `${rows * apolloCardRowHeight + CARD_CONTENT_PADDING_Y_PX}px`
+export const apolloCardRowHeight = font.body.size * font.body.lineHeight
+
+export const apolloCardContentHeight = (rows: number) =>
+  `${Math.round(rows * apolloCardRowHeight + CARD_CONTENT_PADDING_TOP + CARD_CONTENT_PADDING_BOTTOM)}px`
 
 export const ApolloCardHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -50,6 +54,7 @@ export const Actions = styled(Box)({
 export const ApolloCardRoot = styled(Card, {
   shouldForwardProp: prop => prop !== 'zoom',
 })<{ zoom?: boolean }>(({ zoom }) => ({
+  position: 'relative',
   ...(zoom
     ? {
         boxSizing: 'border-box',
@@ -69,13 +74,23 @@ export const ApolloCardRoot = styled(Card, {
       }),
 }))
 
+export const ApolloCardBottomFade = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  insetInline: 0,
+  bottom: 0,
+  height: `${CARD_CONTENT_PADDING_BOTTOM}px`,
+  pointerEvents: 'none',
+  zIndex: 1,
+  backgroundImage: `linear-gradient(180deg, transparent 0%, color-mix(in srgb, ${theme.vars.palette.background.paper} 45%, transparent) 45%, ${theme.vars.palette.background.paper} 100%)`,
+}))
+
 export const ApolloCardContent = styled(CardContent)({
   boxSizing: 'border-box',
   overflowY: 'auto',
   fontSize: designTokens.font.body.size,
-  padding: '0.666rem 16px 0.666rem',
+  padding: `${CARD_CONTENT_PADDING_TOP}px ${CARD_CONTENT_PADDING_X}px`,
   paddingBottom: 0,
   ':last-child': {
-    paddingBottom: '0.666rem',
+    paddingBottom: `${CARD_CONTENT_PADDING_BOTTOM}px`,
   },
 })
