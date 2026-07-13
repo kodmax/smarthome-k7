@@ -85,7 +85,7 @@ export const pl: Translations = {
       title: 'Jakość powietrza',
       co2Level: 'Poziom CO₂',
       humidity: 'Wilgotność',
-      airQuality: 'Jakość powietrza',
+      airQuality: 'AQI',
       dusk: 'Zmierzch',
       dawn: 'Świt',
     },

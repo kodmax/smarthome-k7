@@ -85,7 +85,7 @@ export const en: Translations = {
       title: 'Air quality',
       co2Level: 'CO₂ level',
       humidity: 'Humidity',
-      airQuality: 'Air quality',
+      airQuality: 'AQI',
       dusk: 'Dusk',
       dawn: 'Dawn',
     },

@@ -85,7 +85,7 @@ export const ru: Translations = {
       title: 'Качество воздуха',
       co2Level: 'Уровень CO₂',
       humidity: 'Влажность',
-      airQuality: 'Качество воздуха',
+      airQuality: 'AQI',
       dusk: 'Закат',
       dawn: 'Рассвет',
     },
