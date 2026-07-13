@@ -12,6 +12,7 @@ import {
   Cog,
   Copy,
   Droplets,
+  Fan,
   Flame,
   Heater,
   House,
@@ -32,6 +33,7 @@ import {
   Sunrise,
   Sunset,
   Thermometer,
+  ThermometerSun,
   TrendingDown,
   TrendingUp,
   TriangleAlert,
@@ -56,10 +58,12 @@ export const EnergyIcon = createStyledIcon(Zap, iconStyles.energy)
 export const ConsumptionIcon = createStyledIcon(Activity, iconStyles.energy)
 export const PowerIcon = createStyledIcon(ChartNoAxesColumnIncreasing, iconStyles.energy)
 export const TemperatureIcon = createStyledIcon(Thermometer, iconStyles.temperature)
+export const ThermometerSunIcon = createStyledIcon(ThermometerSun, iconStyles.temperature)
 export const AirVentIcon = createStyledIcon(AirVent, iconStyles.temperature)
 export const HeatingIcon = createStyledIcon(Flame, iconStyles.temperature)
 export const HeaterIcon = createStyledIcon(Heater, iconStyles.temperature)
 export const CoolingIcon = createStyledIcon(Snowflake, iconStyles.weather)
+export const FanIcon = createStyledIcon(Fan, iconStyles.weather)
 export const HumidityIcon = createStyledIcon(Droplets, iconStyles.weather)
 export const AirQualityIcon = createStyledIcon(Leaf, iconStyles.air)
 export const WindIcon = createStyledIcon(Wind, iconStyles.weather)

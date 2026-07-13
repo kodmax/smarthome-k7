@@ -69,19 +69,6 @@ export class WeatherSource extends DataSourceDefinition<WeatherFeed> {
               order by hour(timestamp)`,
           [datetime.getDate()],
         ),
-        pressure: {
-          week: await conn.query(
-            `select
-                reading_value as pressure,
-                timestamp as datetime
-                from readings
-                where timestamp >= ?
-                  and reading_name = 'air_pressure'
-                order by timestamp`,
-            [DateTime.shift(-14, CacheAgeUnit.DAYS).getDateTime()],
-          ),
-          instant: instant.pressure,
-        },
         sunTimes,
         allergens,
         forecast,

@@ -42,11 +42,17 @@ export const ApolloCardHeadingInfo = styled(Box)(({ theme }) => ({
   lineHeight: designTokens.font.h3.lineHeight,
   color: theme.vars.palette.text.secondary,
   flex: 1,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  minWidth: 0,
+  overflow: 'visible',
   display: 'flex',
   justifyContent: 'flex-end',
-  whiteSpace: 'nowrap',
+  alignItems: 'center',
+  '& > span': {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    minWidth: 0,
+  },
 }))
 
 export const Actions = styled(Box)({

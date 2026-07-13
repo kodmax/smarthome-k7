@@ -80,6 +80,7 @@ export const en: Translations = {
       avgMonthlyConsumption: 'Monthly avg.',
       avgMonthlyCost: 'Monthly cost',
       instantDraw: 'Live draw',
+      highDraw: 'High draw',
     },
     indoor: {
       title: 'Air quality',
@@ -88,6 +89,17 @@ export const en: Translations = {
       airQuality: 'AQI',
       dusk: 'Dusk',
       dawn: 'Dawn',
+      ventilate: {
+        highCo2: 'Ventilate — CO₂ is high',
+        elevatedCo2: 'Consider ventilating — CO₂ is elevated',
+        highHumidity: 'Consider ventilating — humidity is high',
+        tooCold: 'Too cold outside to ventilate',
+        tooHot: 'Too hot outside to ventilate',
+        poorOutdoorAir: 'Poor outdoor air quality',
+        tooWindy: 'Too windy to ventilate',
+        comfortable: 'Air quality is comfortable',
+        missingData: 'Not enough data to assess ventilation',
+      },
     },
     temperature: {
       title: 'Temperature',
@@ -95,6 +107,7 @@ export const en: Translations = {
       livingRoom: 'Living room',
       bedroom: 'Bedroom',
       bathroom: 'Bathroom',
+      hotBedroom: 'High bedroom temperature',
     },
     weather: {
       title: 'Weather',
@@ -105,6 +118,8 @@ export const en: Translations = {
       windGusts: 'Wind gusts',
       sunAltitude: 'Sun altitude',
       moonAltitude: 'Moon altitude',
+      strongWind: 'Strong wind',
+      hotOutdoor: 'High outdoor temperature',
       beaufortScale: [
         'Calm',
         'Light air',
@@ -126,6 +141,7 @@ export const en: Translations = {
     },
     hourlyWeatherForecast: {
       title: 'Hourly forecast',
+      rainChance: 'Rain chance in the next hours',
     },
     jobs: {
       title: 'Job offers',

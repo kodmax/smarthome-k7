@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { pl } from '@/i18n/translations/pl'
-import { beaufortLevelLabel, beaufortScale } from './beaufort'
+import { beaufortLevelLabel, beaufortScale, beaufortScaleFromMetersPerSecond } from './beaufort'
 
 const beaufortLabels = pl.dashboard.weather.beaufortScale
 
@@ -15,6 +15,12 @@ describe('beaufortScale', () => {
 
   it('returns the top level for hurricane-force wind', () => {
     expect(beaufortScale(200)).toBe(12)
+  })
+})
+
+describe('beaufortScaleFromMetersPerSecond', () => {
+  it('converts m/s to km/h before mapping Beaufort', () => {
+    expect(beaufortScaleFromMetersPerSecond(1)).toBe(beaufortScale(3.6))
   })
 })
 

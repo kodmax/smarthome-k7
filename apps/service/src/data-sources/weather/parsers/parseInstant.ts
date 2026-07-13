@@ -2,6 +2,8 @@ import { fetchDocument } from '@/fetch'
 import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
 import { windDirectionCodes } from './windDirectionCodes'
+import { parseWindValue } from './parseWindValue'
+import { toMetersPerSecond } from './toMetersPerSecond'
 
 const requireDetail = (details: Record<string, string>, key: string, context: string): string => {
   const value = details[key]
@@ -20,7 +22,6 @@ export type InstantWeather = {
   wind: {
     angle: number
     maxSpeed: number
-    speedUnit: string
     direction: string
     speed: number
   }
@@ -57,12 +58,14 @@ export const parseInstantFromDocument = (document: Document): InstantWeather =>
     )
 
     const wind = requireDetail(details, 'Wiatr', 'current weather details')
-    const [windDirection, windSpeed, windSpeedUnit] = wind.split(' ')
-    if (windDirection === undefined || windSpeed === undefined || windSpeedUnit === undefined) {
-      throw new Error(`malformed "Wiatr" detail value "${wind}"`)
-    }
+    const { direction: windDirection, speed: windSpeed, speedUnit: windSpeedUnit } = parseWindValue(wind)
 
     const gusts = requireDetail(details, 'Porywy wiatru', 'current weather details')
+    const [gustSpeed, gustUnit] = gusts.split(' ')
+    if (gustSpeed === undefined || gustUnit === undefined) {
+      throw new Error(`malformed gust value "${gusts}" in current weather details`)
+    }
+
     const uvRaw = details['Maksymalny wskaźnik UV']
 
     return {
@@ -72,10 +75,9 @@ export const parseInstantFromDocument = (document: Document): InstantWeather =>
       },
       wind: {
         angle: Number(windDirectionCodes.indexOf(windDirection as (typeof windDirectionCodes)[number]) * 22.5),
-        maxSpeed: Number(gusts.split(' ')[0]),
-        speedUnit: windSpeedUnit,
+        maxSpeed: toMetersPerSecond(Number(gustSpeed), gustUnit),
         direction: windDirection,
-        speed: Number(windSpeed),
+        speed: toMetersPerSecond(windSpeed, windSpeedUnit),
       },
       uv: uvRaw !== undefined ? Number(uvRaw.replace(/[^\d.]/g, '')) : 0,
       humidity: Number(requireDetail(details, 'Wilgotność', 'current weather details').replace(/[^\d]/g, '')),

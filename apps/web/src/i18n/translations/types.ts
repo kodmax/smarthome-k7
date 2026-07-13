@@ -78,6 +78,7 @@ export type Translations = {
       avgMonthlyConsumption: string
       avgMonthlyCost: string
       instantDraw: string
+      highDraw: string
     }
     indoor: {
       title: string
@@ -86,6 +87,17 @@ export type Translations = {
       airQuality: string
       dusk: string
       dawn: string
+      ventilate: {
+        highCo2: string
+        elevatedCo2: string
+        highHumidity: string
+        tooCold: string
+        tooHot: string
+        poorOutdoorAir: string
+        tooWindy: string
+        comfortable: string
+        missingData: string
+      }
     }
     temperature: {
       title: string
@@ -93,6 +105,7 @@ export type Translations = {
       livingRoom: string
       bedroom: string
       bathroom: string
+      hotBedroom: string
     }
     weather: {
       title: string
@@ -103,6 +116,8 @@ export type Translations = {
       windGusts: string
       sunAltitude: string
       moonAltitude: string
+      strongWind: string
+      hotOutdoor: string
       beaufortScale: readonly [
         string,
         string,
@@ -124,6 +139,7 @@ export type Translations = {
     }
     hourlyWeatherForecast: {
       title: string
+      rainChance: string
     }
     jobs: {
       title: string

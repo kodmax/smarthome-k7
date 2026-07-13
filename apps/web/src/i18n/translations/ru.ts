@@ -80,6 +80,7 @@ export const ru: Translations = {
       avgMonthlyConsumption: 'Ср. месяц',
       avgMonthlyCost: 'Стоим. мес',
       instantDraw: 'Нагрузка',
+      highDraw: 'Высокое потребление',
     },
     indoor: {
       title: 'Качество воздуха',
@@ -88,6 +89,17 @@ export const ru: Translations = {
       airQuality: 'AQI',
       dusk: 'Закат',
       dawn: 'Рассвет',
+      ventilate: {
+        highCo2: 'Стоит проветрить — высокий CO₂',
+        elevatedCo2: 'Рассмотрите проветривание — повышенный CO₂',
+        highHumidity: 'Рассмотрите проветривание — высокая влажность',
+        tooCold: 'На улице слишком холодно для проветривания',
+        tooHot: 'На улице слишком жарко для проветривания',
+        poorOutdoorAir: 'Плохое качество воздуха на улице',
+        tooWindy: 'Слишком ветрено для проветривания',
+        comfortable: 'Воздух в норме',
+        missingData: 'Недостаточно данных для оценки проветривания',
+      },
     },
     temperature: {
       title: 'Температура',
@@ -95,6 +107,7 @@ export const ru: Translations = {
       livingRoom: 'Гостиная',
       bedroom: 'Спальня',
       bathroom: 'Ванная',
+      hotBedroom: 'Высокая температура в спальне',
     },
     weather: {
       title: 'Погода',
@@ -105,6 +118,8 @@ export const ru: Translations = {
       windGusts: 'Порывы ветра',
       sunAltitude: 'Высота солнца',
       moonAltitude: 'Высота луны',
+      strongWind: 'Сильный ветер',
+      hotOutdoor: 'Высокая температура на улице',
       beaufortScale: [
         'Штиль',
         'Тихий ветер',
@@ -126,6 +141,7 @@ export const ru: Translations = {
     },
     hourlyWeatherForecast: {
       title: 'Почасовой прогноз',
+      rainChance: 'Вероятность осадков в ближайшие часы',
     },
     jobs: {
       title: 'Вакансии',

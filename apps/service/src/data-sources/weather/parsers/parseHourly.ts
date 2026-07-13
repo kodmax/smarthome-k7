@@ -6,6 +6,7 @@ import { requireElements, requireText, withScraperSource } from '@/utils/scraper
 import { weatherPageUrls } from '../urls'
 import DateTime from '@/DateTime'
 import { CacheAgeUnit } from '@repo/apollo-ws'
+import { hourlyHourSelector, parseHourlyWind } from './parseHourlyHelpers'
 
 export const parseHourlyFromDocument = (
   document: Document,
@@ -14,32 +15,30 @@ export const parseHourlyFromDocument = (
   longitude: number,
 ): HourWeatherForecast[] =>
   withScraperSource('weather', () => {
-    const hours = requireElements(document, '.hourly-wrapper .hour', 'hourly forecast')
+    const hours = requireElements(document, hourlyHourSelector, 'hourly forecast')
 
-    return hours.map(hour => {
-      const precipSrc = hour.querySelector('.precip img.precip-icon')?.getAttribute('data-src') ?? ''
-      const iconSrc = hour.querySelector('.icon')?.getAttribute('src') ?? ''
+    return hours.map(item => {
+      const precipSrc = item.querySelector('.precip img.precip-icon')?.getAttribute('data-src') ?? ''
+      const iconSrc = item.querySelector('.icon')?.getAttribute('src') ?? ''
       if (iconSrc === '') {
         throw new Error('missing ".icon" src in hourly forecast hour')
       }
 
-      const forecast = {
-        precipIcon: basename(new URL(precipSrc, 'https://www.accuweather.com/').pathname),
-        icon: basename(iconSrc),
-        temp: requireText(hour, '.temp.metric', 'hourly forecast hour').replace(/[^\d-]/g, ''),
-        precip: requireText(hour, '.precip', 'hourly forecast hour'),
-        hour: requireText(hour, '.date', 'hourly forecast hour'),
-        date,
-      }
-
-      const sunPosition = suncalc.getPosition(new Date(`${date} ${forecast.hour}:00:00`), latitude, longitude)
+      const hour = requireText(item, '.date', 'hourly forecast hour')
+      const sunPosition = suncalc.getPosition(new Date(`${date} ${hour}:00:00`), latitude, longitude)
 
       return {
+        precipIcon: basename(new URL(precipSrc, 'https://www.accuweather.com/').pathname),
+        icon: basename(iconSrc),
+        temp: requireText(item, '.temp.metric', 'hourly forecast hour').replace(/[^\d-]/g, ''),
+        precip: requireText(item, '.precip', 'hourly forecast hour'),
+        hour,
+        date,
+        wind: parseHourlyWind(item),
         sun: {
           altitude: (sunPosition.altitude / Math.PI) * 180,
           azimuth: (sunPosition.azimuth / Math.PI) * 180,
         },
-        ...forecast,
       }
     })
   })

@@ -147,6 +147,10 @@ export type HourWeatherForecast = {
   icon: string
   hour: string
   date: string
+  wind: {
+    direction: string
+    speed: number
+  }
   sun: {
     altitude: number
     azimuth: number
@@ -163,7 +167,6 @@ export type WeatherFeed = {
     wind: {
       angle: number
       maxSpeed: number
-      speedUnit: string
       direction: string
       speed: number
     }
@@ -177,13 +180,6 @@ export type WeatherFeed = {
     sunset: string
     dusk: string
     dawn: string
-  }
-  pressure: {
-    week: {
-      datetime: string
-      pressure: number
-    }[]
-    instant: number
   }
   allergens: {
     id: string | null

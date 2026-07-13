@@ -4,10 +4,9 @@ const defaultInstant: WeatherFeed['instant'] = {
   clouds: { coverage: '20', height: '1000' },
   wind: {
     angle: 180,
-    maxSpeed: 36,
-    speedUnit: 'km/h',
+    maxSpeed: 10,
     direction: 'S',
-    speed: 18,
+    speed: 5,
   },
   humidity: 55,
   pressure: 1013,

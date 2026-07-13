@@ -3,9 +3,14 @@ import { type FC, useCallback } from 'react'
 import { EnergyIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { designTokens } from '@repo/design-tokens'
 import { ApolloDataTable, KnxReading, Reading, TablePlaceholder } from '@/card-components'
 import { EnergyFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
+import { shouldShowHighDrawHint } from './Energy/highDrawHint'
+import { indicatorRed } from './components/colorForValueInRange'
+
+const { icon } = designTokens
 
 export const Energy: FC<Record<string, never>> = () => {
   const zoom = useZoom('energy')
@@ -35,7 +40,23 @@ export const Energy: FC<Record<string, never>> = () => {
     feed.cost.rates.vat
 
   return (
-    <ApolloCard cardId='energy' title={labels.title} icon={EnergyIcon} onZoom={onZoom}>
+    <ApolloCard
+      cardId='energy'
+      title={labels.title}
+      icon={EnergyIcon}
+      onZoom={onZoom}
+      headingInfo={
+        shouldShowHighDrawHint(feed.instant.reading.value) ? (
+          <EnergyIcon
+            size={icon.sizeSm}
+            strokeWidth={icon.strokeWidth}
+            color={indicatorRed}
+            glow='default'
+            aria-label={labels.highDraw}
+          />
+        ) : undefined
+      }
+    >
       {!feed ? (
         <TablePlaceholder rows={4} graph={false} value={true} />
       ) : (

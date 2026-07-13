@@ -1,8 +1,8 @@
-import { TableBody } from '@mui/material'
+import { Box, TableBody } from '@mui/material'
 import { type FC } from 'react'
-import { WeatherIcon as WeatherCardIcon } from '@repo/assets'
+import { ThermometerSunIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
 import { ApolloDataTable, HoursBars, Reading, TablePlaceholder } from '@/card-components'
-import { beaufortLevelLabel, beaufortScale } from './beaufort'
+import { beaufortLevelLabel, beaufortScaleFromMetersPerSecond } from './beaufort'
 import { optimalHumidityRange } from './optimalHumidityRange'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { designTokens } from '@repo/design-tokens'
@@ -12,7 +12,10 @@ import { useFeed } from '@repo/feed-client'
 import { WeatherFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { sunTimes } from './sunTimes'
-import { toMetersPerSecond } from './windSpeed'
+import { shouldShowHotOutdoorHint, shouldShowStrongWindHint } from './weatherHints'
+import { indicatorRed } from '../components/colorForValueInRange'
+
+const { icon, space } = designTokens
 
 export const Weather: FC<Record<string, never>> = () => {
   const zoom = useZoom('current-weather')
@@ -29,15 +32,46 @@ export const Weather: FC<Record<string, never>> = () => {
   }
   const moonAlt = (getMoonPosition(new Date(), 52.2287755, 20.9756375).altitude / Math.PI) * 180
   const sunAlt = (getPosition(new Date(), 52.2287755, 20.9756375).altitude / Math.PI) * 180
-  const bs = beaufortScale(feed.instant.wind.speed)
+  const bs = beaufortScaleFromMetersPerSecond(feed.instant.wind.speed)
   const hum = feed.instant.humidity
   const sun = sunTimes(feed)
 
-  const windMaxSpeed = toMetersPerSecond(feed.instant.wind.maxSpeed, feed.instant.wind.speedUnit)
-  const windSpeed = toMetersPerSecond(feed.instant.wind.speed, feed.instant.wind.speedUnit)
+  const windMaxSpeed = feed.instant.wind.maxSpeed
+  const windSpeed = feed.instant.wind.speed
+
+  const showStrongWind = shouldShowStrongWindHint(feed.instant.wind.speed)
+  const showHotOutdoor = shouldShowHotOutdoorHint(feed.instant.temp)
 
   return (
-    <ApolloCard cardId='current-weather' title={labels.title} icon={WeatherCardIcon}>
+    <ApolloCard
+      cardId='current-weather'
+      title={labels.title}
+      icon={WeatherCardIcon}
+      headingInfo={
+        showStrongWind || showHotOutdoor ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: space[1] }}>
+            {showStrongWind ? (
+              <WindIcon
+                size={icon.sizeSm}
+                strokeWidth={icon.strokeWidth}
+                color='var(--mui-palette-info-main)'
+                glow='default'
+                aria-label={labels.strongWind}
+              />
+            ) : null}
+            {showHotOutdoor ? (
+              <ThermometerSunIcon
+                size={icon.sizeSm}
+                strokeWidth={icon.strokeWidth}
+                color={indicatorRed}
+                glow='default'
+                aria-label={labels.hotOutdoor}
+              />
+            ) : null}
+          </Box>
+        ) : undefined
+      }
+    >
       <ApolloDataTable>
         <TableBody>
           <Reading
@@ -81,12 +115,12 @@ export const Weather: FC<Record<string, never>> = () => {
                 />
               ) : undefined
             }
-            displayValue={String(windSpeed)}
+            displayValue={windSpeed.toFixed(0)}
             unit='m/s'
             colorIndicatorRange={{ lowest: 0, highest: 7, optimal: 1 }}
             value={bs}
           />
-          {!zoom ? null : <Reading title={labels.windGusts} displayValue={String(windMaxSpeed)} unit='m/s' />}
+          {!zoom ? null : <Reading title={labels.windGusts} displayValue={windMaxSpeed.toFixed(0)} unit='m/s' />}
           {!zoom ? null : sun.timeOfDay === 'day' ? (
             <Reading
               title={labels.sunAltitude}

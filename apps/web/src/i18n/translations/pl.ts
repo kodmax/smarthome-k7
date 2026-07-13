@@ -80,6 +80,7 @@ export const pl: Translations = {
       avgMonthlyConsumption: 'Śr. zużycie msc',
       avgMonthlyCost: 'Śr. koszt za msc',
       instantDraw: 'Chwilowy pobór',
+      highDraw: 'Wysokie pobieranie',
     },
     indoor: {
       title: 'Jakość powietrza',
@@ -88,6 +89,17 @@ export const pl: Translations = {
       airQuality: 'AQI',
       dusk: 'Zmierzch',
       dawn: 'Świt',
+      ventilate: {
+        highCo2: 'Warto przewietrzyć — wysokie CO₂',
+        elevatedCo2: 'Rozważ przewietrzenie — podwyższone CO₂',
+        highHumidity: 'Rozważ przewietrzenie — wysoka wilgotność',
+        tooCold: 'Na dworze za zimno na przewietrzenie',
+        tooHot: 'Na dworze za ciepło na przewietrzenie',
+        poorOutdoorAir: 'Na dworze słaba jakość powietrza',
+        tooWindy: 'Za silny wiatr na przewietrzenie',
+        comfortable: 'Powietrze w normie',
+        missingData: 'Brak danych do oceny przewietrzenia',
+      },
     },
     temperature: {
       title: 'Temperatura',
@@ -95,6 +107,7 @@ export const pl: Translations = {
       livingRoom: 'Salon',
       bedroom: 'Sypialnia',
       bathroom: 'Łazienka',
+      hotBedroom: 'Wysoka temperatura w sypialni',
     },
     weather: {
       title: 'Pogoda',
@@ -105,6 +118,8 @@ export const pl: Translations = {
       windGusts: 'Porywy wiatru',
       sunAltitude: 'Wysokość słońca',
       moonAltitude: 'Wysokość księżyca',
+      strongWind: 'Silny wiatr',
+      hotOutdoor: 'Wysoka temperatura na zewnątrz',
       beaufortScale: [
         'Cisza, flauta',
         'Powiew',
@@ -126,6 +141,7 @@ export const pl: Translations = {
     },
     hourlyWeatherForecast: {
       title: 'Prognoza godzinowa',
+      rainChance: 'Szansa na opady w najbliższych godzinach',
     },
     jobs: {
       title: 'Oferty pracy',

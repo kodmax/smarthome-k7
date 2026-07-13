@@ -1,23 +1,25 @@
 import { TableBody } from '@mui/material'
-import { type FC, useCallback } from 'react'
-import { AirQualityIcon, AlertIcon } from '@repo/assets'
+import { type FC } from 'react'
+import { AirQualityIcon, AirVentIcon, AlertIcon } from '@repo/assets'
 
 import { ApolloDataTable, KnxReading, KnxStateIcon, Reading, TablePlaceholder } from '@/card-components'
 import { ApolloCard } from '@repo/apollo-card'
-import { refreshFeeds, useFeed } from '@repo/feed-client'
+import { designTokens } from '@repo/design-tokens'
+import { useFeed } from '@repo/feed-client'
 import { Co2Data, WeatherFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { optimalHumidityRange } from './Weather/optimalHumidityRange'
 import { sunTimes } from './Weather/sunTimes'
+import { shouldShowVentilateHint } from './Indoor/ventilateDecision'
+import { useVentilateDecision } from './Indoor/useVentilateDecision'
+
+const { icon } = designTokens
 
 export const Indoor: FC<Record<string, never>> = () => {
   const feed = useFeed<WeatherFeed>('weather')
+  const ventilate = useVentilateDecision()
   const { t } = useTranslations()
   const labels = t.dashboard.indoor
-
-  const onZoom = useCallback(() => {
-    refreshFeeds(['weather', 'home.air-quality.co2', 'home.air-quality.humidity'])
-  }, [])
 
   if (feed === undefined) {
     return (
@@ -30,7 +32,22 @@ export const Indoor: FC<Record<string, never>> = () => {
   const sun = sunTimes(feed)
 
   return (
-    <ApolloCard cardId='air-quality' title={labels.title} icon={AirQualityIcon} onZoom={onZoom}>
+    <ApolloCard
+      cardId='air-quality'
+      title={labels.title}
+      icon={AirQualityIcon}
+      headingInfo={
+        shouldShowVentilateHint(ventilate.verdict) ? (
+          <AirVentIcon
+            size={icon.sizeSm}
+            strokeWidth={icon.strokeWidth}
+            color='var(--mui-palette-info-main)'
+            glow='default'
+            aria-label={labels.ventilate[ventilate.reasonKey]}
+          />
+        ) : undefined
+      }
+    >
       <ApolloDataTable>
         <TableBody>
           <KnxReading

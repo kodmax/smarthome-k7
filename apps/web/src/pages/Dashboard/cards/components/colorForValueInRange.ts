@@ -8,6 +8,8 @@ export const INDICATOR_LIGHTNESS = 60
 
 const hsl = (deg: number): string => `hsl(${deg}deg ${INDICATOR_SATURATION}% ${INDICATOR_LIGHTNESS}%)`
 
+export const indicatorRed = hsl(0)
+
 export function colorForValueInRange(
   value: number,
   { lowest, optimal, highest, reverse }: ColorIndicationRange,

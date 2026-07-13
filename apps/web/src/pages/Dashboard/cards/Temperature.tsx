@@ -1,11 +1,16 @@
 import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import { AirVentIcon, HeaterIcon, HeatingIcon, NightIcon, SunIcon, TemperatureIcon } from '@repo/assets'
+import { AirVentIcon, FanIcon, HeaterIcon, HeatingIcon, NightIcon, SunIcon, TemperatureIcon } from '@repo/assets'
 import { ApolloDataTable, KnxReading, KnxStateIcon } from '@/card-components'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { designTokens } from '@repo/design-tokens'
+import { useFeed } from '@repo/feed-client'
 import type { LucideIcon } from 'lucide-react'
-import { TemperatureData } from '@repo/types'
+import { HomeTempFeedData, TemperatureData } from '@repo/types'
 import { useTranslations } from '@/i18n'
+import { shouldShowHotBedroomHint } from './Temperature/hotBedroomHint'
+
+const { icon } = designTokens
 
 const icons: Record<string, LucideIcon> = {
   FrostProtection: AirVentIcon,
@@ -16,11 +21,27 @@ const icons: Record<string, LucideIcon> = {
 
 export const Temperature: FC<Record<string, never>> = () => {
   const zoom = useZoom('indoor-temp')
+  const bedroomFeed = useFeed<HomeTempFeedData>('home.temp.bedroom')
   const { t } = useTranslations()
   const labels = t.dashboard.temperature
 
   return (
-    <ApolloCard cardId='indoor-temp' title={labels.title} icon={TemperatureIcon}>
+    <ApolloCard
+      cardId='indoor-temp'
+      title={labels.title}
+      icon={TemperatureIcon}
+      headingInfo={
+        shouldShowHotBedroomHint(bedroomFeed?.reading.value) ? (
+          <FanIcon
+            size={icon.sizeSm}
+            strokeWidth={icon.strokeWidth}
+            color='var(--mui-palette-info-main)'
+            glow='default'
+            aria-label={labels.hotBedroom}
+          />
+        ) : undefined
+      }
+    >
       <ApolloDataTable>
         <TableBody>
           <KnxReading

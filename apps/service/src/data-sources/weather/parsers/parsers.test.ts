@@ -43,7 +43,7 @@ describe('weather parsers', () => {
       pressure: 1013,
       uv: 5.2,
       clouds: { height: '1200 m', coverage: '40%' },
-      wind: { direction: 'NE', speed: 12, maxSpeed: 24, speedUnit: 'km/h', angle: 45 },
+      wind: { direction: 'NE', speed: expect.closeTo(12 / 3.6), maxSpeed: expect.closeTo(24 / 3.6), angle: 45 },
       details: {
         Wiatr: 'NE 12 km/h',
         'Porywy wiatru': '24 km/h',
@@ -104,6 +104,7 @@ describe('weather parsers', () => {
       icon: '04.svg',
       precipIcon: 'rain.svg',
     })
+    expect(hour.wind).toEqual({ direction: 'NE', speed: expect.closeTo(12 / 3.6) })
     expect(Number.isFinite(hour.sun.altitude)).toBe(true)
     expect(Number.isFinite(hour.sun.azimuth)).toBe(true)
   })
@@ -118,17 +119,27 @@ describe('weather parsers', () => {
     const document = parseHTML('<div class="hourly-wrapper"></div>').window.document
 
     expect(() => parseHourlyFromDocument(document, '2026-06-28', 52.23, 21.01)).toThrow(
-      'weather: no elements matched ".hourly-wrapper .hour" in hourly forecast',
+      'weather: no elements matched ".accordion-item.hour, .hourly-wrapper .hour" in hourly forecast',
     )
   })
 
   it('parseHourly throws when hour icon is missing', () => {
     const document = parseHTML(
-      '<div class="hourly-wrapper"><div class="hour"><span class="date">14</span><span class="temp metric">21°</span><span class="precip">10%</span></div></div>',
+      '<div class="accordion-item hour"><h2 class="date"><div>14</div></h2><div class="temp metric">21°</div><div class="precip">10%</div><div class="panel"><p>Wiatr<span class="value">NE 12 km/h</span></p></div></div>',
     ).window.document
 
     expect(() => parseHourlyFromDocument(document, '2026-06-28', 52.23, 21.01)).toThrow(
       'weather: missing ".icon" src in hourly forecast hour',
+    )
+  })
+
+  it('parseHourly throws when wind is missing from panel', () => {
+    const document = parseHTML(
+      '<div class="accordion-item hour"><h2 class="date"><div>14</div></h2><img class="icon" src="/images/04.svg" /><div class="temp metric">21°</div><div class="precip">10%</div></div>',
+    ).window.document
+
+    expect(() => parseHourlyFromDocument(document, '2026-06-28', 52.23, 21.01)).toThrow(
+      'weather: missing "Wiatr" in hourly forecast panel',
     )
   })
 
