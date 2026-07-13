@@ -3,13 +3,21 @@ import { designTokens, scaleBelow2xl } from '@repo/design-tokens'
 const { layout, breakpoint, shadow } = designTokens
 const sideMenu = designTokens.components.sideMenu
 
+const containerCenterOffset = `max(0px, (100vw - ${layout.containerMax}px) / 2)`
+
+const offsetFromContainerLeft = (value: number) => `calc(${containerCenterOffset} + ${value}px)`
+
 export const drawerTop = {
   xs: `${layout.paddingMobile}px`,
   md: `${layout.paddingTablet}px`,
   lg: `${layout.paddingDesktop}px`,
 }
 
-export const drawerLeft = drawerTop
+export const drawerLeft = {
+  xs: offsetFromContainerLeft(layout.paddingMobile),
+  md: offsetFromContainerLeft(layout.paddingTablet),
+  lg: offsetFromContainerLeft(layout.paddingDesktop),
+}
 
 export const drawerHeight = {
   xs: `calc(100dvh - ${layout.paddingMobile * 2}px)`,
@@ -21,9 +29,9 @@ export const toggleTopClosed = `${sideMenu.toggleClosedOffset}px`
 
 export const toggleTopClosedBelow2xl = `${scaleBelow2xl(sideMenu.toggleClosedOffset)}px`
 
-export const toggleLeftClosed = `${sideMenu.toggleClosedOffset}px`
+export const toggleLeftClosed = offsetFromContainerLeft(sideMenu.toggleClosedOffset)
 
-export const toggleLeftClosedBelow2xl = `${scaleBelow2xl(sideMenu.toggleClosedOffset)}px`
+export const toggleLeftClosedBelow2xl = offsetFromContainerLeft(scaleBelow2xl(sideMenu.toggleClosedOffset))
 
 export const toggleTopOnDrawer = `${sideMenu.toggleOffsetY + sideMenu.toggleOpenOffsetY}px`
 
