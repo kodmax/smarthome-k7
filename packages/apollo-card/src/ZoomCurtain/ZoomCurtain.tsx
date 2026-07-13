@@ -1,4 +1,5 @@
-import { styled } from '@mui/material'
+import { styled, useMediaQuery } from '@mui/material'
+import { portraitMobileQuery } from '@repo/design-tokens'
 import { useContext, useEffect, useMemo, type FC, type ReactNode } from 'react'
 import { ZOOM_CURTAIN_Z_INDEX } from './zoomConstants'
 import { useValue } from './useValue'
@@ -25,7 +26,15 @@ const ZoomCurtain: FC<{ children: ZoomCurtainChildFn; cardId: string; allowZoom:
   cardId,
 }) => {
   const { zoomedCardId, dispatch } = useContext(ZoomStateContext)
-  const { state, handleCardClick, handleBackdropClick, startZoomOut } = useValue({ allowZoom, onZoom })
+  const isPortraitMobile = useMediaQuery(portraitMobileQuery)
+  const zoomAllowed = allowZoom && !isPortraitMobile
+  const { state, handleCardClick, handleBackdropClick, startZoomOut } = useValue({ allowZoom: zoomAllowed, onZoom })
+
+  useEffect(() => {
+    if (isPortraitMobile && state.active) {
+      startZoomOut()
+    }
+  }, [isPortraitMobile, state.active, startZoomOut])
 
   useEffect(() => {
     state.active ? dispatch({ id: 'zoom-in', cardId }) : dispatch({ id: 'zoom-out' })
