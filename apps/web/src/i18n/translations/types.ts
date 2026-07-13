@@ -67,6 +67,22 @@ export type Translations = {
       editPreferences: string
       copy: string
     }
+    hintExplanations: {
+      energyHighDraw: { line1: string }
+      hotBedroom: { line1: string }
+      strongWind: { line1: string }
+      hotOutdoor: { line1: string }
+      highUv: { line1: string }
+      hourlyRain: { line1: string }
+      hourlyHotOutdoor: { line1: string }
+      hourlyStrongWind: { line1: string }
+      hourlyHighUv: { line1: string }
+      ventilate: {
+        highCo2: string
+        elevatedCo2: string
+        highHumidity: string
+      }
+    }
     energy: {
       title: string
       consumptionToday: string
@@ -118,6 +134,7 @@ export type Translations = {
       moonAltitude: string
       strongWind: string
       hotOutdoor: string
+      highUv: string
       beaufortScale: readonly [
         string,
         string,

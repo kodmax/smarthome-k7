@@ -155,6 +155,7 @@ export type HourWeatherForecast = {
     altitude: number
     azimuth: number
   }
+  uv: number
 }
 
 export type WeatherFeed = {

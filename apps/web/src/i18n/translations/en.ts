@@ -69,6 +69,40 @@ export const en: Translations = {
       editPreferences: 'Edit preferences',
       copy: 'Copy',
     },
+    hintExplanations: {
+      energyHighDraw: {
+        line1: 'Instant power draw is {value} W.',
+      },
+      hotBedroom: {
+        line1: 'Bedroom temperature is {value}°C.',
+      },
+      strongWind: {
+        line1: 'Wind speed is {value} m/s.',
+      },
+      hotOutdoor: {
+        line1: 'Outdoor temperature is {value}°C.',
+      },
+      highUv: {
+        line1: 'UV index is {value}.',
+      },
+      hourlyRain: {
+        line1: 'Precipitation chance reaches up to {value}%.',
+      },
+      hourlyHotOutdoor: {
+        line1: 'Temperature in the next few hours will reach {value}°C.',
+      },
+      hourlyStrongWind: {
+        line1: 'Wind in the next few hours will reach {value} m/s.',
+      },
+      hourlyHighUv: {
+        line1: 'UV index in the next few hours will reach {value}.',
+      },
+      ventilate: {
+        highCo2: 'CO₂ is high — ventilating will improve air quality.',
+        elevatedCo2: 'CO₂ is elevated — consider a short ventilation.',
+        highHumidity: 'Indoor humidity is high and outdoor air is drier.',
+      },
+    },
     energy: {
       title: 'Energy',
       consumptionToday: 'Today',
@@ -120,6 +154,7 @@ export const en: Translations = {
       moonAltitude: 'Moon altitude',
       strongWind: 'Strong wind',
       hotOutdoor: 'High outdoor temperature',
+      highUv: 'High UV index',
       beaufortScale: [
         'Calm',
         'Light air',

@@ -1,7 +1,7 @@
 import { NightIcon, SunIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
-import { ColorIndicator } from '@/card-components'
+import { Unit } from '@/card-components'
 import WeatherIcon from '../WeatherIcon'
 import {
   HourColumn,
@@ -35,8 +35,8 @@ export const Hour: FC<{ fc: HourWeatherForecast; zoom: boolean; weekdayLabel: st
       ) : (
         <SunRow>
           <SunIcon size={SUN_ICON_SIZE} strokeWidth={designTokens.icon.strokeWidth} />
-          <span>{sunAltitude.toFixed(0)}°</span>
-          {sunAltitude > 40 ? <ColorIndicator instant={sunAltitude} range={sunAltitudeColorRange} /> : null}
+          <span>{fc.uv}</span>
+          <Unit>UVI</Unit>
         </SunRow>
       )}
       <IconSlot>

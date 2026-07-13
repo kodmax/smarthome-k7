@@ -32,7 +32,6 @@ export function weatherFeed(overrides?: Partial<WeatherFeed>): WeatherFeed {
       dusk: '2026-06-28T21:00:00',
       ...overrides?.sunTimes,
     },
-    pressure: { week: [], instant: 1013, ...overrides?.pressure },
     allergens: overrides?.allergens ?? [],
     forecast: overrides?.forecast ?? [],
     hourly: overrides?.hourly ?? [],

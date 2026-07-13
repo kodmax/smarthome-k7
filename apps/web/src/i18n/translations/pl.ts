@@ -69,6 +69,40 @@ export const pl: Translations = {
       editPreferences: 'Edytuj preferencje',
       copy: 'Kopiuj',
     },
+    hintExplanations: {
+      energyHighDraw: {
+        line1: 'Chwilowy pobór wynosi {value} W.',
+      },
+      hotBedroom: {
+        line1: 'Temperatura w sypialni wynosi {value}°C.',
+      },
+      strongWind: {
+        line1: 'Prędkość wiatru wynosi {value} m/s.',
+      },
+      hotOutdoor: {
+        line1: 'Temperatura na zewnątrz wynosi {value}°C.',
+      },
+      highUv: {
+        line1: 'Indeks UV wynosi {value}.',
+      },
+      hourlyRain: {
+        line1: 'Prawdopodobieństwo opadów wynosi do {value}%.',
+      },
+      hourlyHotOutdoor: {
+        line1: 'Temperatura w najbliższych godzinach sięgnie {value}°C.',
+      },
+      hourlyStrongWind: {
+        line1: 'Wiatr w najbliższych godzinach sięgnie {value} m/s.',
+      },
+      hourlyHighUv: {
+        line1: 'Indeks UV w najbliższych godzinach sięgnie {value}.',
+      },
+      ventilate: {
+        highCo2: 'Poziom CO₂ jest wysoki — przewietrzenie poprawi jakość powietrza.',
+        elevatedCo2: 'CO₂ jest podwyższone — rozważ krótkie przewietrzenie.',
+        highHumidity: 'Wilgotność w domu jest wysoka, a na dworze powietrze jest suchsze.',
+      },
+    },
     energy: {
       title: 'Energia',
       consumptionToday: 'Zużycie dziś',
@@ -120,6 +154,7 @@ export const pl: Translations = {
       moonAltitude: 'Wysokość księżyca',
       strongWind: 'Silny wiatr',
       hotOutdoor: 'Wysoka temperatura na zewnątrz',
+      highUv: 'Wysoki indeks UV',
       beaufortScale: [
         'Cisza, flauta',
         'Powiew',

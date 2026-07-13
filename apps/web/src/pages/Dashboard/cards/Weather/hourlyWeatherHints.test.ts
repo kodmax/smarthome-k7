@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { HourWeatherForecast } from '@repo/types'
-import { shouldShowHourlyHotHint, shouldShowHourlyRainHint, shouldShowHourlyWindHint } from './hourlyWeatherHints'
+import {
+  shouldShowHourlyHighUvHint,
+  shouldShowHourlyHotHint,
+  shouldShowHourlyRainHint,
+  shouldShowHourlyWindHint,
+} from './hourlyWeatherHints'
 
 const hour = (overrides: Partial<HourWeatherForecast>): HourWeatherForecast => ({
   precipIcon: 'rain.svg',
@@ -11,6 +16,7 @@ const hour = (overrides: Partial<HourWeatherForecast>): HourWeatherForecast => (
   date: '2026-07-13',
   sun: { altitude: 45, azimuth: 180 },
   wind: { direction: 'NE', speed: 3 },
+  uv: 0,
   ...overrides,
 })
 
@@ -84,5 +90,15 @@ describe('shouldShowHourlyWindHint', () => {
         hour({ wind: { direction: 'NE', speed: 2 } }),
       ]),
     ).toBe(false)
+  })
+})
+
+describe('shouldShowHourlyHighUvHint', () => {
+  it('shows hint when at least one of the next 3 hours reaches UV 7', () => {
+    expect(shouldShowHourlyHighUvHint([hour({ uv: 2 }), hour({ uv: 7 }), hour({ uv: 1 }), hour({ uv: 9 })])).toBe(true)
+  })
+
+  it('hides hint when UV stays below 7', () => {
+    expect(shouldShowHourlyHighUvHint([hour({ uv: 6.9 }), hour({ uv: 2 })])).toBe(false)
   })
 })

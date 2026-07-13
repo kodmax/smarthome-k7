@@ -105,6 +105,7 @@ describe('weather parsers', () => {
       precipIcon: 'rain.svg',
     })
     expect(hour.wind).toEqual({ direction: 'NE', speed: expect.closeTo(12 / 3.6) })
+    expect(hour.uv).toBe(8)
     expect(Number.isFinite(hour.sun.altitude)).toBe(true)
     expect(Number.isFinite(hour.sun.azimuth)).toBe(true)
   })

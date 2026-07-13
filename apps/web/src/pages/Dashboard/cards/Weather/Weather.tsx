@@ -1,9 +1,7 @@
-import { Box, TableBody } from '@mui/material'
+import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import { ThermometerSunIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
+import { ThermometerSunIcon, UVIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
 import { ApolloDataTable, HoursBars, Reading, TablePlaceholder } from '@/card-components'
-import { beaufortLevelLabel, beaufortScaleFromMetersPerSecond } from './beaufort'
-import { optimalHumidityRange } from './optimalHumidityRange'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { designTokens } from '@repo/design-tokens'
 import { ArrowUp } from 'lucide-react'
@@ -11,17 +9,18 @@ import { getPosition, getMoonPosition } from 'suncalc'
 import { useFeed } from '@repo/feed-client'
 import { WeatherFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
+import { CardHeadingHints, CardHintIcon, formatHintLine } from '../../hints'
+import { beaufortLevelLabel, beaufortScaleFromMetersPerSecond } from './beaufort'
+import { optimalHumidityRange } from './optimalHumidityRange'
 import { sunTimes } from './sunTimes'
-import { shouldShowHotOutdoorHint, shouldShowStrongWindHint } from './weatherHints'
-import { indicatorRed } from '../components/colorForValueInRange'
-
-const { icon, space } = designTokens
+import { shouldShowHighUvHint, shouldShowHotOutdoorHint, shouldShowStrongWindHint } from './weatherHints'
 
 export const Weather: FC<Record<string, never>> = () => {
   const zoom = useZoom('current-weather')
   const feed = useFeed<WeatherFeed>('weather')
   const { t } = useTranslations()
   const labels = t.dashboard.weather
+  const hintExplanations = t.dashboard.hintExplanations
 
   if (feed === undefined) {
     return (
@@ -41,6 +40,7 @@ export const Weather: FC<Record<string, never>> = () => {
 
   const showStrongWind = shouldShowStrongWindHint(feed.instant.wind.speed)
   const showHotOutdoor = shouldShowHotOutdoorHint(feed.instant.temp)
+  const showHighUv = shouldShowHighUvHint(feed.instant.uv)
 
   return (
     <ApolloCard
@@ -48,27 +48,33 @@ export const Weather: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={WeatherCardIcon}
       headingInfo={
-        showStrongWind || showHotOutdoor ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: space[1] }}>
+        showStrongWind || showHotOutdoor || showHighUv ? (
+          <CardHeadingHints>
             {showStrongWind ? (
-              <WindIcon
-                size={icon.sizeSm}
-                strokeWidth={icon.strokeWidth}
-                color='var(--mui-palette-info-main)'
-                glow='default'
-                aria-label={labels.strongWind}
+              <CardHintIcon
+                Icon={WindIcon}
+                variant='info'
+                title={labels.strongWind}
+                description={formatHintLine(hintExplanations.strongWind.line1, windSpeed.toFixed(0))}
               />
             ) : null}
             {showHotOutdoor ? (
-              <ThermometerSunIcon
-                size={icon.sizeSm}
-                strokeWidth={icon.strokeWidth}
-                color={indicatorRed}
-                glow='default'
-                aria-label={labels.hotOutdoor}
+              <CardHintIcon
+                Icon={ThermometerSunIcon}
+                variant='warning'
+                title={labels.hotOutdoor}
+                description={formatHintLine(hintExplanations.hotOutdoor.line1, Number(feed.instant.temp).toFixed(0))}
               />
             ) : null}
-          </Box>
+            {showHighUv ? (
+              <CardHintIcon
+                Icon={UVIcon}
+                variant='warning'
+                title={labels.highUv}
+                description={formatHintLine(hintExplanations.highUv.line1, feed.instant.uv.toFixed(1))}
+              />
+            ) : null}
+          </CardHeadingHints>
         ) : undefined
       }
     >

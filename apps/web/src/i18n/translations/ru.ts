@@ -69,6 +69,40 @@ export const ru: Translations = {
       editPreferences: 'Редактировать настройки',
       copy: 'Копировать',
     },
+    hintExplanations: {
+      energyHighDraw: {
+        line1: 'Мгновенная мощность составляет {value} Вт.',
+      },
+      hotBedroom: {
+        line1: 'Температура в спальне составляет {value}°C.',
+      },
+      strongWind: {
+        line1: 'Скорость ветра составляет {value} м/с.',
+      },
+      hotOutdoor: {
+        line1: 'Температура на улице составляет {value}°C.',
+      },
+      highUv: {
+        line1: 'Индекс УФ составляет {value}.',
+      },
+      hourlyRain: {
+        line1: 'Вероятность осадков достигает {value}%.',
+      },
+      hourlyHotOutdoor: {
+        line1: 'В ближайшие часы температура достигнет {value}°C.',
+      },
+      hourlyStrongWind: {
+        line1: 'В ближайшие часы ветер достигнет {value} м/с.',
+      },
+      hourlyHighUv: {
+        line1: 'В ближайшие часы индекс УФ достигнет {value}.',
+      },
+      ventilate: {
+        highCo2: 'Высокий уровень CO₂ — проветривание улучшит качество воздуха.',
+        elevatedCo2: 'Повышенный CO₂ — рассмотрите краткое проветривание.',
+        highHumidity: 'Высокая влажность в доме, а на улице воздух суше.',
+      },
+    },
     energy: {
       title: 'Энергия',
       consumptionToday: 'Сегодня',
@@ -120,6 +154,7 @@ export const ru: Translations = {
       moonAltitude: 'Высота луны',
       strongWind: 'Сильный ветер',
       hotOutdoor: 'Высокая температура на улице',
+      highUv: 'Высокий индекс УФ',
       beaufortScale: [
         'Штиль',
         'Тихий ветер',

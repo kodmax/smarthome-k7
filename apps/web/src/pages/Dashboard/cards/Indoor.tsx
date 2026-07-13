@@ -4,22 +4,21 @@ import { AirQualityIcon, AirVentIcon, AlertIcon } from '@repo/assets'
 
 import { ApolloDataTable, KnxReading, KnxStateIcon, Reading, TablePlaceholder } from '@/card-components'
 import { ApolloCard } from '@repo/apollo-card'
-import { designTokens } from '@repo/design-tokens'
 import { useFeed } from '@repo/feed-client'
 import { Co2Data, WeatherFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
-import { optimalHumidityRange } from './Weather/optimalHumidityRange'
-import { sunTimes } from './Weather/sunTimes'
+import { CardHeadingHints, CardHintIcon } from '../hints'
 import { shouldShowVentilateHint } from './Indoor/ventilateDecision'
 import { useVentilateDecision } from './Indoor/useVentilateDecision'
-
-const { icon } = designTokens
+import { optimalHumidityRange } from './Weather/optimalHumidityRange'
+import { sunTimes } from './Weather/sunTimes'
 
 export const Indoor: FC<Record<string, never>> = () => {
   const feed = useFeed<WeatherFeed>('weather')
   const ventilate = useVentilateDecision()
   const { t } = useTranslations()
   const labels = t.dashboard.indoor
+  const hintExplanations = t.dashboard.hintExplanations
 
   if (feed === undefined) {
     return (
@@ -30,6 +29,8 @@ export const Indoor: FC<Record<string, never>> = () => {
   }
 
   const sun = sunTimes(feed)
+  const showVentilate = shouldShowVentilateHint(ventilate.verdict)
+  const ventilateReasonKey = ventilate.reasonKey as keyof typeof hintExplanations.ventilate
 
   return (
     <ApolloCard
@@ -37,14 +38,15 @@ export const Indoor: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={AirQualityIcon}
       headingInfo={
-        shouldShowVentilateHint(ventilate.verdict) ? (
-          <AirVentIcon
-            size={icon.sizeSm}
-            strokeWidth={icon.strokeWidth}
-            color='var(--mui-palette-info-main)'
-            glow='default'
-            aria-label={labels.ventilate[ventilate.reasonKey]}
-          />
+        showVentilate ? (
+          <CardHeadingHints>
+            <CardHintIcon
+              Icon={AirVentIcon}
+              variant='info'
+              title={labels.ventilate[ventilate.reasonKey]}
+              description={hintExplanations.ventilate[ventilateReasonKey]}
+            />
+          </CardHeadingHints>
         ) : undefined
       }
     >

@@ -6,7 +6,7 @@ import { requireElements, requireText, withScraperSource } from '@/utils/scraper
 import { weatherPageUrls } from '../urls'
 import DateTime from '@/DateTime'
 import { CacheAgeUnit } from '@repo/apollo-ws'
-import { hourlyHourSelector, parseHourlyWind } from './parseHourlyHelpers'
+import { hourlyHourSelector, parseHourlyUv, parseHourlyWind } from './parseHourlyHelpers'
 
 export const parseHourlyFromDocument = (
   document: Document,
@@ -35,6 +35,7 @@ export const parseHourlyFromDocument = (
         hour,
         date,
         wind: parseHourlyWind(item),
+        uv: parseHourlyUv(item),
         sun: {
           altitude: (sunPosition.altitude / Math.PI) * 180,
           azimuth: (sunPosition.azimuth / Math.PI) * 180,

@@ -3,20 +3,18 @@ import { type FC, useCallback } from 'react'
 import { EnergyIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
-import { designTokens } from '@repo/design-tokens'
 import { ApolloDataTable, KnxReading, Reading, TablePlaceholder } from '@/card-components'
 import { EnergyFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
+import { CardHeadingHints, CardHintIcon, formatHintLine } from '../hints'
 import { shouldShowHighDrawHint } from './Energy/highDrawHint'
-import { indicatorRed } from './components/colorForValueInRange'
-
-const { icon } = designTokens
 
 export const Energy: FC<Record<string, never>> = () => {
   const zoom = useZoom('energy')
   const feed = useFeed<EnergyFeed>('energy')
   const { t } = useTranslations()
   const labels = t.dashboard.energy
+  const hintExplanations = t.dashboard.hintExplanations
 
   const onZoom = useCallback(() => {
     refreshFeeds(['energy', 'home.power-draw', 'home.energy-consumption.today'])
@@ -47,13 +45,17 @@ export const Energy: FC<Record<string, never>> = () => {
       onZoom={onZoom}
       headingInfo={
         shouldShowHighDrawHint(feed.instant.reading.value) ? (
-          <EnergyIcon
-            size={icon.sizeSm}
-            strokeWidth={icon.strokeWidth}
-            color={indicatorRed}
-            glow='default'
-            aria-label={labels.highDraw}
-          />
+          <CardHeadingHints>
+            <CardHintIcon
+              Icon={EnergyIcon}
+              variant='warning'
+              title={labels.highDraw}
+              description={formatHintLine(
+                hintExplanations.energyHighDraw.line1,
+                Number(feed.instant.reading.value).toLocaleString('en-PL', { maximumFractionDigits: 0 }),
+              )}
+            />
+          </CardHeadingHints>
         ) : undefined
       }
     >
