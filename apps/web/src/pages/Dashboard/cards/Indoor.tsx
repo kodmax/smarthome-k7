@@ -55,7 +55,6 @@ export const Indoor: FC<Record<string, never>> = () => {
           <Reading
             title={labels.airQuality}
             displayValue={String(feed.aq.aqi)}
-            unit='AQI'
             colorIndicatorRange={{ optimal: 0, highest: 150 }}
             value={feed.aq.aqi}
           />
