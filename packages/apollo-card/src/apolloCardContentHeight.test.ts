@@ -5,12 +5,12 @@ import { apolloCardContentHeight, apolloCardContentRowHeight, apolloCardRowHeigh
 const { font, space } = designTokens
 
 describe('apolloCardContentHeight', () => {
-  it('uses content row height, vertical padding, and a one pixel buffer', () => {
+  it('uses content row height, vertical padding, and a two pixel buffer', () => {
     expect(apolloCardRowHeight).toBe(Math.ceil(font.body.size * font.body.lineHeight))
     expect(apolloCardContentRowHeight).toBe(apolloCardRowHeight + 1)
 
     const rows = 4
-    const expected = rows * apolloCardContentRowHeight + space[3] * 2 + 1
+    const expected = rows * apolloCardContentRowHeight + space[3] * 2 + 2
 
     expect(apolloCardContentHeight(rows)).toBe(`${expected}px`)
   })

@@ -6,10 +6,12 @@ import {
   Actions,
   ApolloCardBottomFade,
   ApolloCardContent,
+  ApolloCardContentArea,
   ApolloCardHeader,
   ApolloCardHeadingInfo,
   ApolloCardRoot,
   ApolloCardTitle,
+  ApolloCardTopFade,
 } from './styled'
 import { ZoomCurtain } from './ZoomCurtain'
 
@@ -57,13 +59,16 @@ export const ApolloCard: FC<ApolloCardProps> = ({
             {zoom && actions !== undefined ? <Actions>{actions}</Actions> : null}
           </ApolloCardHeader>
 
-          <ApolloCardContent
-            rows={zoom ? undefined : height}
-            sx={zoom ? { flex: '1 1 auto', minHeight: 0, overflowY: 'auto' } : undefined}
-          >
-            {children}
-          </ApolloCardContent>
-          <ApolloCardBottomFade aria-hidden />
+          <ApolloCardContentArea zoom={zoom}>
+            <ApolloCardContent
+              rows={zoom ? undefined : height}
+              sx={zoom ? { flex: '1 1 auto', minHeight: 0, overflowY: 'auto' } : undefined}
+            >
+              {children}
+            </ApolloCardContent>
+            <ApolloCardTopFade aria-hidden />
+            <ApolloCardBottomFade aria-hidden />
+          </ApolloCardContentArea>
         </ApolloCardRoot>
       )}
     </ZoomCurtain>

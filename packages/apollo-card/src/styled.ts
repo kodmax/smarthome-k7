@@ -9,7 +9,7 @@ const CARD_CONTENT_PADDING_BOTTOM = space[3]
 const CARD_CONTENT_PADDING_X = space[4]
 
 const CARD_CONTENT_ROW_SLACK = 1
-const CARD_CONTENT_HEIGHT_BUFFER = 1
+const CARD_CONTENT_HEIGHT_BUFFER = 2
 
 export const apolloCardRowHeight = Math.ceil(font.body.size * font.body.lineHeight)
 export const apolloCardContentRowHeight = apolloCardRowHeight + CARD_CONTENT_ROW_SLACK
@@ -76,6 +76,23 @@ export const ApolloCardRoot = styled(Card, {
     : {
         maxHeight: '100%',
       }),
+}))
+
+export const ApolloCardContentArea = styled(Box, {
+  shouldForwardProp: prop => prop !== 'zoom',
+})<{ zoom?: boolean }>(({ zoom }) => ({
+  position: 'relative',
+  ...(zoom ? { flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column' } : {}),
+}))
+
+export const ApolloCardTopFade = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  insetInline: 0,
+  top: 0,
+  height: `${CARD_CONTENT_PADDING_TOP}px`,
+  pointerEvents: 'none',
+  zIndex: 1,
+  backgroundImage: `linear-gradient(180deg, ${theme.vars.palette.background.paper} 0%, color-mix(in srgb, ${theme.vars.palette.background.paper} 45%, transparent) 55%, transparent 100%)`,
 }))
 
 export const ApolloCardBottomFade = styled(Box)(({ theme }) => ({
