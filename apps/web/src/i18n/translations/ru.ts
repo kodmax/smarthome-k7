@@ -91,6 +91,21 @@ export const ru: Translations = {
       hourlyRain: {
         line1: 'Вероятность осадков достигает {value}%.',
       },
+      hourlySnow: {
+        line1: 'Вероятность осадков достигает {value}%.',
+      },
+      hourlyHail: {
+        line1: 'Вероятность осадков достигает {value}%.',
+      },
+      hourlySleet: {
+        line1: 'Вероятность осадков достигает {value}%.',
+      },
+      hourlyIce: {
+        line1: 'Вероятность осадков достигает {value}%.',
+      },
+      hourlyMixed: {
+        line1: 'Вероятность осадков достигает {value}%.',
+      },
       hourlyHotOutdoor: {
         line1: 'В ближайшие часы температура достигнет {value}°C.',
       },
@@ -183,7 +198,12 @@ export const ru: Translations = {
     },
     hourlyWeatherForecast: {
       title: 'Почасовой прогноз',
-      rainChance: 'Вероятность осадков в ближайшие часы',
+      rainChance: 'Вероятность дождя в ближайшие часы',
+      snowChance: 'Вероятность снега в ближайшие часы',
+      hailChance: 'Вероятность града в ближайшие часы',
+      sleetChance: 'Вероятность мокрого снега в ближайшие часы',
+      iceChance: 'Вероятность ледяного дождя в ближайшие часы',
+      mixedChance: 'Вероятность смешанных осадков в ближайшие часы',
     },
     jobs: {
       title: 'Вакансии',

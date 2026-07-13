@@ -3,6 +3,7 @@ import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
 import { Unit } from '@/card-components'
 import WeatherIcon from '../WeatherIcon'
+import { precipTypeIcon } from '../precipTypeIcons'
 import {
   HourColumn,
   IconSlot,
@@ -20,10 +21,9 @@ const formatHourDisplay = (hour: string): string => (hour.includes(':') ? hour :
 const sunAltitudeColorRange = { lowest: -6, optimal: 30, highest: 50 } as const
 const civilTwilightAltitude = sunAltitudeColorRange.lowest
 
-const HOURLY_PRECIP_ICON = 'drop-icon.svg'
-
 export const Hour: FC<{ fc: HourWeatherForecast; zoom: boolean; weekdayLabel: string }> = ({ fc, weekdayLabel }) => {
   const sunAltitude = Number(fc.sun.altitude)
+  const PrecipIcon = precipTypeIcon(fc.precipType)
 
   return (
     <HourColumn>
@@ -46,8 +46,8 @@ export const Hour: FC<{ fc: HourWeatherForecast; zoom: boolean; weekdayLabel: st
       </IconSlot>
       <RowText>{Number(fc.temp).toFixed(0)} °C</RowText>
       <PrecipRow>
-        <WeatherIcon icon={HOURLY_PRECIP_ICON} width={`${PRECIP_ICON_SIZE}px`} height={`${PRECIP_ICON_SIZE}px`} />
-        <span> {fc.precip}</span>
+        <PrecipIcon size={PRECIP_ICON_SIZE} strokeWidth={designTokens.icon.strokeWidth} />
+        <span>{fc.precip}</span>
       </PrecipRow>
     </HourColumn>
   )

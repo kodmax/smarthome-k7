@@ -91,6 +91,21 @@ export const pl: Translations = {
       hourlyRain: {
         line1: 'Prawdopodobieństwo opadów wynosi do {value}%.',
       },
+      hourlySnow: {
+        line1: 'Prawdopodobieństwo opadów wynosi do {value}%.',
+      },
+      hourlyHail: {
+        line1: 'Prawdopodobieństwo opadów wynosi do {value}%.',
+      },
+      hourlySleet: {
+        line1: 'Prawdopodobieństwo opadów wynosi do {value}%.',
+      },
+      hourlyIce: {
+        line1: 'Prawdopodobieństwo opadów wynosi do {value}%.',
+      },
+      hourlyMixed: {
+        line1: 'Prawdopodobieństwo opadów wynosi do {value}%.',
+      },
       hourlyHotOutdoor: {
         line1: 'Temperatura w najbliższych godzinach sięgnie {value}°C.',
       },
@@ -183,7 +198,12 @@ export const pl: Translations = {
     },
     hourlyWeatherForecast: {
       title: 'Prognoza godzinowa',
-      rainChance: 'Szansa na opady w najbliższych godzinach',
+      rainChance: 'Szansa na deszcz w najbliższych godzinach',
+      snowChance: 'Szansa na śnieg w najbliższych godzinach',
+      hailChance: 'Szansa na grad w najbliższych godzinach',
+      sleetChance: 'Szansa na deszcz ze śniegiem w najbliższych godzinach',
+      iceChance: 'Szansa na marznący deszcz w najbliższych godzinach',
+      mixedChance: 'Szansa na mieszane opady w najbliższych godzinach',
     },
     jobs: {
       title: 'Oferty pracy',

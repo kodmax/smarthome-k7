@@ -7,6 +7,7 @@ export const iconStyles = {
   air: { color: paletteMain('air') },
   temperature: { color: paletteMain('temperature') },
   weather: { color: paletteMain('info') },
+  error: { color: paletteMain('error') },
   media: { color: paletteMain('media') },
   warning: { color: paletteMain('warning') },
   neutral: { color: 'var(--mui-palette-text-primary)' },

@@ -1,31 +1,44 @@
 import { type FC } from 'react'
-import {
-  CoolingIcon,
-  RainIcon,
-  ThermometerSunIcon,
-  UVIcon,
-  WeatherIcon as WeatherCardIcon,
-  WindIcon,
-} from '@repo/assets'
+import { CoolingIcon, ThermometerSunIcon, UVIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
 import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { HourWeatherForecast, WeatherFeed } from '@repo/types'
 import { formatIsoWeekdayShort, useTranslations } from '@/i18n'
 import { CardHeadingHints, CardHintIcon, formatHintLine } from '../../../hints'
 import {
-  maxHourlyPrecipPercent,
+  maxHourlyPrecipPercentForType,
   maxHourlyTemp,
   maxHourlyUv,
   maxHourlyWindSpeed,
   minHourlyTemp,
+  shouldShowAnyHourlyPrecipHint,
   shouldShowHourlyFrostHint,
   shouldShowHourlyHighUvHint,
   shouldShowHourlyHotHint,
-  shouldShowHourlyRainHint,
+  shouldShowHourlyPrecipHint,
   shouldShowHourlyWindHint,
 } from '../hourlyWeatherHints'
+import { PRECIP_HINT_TYPES, precipHintVariant, precipTypeIcon } from '../precipTypeIcons'
 import { ForecastRow, ScrollArea } from './styled'
 import { Hour } from './Hour'
+
+const hourlyPrecipHintKey = {
+  rain: 'hourlyRain',
+  snow: 'hourlySnow',
+  hail: 'hourlyHail',
+  sleet: 'hourlySleet',
+  ice: 'hourlyIce',
+  mixed: 'hourlyMixed',
+} as const
+
+const hourlyPrecipTitleKey = {
+  rain: 'rainChance',
+  snow: 'snowChance',
+  hail: 'hailChance',
+  sleet: 'sleetChance',
+  ice: 'iceChance',
+  mixed: 'mixedChance',
+} as const
 
 export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
   const zoom = useZoom('hourly-weather-forecast')
@@ -36,7 +49,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
   const hintExplanations = t.dashboard.hintExplanations
   const hourly = forecast?.hourly
 
-  const showRain = shouldShowHourlyRainHint(hourly)
+  const showPrecip = shouldShowAnyHourlyPrecipHint(hourly)
   const showHot = shouldShowHourlyHotHint(hourly)
   const showWind = shouldShowHourlyWindHint(hourly)
   const showHighUv = shouldShowHourlyHighUvHint(hourly)
@@ -49,16 +62,22 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
       icon={WeatherCardIcon}
       height={6}
       headingInfo={
-        showRain || showHot || showWind || showHighUv || showFrost ? (
+        showPrecip || showHot || showWind || showHighUv || showFrost ? (
           <CardHeadingHints>
-            {showRain ? (
-              <CardHintIcon
-                Icon={RainIcon}
-                variant='info'
-                title={labels.rainChance}
-                description={formatHintLine(hintExplanations.hourlyRain.line1, String(maxHourlyPrecipPercent(hourly)))}
-              />
-            ) : null}
+            {PRECIP_HINT_TYPES.map(precipType =>
+              shouldShowHourlyPrecipHint(hourly, precipType) ? (
+                <CardHintIcon
+                  key={precipType}
+                  Icon={precipTypeIcon(precipType)}
+                  variant={precipHintVariant(precipType)}
+                  title={labels[hourlyPrecipTitleKey[precipType]]}
+                  description={formatHintLine(
+                    hintExplanations[hourlyPrecipHintKey[precipType]].line1,
+                    String(maxHourlyPrecipPercentForType(hourly, precipType)),
+                  )}
+                />
+              ) : null,
+            )}
             {showHot ? (
               <CardHintIcon
                 Icon={ThermometerSunIcon}

@@ -53,6 +53,10 @@ export const RowText = styled(Box)({
 })
 
 export const PrecipRow = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: space[1],
   fontSize: ROW_FONT_SIZE,
   lineHeight: 1.2,
 })

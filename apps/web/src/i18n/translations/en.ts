@@ -91,6 +91,21 @@ export const en: Translations = {
       hourlyRain: {
         line1: 'Precipitation chance reaches up to {value}%.',
       },
+      hourlySnow: {
+        line1: 'Precipitation chance reaches up to {value}%.',
+      },
+      hourlyHail: {
+        line1: 'Precipitation chance reaches up to {value}%.',
+      },
+      hourlySleet: {
+        line1: 'Precipitation chance reaches up to {value}%.',
+      },
+      hourlyIce: {
+        line1: 'Precipitation chance reaches up to {value}%.',
+      },
+      hourlyMixed: {
+        line1: 'Precipitation chance reaches up to {value}%.',
+      },
       hourlyHotOutdoor: {
         line1: 'Temperature in the next few hours will reach {value}°C.',
       },
@@ -184,6 +199,11 @@ export const en: Translations = {
     hourlyWeatherForecast: {
       title: 'Hourly forecast',
       rainChance: 'Rain chance in the next hours',
+      snowChance: 'Snow chance in the next hours',
+      hailChance: 'Hail chance in the next hours',
+      sleetChance: 'Sleet chance in the next hours',
+      iceChance: 'Freezing rain chance in the next hours',
+      mixedChance: 'Mixed precipitation chance in the next hours',
     },
     jobs: {
       title: 'Job offers',

@@ -75,6 +75,11 @@ export type Translations = {
       highUv: { line1: string }
       frost: { line1: string }
       hourlyRain: { line1: string }
+      hourlySnow: { line1: string }
+      hourlyHail: { line1: string }
+      hourlySleet: { line1: string }
+      hourlyIce: { line1: string }
+      hourlyMixed: { line1: string }
       hourlyHotOutdoor: { line1: string }
       hourlyStrongWind: { line1: string }
       hourlyHighUv: { line1: string }
@@ -160,6 +165,11 @@ export type Translations = {
     hourlyWeatherForecast: {
       title: string
       rainChance: string
+      snowChance: string
+      hailChance: string
+      sleetChance: string
+      iceChance: string
+      mixedChance: string
     }
     jobs: {
       title: string

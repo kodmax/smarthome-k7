@@ -7,7 +7,11 @@ import {
   ChartNoAxesColumnIncreasing,
   CircleCheck,
   Clapperboard,
+  CloudDrizzle,
+  CloudHail,
   CloudRain,
+  CloudRainWind,
+  CloudSnow,
   CloudSun,
   Cog,
   Copy,
@@ -69,6 +73,10 @@ export const AirQualityIcon = createStyledIcon(Leaf, iconStyles.air)
 export const WindIcon = createStyledIcon(Wind, iconStyles.weather)
 export const WeatherIcon = createStyledIcon(CloudSun, iconStyles.weather)
 export const RainIcon = createStyledIcon(CloudRain, iconStyles.weather)
+export const SnowIcon = createStyledIcon(CloudSnow, iconStyles.weather)
+export const HailIcon = createStyledIcon(CloudHail, iconStyles.error)
+export const SleetIcon = createStyledIcon(CloudDrizzle, iconStyles.weather)
+export const MixedPrecipIcon = createStyledIcon(CloudRainWind, iconStyles.weather)
 export const SunIcon = createStyledIcon(Sun, iconStyles.warning)
 export const NightIcon = createStyledIcon(Moon, iconStyles.weather)
 export const UVIcon = createStyledIcon(SunMedium, iconStyles.warning)
