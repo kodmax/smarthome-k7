@@ -1,20 +1,20 @@
-import { designTokens } from '@repo/design-tokens'
 import { apolloCardRowHeight } from '@repo/apollo-card'
+import { designTokens } from '@repo/design-tokens'
 import { Table, TableCell, TableRow, styled } from '@mui/material'
 
 const { font } = designTokens
-
-export const apolloDataTableRowHeight = apolloCardRowHeight
 
 export const ApolloDataTable = styled(Table)(({ theme }) => ({
   borderSpacing: 0,
   width: '100%',
   fontSize: font.body.size,
-  lineHeight: font.body.lineHeight,
+  lineHeight: `${apolloCardRowHeight}px`,
   color: theme.vars.palette.text.primary,
 }))
 
-export const ApolloTableRow = styled(TableRow)({})
+export const ApolloTableRow = styled(TableRow)({
+  height: `${apolloCardRowHeight}px`,
+})
 
 export const ApolloTableCell = styled(TableCell)(({ theme }) => ({
   borderBottom: 'none',

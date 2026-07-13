@@ -10,7 +10,6 @@ import {
   ApolloCardHeadingInfo,
   ApolloCardRoot,
   ApolloCardTitle,
-  apolloCardContentHeight,
 } from './styled'
 import { ZoomCurtain } from './ZoomCurtain'
 
@@ -59,9 +58,8 @@ export const ApolloCard: FC<ApolloCardProps> = ({
           </ApolloCardHeader>
 
           <ApolloCardContent
-            sx={
-              zoom ? { flex: '1 1 auto', minHeight: 0, overflowY: 'auto' } : { height: apolloCardContentHeight(height) }
-            }
+            rows={zoom ? undefined : height}
+            sx={zoom ? { flex: '1 1 auto', minHeight: 0, overflowY: 'auto' } : undefined}
           >
             {children}
           </ApolloCardContent>

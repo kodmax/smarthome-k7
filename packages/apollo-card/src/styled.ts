@@ -8,10 +8,14 @@ const CARD_CONTENT_PADDING_TOP = space[3]
 const CARD_CONTENT_PADDING_BOTTOM = space[3]
 const CARD_CONTENT_PADDING_X = space[4]
 
-export const apolloCardRowHeight = font.body.size * font.body.lineHeight
+const CARD_CONTENT_ROW_SLACK = 1
+const CARD_CONTENT_HEIGHT_BUFFER = 1
+
+export const apolloCardRowHeight = Math.ceil(font.body.size * font.body.lineHeight)
+export const apolloCardContentRowHeight = apolloCardRowHeight + CARD_CONTENT_ROW_SLACK
 
 export const apolloCardContentHeight = (rows: number) =>
-  `${Math.round(rows * apolloCardRowHeight + CARD_CONTENT_PADDING_TOP + CARD_CONTENT_PADDING_BOTTOM)}px`
+  `${rows * apolloCardContentRowHeight + CARD_CONTENT_PADDING_TOP + CARD_CONTENT_PADDING_BOTTOM + CARD_CONTENT_HEIGHT_BUFFER}px`
 
 export const ApolloCardHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -84,9 +88,14 @@ export const ApolloCardBottomFade = styled(Box)(({ theme }) => ({
   backgroundImage: `linear-gradient(180deg, transparent 0%, color-mix(in srgb, ${theme.vars.palette.background.paper} 45%, transparent) 45%, ${theme.vars.palette.background.paper} 100%)`,
 }))
 
-export const ApolloCardContent = styled(CardContent)({
+export const ApolloCardContent = styled(CardContent, {
+  shouldForwardProp: prop => prop !== 'rows',
+})<{ rows?: number }>(({ rows }) => ({
   boxSizing: 'border-box',
   overflowY: 'auto',
   fontSize: designTokens.font.body.size,
+  WebkitTextSizeAdjust: '100%',
+  textSizeAdjust: '100%',
   padding: `${CARD_CONTENT_PADDING_TOP}px ${CARD_CONTENT_PADDING_X}px ${CARD_CONTENT_PADDING_BOTTOM}px`,
-})
+  ...(rows !== undefined ? { height: apolloCardContentHeight(rows) } : {}),
+}))
