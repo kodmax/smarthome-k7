@@ -30,23 +30,23 @@ export const Dashboard: FC<Record<string, never>> = () => {
           <Grid size={{ xs: 12, md: 6, xl: 3 }} sx={dashboardMdOrder(4)}>
             <Weather />
           </Grid>
-          <Grid size={12} sx={dashboardMdOrder(5)}>
-            <WeatherForecast />
-          </Grid>
           <Grid size={{ xs: 12, md: 6, xl: 4 }} sx={dashboardMdOrder(7)}>
-            <TopTorrents />
+            <StockMarket />
           </Grid>
-          <Grid size={{ xs: 12, xl: 8 }} sx={dashboardMdOrder(6)}>
+          <Grid size={{ xs: 12, xl: 8 }} sx={dashboardMdOrder(5)}>
             <HourlyWeatherForecast />
+          </Grid>
+          <Grid size={12} sx={dashboardMdOrder(6)}>
+            <WeatherForecast />
           </Grid>
           <Grid size={{ xs: 12, md: 6, xl: 4 }} sx={dashboardMdOrder(8)}>
             <Jobs />
           </Grid>
           <Grid size={{ xs: 12, md: 6, xl: 4 }} sx={dashboardMdOrder(9)}>
-            <StockMarket />
+            <News />
           </Grid>
           <Grid size={{ xs: 12, md: 6, xl: 4 }} sx={dashboardMdOrder(10)}>
-            <News />
+            <TopTorrents />
           </Grid>
         </Grid>
       </ZoomStateProvider>
