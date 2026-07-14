@@ -7,7 +7,7 @@ import { useFeed } from '@repo/feed-client'
 import type { LucideIcon } from 'lucide-react'
 import { HomeTempFeedData, TemperatureData } from '@repo/types'
 import { useTranslations } from '@/i18n'
-import { CardHeadingHints, CardHintIcon, formatHintLine } from '../hints'
+import { CardHeadingHints, CardHintIcon, formatHintLine } from '@/app/hints'
 import { shouldShowHotBedroomHint } from './Temperature/hotBedroomHint'
 
 const icons: Record<string, LucideIcon> = {
@@ -37,7 +37,7 @@ export const Temperature: FC<Record<string, never>> = () => {
               Icon={FanIcon}
               variant='info'
               title={labels.hotBedroom}
-              description={formatHintLine(hintExplanations.hotBedroom.line1, Number(bedroomTemp).toFixed(1))}
+              description={formatHintLine(hintExplanations.hotBedroom.line1, Number(bedroomTemp), 1)}
             />
           </CardHeadingHints>
         ) : undefined

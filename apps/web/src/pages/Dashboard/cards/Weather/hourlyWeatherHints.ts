@@ -1,9 +1,13 @@
 import type { HourWeatherForecast, PrecipType } from '@repo/types'
+import {
+  FROST_MAX_C,
+  HIGH_UV_MIN,
+  HOURLY_LOOKAHEAD,
+  HOT_OUTDOOR_MIN_C,
+  PRECIP_CHANCE_MIN_PERCENT,
+  STRONG_WIND_MIN_MS,
+} from '@/app/hints/hintShowThresholds'
 import { type PrecipHintType, PRECIP_HINT_TYPES } from './precipTypeIcons'
-import { FROST_MAX_C, HIGH_UV_MIN, HOT_OUTDOOR_MIN_C, STRONG_WIND_MIN_MS } from './weatherHints'
-
-export const HOURLY_LOOKAHEAD = 3
-export const PRECIP_CHANCE_MIN_PERCENT = 51
 
 const parsePrecipPercent = (precip: string): number => Number.parseFloat(precip.replace('%', '').trim())
 

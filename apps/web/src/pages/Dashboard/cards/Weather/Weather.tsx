@@ -9,7 +9,7 @@ import { getPosition, getMoonPosition } from 'suncalc'
 import { useFeed } from '@repo/feed-client'
 import { WeatherFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
-import { CardHeadingHints, CardHintIcon, formatHintLine } from '../../hints'
+import { CardHeadingHints, CardHintIcon, formatHintLine } from '@/app/hints'
 import { beaufortLevelLabel, beaufortScaleFromMetersPerSecond } from './beaufort'
 import { optimalHumidityRange } from './optimalHumidityRange'
 import { sunTimes } from './sunTimes'
@@ -61,7 +61,7 @@ export const Weather: FC<Record<string, never>> = () => {
                 Icon={WindIcon}
                 variant='info'
                 title={labels.strongWind}
-                description={formatHintLine(hintExplanations.strongWind.line1, windSpeed.toFixed(0))}
+                description={formatHintLine(hintExplanations.strongWind.line1, windSpeed, 0)}
               />
             ) : null}
             {showHotOutdoor ? (
@@ -69,7 +69,7 @@ export const Weather: FC<Record<string, never>> = () => {
                 Icon={ThermometerSunIcon}
                 variant='warning'
                 title={labels.hotOutdoor}
-                description={formatHintLine(hintExplanations.hotOutdoor.line1, Number(feed.instant.temp).toFixed(0))}
+                description={formatHintLine(hintExplanations.hotOutdoor.line1, Number(feed.instant.temp), 0)}
               />
             ) : null}
             {showHighUv ? (
@@ -77,7 +77,7 @@ export const Weather: FC<Record<string, never>> = () => {
                 Icon={UVIcon}
                 variant='warning'
                 title={labels.highUv}
-                description={formatHintLine(hintExplanations.highUv.line1, feed.instant.uv.toFixed(1))}
+                description={formatHintLine(hintExplanations.highUv.line1, feed.instant.uv, 1)}
               />
             ) : null}
             {showFrost ? (
@@ -85,7 +85,7 @@ export const Weather: FC<Record<string, never>> = () => {
                 Icon={CoolingIcon}
                 variant='info'
                 title={labels.frost}
-                description={formatHintLine(hintExplanations.frost.line1, Number(feed.instant.temp).toFixed(0))}
+                description={formatHintLine(hintExplanations.frost.line1, Number(feed.instant.temp), 0)}
               />
             ) : null}
           </CardHeadingHints>

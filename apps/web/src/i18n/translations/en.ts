@@ -135,7 +135,7 @@ export const en: Translations = {
       avgMonthlyConsumption: 'Monthly avg.',
       avgMonthlyCost: 'Monthly cost',
       instantDraw: 'Live draw',
-      highDraw: 'High draw',
+      highDraw: 'High power draw',
     },
     indoor: {
       title: 'Air quality',

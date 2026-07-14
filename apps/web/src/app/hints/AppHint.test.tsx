@@ -1,9 +1,10 @@
 import { act, renderWithTheme } from '@/test/test-utils'
+import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CardHintOverlay } from './CardHintOverlay'
-import type { ActiveCardHint } from './cardHintTypes'
+import type { ActiveAppHint } from './appHintTypes'
+import { AppHintView } from './AppHint'
 
-const hintA: ActiveCardHint = {
+const hintA: ActiveAppHint = {
   id: 1,
   content: {
     title: 'Pierwszy hint',
@@ -12,7 +13,7 @@ const hintA: ActiveCardHint = {
   },
 }
 
-const hintB: ActiveCardHint = {
+const hintB: ActiveAppHint = {
   id: 2,
   content: {
     title: 'Drugi hint',
@@ -21,7 +22,7 @@ const hintB: ActiveCardHint = {
   },
 }
 
-describe('CardHintOverlay', () => {
+describe('AppHint', () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
@@ -33,7 +34,7 @@ describe('CardHintOverlay', () => {
   it('calls onDismiss after the dismiss delay', () => {
     const onDismiss = vi.fn()
 
-    renderWithTheme(<CardHintOverlay hint={hintA} dismissMs={8_000} onDismiss={onDismiss} />)
+    renderWithTheme(<AppHintView hint={hintA} dismissMs={8_000} onDismiss={onDismiss} />)
 
     act(() => {
       vi.advanceTimersByTime(8_000)
@@ -45,13 +46,13 @@ describe('CardHintOverlay', () => {
   it('resets the dismiss timer when a new hint replaces the current one', () => {
     const onDismiss = vi.fn()
 
-    const { rerender } = renderWithTheme(<CardHintOverlay hint={hintA} dismissMs={8_000} onDismiss={onDismiss} />)
+    const { rerender } = renderWithTheme(<AppHintView hint={hintA} dismissMs={8_000} onDismiss={onDismiss} />)
 
     act(() => {
       vi.advanceTimersByTime(7_000)
     })
 
-    rerender(<CardHintOverlay hint={hintB} dismissMs={8_000} onDismiss={onDismiss} />)
+    rerender(<AppHintView hint={hintB} dismissMs={8_000} onDismiss={onDismiss} />)
 
     act(() => {
       vi.advanceTimersByTime(7_000)
@@ -62,6 +63,16 @@ describe('CardHintOverlay', () => {
     act(() => {
       vi.advanceTimersByTime(1_000)
     })
+
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onDismiss when the hint card is clicked', () => {
+    const onDismiss = vi.fn()
+
+    renderWithTheme(<AppHintView hint={hintA} dismissMs={8_000} onDismiss={onDismiss} />)
+
+    fireEvent.click(screen.getByRole('status'))
 
     expect(onDismiss).toHaveBeenCalledTimes(1)
   })

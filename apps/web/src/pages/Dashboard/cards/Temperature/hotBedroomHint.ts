@@ -1,4 +1,4 @@
-export const BEDROOM_HOT_MIN_C = 28
+import { BEDROOM_HOT_MIN_C } from '@/app/hints/hintShowThresholds'
 
 export const shouldShowHotBedroomHint = (tempC: number | undefined): boolean =>
   tempC !== undefined && tempC >= BEDROOM_HOT_MIN_C

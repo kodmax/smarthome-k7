@@ -135,7 +135,7 @@ export const pl: Translations = {
       avgMonthlyConsumption: 'Śr. zużycie msc',
       avgMonthlyCost: 'Śr. koszt za msc',
       instantDraw: 'Chwilowy pobór',
-      highDraw: 'Wysokie pobieranie',
+      highDraw: 'Wysoki pobór mocy',
     },
     indoor: {
       title: 'Jakość powietrza',

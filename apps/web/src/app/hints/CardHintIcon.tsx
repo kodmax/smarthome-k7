@@ -3,7 +3,7 @@ import type { StyledIconProps, StyledLucideIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
 import { type FC, type MouseEvent } from 'react'
 import { cardHintIconColor, type CardHintIconVariant } from './cardHintIconPresets'
-import { useCardHint } from './useCardHint'
+import { useAppHint } from './useAppHint'
 
 const { icon } = designTokens
 
@@ -15,7 +15,7 @@ export type CardHintIconProps = {
 }
 
 export const CardHintIcon: FC<CardHintIconProps> = ({ Icon, variant, title, description }) => {
-  const { showHint } = useCardHint()
+  const { showHint } = useAppHint()
   const iconProps: StyledIconProps = {
     size: icon.sizeSm,
     strokeWidth: icon.strokeWidth,

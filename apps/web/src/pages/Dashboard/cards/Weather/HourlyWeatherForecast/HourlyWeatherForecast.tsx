@@ -4,7 +4,7 @@ import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { HourWeatherForecast, WeatherFeed } from '@repo/types'
 import { formatIsoWeekdayShort, useTranslations } from '@/i18n'
-import { CardHeadingHints, CardHintIcon, formatHintLine } from '../../../hints'
+import { CardHeadingHints, CardHintIcon, formatHintLine } from '@/app/hints'
 import {
   maxHourlyPrecipPercentForType,
   maxHourlyTemp,
@@ -73,7 +73,8 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
                   title={labels[hourlyPrecipTitleKey[precipType]]}
                   description={formatHintLine(
                     hintExplanations[hourlyPrecipHintKey[precipType]].line1,
-                    String(maxHourlyPrecipPercentForType(hourly, precipType)),
+                    maxHourlyPrecipPercentForType(hourly, precipType),
+                    0,
                   )}
                 />
               ) : null,
@@ -83,7 +84,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
                 Icon={ThermometerSunIcon}
                 variant='warning'
                 title={weatherLabels.hotOutdoor}
-                description={formatHintLine(hintExplanations.hourlyHotOutdoor.line1, maxHourlyTemp(hourly).toFixed(0))}
+                description={formatHintLine(hintExplanations.hourlyHotOutdoor.line1, maxHourlyTemp(hourly), 0)}
               />
             ) : null}
             {showWind ? (
@@ -91,10 +92,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
                 Icon={WindIcon}
                 variant='info'
                 title={weatherLabels.strongWind}
-                description={formatHintLine(
-                  hintExplanations.hourlyStrongWind.line1,
-                  maxHourlyWindSpeed(hourly).toFixed(0),
-                )}
+                description={formatHintLine(hintExplanations.hourlyStrongWind.line1, maxHourlyWindSpeed(hourly), 0)}
               />
             ) : null}
             {showHighUv ? (
@@ -102,7 +100,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
                 Icon={UVIcon}
                 variant='warning'
                 title={weatherLabels.highUv}
-                description={formatHintLine(hintExplanations.hourlyHighUv.line1, maxHourlyUv(hourly).toFixed(1))}
+                description={formatHintLine(hintExplanations.hourlyHighUv.line1, maxHourlyUv(hourly), 1)}
               />
             ) : null}
             {showFrost ? (
@@ -110,7 +108,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
                 Icon={CoolingIcon}
                 variant='info'
                 title={weatherLabels.frost}
-                description={formatHintLine(hintExplanations.hourlyFrost.line1, minHourlyTemp(hourly).toFixed(0))}
+                description={formatHintLine(hintExplanations.hourlyFrost.line1, minHourlyTemp(hourly), 0)}
               />
             ) : null}
           </CardHeadingHints>

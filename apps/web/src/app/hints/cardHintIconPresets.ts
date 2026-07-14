@@ -1,4 +1,4 @@
-import { indicatorRed } from '../cards/components/colorForValueInRange'
+import { indicatorRed } from '@/pages/Dashboard/cards/components/colorForValueInRange'
 
 export type CardHintIconVariant = 'info' | 'warning'
 

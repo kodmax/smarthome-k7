@@ -6,7 +6,7 @@ import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { ApolloDataTable, KnxReading, Reading, TablePlaceholder } from '@/card-components'
 import { EnergyFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
-import { CardHeadingHints, CardHintIcon, formatHintLine } from '../hints'
+import { CardHeadingHints, CardHintIcon, formatHintLine } from '@/app/hints'
 import { shouldShowHighDrawHint } from './Energy/highDrawHint'
 
 export const Energy: FC<Record<string, never>> = () => {
@@ -50,10 +50,7 @@ export const Energy: FC<Record<string, never>> = () => {
               Icon={EnergyIcon}
               variant='warning'
               title={labels.highDraw}
-              description={formatHintLine(
-                hintExplanations.energyHighDraw.line1,
-                Number(feed.instant.reading.value).toLocaleString('en-PL', { maximumFractionDigits: 0 }),
-              )}
+              description={formatHintLine(hintExplanations.energyHighDraw.line1, Number(feed.instant.reading.value), 0)}
             />
           </CardHeadingHints>
         ) : undefined
