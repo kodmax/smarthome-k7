@@ -11,7 +11,9 @@ import {
   PrecipRow,
   RowText,
   SUN_ICON_SIZE,
+  SunIconSlot,
   SunRow,
+  SunUvLabel,
   WEATHER_ICON_SIZE,
 } from './styled'
 import { HourWeatherForecast } from '@repo/types'
@@ -32,13 +34,19 @@ export const Hour: FC<{ fc: HourWeatherForecast; zoom: boolean; weekdayLabel: st
       </RowText>
       {sunAltitude < civilTwilightAltitude ? (
         <SunRow>
-          <NightIcon size={SUN_ICON_SIZE} strokeWidth={designTokens.icon.strokeWidth} />
+          <SunIconSlot>
+            <NightIcon size={SUN_ICON_SIZE} strokeWidth={designTokens.icon.strokeWidth} />
+          </SunIconSlot>
         </SunRow>
       ) : (
         <SunRow>
-          <SunIcon size={SUN_ICON_SIZE} strokeWidth={designTokens.icon.strokeWidth} />
-          <span>{fc.uv}</span>
-          <Unit>UVI</Unit>
+          <SunIconSlot>
+            <SunIcon size={SUN_ICON_SIZE} strokeWidth={designTokens.icon.strokeWidth} />
+          </SunIconSlot>
+          <SunUvLabel>
+            <span>{fc.uv}</span>
+            <Unit>UVI</Unit>
+          </SunUvLabel>
         </SunRow>
       )}
       <IconSlot>
