@@ -1,5 +1,6 @@
 import { Box, Card, CardContent, Typography, styled } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
+import { apolloCardHeaderMinHeight } from './cardHeaderLayout'
 import { ZOOM_SCALE } from './ZoomCurtain/zoomConstants'
 
 const { font, space } = designTokens
@@ -21,6 +22,7 @@ export const ApolloCardHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: designTokens.space[2],
+  minHeight: apolloCardHeaderMinHeight,
   padding: '12px 12px 12px 16px',
   paddingBottom: designTokens.space[2],
   borderBottom: `${designTokens.borderWidth.hairline}px solid ${theme.vars.palette.cardHeaderBorder.main}`,

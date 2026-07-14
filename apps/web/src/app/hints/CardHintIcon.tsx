@@ -1,11 +1,9 @@
 import { IconButton } from '@mui/material'
 import type { StyledIconProps, StyledLucideIcon } from '@repo/assets'
-import { designTokens } from '@repo/design-tokens'
+import { apolloCardHintIconSize, apolloCardHintIconStrokeWidth } from '@repo/apollo-card'
 import { type FC, type MouseEvent } from 'react'
 import { cardHintIconColor, type CardHintIconVariant } from './cardHintIconPresets'
 import { useAppHint } from './useAppHint'
-
-const { icon } = designTokens
 
 export type CardHintIconProps = {
   Icon: StyledLucideIcon
@@ -17,8 +15,8 @@ export type CardHintIconProps = {
 export const CardHintIcon: FC<CardHintIconProps> = ({ Icon, variant, title, description }) => {
   const { showHint } = useAppHint()
   const iconProps: StyledIconProps = {
-    size: icon.sizeSm,
-    strokeWidth: icon.strokeWidth,
+    size: apolloCardHintIconSize,
+    strokeWidth: apolloCardHintIconStrokeWidth,
     color: cardHintIconColor(variant),
     glow: 'default',
     'aria-hidden': true,

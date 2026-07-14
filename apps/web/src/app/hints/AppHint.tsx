@@ -1,10 +1,11 @@
 import { Box, Fade, Portal, Slide, Typography } from '@mui/material'
 import { below2xlSideMenuScaleMediaQuery, designTokens, scaleBelow2xl } from '@repo/design-tokens'
+import { apolloCardHintIconSize } from '@repo/apollo-card'
 import { type FC, useEffect, useState } from 'react'
 import { APP_HINT_AUTO_DISMISS_MS, type ActiveAppHint } from './appHintTypes'
 import { useAppHint } from './useAppHint'
 
-const { font, icon, space } = designTokens
+const { font, space } = designTokens
 
 const HINT_Z_INDEX = 1400
 
@@ -127,8 +128,8 @@ export const AppHintView: FC<AppHintViewProps> = ({ hint, dismissMs, onDismiss }
                   alignItems: 'center',
                   [below2xlSideMenuScaleMediaQuery]: {
                     '& svg': {
-                      width: scaleBelow2xl(icon.sizeSm),
-                      height: scaleBelow2xl(icon.sizeSm),
+                      width: scaleBelow2xl(apolloCardHintIconSize),
+                      height: scaleBelow2xl(apolloCardHintIconSize),
                     },
                   },
                 }}
