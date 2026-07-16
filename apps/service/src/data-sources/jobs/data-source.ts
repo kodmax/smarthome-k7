@@ -5,6 +5,7 @@ import { jjit } from './jjit/jjit'
 import { JobAd, JobsFeed } from '@repo/types'
 import { nfj } from './nfj/nfj'
 import { addAds } from './filters'
+import { theprotocol } from './theprotocol'
 
 export class JobsSource extends DataSourceDefinition<JobsFeed> {
   @Inject('db')
@@ -85,7 +86,7 @@ export class JobsSource extends DataSourceDefinition<JobsFeed> {
 
     addAds(allAds, await jjit())
     addAds(allAds, await nfj())
-    // addAds(allAds, await theprotocol())
+    addAds(allAds, await theprotocol())
 
     const ads = [...allAds.values()].sort(
       (a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0),
