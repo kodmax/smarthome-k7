@@ -224,7 +224,9 @@ export const en: Translations = {
       title: 'Stock market',
       symbol: 'Symbol',
       earnings: 'To earnings',
-      priceTarget: 'To target',
+      pe: 'P/E',
+      toPriceTarget: 'To target',
+      priceTarget: 'Target',
       peAtTarget: 'P/E@Target',
       quote: 'Quote',
       status: {

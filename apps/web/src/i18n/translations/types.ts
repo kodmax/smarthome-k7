@@ -190,6 +190,8 @@ export type Translations = {
       title: string
       symbol: string
       earnings: string
+      pe: string
+      toPriceTarget: string
       priceTarget: string
       peAtTarget: string
       quote: string

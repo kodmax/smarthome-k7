@@ -224,7 +224,9 @@ export const pl: Translations = {
       title: 'Giełda',
       symbol: 'Symbol',
       earnings: 'Do wyników',
-      priceTarget: 'Do celu',
+      pe: 'C/Z',
+      toPriceTarget: 'Do celu',
+      priceTarget: 'Cel',
       peAtTarget: 'C/Z@Cel',
       quote: 'Notowanie',
       status: {

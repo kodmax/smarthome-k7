@@ -43,6 +43,8 @@ export const StockMarket: FC<Record<string, never>> = () => {
               <ApolloTableCell sx={{ width: '14px' }} />
               <ApolloTableCell>{labels.symbol}</ApolloTableCell>
               <ApolloTableCell>{labels.earnings}</ApolloTableCell>
+              <ApolloTableCell>{labels.pe}</ApolloTableCell>
+              <ApolloTableCell>{labels.toPriceTarget}</ApolloTableCell>
               <ApolloTableCell>{labels.priceTarget}</ApolloTableCell>
               <ApolloTableCell>{labels.peAtTarget}</ApolloTableCell>
               <ApolloTableCell>{labels.quote}</ApolloTableCell>

@@ -224,7 +224,9 @@ export const ru: Translations = {
       title: 'Биржа',
       symbol: 'Символ',
       earnings: 'До отчёта',
-      priceTarget: 'До цели',
+      pe: 'P/E',
+      toPriceTarget: 'До цели',
+      priceTarget: 'Цель',
       peAtTarget: 'P/E@Цель',
       quote: 'Котировка',
       status: {
