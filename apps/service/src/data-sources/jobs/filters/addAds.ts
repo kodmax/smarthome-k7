@@ -1,9 +1,9 @@
 import { JobAd } from '@repo/types'
-import { isHybridOrRemote, isSalaryAcceptable, noManager, noUwantedSkills, withReact } from './filters'
+import { isHybridOrRemote, isSalaryAcceptable, noManager, withReact } from './filters'
 
 export const addAds = (allAds: Map<string, JobAd>, ads: JobAd[]): void => {
   const filteredAds = ads
-    .filter(noUwantedSkills)
+    //.filter(noUwantedSkills)
     .filter(isSalaryAcceptable)
     .filter(isHybridOrRemote)
     .filter(noManager)
