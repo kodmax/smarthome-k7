@@ -31,10 +31,14 @@ describe('addAds', () => {
     expect(allAds.get('acme -- SENIOR REACT DEVELOPER')).toBe(ad)
   })
 
-  it('rejects ads with unwanted skills', () => {
+  it('accepts ads with unwanted skills when other filters pass', () => {
     const allAds = new Map<string, JobAd>()
-    addAds(allAds, [makeAd({ requiredSkills: ['Python', 'React'] })])
-    expect(allAds.size).toBe(0)
+    const ad = makeAd({ requiredSkills: ['Python', 'React'] })
+
+    addAds(allAds, [ad])
+
+    expect(allAds.size).toBe(1)
+    expect(allAds.get('acme -- SENIOR REACT DEVELOPER')).toBe(ad)
   })
 
   it('rejects ads with salary below threshold', () => {
