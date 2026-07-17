@@ -249,6 +249,11 @@ export const en: Translations = {
       searchFor: 'Search torrents for',
     },
   },
+  offline: {
+    title: 'You are offline',
+    description: 'It looks like you lost your connection. Check your network and try again.',
+    retry: 'Refresh',
+  },
   dateTime: {
     todayShort: 'Today',
     tomorrowShort: 'Tomorrow',

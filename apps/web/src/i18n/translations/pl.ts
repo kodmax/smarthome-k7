@@ -249,6 +249,11 @@ export const pl: Translations = {
       searchFor: 'Szukaj torrentów dla',
     },
   },
+  offline: {
+    title: 'Brak połączenia',
+    description: 'Wygląda na to, że jesteś offline. Sprawdź sieć i spróbuj ponownie.',
+    retry: 'Odśwież',
+  },
   dateTime: {
     todayShort: 'Dziś',
     tomorrowShort: 'Jutro',

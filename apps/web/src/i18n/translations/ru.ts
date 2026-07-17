@@ -249,6 +249,11 @@ export const ru: Translations = {
       searchFor: 'Искать торренты для',
     },
   },
+  offline: {
+    title: 'Нет подключения',
+    description: 'Похоже, вы offline. Проверьте сеть и попробуйте снова.',
+    retry: 'Обновить',
+  },
   dateTime: {
     todayShort: 'Сегодня',
     tomorrowShort: 'Завтра',

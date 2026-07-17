@@ -220,4 +220,9 @@ export type Translations = {
     tomorrowShort: string
     weekdayShort: readonly [string, string, string, string, string, string, string]
   }
+  offline: {
+    title: string
+    description: string
+    retry: string
+  }
 }
