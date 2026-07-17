@@ -1,7 +1,8 @@
+import { getDefaultWebSocketUrl } from './getDefaultWebSocketUrl'
 import { TopicSubscriber } from './types'
 import { WSClient } from './WSClient'
 
-const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL ?? `ws://${location.hostname}:3678`
+const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL ?? getDefaultWebSocketUrl()
 const subscribers: Map<string, TopicSubscriber<unknown>[]> = new Map()
 const recentPayload: Map<string, unknown> = new Map()
 

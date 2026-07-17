@@ -25,7 +25,7 @@ The dev server listens on `--host` by default (accessible on the local network).
 
 | Variable             | Description                                                |
 | -------------------- | ---------------------------------------------------------- |
-| `VITE_WEBSOCKET_URL` | Backend WebSocket URL (defaults to `ws://<hostname>:3678`) |
+| `VITE_WEBSOCKET_URL` | Backend WebSocket URL (defaults to `ws(s)://<host>/ws`) |
 
 The backend (`apps/service`) must be running for cards to receive data.
 

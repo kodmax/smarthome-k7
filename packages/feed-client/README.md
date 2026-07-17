@@ -10,7 +10,7 @@ React client library for the Apollo WebSocket protocol — feed subscriptions an
 | `useCommand()`         | Sends a command to a data source                         |
 | `refreshFeeds(topics)` | Forces a refresh of selected feeds                       |
 
-Default WebSocket URL: `ws://${location.hostname}:3678` (overridable via `VITE_WEBSOCKET_URL`).
+Default WebSocket URL: same host and scheme as the page (`ws(s)://<host>/ws`, overridable via `VITE_WEBSOCKET_URL`).
 
 ## Usage
 
