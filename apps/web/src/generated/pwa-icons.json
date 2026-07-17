@@ -1,0 +1,36 @@
+{
+  "hash": "b362ac1f",
+  "cropPercent": 82,
+  "source": "ikonka.PNG",
+  "cropSide": 1028,
+  "sourceWidth": 1254,
+  "sourceHeight": 1254,
+  "favicon": "/pwa/favicon-32-b362ac1f.png",
+  "appleTouchIcon": "/pwa/apple-touch-icon-180-b362ac1f.png",
+  "includeAssets": [
+    "pwa/favicon-32-b362ac1f.png",
+    "pwa/apple-touch-icon-180-b362ac1f.png",
+    "pwa/pwa-192-b362ac1f.png",
+    "pwa/pwa-512-b362ac1f.png"
+  ],
+  "manifestIcons": [
+    {
+      "src": "pwa/pwa-192-b362ac1f.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa/pwa-512-b362ac1f.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa/pwa-512-b362ac1f.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

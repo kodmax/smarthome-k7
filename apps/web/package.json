@@ -11,7 +11,7 @@
     "lint": "eslint \"src/**/*.ts?\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "icons:generate": "npx --yes sharp-cli -i ikonka.PNG -o public/apple-touch-icon.png resize 180 180 && npx --yes sharp-cli -i ikonka.PNG -o public/pwa-192.png resize 192 192 && npx --yes sharp-cli -i ikonka.PNG -o public/pwa-512.png resize 512 512 && npx --yes sharp-cli -i ikonka.PNG -o public/favicon.png resize 32 32"
+    "icons:generate": "node scripts/generate-pwa-icons.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -44,6 +44,7 @@
     "eslint": "^8.57.0",
     "js-knx": "^3.1.0",
     "jsdom": "^28.1.0",
+    "sharp": "^0.35.3",
     "typescript": "5.5.4",
     "vite": "^8.1.0",
     "vite-plugin-pwa": "^1.3.0",

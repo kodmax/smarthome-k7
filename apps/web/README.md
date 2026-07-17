@@ -29,6 +29,21 @@ The dev server listens on `--host` by default (accessible on the local network).
 
 The backend (`apps/service`) must be running for cards to receive data.
 
+## PWA icons
+
+Generate favicon and PWA icons from a source image:
+
+```sh
+yarn workspace web icons:generate ikonka.PNG
+yarn workspace web icons:generate ikonka.PNG 90
+```
+
+- `90` means use the center 90% of the image (5% trimmed from each side)
+- Output files are written to `public/pwa/` with a content hash in the filename
+- `src/generated/pwa-icons.json` is updated for Vite, HTML, and the web manifest
+
+Run this after changing the source icon, then rebuild/deploy.
+
 ## Scripts
 
 | Script            | Description              |
@@ -36,6 +51,7 @@ The backend (`apps/service`) must be running for cards to receive data.
 | `dev`             | Vite dev server          |
 | `build`           | `tsc` + production build |
 | `preview`         | Preview production build |
+| `icons:generate`  | Generate hashed PWA icons from a source image |
 | `test`            | Vitest (single run)      |
 | `test:watch`      | Vitest in watch mode     |
 | `lint` / `format` | ESLint / Prettier        |
