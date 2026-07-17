@@ -9,7 +9,32 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: null,
-      includeAssets: ['vite.svg', 'typescript.svg'],
+      includeAssets: ['vite.svg'],
+      manifest: {
+        name: 'Smarthome K7',
+        short_name: 'Smarthome',
+        description: 'Smart home dashboard',
+        start_url: '/dashboard',
+        scope: '/',
+        display: 'standalone',
+        orientation: 'any',
+        theme_color: '#646cff',
+        background_color: '#ffffff',
+        icons: [
+          {
+            src: 'vite.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any',
+          },
+          {
+            src: 'vite.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'maskable',
+          },
+        ],
+      },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         navigateFallback: '/index.html',
