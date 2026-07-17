@@ -10,7 +10,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts?\"",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "icons:generate": "npx --yes sharp-cli -i ikonka.PNG -o public/apple-touch-icon.png resize 180 180 && npx --yes sharp-cli -i ikonka.PNG -o public/pwa-192.png resize 192 192 && npx --yes sharp-cli -i ikonka.PNG -o public/pwa-512.png resize 512 512 && npx --yes sharp-cli -i ikonka.PNG -o public/favicon.png resize 32 32"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
