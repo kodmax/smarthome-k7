@@ -1,3 +1,5 @@
+import { registerSW } from 'virtual:pwa-register'
+
 export function registerServiceWorker(): void {
   if (!('serviceWorker' in navigator)) {
     return
@@ -13,16 +15,5 @@ export function registerServiceWorker(): void {
     return
   }
 
-  const register = () => {
-    navigator.serviceWorker.register('/sw.js').catch(error => {
-      console.error('Service worker registration failed:', error)
-    })
-  }
-
-  if (document.readyState === 'complete') {
-    register()
-    return
-  }
-
-  window.addEventListener('load', register, { once: true })
+  registerSW({ immediate: true })
 }
