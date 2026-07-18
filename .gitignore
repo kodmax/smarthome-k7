@@ -7,7 +7,7 @@ dist-ssr
 *.local
 .env
 .cache
-.cursor/mcp.json
+.cursor/sandbox.json
 .cursor/mysql-mcp.generated.yaml
 server/dist
 public/dist
