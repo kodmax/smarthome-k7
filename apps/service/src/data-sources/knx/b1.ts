@@ -3,7 +3,8 @@ import { DPT_Generic_B1, KnxReading } from 'js-knx'
 
 export default (id: string, dp: DPT_Generic_B1): DataSourceDefinitionClass<KnxReading<number>> => {
   return class KnxB1Source extends DataSourceDefinition<KnxReading<number>> {
-    protected init(): void {
+    public constructor(push: (content: KnxReading<number>) => void, reportError: (e: Error) => void) {
+      super(push, reportError)
       dp.addWriteListener(reading => {
         this.push(reading)
       })

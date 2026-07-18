@@ -30,7 +30,8 @@ function createTestSourceClass<T>(options: {
   handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
 }): DataSourceDefinitionClass<T> {
   return class TestSource extends DataSourceDefinition<T> {
-    protected init(): void {
+    public constructor(push: (content: T) => void, reportError: (e: Error) => void) {
+      super(push, reportError)
       options.onInit?.({ push: content => this.push(content) })
     }
 

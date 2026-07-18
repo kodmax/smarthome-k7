@@ -9,10 +9,7 @@ export default (knx: KnxLink): DataSourceDefinitionClass<LightsFeed> => {
     private readonly statuses = new Map<string, DPT_Generic_B1>()
     private readonly readings: Partial<Record<string, KnxReading<number>>> = {}
 
-    public constructor(
-      push: (content: LightsFeed) => void,
-      reportError: (e: Error) => void,
-    ) {
+    public constructor(push: (content: LightsFeed) => void, reportError: (e: Error) => void) {
       super(push, reportError)
 
       for (const circuit of homeLights) {

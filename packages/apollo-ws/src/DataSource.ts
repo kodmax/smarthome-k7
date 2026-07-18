@@ -6,12 +6,7 @@ export abstract class DataSourceDefinition<T> {
   public constructor(
     protected readonly push: (content: T) => void,
     protected readonly reportError: (e: Error) => void,
-  ) {
-    this.init()
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected init(): void {}
+  ) {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public handleCommand(_command: string, _args: string, _recentContent?: T): Promise<void> {

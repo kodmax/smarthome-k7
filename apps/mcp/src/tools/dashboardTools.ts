@@ -14,12 +14,7 @@ import type {
   WeatherFeed,
 } from '@repo/types'
 import type { FeedStore } from '../feeds/FeedStore.js'
-import {
-  formatControlLightResult,
-  formatLights,
-  listLightCircuitIds,
-  resolveLightCircuit,
-} from './formatLights.js'
+import { formatControlLightResult, formatLights, listLightCircuitIds, resolveLightCircuit } from './formatLights.js'
 import {
   formatAirQuality,
   formatDashboardSummary,
@@ -257,7 +252,9 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
 
       if (resolved === undefined) {
         return textResult(
-          `Nieznany obwód "${circuitId}". Dostępne ID:\n${listLightCircuitIds().map(id => `- ${id}`).join('\n')}`,
+          `Nieznany obwód "${circuitId}". Dostępne ID:\n${listLightCircuitIds()
+            .map(id => `- ${id}`)
+            .join('\n')}`,
         )
       }
 
