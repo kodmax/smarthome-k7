@@ -86,19 +86,24 @@ Cursor can query the database via [mysql-mcp-server](https://github.com/askdba/m
 
 ```sh
 brew install askdba/tap/mysql-mcp-server
-cp .cursor/mcp.json.example .cursor/mcp.json
-chmod +x .cursor/mcp-mariadb.sh
 ```
+
+Konfiguracja MCP jest w [`.cursor/mcp.json`](../../.cursor/mcp.json) (w repo, ścieżki przez `${workspaceFolder}`).
 
 The launcher [`.cursor/mcp-mariadb.mjs`](../.cursor/mcp-mariadb.mjs) verifies credentials with the same `mariadb` driver
 as service, then starts `mysql-mcp-server` from a generated YAML config (avoids passing `%`-encoded DSN via env).
 Credentials are read from `apps/service/.env` by [`.cursor/mcp-dsn.py`](../.cursor/mcp-dsn.py). Optional `DB_MCP_*`
 overrides apply. Enable the server in **Cursor Settings → MCP** and restart Cursor.
 
+### Cursor sandbox
+
+`.cursor/sandbox.json` jest w `.gitignore` — każdy dev konfiguruje sandbox u siebie (np. dostęp do LAN `192.168.1.0/24`
+dla MCP do bazy).
+
 ### Troubleshooting: `no route to host`
 
 If `ping 192.168.1.2` works in Terminal but MCP logs `connect: no route to host`, Cursor likely blocks private LAN IPs
-in its sandbox (RFC 1918). This repo’s [`.cursor/sandbox.json`](../.cursor/sandbox.json) allows `192.168.1.0/24` —
+in its sandbox (RFC 1918). Dodaj swoją podsieć LAN do `networkPolicy.allow` w lokalnym `.cursor/sandbox.json` —
 **restart Cursor** after changing it, then toggle MCP off/on.
 
 Also check **System Settings → Privacy & Security → Local Network** — Cursor must be allowed (toggle off/on if needed).

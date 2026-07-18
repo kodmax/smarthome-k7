@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "smarthome-mariadb": {
+      "command": "node",
+      "args": ["${workspaceFolder}/.cursor/mcp-mariadb.mjs"]
+    },
+    "dashboard": {
+      "command": "node",
+      "args": ["--use-system-ca", "${workspaceFolder}/apps/mcp/dist/index.js"],
+      "envFile": "${workspaceFolder}/apps/mcp/.env"
+    }
+  }
+}

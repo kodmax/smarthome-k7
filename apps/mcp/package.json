@@ -1,0 +1,27 @@
+{
+  "name": "mcp",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "start": "node dist/index.js",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@repo/types": "*",
+    "ws": "^8.18.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/node": "^17.0.45",
+    "@types/ws": "^8.18.1",
+    "eslint": "^8.57.0",
+    "typescript": "5.5.4"
+  }
+}
