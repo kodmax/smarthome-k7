@@ -5,6 +5,7 @@ import type {
   EnergyFeed,
   HumidityData,
   JobsFeed,
+  LightsFeed,
   NewsFeed,
   StockMarketFeed,
   TemperatureData,
@@ -13,6 +14,12 @@ import type {
   WeatherFeed,
 } from '@repo/types'
 import type { FeedStore } from '../feeds/FeedStore.js'
+import {
+  formatControlLightResult,
+  formatLights,
+  listLightCircuitIds,
+  resolveLightCircuit,
+} from './formatLights.js'
 import {
   formatAirQuality,
   formatDashboardSummary,
@@ -210,6 +217,63 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
       return textResult(
         formatTorrentsStatus(feedStore.get<Torrent[]>('top-torrents'), feedStore.get<TransmissionFeed>('transmission')),
       )
+    },
+  )
+
+  server.registerTool(
+    'home_lights',
+    {
+      title: 'Światła w domu (KNX)',
+      description:
+        'Stan wszystkich obwodów oświetlenia KNX. Opcjonalnie filtruj po pokoju (np. living_room, kitchen, bathroom, bedroom, dining_room, hallway). ID obwodów po angielsku, np. living_room_led_tv.',
+      inputSchema: {
+        room: z
+          .string()
+          .optional()
+          .describe('Pokój po angielsku: living_room, kitchen, bathroom, bedroom, dining_room, hallway'),
+      },
+    },
+    async ({ room }) => {
+      const feed = feedStore.get<LightsFeed>('home.lights')
+      if (!feed) return feedUnavailable(feedStore, 'światła KNX')
+      return textResult(formatLights(feed, room))
+    },
+  )
+
+  server.registerTool(
+    'control_light',
+    {
+      title: 'Sterowanie światłem (KNX)',
+      description:
+        'Włącza lub wyłącza obwód oświetlenia KNX. Podaj ID obwodu (np. living_room_led_tv, kitchen_lamp) i stan on/off. Użyj home_lights, żeby zobaczyć dostępne obwody i ich aktualny stan.',
+      inputSchema: {
+        circuit: z.string().min(1).describe('ID obwodu, np. living_room_led_tv, bedroom_ceiling'),
+        state: z.enum(['on', 'off']).describe('on = włącz, off = wyłącz'),
+      },
+    },
+    async ({ circuit, state }) => {
+      const circuitId = circuit.trim()
+      const resolved = resolveLightCircuit(circuitId)
+
+      if (resolved === undefined) {
+        return textResult(
+          `Nieznany obwód "${circuitId}". Dostępne ID:\n${listLightCircuitIds().map(id => `- ${id}`).join('\n')}`,
+        )
+      }
+
+      if (!feedStore.isConnected()) {
+        return textResult('Brak połączenia z Apollo WebSocket — nie można sterować światłami.')
+      }
+
+      try {
+        const waitForUpdate = feedStore.waitForFeed<LightsFeed>('home.lights', 20000)
+        feedStore.command('lights', 'set', `${circuitId} ${state}`)
+        const feed = await waitForUpdate
+        return textResult(formatControlLightResult(circuitId, state, feed))
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'nieznany błąd'
+        return textResult(`Sterowanie światłem nie powiodło się: ${message}`)
+      }
     },
   )
 

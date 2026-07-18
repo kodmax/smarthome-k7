@@ -16,7 +16,7 @@ yarn workspace mcp start
 Watch TypeScript:
 
 ```bash
-yarn workspace mcp dev
+yarn workspace mcp watch
 ```
 
 ## Konfiguracja

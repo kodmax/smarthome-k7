@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "watch": "tsc -p tsconfig.json --watch --preserveWatchOutput",
     "start": "node dist/index.js",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\""
   },
-  "dependencies": {
+    "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@repo/knx-schema": "*",
     "@repo/types": "*",
     "ws": "^8.18.3",
     "zod": "^3.25.76"

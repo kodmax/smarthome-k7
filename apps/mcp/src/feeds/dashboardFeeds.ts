@@ -13,6 +13,7 @@ export const DASHBOARD_FEEDS = [
   { id: 'jobs', label: 'Oferty pracy' },
   { id: 'top-torrents', label: 'Top torrenty' },
   { id: 'transmission', label: 'Transmission' },
+  { id: 'home.lights', label: 'Światła KNX' },
 ] as const
 
 export type DashboardFeedId = (typeof DASHBOARD_FEEDS)[number]['id']

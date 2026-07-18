@@ -5,14 +5,15 @@ import { DPT_Generic_B1, DPT_Switch, KnxReading, type KnxLink } from 'js-knx'
 
 export default (knx: KnxLink): DataSourceDefinitionClass<LightsFeed> => {
   return class LightsSource extends DataSourceDefinition<LightsFeed> {
-    private sets!: Map<string, DPT_Switch>
-    private statuses!: Map<string, DPT_Generic_B1>
-    private readings!: Partial<Record<string, KnxReading<number>>>
+    private readonly sets = new Map<string, DPT_Switch>()
+    private readonly statuses = new Map<string, DPT_Generic_B1>()
+    private readonly readings: Partial<Record<string, KnxReading<number>>> = {}
 
-    protected init(): void {
-      this.sets = new Map()
-      this.statuses = new Map()
-      this.readings = {}
+    public constructor(
+      push: (content: LightsFeed) => void,
+      reportError: (e: Error) => void,
+    ) {
+      super(push, reportError)
 
       for (const circuit of homeLights) {
         this.sets.set(circuit.id, knx.group(circuit.set))
@@ -31,7 +32,7 @@ export default (knx: KnxLink): DataSourceDefinitionClass<LightsFeed> => {
         circuits: Object.fromEntries(
           homeLights
             .filter(circuit => this.readings[circuit.id] !== undefined)
-            .map(circuit => [circuit.id, { reading: this.readings[circuit.id] }]),
+            .map(circuit => [circuit.id, { reading: this.readings[circuit.id] as KnxReading<number> }]),
         ),
       }
     }

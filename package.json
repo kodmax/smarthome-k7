@@ -8,7 +8,8 @@
     "format": "turbo run format",
     "db:migrate": "yarn workspace @repo/db db:migrate",
     "db:rollback": "yarn workspace @repo/db db:rollback",
-    "db:status": "yarn workspace @repo/db db:status"
+    "db:status": "yarn workspace @repo/db db:status",
+    "mcp": "yarn workspace mcp build && npx @modelcontextprotocol/inspector node --use-system-ca apps/mcp/dist/index.js"
   },
   "devDependencies": {
     "eslint": "^8.57.0",

@@ -34,7 +34,7 @@ async function main(): Promise<void> {
   const server = createServer(feedStore)
   const transport = new StdioServerTransport()
   await server.connect(transport)
-  console.error('[dashboard-mcp] ready on stdio (13 tools: ping + 12 dashboard)')
+  console.error('[dashboard-mcp] ready on stdio (15 tools: ping + 14 dashboard)')
 }
 
 main().catch(error => {
