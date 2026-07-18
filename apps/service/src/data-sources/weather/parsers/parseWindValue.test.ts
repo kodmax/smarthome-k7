@@ -10,6 +10,14 @@ describe('parseWindValue', () => {
     })
   })
 
+  it('parses calm wind without direction', () => {
+    expect(parseWindValue('0 km/h')).toEqual({
+      direction: '',
+      speed: 0,
+      speedUnit: 'km/h',
+    })
+  })
+
   it('throws on malformed wind text', () => {
     expect(() => parseWindValue('NNW 13')).toThrow('malformed wind detail value "NNW 13"')
   })

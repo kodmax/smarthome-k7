@@ -74,7 +74,10 @@ export const parseInstantFromDocument = (document: Document): InstantWeather =>
         coverage: requireDetail(details, 'Zachmurzenie', 'current weather details'),
       },
       wind: {
-        angle: Number(windDirectionCodes.indexOf(windDirection as (typeof windDirectionCodes)[number]) * 22.5),
+        angle:
+          windDirection === ''
+            ? 0
+            : Number(windDirectionCodes.indexOf(windDirection as (typeof windDirectionCodes)[number]) * 22.5),
         maxSpeed: toMetersPerSecond(Number(gustSpeed), gustUnit),
         direction: windDirection,
         speed: toMetersPerSecond(windSpeed, windSpeedUnit),
