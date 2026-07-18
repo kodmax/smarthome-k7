@@ -258,6 +258,14 @@ export type HomeTempFeedData = {
   setpoint?: string
 }
 
+export type LightCircuitFeedEntry = {
+  reading: KnxReading<number>
+}
+
+export type LightsFeed = {
+  circuits: Record<string, LightCircuitFeedEntry>
+}
+
 export type TemperatureData = {
   status: {
     lazienka: KnxReading<number>

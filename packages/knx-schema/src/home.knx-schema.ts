@@ -11,6 +11,7 @@ import {
   DPT_Value_Temp,
   DPT_State,
 } from 'js-knx'
+import { homeLightsById } from './home.lights'
 
 export const knxSchema = {
   system: {
@@ -55,6 +56,7 @@ export const knxSchema = {
         hvacMode: { address: '2/0/4', DataType: DPT_HVACMode },
       },
     },
+    lights: homeLightsById,
     temp: {
       bathroom: {
         history: 'bathroom' as const,
