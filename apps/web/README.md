@@ -23,8 +23,8 @@ The dev server listens on `--host` by default (accessible on the local network).
 
 ## Environment variables
 
-| Variable             | Description                                                |
-| -------------------- | ---------------------------------------------------------- |
+| Variable             | Description                                             |
+| -------------------- | ------------------------------------------------------- |
 | `VITE_WEBSOCKET_URL` | Backend WebSocket URL (defaults to `ws(s)://<host>/ws`) |
 
 The backend (`apps/service`) must be running for cards to receive data.
@@ -46,15 +46,15 @@ Run this after changing the source icon, then rebuild/deploy.
 
 ## Scripts
 
-| Script            | Description              |
-| ----------------- | ------------------------ |
-| `dev`             | Vite dev server          |
-| `build`           | `tsc` + production build |
-| `preview`         | Preview production build |
+| Script            | Description                                   |
+| ----------------- | --------------------------------------------- |
+| `dev`             | Vite dev server                               |
+| `build`           | `tsc` + production build                      |
+| `preview`         | Preview production build                      |
 | `icons:generate`  | Generate hashed PWA icons from a source image |
-| `test`            | Vitest (single run)      |
-| `test:watch`      | Vitest in watch mode     |
-| `lint` / `format` | ESLint / Prettier        |
+| `test`            | Vitest (single run)                           |
+| `test:watch`      | Vitest in watch mode                          |
+| `lint` / `format` | ESLint / Prettier                             |
 
 ## Monorepo dependencies
 
