@@ -5,7 +5,7 @@ import { AdExpandedEditorRow } from './AdExpandedEditorRow'
 import { AdSalaryCells } from './AdSalaryCells'
 import { AdTitleText } from './AdTitleText'
 import { AdTitleTrailing } from './AdTitleTrailing'
-import { JobTitle } from './styled'
+import { JobTitleCell, JobTitleContent } from './styled'
 
 export const Ad: FC<{
   ad: JobAdWithMeta
@@ -23,16 +23,18 @@ export const Ad: FC<{
     <Fragment>
       <ApolloTableRow>
         {zoom ? <LinkOpen href={ad.advertUrl} /> : null}
-        <JobTitle>
-          <AdTitleText ad={ad} />
-          <AdTitleTrailing
-            ad={ad}
-            editMode={editMode}
-            zoom={zoom}
-            expanded={expanded}
-            onToggleExpand={onToggleExpand}
-          />
-        </JobTitle>
+        <JobTitleCell>
+          <JobTitleContent>
+            <AdTitleText ad={ad} />
+            <AdTitleTrailing
+              ad={ad}
+              editMode={editMode}
+              zoom={zoom}
+              expanded={expanded}
+              onToggleExpand={onToggleExpand}
+            />
+          </JobTitleContent>
+        </JobTitleCell>
         <AdSalaryCells ad={ad} zoom={zoom} />
       </ApolloTableRow>
       {zoom && editMode && expanded ? (

@@ -6,6 +6,6 @@ export const jobTitleTrailingGroupStyle = {
   display: 'inline-flex',
   alignItems: 'center',
   verticalAlign: 'middle',
-  marginLeft: `${designTokens.space[1]}px`,
+  flexShrink: 0,
   gap: `${designTokens.space[1]}px`,
 } as const

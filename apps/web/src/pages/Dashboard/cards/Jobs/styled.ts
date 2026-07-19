@@ -2,10 +2,29 @@ import styled from '@emotion/styled'
 import { designTokens } from '@repo/design-tokens'
 import { ApolloTableCell } from '@/card-components'
 
-export const JobTitle = styled(ApolloTableCell)({
-  textOverflow: 'ellipsis',
+export const JobTitleCell = styled(ApolloTableCell)({
   padding: 0,
   borderBottom: 'none',
+  overflow: 'hidden',
+  textOverflow: 'clip',
+  whiteSpace: 'normal',
+  maxWidth: '100%',
+})
+
+export const JobTitleContent = styled('span')({
+  display: 'inline-flex',
+  alignItems: 'center',
+  maxWidth: '100%',
+  minWidth: 0,
+  verticalAlign: 'middle',
+  gap: `${designTokens.space[1]}px`,
+})
+
+export const JobTitleText = styled('span')({
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  minWidth: 0,
 })
 
 export const Salary = styled(ApolloTableCell)({
