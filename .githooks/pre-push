@@ -4,4 +4,7 @@ set -eu
 root="$(git rev-parse --show-toplevel)"
 cd "$root"
 
-yarn proof
+yarn format:check
+yarn test
+yarn lint
+yarn build

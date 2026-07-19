@@ -6,6 +6,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "format": "turbo run format",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json,js}\"",
     "proof": "yarn format && yarn test && yarn lint && yarn build",
     "prepare": "git config core.hooksPath .githooks",
     "db:migrate": "yarn workspace @repo/db db:migrate",
