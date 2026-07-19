@@ -222,6 +222,11 @@ export const ru: Translations = {
       applicationComment: 'Комментарий',
       save: 'Сохранить',
       cancel: 'Отмена',
+      workplaceType: {
+        office: 'Офис',
+        remote: 'Удалённо',
+        hybrid: 'Гибрид',
+      },
       applyStatus: {
         'not-applied': 'Не откликался',
         applied: 'Отклик отправлен',

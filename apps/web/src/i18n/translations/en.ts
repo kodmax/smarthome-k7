@@ -222,6 +222,11 @@ export const en: Translations = {
       applicationComment: 'Comment',
       save: 'Save',
       cancel: 'Cancel',
+      workplaceType: {
+        office: 'Office',
+        remote: 'Remote',
+        hybrid: 'Hybrid',
+      },
       applyStatus: {
         'not-applied': 'Not applied',
         applied: 'Applied',

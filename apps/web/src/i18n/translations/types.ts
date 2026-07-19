@@ -188,6 +188,11 @@ export type Translations = {
       applicationComment: string
       save: string
       cancel: string
+      workplaceType: {
+        office: string
+        remote: string
+        hybrid: string
+      }
       applyStatus: {
         'not-applied': string
         applied: string

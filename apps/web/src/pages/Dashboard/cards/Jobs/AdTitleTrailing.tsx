@@ -4,25 +4,31 @@ import { AppliedDaysPrefix } from './AppliedDaysPrefix'
 import { ApplyStatusIndicator } from './ApplyStatusIndicator'
 import { EditApplicationButton } from './EditApplicationButton'
 import { JobFavIndicator } from './JobFavIndicator'
-import { jobTitleLeadingGroupStyle } from './jobTitleIcons'
+import { WorkplaceTypeIndicator } from './WorkplaceTypeIndicator'
+import { jobTitleTrailingGroupStyle } from './jobTitleIcons'
 
-function hasAdTitleLeadingContent(ad: Pick<JobAdWithMeta, 'meta'>, editMode: boolean, zoom: boolean): boolean {
-  return ad.meta.fav || ad.meta.application.status !== 'not-applied' || (zoom && editMode)
+function hasAdTitleTrailingContent(ad: Pick<JobAdWithMeta, 'meta'>, zoom: boolean): boolean {
+  if (zoom) {
+    return true
+  }
+
+  return ad.meta.fav || ad.meta.application.status !== 'not-applied'
 }
 
-export const AdTitleLeading: FC<{
-  ad: Pick<JobAdWithMeta, 'id' | 'meta'>
+export const AdTitleTrailing: FC<{
+  ad: JobAdWithMeta
   editMode: boolean
   zoom: boolean
   expanded: boolean
   onToggleExpand: (id: string) => void
 }> = ({ ad, editMode, zoom, expanded, onToggleExpand }) => {
-  if (!hasAdTitleLeadingContent(ad, editMode, zoom)) {
+  if (!hasAdTitleTrailingContent(ad, zoom)) {
     return null
   }
 
   return (
-    <span style={jobTitleLeadingGroupStyle}>
+    <span style={jobTitleTrailingGroupStyle}>
+      {zoom ? <WorkplaceTypeIndicator workplaceType={ad.workplaceType} /> : null}
       <JobFavIndicator fav={ad.meta.fav} />
       <ApplyStatusIndicator ad={ad} />
       <AppliedDaysPrefix editMode={editMode} application={ad.meta.application} />

@@ -3,8 +3,8 @@ import { FC, Fragment } from 'react'
 import { ApolloTableRow, LinkOpen } from '@/card-components'
 import { AdExpandedEditorRow } from './AdExpandedEditorRow'
 import { AdSalaryCells } from './AdSalaryCells'
-import { AdTitleLeading } from './AdTitleLeading'
 import { AdTitleText } from './AdTitleText'
+import { AdTitleTrailing } from './AdTitleTrailing'
 import { JobTitle } from './styled'
 
 export const Ad: FC<{
@@ -24,8 +24,14 @@ export const Ad: FC<{
       <ApolloTableRow>
         {zoom ? <LinkOpen href={ad.advertUrl} /> : null}
         <JobTitle>
-          <AdTitleLeading ad={ad} editMode={editMode} zoom={zoom} expanded={expanded} onToggleExpand={onToggleExpand} />
-          <AdTitleText ad={ad} zoom={zoom} />
+          <AdTitleText ad={ad} />
+          <AdTitleTrailing
+            ad={ad}
+            editMode={editMode}
+            zoom={zoom}
+            expanded={expanded}
+            onToggleExpand={onToggleExpand}
+          />
         </JobTitle>
         <AdSalaryCells ad={ad} zoom={zoom} />
       </ApolloTableRow>

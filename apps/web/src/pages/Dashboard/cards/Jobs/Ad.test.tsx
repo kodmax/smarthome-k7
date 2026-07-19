@@ -55,17 +55,14 @@ describe('Ad', () => {
     )
 
     expect(screen.getByText(/Full Stack Engineer/)).toBeInTheDocument()
-    expect(screen.getByText(/\[B2B\]/)).toBeInTheDocument()
-    expect(screen.getByText(/\[hybrid\]/)).toBeInTheDocument()
-    expect(screen.getByText('[TypeScript]')).toBeInTheDocument()
-    expect(screen.getByText('[React]')).toBeInTheDocument()
-    expect(screen.queryByText('[Java]')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Hybrydowo')).toBeInTheDocument()
+    expect(screen.queryByText(/\[hybrid\]/)).not.toBeInTheDocument()
     expect(screen.getByText('20 — 28')).toBeInTheDocument()
     expect(screen.getByText('kPLN')).toBeInTheDocument()
     expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
   })
 
-  it('shows an apply-status icon before the title', () => {
+  it('shows an apply-status icon after the title', () => {
     renderAd(
       jobAd({
         id: '3',
@@ -103,19 +100,19 @@ describe('Ad', () => {
     expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
   })
 
-  it('shows a star icon before the title when favourite', () => {
+  it('shows a star icon after the title when favourite', () => {
     renderAd(jobAd({ id: '3b', title: 'Favourite Role', meta: { fav: true } }), true)
 
     expect(screen.getByLabelText('Ulubione')).toBeInTheDocument()
   })
 
-  it('shows a star icon before the title when favourite in edit mode', () => {
+  it('shows a star icon after the title when favourite in edit mode', () => {
     renderAd(jobAd({ id: '3d', title: 'Favourite Role', meta: { fav: true } }), true, true)
 
     expect(screen.getByLabelText('Ulubione')).toBeInTheDocument()
   })
 
-  it('shows abbreviated applied days before the title in edit mode', () => {
+  it('shows abbreviated applied days after the title in edit mode', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-07-19T12:00:00'))
 
