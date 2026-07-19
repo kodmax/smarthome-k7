@@ -7,7 +7,7 @@
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,js}\" --ignore-path .gitignore",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json,js}\" --ignore-path .gitignore",
-    "proof": "yarn format && yarn test && yarn lint && yarn build",
+    "verify": "yarn format && yarn test && yarn lint && yarn build",
     "prepare": "git config core.hooksPath .githooks",
     "db:migrate": "yarn workspace @repo/db db:migrate",
     "db:rollback": "yarn workspace @repo/db db:rollback",

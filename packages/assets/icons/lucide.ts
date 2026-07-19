@@ -25,6 +25,8 @@ import {
   Leaf,
   Link,
   List,
+  Funnel,
+  FunnelX,
   Menu,
   Moon,
   Newspaper,
@@ -90,6 +92,8 @@ export const MoviesIcon = createStyledIcon(Clapperboard, iconStyles.neutral)
 export const CameraIcon = createStyledIcon(Camera, iconStyles.warning)
 export const JobsIcon = createStyledIcon(BriefcaseBusiness, iconStyles.neutral)
 export const ListIcon = createStyledIcon(List, iconStyles.muted)
+export const FilterIcon = createStyledIcon(Funnel, iconStyles.muted)
+export const FilterOffIcon = createStyledIcon(FunnelX, iconStyles.muted)
 export const SettingsIcon = createStyledIcon(Cog, iconStyles.muted)
 export const SunMoonIcon = createStyledIcon(SunMoon, iconStyles.muted)
 export const SecurityIcon = createStyledIcon(ShieldCheck, iconStyles.air)

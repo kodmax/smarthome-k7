@@ -77,7 +77,7 @@ describe('Ad', () => {
       true,
     )
 
-    expect(screen.getByLabelText('Złożone')).toBeInTheDocument()
+    expect(screen.getByLabelText('Zaaplikowane')).toBeInTheDocument()
   })
 
   it('shows an apply-status icon in edit mode without opening the editor panel', () => {

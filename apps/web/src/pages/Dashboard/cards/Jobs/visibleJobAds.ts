@@ -13,3 +13,16 @@ export function isJobAdVisibleInNormalView(ad: Pick<JobAdWithMeta, 'meta'>): boo
 export function filterVisibleJobAds(ads: JobAdWithMeta[]): JobAdWithMeta[] {
   return ads.filter(isJobAdVisibleInNormalView)
 }
+
+export function getDisplayedJobAds(
+  ads: JobAdWithMeta[] | undefined,
+  { editMode, showAllAds }: { editMode: boolean; showAllAds: boolean },
+): JobAdWithMeta[] {
+  const visibleAds = ads ? filterVisibleJobAds(ads) : []
+
+  if (editMode && showAllAds) {
+    return ads ?? []
+  }
+
+  return visibleAds
+}

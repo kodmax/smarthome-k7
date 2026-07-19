@@ -1,6 +1,6 @@
 import { TableBody } from '@mui/material'
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
-import { JobsIcon, SettingsIcon } from '@repo/assets'
+import { JobsIcon, FilterIcon, FilterOffIcon, SettingsIcon } from '@repo/assets'
 import { ApolloCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
 import { useCommand, useFeed } from '@repo/feed-client'
 import { ApolloDataTable, TableEmptyMessage, TablePlaceholder } from '@/card-components'
@@ -8,12 +8,13 @@ import { designTokens } from '@repo/design-tokens'
 import { JobApplyStatus, JobsFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { Ad } from './Ad'
-import { filterVisibleJobAds } from './visibleJobAds'
+import { getDisplayedJobAds } from './visibleJobAds'
 
 const cardTableFontSize = designTokens.font.body.size
 
 export const Jobs: FC<Record<string, never>> = () => {
   const [editMode, setEditMode] = useState<boolean>(false)
+  const [showAllAds, setShowAllAds] = useState<boolean>(false)
   const [expandedAdId, setExpandedAdId] = useState<string | null>(null)
 
   const zoom = useZoom('jobs')
@@ -54,21 +55,26 @@ export const Jobs: FC<Record<string, never>> = () => {
     setEditMode(current => !current)
   }, [])
 
+  const onToggleShowAllAds = useCallback(() => {
+    setShowAllAds(current => !current)
+  }, [])
+
   useEffect(() => {
     if (!zoom) {
       setEditMode(false)
+      setShowAllAds(false)
       setExpandedAdId(null)
     }
   }, [zoom])
 
   useEffect(() => {
     if (!editMode) {
+      setShowAllAds(false)
       setExpandedAdId(null)
     }
   }, [editMode])
 
-  const visibleAds = useMemo(() => (feed ? filterVisibleJobAds(feed.ads) : []), [feed])
-  const ads = editMode ? (feed?.ads ?? []) : visibleAds
+  const ads = useMemo(() => getDisplayedJobAds(feed?.ads, { editMode, showAllAds }), [editMode, feed?.ads, showAllAds])
 
   return (
     <ApolloCard
@@ -76,9 +82,22 @@ export const Jobs: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={JobsIcon}
       height={6}
-      headingInfo={visibleAds.length}
+      headingInfo={ads.length}
       actions={
-        <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />
+        <>
+          {editMode ? (
+            <ApolloCardAction
+              title={showAllAds ? labels.showActiveOnly : labels.showAll}
+              onClick={onToggleShowAllAds}
+              Icon={showAllAds ? FilterIcon : FilterOffIcon}
+            />
+          ) : null}
+          <ApolloCardAction
+            title={t.dashboard.common.editPreferences}
+            onClick={onEditPreferences}
+            Icon={SettingsIcon}
+          />
+        </>
       }
     >
       {!feed ? (

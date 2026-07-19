@@ -222,6 +222,8 @@ export const pl: Translations = {
       applicationComment: 'Komentarz',
       save: 'Zapisz',
       cancel: 'Anuluj',
+      showAll: 'Pokaż wszystkie',
+      showActiveOnly: 'Pokaż aktywne',
       workplaceType: {
         office: 'Biuro',
         remote: 'Zdalnie',
@@ -229,7 +231,7 @@ export const pl: Translations = {
       },
       applyStatus: {
         'not-applied': 'Nie aplikowano',
-        applied: 'Złożone',
+        applied: 'Zaaplikowane',
         'not-interested': 'Nie interesuje mnie',
         rejected: 'Odrzucone',
         'no-response': 'Brak odpowiedzi',

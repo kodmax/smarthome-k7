@@ -50,7 +50,7 @@ describe('ApplicationStatusEditor', () => {
     expect(screen.getByText('Obecny status')).toBeInTheDocument()
     expect(screen.getByText('Data zaaplikowania')).toBeInTheDocument()
     expect(screen.getByText('Ostatnia zmiana statusu')).toBeInTheDocument()
-    expect(screen.getAllByText('Złożone').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Zaaplikowane').length).toBeGreaterThan(0)
     expect(screen.getByText('Komentarz')).toBeInTheDocument()
     expect(screen.getByText('Existing note')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Zmień stan' })).toBeInTheDocument()
@@ -107,7 +107,7 @@ describe('ApplicationStatusEditor', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
     fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Nowy status' }))
-    fireEvent.click(screen.getByRole('option', { name: 'Złożone' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Zaaplikowane' }))
     fireEvent.change(screen.getByLabelText('Komentarz'), { target: { value: '  CV sent  ' } })
     fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
 
