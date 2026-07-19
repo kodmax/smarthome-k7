@@ -11,7 +11,7 @@ export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> 
   declare private readonly start: DPT_StartStop
   declare private readonly stop: DPT_StartStop
 
-  public constructor(push: (content: KnxReading<number>) => void, reportError: (e: Error) => void) {
+  public constructor(push: (content?: KnxReading<number>) => void, reportError: (e: Error) => void) {
     super(push, reportError)
 
     this.intermediateReading = this.knx.group({

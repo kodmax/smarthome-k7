@@ -105,7 +105,7 @@ export class Feeds {
 
     await Promise.all(
       Array.from([...feed.sources.entries()]).map(async ([srcName, src]) => {
-        contents[srcName] = triggeredBy !== undefined ? src.getRecentContent() : await src.getData()
+        contents[srcName] = triggeredBy !== undefined ? await src.getRecentContent() : await src.getData()
       }),
     )
 

@@ -2,9 +2,9 @@ import { Cache, CacheEntry, Snapshot } from './cache'
 import { NoRecentContent } from './Errors'
 import { ApolloEvents } from './ApolloEvents'
 
-export abstract class DataSourceDefinition<T> {
+export abstract class DataSourceDefinition<T, TCache = T> {
   public constructor(
-    protected readonly push: (content: T) => void,
+    protected readonly push: (content?: T) => void,
     protected readonly reportError: (e: Error) => void,
   ) {}
 
@@ -15,7 +15,15 @@ export abstract class DataSourceDefinition<T> {
 
   public abstract getId(): string
   public abstract isSnapshotExpired(snapshot: Snapshot<unknown>): boolean
-  public abstract getData(): Promise<T>
+  public abstract getData(): Promise<TCache>
+
+  public composeContent(cached: TCache): Promise<T> {
+    return Promise.resolve(cached as unknown as T)
+  }
+
+  public toCacheContent(content: T): TCache {
+    return content as unknown as TCache
+  }
 
   public getCron(): string | undefined {
     return undefined
@@ -26,16 +34,16 @@ export abstract class DataSourceDefinition<T> {
   }
 }
 
-export type DataSourceDefinitionClass<T = unknown> = new (
-  push: (content: T) => void,
+export type DataSourceDefinitionClass<T = unknown, TCache = T> = new (
+  push: (content?: T) => void,
   reportError: (e: Error) => void,
-) => DataSourceDefinition<T>
+) => DataSourceDefinition<T, TCache>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyDataSourceDefinitionClass = DataSourceDefinitionClass<any>
+export type AnyDataSourceDefinitionClass = DataSourceDefinitionClass<any, any>
 
 type DSCT<S> = S extends new (...args: never[]) => infer I
-  ? I extends DataSourceDefinition<infer T>
+  ? I extends DataSourceDefinition<infer T, unknown>
     ? T
     : never
   : never
@@ -52,29 +60,29 @@ export type DataSourceCommand = {
   args: string
 }
 
-class DataSource<T> {
+class DataSource<T, TCache = T> {
   private updating: Promise<T> | undefined
 
   private constructor(
-    private definition: DataSourceDefinition<T>,
-    private cacheEntry: CacheEntry<T>,
+    private definition: DataSourceDefinition<T, TCache>,
+    private cacheEntry: CacheEntry<TCache>,
     private vent: ApolloEvents,
   ) {}
 
-  public static async fromClass<T>(
-    sourceClass: DataSourceDefinitionClass<T>,
+  public static async fromClass<T, TCache = T>(
+    sourceClass: DataSourceDefinitionClass<T, TCache>,
     cache: Cache,
     vent: ApolloEvents,
-  ): Promise<DataSource<T>> {
+  ): Promise<DataSource<T, TCache>> {
     // eslint-disable-next-line prefer-const -- forward ref: push callback needs dataSource before assignment
-    let dataSource!: DataSource<T>
+    let dataSource!: DataSource<T, TCache>
 
     const definition = new sourceClass(
       content => void dataSource.push(content),
       e => vent.emit('sys-log', 4, `Push data source <${definition.getId()}> update error: ${e}`, e),
     )
 
-    const cacheEntry = await cache.getEntry<T>(definition.isVolatile() ? undefined : definition.getId())
+    const cacheEntry = await cache.getEntry<TCache>(definition.isVolatile() ? undefined : definition.getId())
     dataSource = new DataSource(definition, cacheEntry, vent)
 
     return dataSource
@@ -84,7 +92,7 @@ class DataSource<T> {
     let recentContent: T | undefined
 
     try {
-      recentContent = this.getRecentContent()
+      recentContent = await this.getRecentContent()
     } catch (e) {
       if (!(e instanceof NoRecentContent)) {
         throw e
@@ -98,8 +106,10 @@ class DataSource<T> {
     return this.definition.getCron()
   }
 
-  public async push(content: T): Promise<void> {
-    await this.cacheEntry.write(content)
+  public async push(content?: T): Promise<void> {
+    if (content !== undefined) {
+      await this.cacheEntry.write(this.definition.toCacheContent(content))
+    }
 
     this.vent.emit('sys-log', 7, `Push data source <${this.definition.getId()}>`)
     this.vent.emit('data-update', this.definition.getId())
@@ -113,12 +123,12 @@ class DataSource<T> {
     return this.definition.getId()
   }
 
-  public getRecentContent(): T {
+  public async getRecentContent(): Promise<T> {
     if (this.cacheEntry.isEmpty()) {
       throw new NoRecentContent()
     }
 
-    return this.cacheEntry.getSnapshot().getContent()
+    return this.definition.composeContent(this.cacheEntry.getSnapshot().getContent())
   }
 
   public async getData(forceRefresh = false): Promise<T> {
@@ -127,14 +137,15 @@ class DataSource<T> {
     } else if (!forceRefresh && this.isCacheFresh()) {
       this.vent.emit('sys-log', 7, `Cache hit on data source <${this.definition.getId()}>`)
 
-      return this.cacheEntry.getSnapshot().getContent()
+      return this.definition.composeContent(this.cacheEntry.getSnapshot().getContent())
     } else {
       this.updating = new Promise((resolve, reject) => {
         this.definition
           .getData()
-          .then(async content => {
-            await this.cacheEntry.write(content as T)
-            resolve(content as T)
+          .then(async cached => {
+            await this.cacheEntry.write(cached)
+            const content = await this.definition.composeContent(cached)
+            resolve(content)
 
             this.vent.emit('sys-log', 4, `Data source <${this.definition.getId()}> content refreshed`)
             this.vent.emit('data-update', this.definition.getId())

@@ -26,11 +26,11 @@ function createTestSourceClass<T>(options: {
   isSnapshotExpired?: (snapshot: Snapshot<unknown>) => boolean
   getData?: () => Promise<T>
   isVolatile?: boolean
-  onInit?: (ctx: { push: (content: T) => void }) => void
+  onInit?: (ctx: { push: (content?: T) => void }) => void
   handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
 }): DataSourceDefinitionClass<T> {
   return class TestSource extends DataSourceDefinition<T> {
-    public constructor(push: (content: T) => void, reportError: (e: Error) => void) {
+    public constructor(push: (content?: T) => void, reportError: (e: Error) => void) {
       super(push, reportError)
       options.onInit?.({ push: content => this.push(content) })
     }

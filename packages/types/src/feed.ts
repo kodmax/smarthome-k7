@@ -335,6 +335,10 @@ export type JobsFeed = {
   ads: JobAdWithMeta[]
 }
 
+export type JobsCachedFeed = {
+  ads: JobAd[]
+}
+
 export function emptyJobAdApplication(): JobAdApplication {
   return {
     status: DEFAULT_JOB_APPLY_STATUS,
@@ -384,6 +388,10 @@ export type Article = {
 
 export type NewsFeed = {
   articles: Article[]
+}
+
+export type NewsCachedFeed = {
+  articles: Omit<Article, 'read'>[]
 }
 
 export type AllergenData = {

@@ -6,6 +6,7 @@ import {
   JobAd,
   JobAdApplicationMeta,
   JobAdWithMeta,
+  JobsCachedFeed,
   JobsFeed,
   emptyJobAdMeta,
   jobAdApplicationFromMeta,
@@ -31,47 +32,46 @@ type MetaRow = {
   last_update_timestamp?: Date | string
 }
 
-export class JobsSource extends DataSourceDefinition<JobsFeed> {
+export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
   @Inject('db')
   declare private db: Pool
-  public async handleCommand(command: string, args: string, recentContent?: JobsFeed): Promise<void> {
+
+  public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'applied':
-        await this.commandApplied(args, recentContent)
+        await this.commandApplied(args)
         break
       case 'change-state':
-        await this.commandChangeState(args, recentContent)
+        await this.commandChangeState(args)
         break
       case 'fav':
-        await this.commandFav(args, recentContent)
+        await this.commandFav(args)
         break
       case 'unfav':
-        await this.commandUnfav(args, recentContent)
+        await this.commandUnfav(args)
         break
     }
   }
 
-  private async commandApplied(itemId: string, recentContent?: JobsFeed): Promise<void> {
-    await this.saveApplicationChange(itemId, { applyStatus: 'applied' }, recentContent)
+  private async commandApplied(itemId: string): Promise<void> {
+    await this.saveApplicationChange(itemId, { applyStatus: 'applied' })
   }
 
-  private async commandChangeState(args: string, recentContent?: JobsFeed): Promise<void> {
+  private async commandChangeState(args: string): Promise<void> {
     const parsed = parseChangeStateCommandArgs(args)
     if (parsed === null) {
       return
     }
 
-    await this.saveApplicationChange(
-      parsed.id,
-      { applyStatus: parsed.applyStatus, comment: parsed.comment },
-      recentContent,
-    )
+    await this.saveApplicationChange(parsed.id, {
+      applyStatus: parsed.applyStatus,
+      comment: parsed.comment,
+    })
   }
 
   private async saveApplicationChange(
     itemId: string,
     input: { applyStatus: JobAdApplicationMeta['applyStatus']; comment?: string },
-    recentContent?: JobsFeed,
   ): Promise<void> {
     const current = await this.loadApplicationMeta(itemId)
     const next = applyStatusChange(current, input)
@@ -79,55 +79,18 @@ export class JobsSource extends DataSourceDefinition<JobsFeed> {
       return
     }
 
-    const statusChanged = current.applyStatus !== next.applyStatus
-
     await this.writeApplicationMeta(itemId, next)
-    this.pushAdUpdate(itemId, recentContent, ad => ({
-      ...ad,
-      meta: {
-        ...ad.meta,
-        application: jobAdApplicationFromMeta(
-          next,
-          statusChanged ? resolveStatusChangedAt(next.applyStatus, new Date()) : ad.meta.application.statusChangedAt,
-        ),
-      },
-    }))
+    this.push()
   }
 
-  private async commandFav(itemId: string, recentContent?: JobsFeed): Promise<void> {
+  private async commandFav(itemId: string): Promise<void> {
     await this.markMeta(itemId, 'fav', true)
-    this.pushAdUpdate(itemId, recentContent, ad => ({
-      ...ad,
-      meta: {
-        ...ad.meta,
-        fav: true,
-      },
-    }))
+    this.push()
   }
 
-  private async commandUnfav(itemId: string, recentContent?: JobsFeed): Promise<void> {
+  private async commandUnfav(itemId: string): Promise<void> {
     await this.unmarkMeta(itemId, 'fav')
-    this.pushAdUpdate(itemId, recentContent, ad => ({
-      ...ad,
-      meta: {
-        ...ad.meta,
-        fav: false,
-      },
-    }))
-  }
-
-  private pushAdUpdate(
-    itemId: string,
-    recentContent: JobsFeed | undefined,
-    update: (ad: JobAdWithMeta) => JobAdWithMeta,
-  ): void {
-    if (recentContent === undefined) {
-      return
-    }
-
-    this.push({
-      ads: recentContent.ads.map(ad => (ad.id === itemId ? update(ad) : ad)),
-    })
+    this.push()
   }
 
   getId() {
@@ -149,12 +112,16 @@ export class JobsSource extends DataSourceDefinition<JobsFeed> {
     addAds(allAds, await nfj())
     addAds(allAds, await theprotocol())
 
-    const ads = [...allAds.values()].sort(
-      (a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0),
-    )
-
     return {
-      ads: await this.attachMeta(ads),
+      ads: [...allAds.values()].sort(
+        (a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0),
+      ),
+    }
+  }
+
+  async composeContent(cached: JobsCachedFeed): Promise<JobsFeed> {
+    return {
+      ads: await this.attachMeta(cached.ads),
     }
   }
 

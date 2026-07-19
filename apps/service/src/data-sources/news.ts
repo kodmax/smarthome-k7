@@ -2,52 +2,39 @@ import { createHash } from 'node:crypto'
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { Inject } from '@/di'
 import { fetchDocument } from '@/fetch'
-import { Article, NewsFeed } from '@repo/types'
+import { Article, NewsCachedFeed, NewsFeed } from '@repo/types'
 import type { config as AppConfig } from '../config'
 import type { Pool } from 'mariadb'
 
 const FEED_URL =
   'https://news.google.com/topics/CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE/sections/CAQiTkNCSVNORG9JYkc5allXeGZkakpDRUd4dlkyRnNYM1l5WDNObFkzUnBiMjV5Q2hJSUwyMHZNRGd4YlY5NkNnb0lMMjB2TURneGJWOG9BQSowCAAqLAgKIiZDQklTRmpvSWJHOWpZV3hmZGpKNkNnb0lMMjB2TURneGJWOG9BQVABUAE?hl=pl&gl=PL&ceid=PL%3Apl'
 
-export class NewsSource extends DataSourceDefinition<NewsFeed> {
+export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
   @Inject('db')
   declare private db: Pool
 
   @Inject('config')
   declare private config: typeof AppConfig
-  public async handleCommand(command: string, args: string, recentContent?: NewsFeed): Promise<void> {
+
+  public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'read':
-        await this.commandRead(args, recentContent)
+        await this.commandRead(args)
         break
       case 'unread':
-        await this.commandUnread(args, recentContent)
+        await this.commandUnread(args)
         break
     }
   }
 
-  private async commandRead(itemUid: string, recentContent?: NewsFeed): Promise<void> {
+  private async commandRead(itemUid: string): Promise<void> {
     await this.markMeta(itemUid, 'read', true)
-    this.pushArticleUpdate(itemUid, recentContent, { read: true })
+    this.push()
   }
 
-  private async commandUnread(itemUid: string, recentContent?: NewsFeed): Promise<void> {
+  private async commandUnread(itemUid: string): Promise<void> {
     await this.unmarkMeta(itemUid, 'read')
-    this.pushArticleUpdate(itemUid, recentContent, { read: false })
-  }
-
-  private pushArticleUpdate(
-    itemUid: string,
-    recentContent: NewsFeed | undefined,
-    patch: Partial<Pick<Article, 'read'>>,
-  ): void {
-    if (recentContent === undefined) {
-      return
-    }
-
-    this.push({
-      articles: recentContent.articles.map(article => (article.uid === itemUid ? { ...article, ...patch } : article)),
-    })
+    this.push()
   }
 
   getId() {
@@ -64,11 +51,17 @@ export class NewsSource extends DataSourceDefinition<NewsFeed> {
 
   async getData() {
     return {
-      articles: await this.withMetaState(await this.fetchArticles()),
+      articles: await this.fetchArticles(),
     }
   }
 
-  private async fetchArticles(): Promise<Article[]> {
+  async composeContent(cached: NewsCachedFeed): Promise<NewsFeed> {
+    return {
+      articles: await this.withMetaState(cached.articles),
+    }
+  }
+
+  private async fetchArticles(): Promise<NewsCachedFeed['articles']> {
     const document = await fetchDocument(FEED_URL, {
       accept: 'text/html',
       cookie: `SOCS=${this.config.google.socs_cookie}`,
@@ -82,12 +75,11 @@ export class NewsSource extends DataSourceDefinition<NewsFeed> {
         href,
         uid: this.digestTitle(title),
         title,
-        read: false,
       }
     })
   }
 
-  private async withMetaState(articles: Article[]): Promise<Article[]> {
+  private async withMetaState(articles: NewsCachedFeed['articles']): Promise<Article[]> {
     if (articles.length === 0) {
       return []
     }

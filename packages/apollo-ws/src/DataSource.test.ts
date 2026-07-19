@@ -7,14 +7,15 @@ import { Cache, Snapshot } from './cache'
 import { DataSource, DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
 import { NoRecentContent } from './Errors'
 
-function createTestSourceClass<T>(options: {
+function createTestSourceClass<T, TCache = T>(options: {
   id: string
   isSnapshotExpired?: (snapshot: Snapshot<unknown>) => boolean
-  getData?: () => Promise<T>
+  getData?: () => Promise<TCache>
+  composeContent?: (cached: TCache) => Promise<T>
   isVolatile?: boolean
   handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
-}): DataSourceDefinitionClass<T> {
-  return class TestSource extends DataSourceDefinition<T> {
+}): DataSourceDefinitionClass<T, TCache> {
+  return class TestSource extends DataSourceDefinition<T, TCache> {
     public async handleCommand(command: string, args: string, recentContent?: T): Promise<void> {
       await options.handleCommand?.(command, args, recentContent)
     }
@@ -27,8 +28,14 @@ function createTestSourceClass<T>(options: {
       return options.isSnapshotExpired?.(snapshot) ?? true
     }
 
-    public async getData(): Promise<T> {
-      return options.getData !== undefined ? await options.getData() : ({ value: 1 } as T)
+    public async getData(): Promise<TCache> {
+      return options.getData !== undefined ? await options.getData() : ({ value: 1 } as TCache)
+    }
+
+    public async composeContent(cached: TCache): Promise<T> {
+      return options.composeContent !== undefined
+        ? await options.composeContent(cached)
+        : await super.composeContent(cached)
     }
 
     public isVolatile(): boolean {
@@ -46,7 +53,7 @@ describe('DataSource', () => {
     }
   })
 
-  async function createDataSource<T>(SourceClass: DataSourceDefinitionClass<T>) {
+  async function createDataSource<T, TCache = T>(SourceClass: DataSourceDefinitionClass<T, TCache>) {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-ds-'))
     cacheDirs.push(cacheDir)
 
@@ -140,13 +147,75 @@ describe('DataSource', () => {
     await dataSource.push({ value: 123 })
 
     expect(updates).toEqual(['push-src'])
-    expect(dataSource.getRecentContent()).toEqual({ value: 123 })
+    await expect(dataSource.getRecentContent()).resolves.toEqual({ value: 123 })
   })
 
   it('throws NoRecentContent when cache is empty', async () => {
     const { dataSource } = await createDataSource(createTestSourceClass({ id: 'empty' }))
 
-    expect(() => dataSource.getRecentContent()).toThrow(NoRecentContent)
+    await expect(dataSource.getRecentContent()).rejects.toThrow(NoRecentContent)
+  })
+
+  it('calls composeContent on cache hit without calling getData again', async () => {
+    const getData = vi.fn(async () => ({ value: 5 }))
+    const composeContent = vi.fn(async (cached: { value: number }) => ({ value: cached.value, meta: 'fresh' }))
+    const { dataSource } = await createDataSource(
+      createTestSourceClass<{ value: number; meta: string }, { value: number }>({
+        id: 'compose-hit',
+        isSnapshotExpired: () => false,
+        getData,
+        composeContent,
+      }),
+    )
+
+    await dataSource.getData()
+    getData.mockClear()
+    composeContent.mockClear()
+
+    await expect(dataSource.getData()).resolves.toEqual({ value: 5, meta: 'fresh' })
+    expect(getData).not.toHaveBeenCalled()
+    expect(composeContent).toHaveBeenCalledTimes(1)
+    expect(composeContent).toHaveBeenCalledWith({ value: 5 })
+  })
+
+  it('emits data-update on push without content without changing cache', async () => {
+    const updates: string[] = []
+    let pushWithoutContent: () => void = () => {}
+
+    class NotifySource extends DataSourceDefinition<{ value: number }> {
+      public constructor(push: (content?: { value: number }) => void, reportError: (e: Error) => void) {
+        super(push, reportError)
+        pushWithoutContent = () => push()
+      }
+
+      public getId(): string {
+        return 'notify-src'
+      }
+
+      public isSnapshotExpired(): boolean {
+        return false
+      }
+
+      public async getData(): Promise<{ value: number }> {
+        return { value: 1 }
+      }
+    }
+
+    const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-ds-'))
+    cacheDirs.push(cacheDir)
+    const vent = new ApolloEvents()
+    const cache = new Cache(cacheDir)
+    const dataSource = await DataSource.fromClass(NotifySource, cache, vent)
+
+    vent.on('data-update', sourceId => updates.push(sourceId))
+    await dataSource.getData()
+    updates.length = 0
+
+    pushWithoutContent()
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    expect(updates).toEqual(['notify-src'])
+    await expect(dataSource.getRecentContent()).resolves.toEqual({ value: 1 })
   })
 
   it('passes recent content to handleCommand when cache has data', async () => {

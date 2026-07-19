@@ -11,7 +11,7 @@ export class TransmissionSource extends DataSourceDefinition<TransmissionFeed> {
   private transmission: Transmission3
   private pollTimer: ReturnType<typeof setTimeout> | undefined
 
-  constructor(push: (content: TransmissionFeed) => void, reportError: (e: Error) => void) {
+  constructor(push: (content?: TransmissionFeed) => void, reportError: (e: Error) => void) {
     super(push, reportError)
 
     this.transmission = new Transmission3(this.config.transmission)

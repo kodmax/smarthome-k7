@@ -4,7 +4,7 @@ export type DS = DataSource<unknown>
 
 export type SourceDataTypes<S extends Record<string, AnyDataSourceDefinitionClass>> = {
   [K in keyof S]: S[K] extends new (...args: never[]) => infer I
-    ? I extends DataSourceDefinition<infer T>
+    ? I extends DataSourceDefinition<infer T, unknown>
       ? T
       : never
     : never
