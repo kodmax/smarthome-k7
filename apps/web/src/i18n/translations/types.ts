@@ -179,6 +179,7 @@ export type Translations = {
       addToFavourites: string
       markAsApplied: string
       editApplication: string
+      company: string
       currentApplicationStatus: string
       applicationDate: string
       lastStatusChange: string

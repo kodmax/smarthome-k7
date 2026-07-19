@@ -31,7 +31,6 @@ export const ApplyStatusIndicator: FC<{ ad: Pick<JobAdWithMeta, 'meta'> }> = ({ 
       <span
         aria-label={labels.applyStatus[application.status]}
         style={{
-          marginRight: `${designTokens.space[1]}px`,
           verticalAlign: 'middle',
           display: 'inline-flex',
         }}

@@ -27,7 +27,7 @@ export const APPLY_STATUS_ICONS: Record<JobApplyStatus, LucideIcon> = {
 export const APPLY_STATUS_COLORS: Record<JobApplyStatus, string> = {
   'not-applied': 'var(--mui-palette-text-disabled)',
   applied: 'var(--mui-palette-success-main)',
-  'not-interested': 'var(--mui-palette-text-secondary)',
+  'not-interested': 'var(--mui-palette-error-main)',
   rejected: 'var(--mui-palette-error-main)',
   'no-response': 'var(--mui-palette-warning-main)',
   interview: 'var(--mui-palette-info-main)',

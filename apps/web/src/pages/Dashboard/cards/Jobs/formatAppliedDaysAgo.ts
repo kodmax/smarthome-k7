@@ -75,3 +75,13 @@ export function formatAppliedDaysAgo(appliedAt: string | null, locale: AppLocale
 
   return formatDaysAgo(locale, days)
 }
+
+export function formatAppliedDaysShort(appliedAt: string | null, now = new Date()): string | null {
+  if (appliedAt === null) {
+    return null
+  }
+
+  const days = calendarDaysBetween(new Date(appliedAt), now)
+
+  return `${Math.max(days, 0)}d`
+}

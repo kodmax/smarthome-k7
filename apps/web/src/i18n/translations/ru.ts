@@ -213,6 +213,7 @@ export const ru: Translations = {
       addToFavourites: 'Добавить в избранное',
       markAsApplied: 'Отметить как откликнутую',
       editApplication: 'Редактировать отклик',
+      company: 'Компания',
       currentApplicationStatus: 'Текущий статус',
       applicationDate: 'Дата отклика',
       lastStatusChange: 'Последнее изменение статуса',

@@ -1,6 +1,6 @@
 import { type JobAdWithMeta, type JobApplyStatus } from '@repo/types'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { jobAd } from '@/pages/Dashboard/test/fixtures/jobs'
 import { renderInTableBody } from '@/pages/Dashboard/test/renderInTable'
 import { Ad } from './Ad'
@@ -30,6 +30,10 @@ function renderAd(
 }
 
 describe('Ad', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('renders the job title in compact mode', () => {
     renderAd(jobAd({ id: '1', title: 'Senior TypeScript Developer' }), false)
 
@@ -99,10 +103,59 @@ describe('Ad', () => {
     expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
   })
 
-  it('shows a star icon before the title when favourite outside edit mode', () => {
+  it('shows a star icon before the title when favourite', () => {
     renderAd(jobAd({ id: '3b', title: 'Favourite Role', meta: { fav: true } }), true)
 
     expect(screen.getByLabelText('Ulubione')).toBeInTheDocument()
+  })
+
+  it('shows a star icon before the title when favourite in edit mode', () => {
+    renderAd(jobAd({ id: '3d', title: 'Favourite Role', meta: { fav: true } }), true, true)
+
+    expect(screen.getByLabelText('Ulubione')).toBeInTheDocument()
+  })
+
+  it('shows abbreviated applied days before the title in edit mode', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-07-19T12:00:00'))
+
+    renderAd(
+      jobAd({
+        id: '7',
+        title: 'Applied Role',
+        meta: {
+          application: {
+            status: 'applied',
+            appliedAt: '2026-07-13T08:00:00.000Z',
+          },
+        },
+      }),
+      true,
+      true,
+    )
+
+    expect(screen.getByText('6d')).toBeInTheDocument()
+  })
+
+  it('does not show abbreviated applied days outside edit mode', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-07-19T12:00:00'))
+
+    renderAd(
+      jobAd({
+        id: '7b',
+        title: 'Applied Role',
+        meta: {
+          application: {
+            status: 'applied',
+            appliedAt: '2026-07-13T08:00:00.000Z',
+          },
+        },
+      }),
+      true,
+    )
+
+    expect(screen.queryByText('6d')).not.toBeInTheDocument()
   })
 
   it('shows an edit button in edit mode', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calendarDaysBetween, formatAppliedDaysAgo } from './formatAppliedDaysAgo'
+import { calendarDaysBetween, formatAppliedDaysAgo, formatAppliedDaysShort } from './formatAppliedDaysAgo'
 
 describe('formatAppliedDaysAgo', () => {
   const now = new Date('2026-07-19T15:30:00')
@@ -25,5 +25,11 @@ describe('formatAppliedDaysAgo', () => {
     const to = new Date('2026-07-19T00:01:00')
 
     expect(calendarDaysBetween(from, to)).toBe(2)
+  })
+
+  it('formats abbreviated applied days', () => {
+    expect(formatAppliedDaysShort(null, now)).toBeNull()
+    expect(formatAppliedDaysShort('2026-07-19T08:00:00', now)).toBe('0d')
+    expect(formatAppliedDaysShort('2026-07-13T08:00:00', now)).toBe('6d')
   })
 })

@@ -213,6 +213,7 @@ export const en: Translations = {
       addToFavourites: 'Add to favourites',
       markAsApplied: 'Mark as applied',
       editApplication: 'Edit application',
+      company: 'Company',
       currentApplicationStatus: 'Current status',
       applicationDate: 'Application date',
       lastStatusChange: 'Last status change',

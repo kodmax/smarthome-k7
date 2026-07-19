@@ -122,6 +122,12 @@ export const ApplicationStatusEditor: FC<{
           <Box sx={{ display: 'flex', gap: `${designTokens.space[3]}px`, alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <Box>
               <Typography variant='caption' color='text.secondary' display='block'>
+                {labels.company}
+              </Typography>
+              <Typography>{ad.companyName}</Typography>
+            </Box>
+            <Box>
+              <Typography variant='caption' color='text.secondary' display='block'>
                 {labels.currentApplicationStatus}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: `${designTokens.space[1]}px` }}>
