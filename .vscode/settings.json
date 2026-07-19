@@ -1,5 +1,3 @@
 {
-  "eslint.workingDirectories": [
-    "apps/web"
-  ]
+  "eslint.workingDirectories": ["apps/web"]
 }

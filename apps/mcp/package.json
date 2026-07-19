@@ -10,7 +10,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\""
   },
-    "dependencies": {
+  "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@repo/knx-schema": "*",
     "@repo/types": "*",

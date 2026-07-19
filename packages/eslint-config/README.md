@@ -23,6 +23,6 @@ Exports from `index.js`: TypeScript ESLint + Prettier rules (`eslint-config-pret
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `format` | Prettier |
+| Script   | Description |
+| -------- | ----------- |
+| `format` | Prettier    |

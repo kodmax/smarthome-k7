@@ -2,7 +2,8 @@
 
 Transmission BitTorrent daemon RPC client for the backend.
 
-Includes a generic JSON-RPC 2.0 HTTP client and a Transmission-specific wrapper that handles session IDs and HTTP basic auth.
+Includes a generic JSON-RPC 2.0 HTTP client and a Transmission-specific wrapper that handles session IDs and HTTP basic
+auth.
 
 ## Runtime API
 
@@ -40,10 +41,10 @@ Or add the same variables to `apps/service/.env` when used from the service.
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
+| Script  | Description                |
+| ------- | -------------------------- |
 | `build` | Compile runtime to `dist/` |
-| `dev` | `tsc --watch` |
+| `dev`   | `tsc --watch`              |
 
 ## Layout
 

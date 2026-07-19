@@ -1,9 +1,5 @@
 import { getTransmissionConfig } from '../config'
-import {
-  type TransmissionClientConfig,
-  type TransmissionRequest,
-  type TransmissionResponse,
-} from './types'
+import { type TransmissionClientConfig, type TransmissionRequest, type TransmissionResponse } from './types'
 
 export class TransmissionCallError extends Error {
   readonly errorCode: number | undefined

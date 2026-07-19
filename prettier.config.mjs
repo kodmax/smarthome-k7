@@ -7,7 +7,7 @@ const config = {
   "bracketSpacing": true,
   "htmlWhitespaceSensitivity": "css",
   "insertPragma": false,
-  "jsxBracketSameLine": false,
+  "bracketSameLine": false,
   "jsxSingleQuote": true,
   "printWidth": 120,
   "proseWrap": "always",

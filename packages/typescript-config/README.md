@@ -4,11 +4,11 @@ Shared `tsconfig.json` presets for the monorepo.
 
 ## Presets
 
-| File | Purpose |
-|------|---------|
-| `base.json` | Strict ESNext — base for most packages |
-| `vite.json` | Vite apps (DOM, `noEmit`) |
-| `react-library.json` | React libraries (`jsx: react-jsx`) |
+| File                 | Purpose                                |
+| -------------------- | -------------------------------------- |
+| `base.json`          | Strict ESNext — base for most packages |
+| `vite.json`          | Vite apps (DOM, `noEmit`)              |
+| `react-library.json` | React libraries (`jsx: react-jsx`)     |
 
 ## Usage
 
@@ -26,6 +26,6 @@ Shared `tsconfig.json` presets for the monorepo.
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `format` | Prettier |
+| Script   | Description |
+| -------- | ----------- |
+| `format` | Prettier    |

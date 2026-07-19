@@ -4,7 +4,8 @@ MariaDB for the `apollo` database: SQL migrations and a shared runtime connectio
 
 Used by `apps/service` (reads + weather writes) and `@repo/cron-scripts` (KNX logging).
 
-Migration tooling is a small Node script on `mariadb` only — no `db-migrate`, no native `ssh2`/`cpu-features` (works on Raspberry Pi).
+Migration tooling is a small Node script on `mariadb` only — no `db-migrate`, no native `ssh2`/`cpu-features` (works on
+Raspberry Pi).
 
 ## Runtime API
 
@@ -36,7 +37,8 @@ cp packages/db/.env.example packages/db/.env
 # fill DB_MIGRATE_*
 ```
 
-Credentials are independent from [`apps/service/.env`](../apps/service/.env). Copy the same values initially, or use a DDL-capable user for migrations and a narrower user for the runtime pool.
+Credentials are independent from [`apps/service/.env`](../apps/service/.env). Copy the same values initially, or use a
+DDL-capable user for migrations and a narrower user for the runtime pool.
 
 Create the database once (as admin), then apply migrations:
 
@@ -52,14 +54,14 @@ yarn workspace @repo/db db:migrate
 
 ## Scripts
 
-| Script | Description |
-|--------|-------------|
-| `build` | Compile runtime to `dist/` |
-| `dev` | `tsc --watch` |
-| `db:migrate` | Apply pending migrations |
-| `db:rollback` | Revert last migration (**destructive** on `down`) |
-| `db:status` | Check migration state |
-| `db:create <name>` | Scaffold new SQL migration files |
+| Script             | Description                                       |
+| ------------------ | ------------------------------------------------- |
+| `build`            | Compile runtime to `dist/`                        |
+| `dev`              | `tsc --watch`                                     |
+| `db:migrate`       | Apply pending migrations                          |
+| `db:rollback`      | Revert last migration (**destructive** on `down`) |
+| `db:status`        | Check migration state                             |
+| `db:create <name>` | Scaffold new SQL migration files                  |
 
 From repo root, shorthand:
 
@@ -77,7 +79,8 @@ Edit `migrations/sqls/<timestamp>-add-meter-total-up.sql` and `-down.sql`, then 
 
 ## Existing production database
 
-The initial migration uses `CREATE TABLE IF NOT EXISTS`. First `db:migrate` on a DB that already has tables is safe — applied versions are recorded in the `migrations` table (compatible with prior db-migrate runs).
+The initial migration uses `CREATE TABLE IF NOT EXISTS`. First `db:migrate` on a DB that already has tables is safe —
+applied versions are recorded in the `migrations` table (compatible with prior db-migrate runs).
 
 ## Layout
 

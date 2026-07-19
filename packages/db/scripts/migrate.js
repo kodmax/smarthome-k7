@@ -82,7 +82,10 @@ async function cmdStatus() {
     if (pending.length === 0) {
       console.log('[INFO] No pending migrations')
     } else {
-      console.log('[INFO] Pending migrations:', pending.map(base => migrationRecordName(base)))
+      console.log(
+        '[INFO] Pending migrations:',
+        pending.map(base => migrationRecordName(base)),
+      )
     }
 
     if (applied.size > 0) {
