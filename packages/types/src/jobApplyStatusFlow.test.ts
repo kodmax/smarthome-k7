@@ -12,7 +12,8 @@ describe('jobApplyStatusFlow', () => {
     expect(canTransition('not-applied', 'withdrawn')).toBe(false)
   })
 
-  it('allows not-interested to applied', () => {
+  it('allows not-interested to not-applied and applied', () => {
+    expect(canTransition('not-interested', 'not-applied')).toBe(true)
     expect(canTransition('not-interested', 'applied')).toBe(true)
   })
 

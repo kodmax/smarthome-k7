@@ -16,7 +16,7 @@ const TERMINAL_APPLY_STATUSES = new Set<JobApplyStatus>(['rejected', 'no-respons
 const TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
   'not-applied': ['applied', 'not-interested'],
   applied: ['rejected', 'no-response', 'interview', 'withdrawn'],
-  'not-interested': ['applied'],
+  'not-interested': ['not-applied', 'applied'],
   rejected: [],
   'no-response': [],
   interview: ['rejected', 'withdrawn', 'offer'],

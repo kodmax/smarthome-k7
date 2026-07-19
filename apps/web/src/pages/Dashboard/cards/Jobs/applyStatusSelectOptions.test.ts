@@ -6,8 +6,8 @@ describe('applyStatusTargetOptions', () => {
     expect(applyStatusTargetOptions('rejected')).toEqual([])
   })
 
-  it('returns reset transition from not-interested', () => {
-    expect(applyStatusTargetOptions('not-interested')).toEqual(['applied'])
+  it('returns reset transitions from not-interested', () => {
+    expect(applyStatusTargetOptions('not-interested')).toEqual(['not-applied', 'applied'])
   })
 
   it('returns only allowed transitions', () => {
