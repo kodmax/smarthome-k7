@@ -3,7 +3,7 @@ import { CoolingIcon, ThermometerSunIcon, UVIcon, WeatherIcon as WeatherCardIcon
 import { ApolloCard, useZoom } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { HourWeatherForecast, WeatherFeed } from '@repo/types'
-import { formatIsoWeekdayShort, useTranslations } from '@/i18n'
+import { formatIsoWeekdayLong, useTranslations } from '@/i18n'
 import { CardHeadingHints, CardHintIcon, formatHintLine } from '@/app/hints'
 import {
   maxHourlyPrecipPercentForType,
@@ -60,7 +60,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
       cardId='hourly-weather-forecast'
       title={labels.title}
       icon={WeatherCardIcon}
-      height={6}
+      height={4}
       headingInfo={
         showPrecip || showHot || showWind || showHighUv || showFrost ? (
           <CardHeadingHints>
@@ -118,7 +118,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
       <ScrollArea>
         <ForecastRow>
           {hourly?.map((fc: HourWeatherForecast) => (
-            <Hour key={`${fc.date}-${fc.hour}`} fc={fc} zoom={zoom} weekdayLabel={formatIsoWeekdayShort(fc.date, t)} />
+            <Hour key={`${fc.date}-${fc.hour}`} fc={fc} zoom={zoom} weekdayLabel={formatIsoWeekdayLong(fc.date, t)} />
           ))}
         </ForecastRow>
       </ScrollArea>

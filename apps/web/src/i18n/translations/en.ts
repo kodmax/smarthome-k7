@@ -258,5 +258,6 @@ export const en: Translations = {
     todayShort: 'Today',
     tomorrowShort: 'Tomorrow',
     weekdayShort: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    weekdayLong: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
   },
 }

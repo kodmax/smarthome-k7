@@ -14,6 +14,7 @@ export { APP_LOCALES, LOCALE_LABELS, LOCALE_STORAGE_KEY, type AppLocale } from '
 export type { Translations } from './translations/types'
 export {
   formatForecastDayLabel,
+  formatIsoWeekdayLong,
   formatIsoWeekdayShort,
   mondayBasedWeekdayIndex,
   parseForecastDate,

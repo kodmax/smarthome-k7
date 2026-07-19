@@ -44,6 +44,10 @@ export const formatIsoWeekdayShort = (isoDate: string, t: Translations): string 
   return t.dateTime.weekdayShort[mondayBasedWeekdayIndex(parseIsoDate(isoDate))]
 }
 
+export const formatIsoWeekdayLong = (isoDate: string, t: Translations): string => {
+  return t.dateTime.weekdayLong[mondayBasedWeekdayIndex(parseIsoDate(isoDate))]
+}
+
 export const formatForecastDayLabel = (ddMm: string, t: Translations): string => {
   const date = parseForecastDate(ddMm)
   const today = new Date()

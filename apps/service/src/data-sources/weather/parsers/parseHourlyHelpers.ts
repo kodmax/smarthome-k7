@@ -38,10 +38,11 @@ export const parseHourlyWind = (item: Element) => {
   }
 
   const { direction, speed, speedUnit } = parseWindValue(wind)
+  const speedMs = toMetersPerSecond(speed, speedUnit)
 
   return {
-    direction,
-    speed: toMetersPerSecond(speed, speedUnit),
+    direction: direction === '' || speed === 0 ? null : direction,
+    speed: speedMs,
   }
 }
 

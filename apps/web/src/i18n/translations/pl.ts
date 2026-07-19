@@ -258,5 +258,6 @@ export const pl: Translations = {
     todayShort: 'Dziś',
     tomorrowShort: 'Jutro',
     weekdayShort: ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'niedz.'],
+    weekdayLong: ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'],
   },
 }

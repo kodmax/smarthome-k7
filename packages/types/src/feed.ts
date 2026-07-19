@@ -150,7 +150,7 @@ export type HourWeatherForecast = {
   hour: string
   date: string
   wind: {
-    direction: string
+    direction: string | null
     speed: number
   }
   sun: {

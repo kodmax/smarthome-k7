@@ -219,6 +219,7 @@ export type Translations = {
     todayShort: string
     tomorrowShort: string
     weekdayShort: readonly [string, string, string, string, string, string, string]
+    weekdayLong: readonly [string, string, string, string, string, string, string]
   }
   offline: {
     title: string
