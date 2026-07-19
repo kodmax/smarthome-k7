@@ -300,7 +300,6 @@ export type JobAd = {
   workplaceType: WorkplaceType
   employmentType: EmploymentType
   monthlySalaryRangeAfterTaxes?: SalaryRange
-  isUnwantedCompany: boolean
   origin: 'jj' | 'nfj' | 'theprotocol'
   applied: boolean
   hide: boolean

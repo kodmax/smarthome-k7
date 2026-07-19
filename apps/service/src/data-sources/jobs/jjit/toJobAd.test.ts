@@ -107,7 +107,6 @@ describe('toJobAd', () => {
   it('should convert justjoin ad to standard JobAd', () => {
     expect(toJobAd(jjAd)).toEqual({
       id: '9c7585ec-bd78-43c7-8ae9-ee898c903012',
-      isUnwantedCompany: true,
       title: 'Engineering Manager',
       advertUrl: 'https://justjoin.it/job-offer/monday-com-software-engineering-team-lead-warszawa-javascript',
       companyLogoUrl:

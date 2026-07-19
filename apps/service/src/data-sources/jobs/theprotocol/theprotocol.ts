@@ -2,7 +2,6 @@ import { JobAd, SalaryUnit, WorkplaceType } from '@repo/types'
 import { getAds } from './getAds'
 import { Contract } from './types'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
-import { isUnwantedCompany } from '../filters/filters'
 
 const theprotocol: () => Promise<JobAd[]> = async () => {
   const theProtocolAds = await getAds()
@@ -50,7 +49,6 @@ const theprotocol: () => Promise<JobAd[]> = async () => {
       workplaceType,
       employmentType: bestContractType.type,
       monthlySalaryRangeAfterTaxes: bestContractType.salaryRange,
-      isUnwantedCompany: isUnwantedCompany(ad.employer),
       origin: 'theprotocol',
       applied: false,
       hide: false,

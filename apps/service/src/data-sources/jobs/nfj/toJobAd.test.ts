@@ -32,7 +32,6 @@ describe('toJobAd', () => {
       requiredSkills: ['React', 'TypeScript'],
       workplaceType: 'office',
       employmentType: 'permanent',
-      isUnwantedCompany: false,
       applied: false,
       hide: false,
       fav: false,
@@ -46,10 +45,6 @@ describe('toJobAd', () => {
 
   it('marks remote when fullyRemote and not hybrid', () => {
     expect(toJobAd({ ...baseNfjAd, location: { fullyRemote: true } }, new Set()).workplaceType).toBe('remote')
-  })
-
-  it('marks unwanted company from blocklist', () => {
-    expect(toJobAd({ ...baseNfjAd, name: 'monday.com' }, new Set()).isUnwantedCompany).toBe(true)
   })
 
   it('omits salary when range is incomplete', () => {

@@ -1,6 +1,5 @@
 import { JobAd } from '@repo/types'
 import { JustJoinAd } from './types'
-import { isUnwantedCompany } from '../filters/filters'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
 
 export const toJobAd = (jjAd: JustJoinAd): JobAd => {
@@ -16,7 +15,6 @@ export const toJobAd = (jjAd: JustJoinAd): JobAd => {
     requiredSkills: jjAd.requiredSkills.filter(item => item.level >= 3).map(item => item.name),
     workplaceType: jjAd.workplaceType,
     employmentType: jjEmploymentType?.type === 'permanent' ? 'permanent' : 'b2b',
-    isUnwantedCompany: isUnwantedCompany(jjAd.companyName),
     applied: false,
     hide: false,
     fav: false,

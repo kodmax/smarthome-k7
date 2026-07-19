@@ -1,13 +1,6 @@
 import { JobAd } from '@repo/types'
 import { describe, expect, it } from 'vitest'
-import {
-  isHybridOrRemote,
-  isSalaryAcceptable,
-  isUnwantedCompany,
-  noManager,
-  noUwantedSkills,
-  withReact,
-} from './filters'
+import { isHybridOrRemote, isSalaryAcceptable, notManager, noUwantedSkills, withReact } from './filters'
 
 const baseAd: JobAd = {
   id: '1',
@@ -19,23 +12,11 @@ const baseAd: JobAd = {
   requiredSkills: ['React', 'TypeScript'],
   workplaceType: 'remote',
   employmentType: 'permanent',
-  isUnwantedCompany: false,
   applied: false,
   hide: false,
   fav: false,
   monthlySalaryRangeAfterTaxes: { from: 26_000, to: 30_000 },
 }
-
-describe('isUnwantedCompany', () => {
-  it('rejects companies from the blocklist', () => {
-    expect(isUnwantedCompany('monday.com')).toBe(true)
-    expect(isUnwantedCompany('monday.com Poland')).toBe(true)
-  })
-
-  it('accepts other companies', () => {
-    expect(isUnwantedCompany('Acme Corp')).toBe(false)
-  })
-})
 
 describe('noUwantedSkills', () => {
   it('rejects ads requiring Python', () => {
@@ -70,13 +51,13 @@ describe('isSalaryAcceptable', () => {
   })
 })
 
-describe('noManager', () => {
+describe('notManager', () => {
   it('rejects titles containing Manager', () => {
-    expect(noManager({ ...baseAd, title: 'Engineering Manager' })).toBe(false)
+    expect(notManager({ ...baseAd, title: 'Engineering Manager' })).toBe(false)
   })
 
   it('accepts titles without Manager', () => {
-    expect(noManager(baseAd)).toBe(true)
+    expect(notManager(baseAd)).toBe(true)
   })
 })
 

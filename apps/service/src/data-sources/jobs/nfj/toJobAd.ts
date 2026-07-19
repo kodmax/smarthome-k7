@@ -1,6 +1,5 @@
 import { JobAd } from '@repo/types'
 import { NoFluffJobsAd } from './types'
-import { isUnwantedCompany } from '../filters/filters'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
 import { digestNfjId } from './digestNfjId'
 
@@ -15,7 +14,6 @@ export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {
     requiredSkills: ad.tiles.values.filter(item => item.type === 'requirement').map(item => item.value),
     workplaceType: hybridIds.has(ad.id) ? 'hybrid' : ad.location.fullyRemote ? 'remote' : 'office',
     employmentType: ad.salary.type === 'permanent' ? 'permanent' : 'b2b',
-    isUnwantedCompany: isUnwantedCompany(ad.name),
     applied: false,
     hide: false,
     fav: false,
