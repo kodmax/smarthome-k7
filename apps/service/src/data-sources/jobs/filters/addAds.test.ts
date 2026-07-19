@@ -12,9 +12,6 @@ const makeAd = (overrides: Partial<JobAd> = {}): JobAd => ({
   requiredSkills: ['React'],
   workplaceType: 'remote',
   employmentType: 'permanent',
-  applied: false,
-  hide: false,
-  fav: false,
   monthlySalaryRangeAfterTaxes: { from: 26_000, to: 30_000 },
   ...overrides,
 })

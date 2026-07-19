@@ -15,9 +15,6 @@ export const toJobAd = (jjAd: JustJoinAd): JobAd => {
     requiredSkills: jjAd.requiredSkills.filter(item => item.level >= 3).map(item => item.name),
     workplaceType: jjAd.workplaceType,
     employmentType: jjEmploymentType?.type === 'permanent' ? 'permanent' : 'b2b',
-    applied: false,
-    hide: false,
-    fav: false,
     monthlySalaryRangeAfterTaxes:
       jjEmploymentType !== undefined && jjEmploymentType.fromPerUnit !== null && jjEmploymentType.toPerUnit !== null
         ? getMonthlySalaryAfterTax(

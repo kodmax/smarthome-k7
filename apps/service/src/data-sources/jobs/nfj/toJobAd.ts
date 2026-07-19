@@ -14,9 +14,6 @@ export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {
     requiredSkills: ad.tiles.values.filter(item => item.type === 'requirement').map(item => item.value),
     workplaceType: hybridIds.has(ad.id) ? 'hybrid' : ad.location.fullyRemote ? 'remote' : 'office',
     employmentType: ad.salary.type === 'permanent' ? 'permanent' : 'b2b',
-    applied: false,
-    hide: false,
-    fav: false,
     monthlySalaryRangeAfterTaxes:
       ad.salary.from !== undefined && ad.salary.to !== undefined
         ? getMonthlySalaryAfterTax(ad.salary.type, 'Month', ad.salary.from, ad.salary.to)

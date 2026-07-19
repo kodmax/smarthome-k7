@@ -1,48 +1,35 @@
 import { TableBody } from '@mui/material'
-import { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { JobsIcon, SettingsIcon } from '@repo/assets'
 import { ApolloCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
 import { useCommand, useFeed } from '@repo/feed-client'
 import { ApolloDataTable, TableEmptyMessage, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
-import { JobsFeed } from '@repo/types'
+import { JobApplyStatus, JobsFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { Ad } from './Ad'
+import { filterVisibleJobAds } from './visibleJobAds'
 
 const cardTableFontSize = designTokens.font.body.size
 
 export const Jobs: FC<Record<string, never>> = () => {
   const [editMode, setEditMode] = useState<boolean>(false)
+  const [expandedAdId, setExpandedAdId] = useState<string | null>(null)
 
   const zoom = useZoom('jobs')
   const feed = useFeed<JobsFeed>('jobs')
   const { t } = useTranslations()
   const labels = t.dashboard.jobs
-  const applied = useCommand('jobs', 'applied')
-  const hide = useCommand('jobs', 'hide')
-  const restore = useCommand('jobs', 'restore')
+  const changeState = useCommand('jobs', 'change-state')
   const fav = useCommand('jobs', 'fav')
   const unfav = useCommand('jobs', 'unfav')
 
-  const onAppliedJob = useCallback(
-    (id: string) => {
-      applied(id)
+  const onChangeApplicationState = useCallback(
+    (id: string, applyStatus: JobApplyStatus, comment: string) => {
+      changeState(JSON.stringify({ id, applyStatus, comment: comment || undefined }))
+      setExpandedAdId(null)
     },
-    [applied],
-  )
-
-  const onHideJob = useCallback(
-    (id: string) => {
-      hide(id)
-    },
-    [hide],
-  )
-
-  const onRestoreJob = useCallback(
-    (id: string) => {
-      restore(id)
-    },
-    [restore],
+    [changeState],
   )
 
   const onFavJob = useCallback(
@@ -59,17 +46,29 @@ export const Jobs: FC<Record<string, never>> = () => {
     [unfav],
   )
 
+  const onToggleExpand = useCallback((id: string) => {
+    setExpandedAdId(current => (current === id ? null : id))
+  }, [])
+
   const onEditPreferences = useCallback(() => {
-    setEditMode(!editMode)
-  }, [editMode])
+    setEditMode(current => !current)
+  }, [])
 
   useEffect(() => {
     if (!zoom) {
       setEditMode(false)
+      setExpandedAdId(null)
     }
   }, [zoom])
 
-  const ads = feed?.ads.filter(ad => !ad.hide || editMode) ?? []
+  useEffect(() => {
+    if (!editMode) {
+      setExpandedAdId(null)
+    }
+  }, [editMode])
+
+  const visibleAds = useMemo(() => (feed ? filterVisibleJobAds(feed.ads) : []), [feed])
+  const ads = editMode ? (feed?.ads ?? []) : visibleAds
 
   return (
     <ApolloCard
@@ -77,7 +76,7 @@ export const Jobs: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={JobsIcon}
       height={6}
-      headingInfo={feed?.ads.filter(ad => !ad.hide).length}
+      headingInfo={visibleAds.length}
       actions={
         <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />
       }
@@ -95,9 +94,9 @@ export const Jobs: FC<Record<string, never>> = () => {
                 ad={ad}
                 zoom={zoom}
                 editMode={editMode}
-                onApplied={onAppliedJob}
-                onHide={onHideJob}
-                onRestore={onRestoreJob}
+                expanded={expandedAdId === ad.id}
+                onToggleExpand={onToggleExpand}
+                onChangeApplicationState={onChangeApplicationState}
                 onFav={onFavJob}
                 onUnfav={onUnfavJob}
               />

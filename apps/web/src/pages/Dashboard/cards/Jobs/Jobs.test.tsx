@@ -33,4 +33,18 @@ describe('Jobs', () => {
     expect(screen.getByText('Backend Engineer')).toBeInTheDocument()
     expect(screen.getByText('Frontend Engineer')).toBeInTheDocument()
   })
+
+  it('hides terminal-status ads in normal view', () => {
+    mockedUseFeed.mockReturnValue(
+      jobsFeed(
+        jobAd({ id: '1', title: 'Active Role', meta: { application: { status: 'applied' } } }),
+        jobAd({ id: '2', title: 'Rejected Role', meta: { application: { status: 'rejected' } } }),
+      ),
+    )
+
+    render(<Jobs />)
+
+    expect(screen.getByText('Active Role')).toBeInTheDocument()
+    expect(screen.queryByText('Rejected Role')).not.toBeInTheDocument()
+  })
 })

@@ -1,8 +1,15 @@
-import { type JobAd } from '@repo/types'
+import { type JobAdApplication, type JobAdMeta, type JobAdWithMeta, emptyJobAdMeta } from '@repo/types'
 
-type JobAdOverrides = Partial<JobAd> & Pick<JobAd, 'id' | 'title'>
+type JobAdOverrides = Partial<Omit<JobAdWithMeta, 'meta'>> &
+  Pick<JobAdWithMeta, 'id' | 'title'> & {
+    meta?: Partial<Omit<JobAdMeta, 'application'>> & {
+      application?: Partial<JobAdApplication>
+    }
+  }
 
-export function jobAd(overrides: JobAdOverrides): JobAd {
+export function jobAd(overrides: JobAdOverrides): JobAdWithMeta {
+  const { meta, ...rest } = overrides
+
   return {
     advertUrl: 'https://example.com/job/1',
     companyLogoUrl: '',
@@ -10,10 +17,15 @@ export function jobAd(overrides: JobAdOverrides): JobAd {
     requiredSkills: [],
     workplaceType: 'remote',
     employmentType: 'permanent',
-    applied: false,
-    hide: false,
-    fav: false,
     origin: 'jj',
-    ...overrides,
+    ...rest,
+    meta: {
+      ...emptyJobAdMeta(),
+      ...meta,
+      application: {
+        ...emptyJobAdMeta().application,
+        ...meta?.application,
+      },
+    },
   }
 }

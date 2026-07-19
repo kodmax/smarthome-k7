@@ -32,9 +32,6 @@ describe('toJobAd', () => {
       requiredSkills: ['React', 'TypeScript'],
       workplaceType: 'office',
       employmentType: 'permanent',
-      applied: false,
-      hide: false,
-      fav: false,
       monthlySalaryRangeAfterTaxes: { from: 18_000, to: 24_000 },
     })
   })

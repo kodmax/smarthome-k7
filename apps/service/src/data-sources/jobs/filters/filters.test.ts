@@ -12,9 +12,6 @@ const baseAd: JobAd = {
   requiredSkills: ['React', 'TypeScript'],
   workplaceType: 'remote',
   employmentType: 'permanent',
-  applied: false,
-  hide: false,
-  fav: false,
   monthlySalaryRangeAfterTaxes: { from: 26_000, to: 30_000 },
 }
 

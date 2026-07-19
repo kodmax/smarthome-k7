@@ -285,9 +285,33 @@ export type ContractType = 'permanent' | 'b2b'
 
 export type WorkplaceType = 'office' | 'remote' | 'hybrid'
 export type EmploymentType = 'permanent' | 'b2b'
+
 export type SalaryRange = {
   from: number
   to: number
+}
+
+export type { JobApplyStatus } from './jobApplyStatusFlow'
+export { DEFAULT_JOB_APPLY_STATUS } from './jobApplyStatusFlow'
+import type { JobApplyStatus } from './jobApplyStatusFlow'
+import { DEFAULT_JOB_APPLY_STATUS } from './jobApplyStatusFlow'
+
+export type JobAdApplicationMeta = {
+  applyStatus: JobApplyStatus
+  comment: string | null
+  appliedAt: string | null
+}
+
+export type JobAdApplication = {
+  status: JobApplyStatus
+  comment: string | null
+  appliedAt: string | null
+  statusChangedAt: string | null
+}
+
+export type JobAdMeta = {
+  application: JobAdApplication
+  fav: boolean
 }
 
 export type JobAd = {
@@ -301,13 +325,54 @@ export type JobAd = {
   employmentType: EmploymentType
   monthlySalaryRangeAfterTaxes?: SalaryRange
   origin: 'jj' | 'nfj' | 'theprotocol'
-  applied: boolean
-  hide: boolean
-  fav: boolean
+}
+
+export type JobAdWithMeta = JobAd & {
+  meta: JobAdMeta
 }
 
 export type JobsFeed = {
-  ads: JobAd[]
+  ads: JobAdWithMeta[]
+}
+
+export function emptyJobAdApplication(): JobAdApplication {
+  return {
+    status: DEFAULT_JOB_APPLY_STATUS,
+    comment: null,
+    appliedAt: null,
+    statusChangedAt: null,
+  }
+}
+
+export function emptyJobAdMeta(): JobAdMeta {
+  return {
+    application: emptyJobAdApplication(),
+    fav: false,
+  }
+}
+
+export function jobAdApplicationFromMeta(
+  meta: JobAdApplicationMeta,
+  statusChangedAt: string | null = null,
+): JobAdApplication {
+  return {
+    status: meta.applyStatus,
+    comment: meta.comment,
+    appliedAt: meta.appliedAt,
+    statusChangedAt,
+  }
+}
+
+export function jobAdApplicationMetaFromApplication(application: JobAdApplication): JobAdApplicationMeta {
+  return {
+    applyStatus: application.status,
+    comment: application.comment,
+    appliedAt: application.appliedAt,
+  }
+}
+
+export function isJobAdApplied(ad: Pick<JobAdWithMeta, 'meta'>): boolean {
+  return ad.meta.application.appliedAt !== null
 }
 
 export type Article = {

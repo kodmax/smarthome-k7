@@ -11,6 +11,7 @@ import type {
   TransmissionFeed,
   WeatherFeed,
 } from '@repo/types'
+import { isJobAdApplied, isTerminalApplyStatus } from '@repo/types'
 import type { FeedStore } from '../feeds/FeedStore.js'
 import { DASHBOARD_FEED_IDS, type DashboardFeedId } from '../feeds/dashboardFeeds.js'
 import { getTopTitles } from '../torrents/getTopTitles.js'
@@ -137,16 +138,21 @@ export function formatNews(feed: NewsFeed): string {
 }
 
 export function formatJobs(feed: JobsFeed, visibleOnly = true): string {
-  const ads = visibleOnly ? feed.ads.filter(ad => !ad.hide) : feed.ads
+  const ads = visibleOnly ? feed.ads.filter(ad => !isTerminalApplyStatus(ad.meta.application.status)) : feed.ads
 
   if (ads.length === 0) {
-    return visibleOnly ? 'Brak widocznych ofert (wszystkie ukryte lub brak ogłoszeń)' : 'Brak ofert'
+    return visibleOnly ? 'Brak aktywnych ofert (wszystkie zakończone lub brak ogłoszeń)' : 'Brak ofert'
   }
 
   const header = visibleOnly ? `Widocznych ofert: ${ads.length}` : `Ofert: ${ads.length}`
   const items = ads
     .map(ad => {
-      const flags = [ad.applied ? 'applied' : null, ad.fav ? '★' : null, ad.workplaceType, ad.employmentType]
+      const flags = [
+        isJobAdApplied(ad) ? 'applied' : null,
+        ad.meta.fav ? '★' : null,
+        ad.workplaceType,
+        ad.employmentType,
+      ]
         .filter(Boolean)
         .join(', ')
       const salary = ad.monthlySalaryRangeAfterTaxes

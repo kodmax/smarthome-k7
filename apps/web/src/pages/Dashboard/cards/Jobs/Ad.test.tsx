@@ -1,21 +1,28 @@
-import { type JobAd } from '@repo/types'
-import { screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { type JobAdWithMeta, type JobApplyStatus } from '@repo/types'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 import { jobAd } from '@/pages/Dashboard/test/fixtures/jobs'
 import { renderInTableBody } from '@/pages/Dashboard/test/renderInTable'
 import { Ad } from './Ad'
 
 const noop = () => undefined
 
-function renderAd(ad: JobAd, zoom: boolean, editMode = false) {
+function renderAd(
+  ad: JobAdWithMeta,
+  zoom: boolean,
+  editMode = false,
+  expanded = false,
+  onChangeApplicationState: (id: string, applyStatus: JobApplyStatus, comment: string) => void = noop,
+  onToggleExpand: () => void = noop,
+) {
   return renderInTableBody(
     <Ad
       ad={ad}
       zoom={zoom}
       editMode={editMode}
-      onApplied={noop}
-      onHide={noop}
-      onRestore={noop}
+      expanded={expanded}
+      onToggleExpand={onToggleExpand}
+      onChangeApplicationState={onChangeApplicationState}
       onFav={noop}
       onUnfav={noop}
     />,
@@ -54,39 +61,79 @@ describe('Ad', () => {
     expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
   })
 
-  it('shows a green mail-check icon before the title when applied outside edit mode', () => {
-    renderAd(jobAd({ id: '3', title: 'Applied Role', applied: true }), true)
+  it('shows an apply-status icon before the title', () => {
+    renderAd(
+      jobAd({
+        id: '3',
+        title: 'Applied Role',
+        meta: {
+          application: {
+            status: 'applied',
+            appliedAt: '2026-01-01T00:00:00.000Z',
+          },
+        },
+      }),
+      true,
+    )
 
     expect(screen.getByLabelText('Złożone')).toBeInTheDocument()
   })
 
+  it('shows an apply-status icon in edit mode without opening the editor panel', () => {
+    renderAd(
+      jobAd({
+        id: '3c',
+        title: 'Applied Role',
+        meta: {
+          application: {
+            status: 'interview',
+            appliedAt: '2026-01-01T00:00:00.000Z',
+          },
+        },
+      }),
+      true,
+      true,
+    )
+
+    expect(screen.getByLabelText('Rozmowa')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
+  })
+
   it('shows a star icon before the title when favourite outside edit mode', () => {
-    renderAd(jobAd({ id: '3b', title: 'Favourite Role', fav: true }), true)
+    renderAd(jobAd({ id: '3b', title: 'Favourite Role', meta: { fav: true } }), true)
 
     expect(screen.getByLabelText('Ulubione')).toBeInTheDocument()
   })
 
-  it('disables the apply button when the ad is already applied in edit mode', () => {
-    renderAd(jobAd({ id: '4', title: 'Already Applied', applied: true }), true, true)
+  it('shows an edit button in edit mode', () => {
+    renderAd(jobAd({ id: '4', title: 'Editable Role' }), true, true)
 
-    expect(screen.getByRole('button', { name: 'Oznacz jako złożone' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Edytuj aplikację' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Oznacz jako złożone' })).not.toBeInTheDocument()
   })
 
-  it('shows a restore button for hidden ads in edit mode', () => {
-    renderAd(jobAd({ id: '5', title: 'Hidden Role', hide: true }), true, true)
+  it('renders the application editor when expanded in edit mode', () => {
+    renderAd(jobAd({ id: '4b', title: 'Expanded Role' }), true, true, true)
 
-    expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
-    expect(screen.getByRole('button', { name: 'Przywróć ofertę' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Ukryj ofertę' })).not.toBeInTheDocument()
+    expect(screen.getByText('Obecny status')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Zmień stan' })).toBeInTheDocument()
+    expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
   })
 
-  it('keeps action buttons and swaps fav for unfav when favourite in edit mode', () => {
-    renderAd(jobAd({ id: '6', title: 'Favourite Role', fav: true }), true, true)
+  it('does not save without selecting a new status', () => {
+    const onChangeApplicationState = vi.fn<(id: string, applyStatus: JobApplyStatus, comment: string) => void>()
 
-    expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
-    expect(screen.getByRole('button', { name: 'Oznacz jako złożone' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Ukryj ofertę' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Usuń z ulubionych' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Dodaj do ulubionych' })).not.toBeInTheDocument()
+    renderAd(
+      jobAd({ id: '6', title: 'Save Role', meta: { application: { status: 'not-applied' } } }),
+      true,
+      true,
+      true,
+      onChangeApplicationState,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
+
+    expect(onChangeApplicationState).not.toHaveBeenCalled()
   })
 })

@@ -175,11 +175,29 @@ export type Translations = {
       title: string
       applied: string
       favourite: string
-      restoreOffer: string
-      hideOffer: string
       removeFromFavourites: string
       addToFavourites: string
       markAsApplied: string
+      editApplication: string
+      currentApplicationStatus: string
+      applicationDate: string
+      lastStatusChange: string
+      changeApplicationStatus: string
+      newApplicationStatus: string
+      applicationComment: string
+      save: string
+      cancel: string
+      applyStatus: {
+        'not-applied': string
+        applied: string
+        'not-interested': string
+        rejected: string
+        'no-response': string
+        interview: string
+        offer: string
+        'offer-accepted': string
+        withdrawn: string
+      }
     }
     news: {
       title: string

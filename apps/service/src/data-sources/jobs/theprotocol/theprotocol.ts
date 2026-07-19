@@ -50,9 +50,6 @@ const theprotocol: () => Promise<JobAd[]> = async () => {
       employmentType: bestContractType.type,
       monthlySalaryRangeAfterTaxes: bestContractType.salaryRange,
       origin: 'theprotocol',
-      applied: false,
-      hide: false,
-      fav: false,
     })
   }
 
