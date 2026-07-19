@@ -29,6 +29,10 @@ export abstract class DataSourceDefinition<T, TCache = T> {
     return undefined
   }
 
+  public maintenance(): Promise<void> {
+    return Promise.resolve()
+  }
+
   public isVolatile(): boolean {
     return false
   }
@@ -104,6 +108,10 @@ class DataSource<T, TCache = T> {
 
   public getCron(): string | undefined {
     return this.definition.getCron()
+  }
+
+  public async maintenance(): Promise<void> {
+    await this.definition.maintenance()
   }
 
   public async push(content?: T): Promise<void> {

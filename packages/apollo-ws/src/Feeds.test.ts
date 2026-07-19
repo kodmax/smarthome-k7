@@ -28,6 +28,7 @@ function createTestSourceClass<T>(options: {
   isVolatile?: boolean
   onInit?: (ctx: { push: (content?: T) => void }) => void
   handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
+  maintenance?: () => void | Promise<void>
 }): DataSourceDefinitionClass<T> {
   return class TestSource extends DataSourceDefinition<T> {
     public constructor(push: (content?: T) => void, reportError: (e: Error) => void) {
@@ -53,6 +54,10 @@ function createTestSourceClass<T>(options: {
 
     public isVolatile(): boolean {
       return options.isVolatile ?? false
+    }
+
+    public async maintenance(): Promise<void> {
+      await options.maintenance?.()
     }
   }
 }
@@ -124,6 +129,44 @@ describe('Feeds data source registration', () => {
 
     await vi.waitFor(() => expect(commandHandler).toHaveBeenCalledTimes(1))
     expect(commandHandler).toHaveBeenCalledWith('50')
+  })
+
+  it('runs maintenance sequentially for all registered data sources at 3 AM', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2024-01-01T02:59:55.000'))
+
+    try {
+      const order: string[] = []
+      const feeds = createFeeds()
+
+      await feeds.addFeed('feed-a', {
+        src: createTestSourceClass({
+          id: 'maint-a',
+          maintenance: async () => {
+            order.push('maint-a-start')
+            await new Promise(resolve => setTimeout(resolve, 20))
+            order.push('maint-a-end')
+          },
+        }),
+      })
+      await feeds.addFeed('feed-b', {
+        src: createTestSourceClass({
+          id: 'maint-b',
+          maintenance: () => {
+            order.push('maint-b')
+          },
+        }),
+      })
+
+      await vi.advanceTimersByTimeAsync(10_000)
+      await vi.advanceTimersByTimeAsync(50)
+
+      expect(order).toEqual(['maint-a-start', 'maint-a-end', 'maint-b'])
+
+      feeds.close()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
 

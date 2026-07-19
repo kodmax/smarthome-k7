@@ -14,6 +14,7 @@ function createTestSourceClass<T, TCache = T>(options: {
   composeContent?: (cached: TCache) => Promise<T>
   isVolatile?: boolean
   handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
+  maintenance?: () => void | Promise<void>
 }): DataSourceDefinitionClass<T, TCache> {
   return class TestSource extends DataSourceDefinition<T, TCache> {
     public async handleCommand(command: string, args: string, recentContent?: T): Promise<void> {
@@ -40,6 +41,10 @@ function createTestSourceClass<T, TCache = T>(options: {
 
     public isVolatile(): boolean {
       return options.isVolatile ?? false
+    }
+
+    public async maintenance(): Promise<void> {
+      await options.maintenance?.()
     }
   }
 }
@@ -247,5 +252,25 @@ describe('DataSource', () => {
     await dataSource.handleCommand('set', '1')
 
     expect(handleCommand).toHaveBeenCalledWith('set', '1', undefined)
+  })
+
+  it('calls definition maintenance', async () => {
+    const maintenance = vi.fn(async () => {})
+    const { dataSource } = await createDataSource(
+      createTestSourceClass({
+        id: 'maint-src',
+        maintenance,
+      }),
+    )
+
+    await dataSource.maintenance()
+
+    expect(maintenance).toHaveBeenCalledTimes(1)
+  })
+
+  it('uses default no-op maintenance when not overridden', async () => {
+    const { dataSource } = await createDataSource(createTestSourceClass({ id: 'maint-default' }))
+
+    await expect(dataSource.maintenance()).resolves.toBeUndefined()
   })
 })

@@ -6,6 +6,8 @@ import { Article, NewsCachedFeed, NewsFeed } from '@repo/types'
 import type { config as AppConfig } from '../config'
 import type { Pool } from 'mariadb'
 
+const META_RETENTION_DAYS = 30
+
 const FEED_URL =
   'https://news.google.com/topics/CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE/sections/CAQiTkNCSVNORG9JYkc5allXeGZkakpDRUd4dlkyRnNYM1l5WDNObFkzUnBiMjV5Q2hJSUwyMHZNRGd4YlY5NkNnb0lMMjB2TURneGJWOG9BQSowCAAqLAgKIiZDQklTRmpvSWJHOWpZV3hmZGpKNkNnb0lMMjB2TURneGJWOG9BQVABUAE?hl=pl&gl=PL&ceid=PL%3Apl'
 
@@ -61,6 +63,20 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
     }
   }
 
+  async maintenance() {
+    const conn = await this.db.getConnection()
+    try {
+      await conn.query(
+        `delete from meta
+         where group_id = ?
+           and last_update_timestamp < current_timestamp() - interval ? day`,
+        [this.getId(), META_RETENTION_DAYS],
+      )
+    } finally {
+      conn.release()
+    }
+  }
+
   private async fetchArticles(): Promise<NewsCachedFeed['articles']> {
     const document = await fetchDocument(FEED_URL, {
       accept: 'text/html',
@@ -89,10 +105,11 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
       const uids = articles.map(article => article.uid)
       const rows = (await conn.query(
         `select item_uid, attribute_name from meta
-         where attribute_name = 'read'
+         where group_id = ?
+           and attribute_name = 'read'
            and item_uid in (?)
            and value = true`,
-        [uids],
+        [this.getId(), uids],
       )) as Array<{ item_uid: string; attribute_name: string }>
       const readUids = new Set(rows.map(row => row.item_uid))
 
@@ -109,10 +126,10 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
     const conn = await this.db.getConnection()
     try {
       await conn.query(
-        `insert into meta (item_uid, attribute_name, value)
-         values (?, ?, ?)
-         on duplicate key update value = values(value)`,
-        [itemUid, attributeName, value],
+        `insert into meta (item_uid, attribute_name, group_id, value)
+         values (?, ?, ?, ?)
+         on duplicate key update value = values(value), group_id = values(group_id)`,
+        [itemUid, attributeName, this.getId(), value],
       )
     } finally {
       conn.release()
@@ -122,7 +139,11 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
   private async unmarkMeta(itemUid: string, attributeName: string): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(`delete from meta where item_uid = ? and attribute_name = ?`, [itemUid, attributeName])
+      await conn.query(`delete from meta where group_id = ? and item_uid = ? and attribute_name = ?`, [
+        this.getId(),
+        itemUid,
+        attributeName,
+      ])
     } finally {
       conn.release()
     }

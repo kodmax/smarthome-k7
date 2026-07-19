@@ -8,6 +8,8 @@ import { DuplicateDataSourceIdError, NonErrorException } from './Errors'
 
 export type { SourceDataTypes } from './Feeds.types'
 
+const DATA_SOURCES_MAINTENANCE_CRON = '0 3 * * *'
+
 export class Feeds {
   private sourcesById = new Map<string, SourceRegistration>()
   private feeds: Map<string, Feed> = new Map()
@@ -19,6 +21,10 @@ export class Feeds {
     private vent: ApolloEvents,
   ) {
     this.chronos = new Chronos((priority, msg) => this.vent.emit('sys-log', priority, msg))
+
+    this.chronos.addJob(DATA_SOURCES_MAINTENANCE_CRON, 'data-sources-maintenance', () =>
+      this.runDataSourcesMaintenance(),
+    )
 
     this.vent.on('feeds-request', feedsIds => {
       for (const id of feedsIds) {
@@ -65,6 +71,20 @@ export class Feeds {
         this.vent.emit('sys-log', 4, `Data source <${ev.sourceId}> command <${ev.name} execution error: ${e}`, e)
       }
     })
+  }
+
+  private async runDataSourcesMaintenance(): Promise<void> {
+    for (const { dataSource } of this.sourcesById.values()) {
+      const sourceId = dataSource.getId()
+
+      try {
+        this.vent.emit('sys-log', 7, `Data source <${sourceId}> maintenance starting`)
+        await dataSource.maintenance()
+        this.vent.emit('sys-log', 7, `Data source <${sourceId}> maintenance completed`)
+      } catch (e) {
+        this.vent.emit('sys-log', 4, `Data source <${sourceId}> maintenance error: ${e}`, e)
+      }
+    }
   }
 
   private async getOrCreateDataSource<S extends AnyDataSourceDefinitionClass, T = DSCT<S>>(

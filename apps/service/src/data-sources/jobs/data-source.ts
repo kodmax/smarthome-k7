@@ -25,6 +25,8 @@ import {
 } from './applicationMeta'
 import { isMetaFlagTrue } from './metaFlag'
 
+const META_RETENTION_DAYS = 90
+
 type MetaRow = {
   item_uid: string
   attribute_name: string
@@ -125,6 +127,20 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
     }
   }
 
+  async maintenance() {
+    const conn = await this.db.getConnection()
+    try {
+      await conn.query(
+        `delete from meta
+         where group_id = ?
+           and last_update_timestamp < current_timestamp() - interval ? day`,
+        [this.getId(), META_RETENTION_DAYS],
+      )
+    } finally {
+      conn.release()
+    }
+  }
+
   private async attachMeta(ads: JobAd[]): Promise<JobAdWithMeta[]> {
     if (ads.length === 0) {
       return []
@@ -136,9 +152,10 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
       const rows = (await conn.query(
         `select item_uid, attribute_name, value, last_update_timestamp
          from meta
-         where attribute_name in ('application', 'applied', 'fav')
+         where group_id = ?
+           and attribute_name in ('application', 'applied', 'fav')
            and item_uid in (?)`,
-        [ids],
+        [this.getId(), ids],
       )) as MetaRow[]
 
       const applicationById = new Map<string, JobAdApplicationMeta>()
@@ -202,9 +219,10 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
       const rows = (await conn.query(
         `select attribute_name, value, last_update_timestamp
          from meta
-         where item_uid = ?
+         where group_id = ?
+           and item_uid = ?
            and attribute_name in ('application', 'applied')`,
-        [itemId],
+        [this.getId(), itemId],
       )) as MetaRow[]
 
       const applicationRow = rows.find(row => row.attribute_name === 'application')
@@ -227,12 +245,15 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
     const conn = await this.db.getConnection()
     try {
       await conn.query(
-        `insert into meta (item_uid, attribute_name, value)
-         values (?, 'application', ?)
-         on duplicate key update value = values(value)`,
-        [itemId, JSON.stringify(meta)],
+        `insert into meta (item_uid, attribute_name, group_id, value)
+         values (?, 'application', ?, ?)
+         on duplicate key update value = values(value), group_id = values(group_id)`,
+        [itemId, this.getId(), JSON.stringify(meta)],
       )
-      await conn.query(`delete from meta where item_uid = ? and attribute_name = 'applied'`, [itemId])
+      await conn.query(`delete from meta where group_id = ? and item_uid = ? and attribute_name = 'applied'`, [
+        this.getId(),
+        itemId,
+      ])
     } finally {
       conn.release()
     }
@@ -242,10 +263,10 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
     const conn = await this.db.getConnection()
     try {
       await conn.query(
-        `insert into meta (item_uid, attribute_name, value)
-         values (?, ?, ?)
-         on duplicate key update value = values(value)`,
-        [itemUid, attributeName, value],
+        `insert into meta (item_uid, attribute_name, group_id, value)
+         values (?, ?, ?, ?)
+         on duplicate key update value = values(value), group_id = values(group_id)`,
+        [itemUid, attributeName, this.getId(), value],
       )
     } finally {
       conn.release()
@@ -255,7 +276,11 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
   private async unmarkMeta(itemUid: string, attributeName: string): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(`delete from meta where item_uid = ? and attribute_name = ?`, [itemUid, attributeName])
+      await conn.query(`delete from meta where group_id = ? and item_uid = ? and attribute_name = ?`, [
+        this.getId(),
+        itemUid,
+        attributeName,
+      ])
     } finally {
       conn.release()
     }
