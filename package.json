@@ -6,6 +6,8 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "format": "turbo run format",
+    "proof": "yarn format && yarn test && yarn lint && yarn build",
+    "prepare": "git config core.hooksPath .githooks",
     "db:migrate": "yarn workspace @repo/db db:migrate",
     "db:rollback": "yarn workspace @repo/db db:rollback",
     "db:status": "yarn workspace @repo/db db:status",
