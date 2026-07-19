@@ -42,5 +42,6 @@ describe('StockMarket', () => {
     expect(screen.getByText('120.00')).toBeInTheDocument()
     expect(screen.getByText('95.50')).toBeInTheDocument()
     expect(screen.getByText('Zamknięcie za 1g')).toBeInTheDocument()
+    expect(screen.getByTitle('Otwarta')).toBeInTheDocument()
   })
 })

@@ -7,9 +7,11 @@ import { designTokens } from '@repo/design-tokens'
 import { StockMarketFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { Ticker } from './Ticker'
-import { TableBody, TableHead, TableRow, useMediaQuery, useTheme } from '@mui/material'
+import { Box, TableBody, TableHead, TableRow, useMediaQuery, useTheme } from '@mui/material'
 import { useSortedTickers } from './useSortedTickers'
 import { useMarketSession } from './useMarketSession'
+import { getMarketStatusTitle } from './helpers/getMarketStatusTitle'
+import { MarketStatusIcon } from './Ticker/cells/Price/MarketStatusIcon'
 
 const cardTableFontSize = designTokens.font.body.size
 const tableHeaderGap = designTokens.space[3]
@@ -34,13 +36,20 @@ export const StockMarket: FC<Record<string, never>> = () => {
     )
   }
 
+  const statusTitle = getMarketStatusTitle(marketSession.status, labels.status)
+
   return (
     <ApolloCard
       cardId='stock-market'
       title={labels.title}
       icon={StockMarketIcon}
       height={cardHeight}
-      headingInfo={marketSession.countdown}
+      headingInfo={
+        <Box component='span' title={statusTitle} sx={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+          <MarketStatusIcon marketStatus={marketSession.status} />
+          {marketSession.countdown}
+        </Box>
+      }
     >
       <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: zoom ? 2 : undefined }}>
         {zoom ? (
