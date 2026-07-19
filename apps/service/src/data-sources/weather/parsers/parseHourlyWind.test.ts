@@ -11,7 +11,7 @@ describe('parseHourlyWind', () => {
 
     expect(parseHourlyWind(item)).toEqual({
       direction: 'NE',
-      speed: expect.closeTo(12 / 3.6),
+      speed: Math.round(12 / 3.6),
     })
   })
 
@@ -25,5 +25,14 @@ describe('parseHourlyWind', () => {
       direction: null,
       speed: 0,
     })
+  })
+
+  it('rounds wind speed to whole m/s', () => {
+    const document = parseHTML(
+      '<div class="accordion-item hour"><div class="panel"><p>Wiatr<span class="value">NE 13 km/h</span></p></div></div>',
+    ).window.document
+    const item = document.querySelector('.accordion-item.hour')!
+
+    expect(parseHourlyWind(item).speed).toBe(Math.round(13 / 3.6))
   })
 })

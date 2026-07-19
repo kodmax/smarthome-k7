@@ -104,7 +104,7 @@ describe('weather parsers', () => {
       icon: '04.svg',
       precipType: 'none',
     })
-    expect(hour.wind).toEqual({ direction: 'NE', speed: expect.closeTo(12 / 3.6) })
+    expect(hour.wind).toEqual({ direction: 'NE', speed: Math.round(12 / 3.6) })
     expect(hour.uv).toBe(8)
     expect(Number.isFinite(hour.sun.altitude)).toBe(true)
     expect(Number.isFinite(hour.sun.azimuth)).toBe(true)

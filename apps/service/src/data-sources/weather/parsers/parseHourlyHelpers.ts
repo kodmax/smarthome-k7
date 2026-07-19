@@ -42,7 +42,7 @@ export const parseHourlyWind = (item: Element) => {
 
   return {
     direction: direction === '' || speed === 0 ? null : direction,
-    speed: speedMs,
+    speed: Math.round(speedMs),
   }
 }
 
