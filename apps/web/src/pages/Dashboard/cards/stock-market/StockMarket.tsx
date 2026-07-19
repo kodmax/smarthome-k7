@@ -7,16 +7,18 @@ import { designTokens } from '@repo/design-tokens'
 import { StockMarketFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { Ticker } from './Ticker'
-import { TableBody, TableHead, TableRow } from '@mui/material'
+import { TableBody, TableHead, TableRow, useMediaQuery, useTheme } from '@mui/material'
 import { useSortedTickers } from './useSortedTickers'
 import { useMarketSession } from './useMarketSession'
-import { getMarketStatusTitle } from './helpers/getMarketStatusTitle'
 
 const cardTableFontSize = designTokens.font.body.size
 const tableHeaderGap = designTokens.space[3]
 const headerRowSx = { '& .MuiTableCell-root': { pb: `${tableHeaderGap}px` } }
 
 export const StockMarket: FC<Record<string, never>> = () => {
+  const theme = useTheme()
+  const isBelowXl = useMediaQuery(theme.breakpoints.down('xl'))
+  const cardHeight = isBelowXl ? 6 : 4
   const zoom = useZoom('stock-market')
   const feed = useFeed<StockMarketFeed>('stock-market')
   const tickers = useSortedTickers(feed)
@@ -26,16 +28,20 @@ export const StockMarket: FC<Record<string, never>> = () => {
 
   if (feed === undefined || tickers === undefined || marketSession === undefined) {
     return (
-      <ApolloCard cardId='stock-market' title={labels.title} icon={StockMarketIcon} height={4}>
+      <ApolloCard cardId='stock-market' title={labels.title} icon={StockMarketIcon} height={cardHeight}>
         <TablePlaceholder rows={12} graph={false} value={true} />
       </ApolloCard>
     )
   }
 
-  const headingInfo = `${getMarketStatusTitle(marketSession.status, labels.status)} · ${marketSession.countdown}`
-
   return (
-    <ApolloCard cardId='stock-market' title={labels.title} icon={StockMarketIcon} height={4} headingInfo={headingInfo}>
+    <ApolloCard
+      cardId='stock-market'
+      title={labels.title}
+      icon={StockMarketIcon}
+      height={cardHeight}
+      headingInfo={marketSession.countdown}
+    >
       <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: zoom ? 2 : undefined }}>
         {zoom ? (
           <TableHead>
