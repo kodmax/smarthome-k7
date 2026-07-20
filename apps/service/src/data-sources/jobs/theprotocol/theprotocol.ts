@@ -2,6 +2,7 @@ import { JobAd, SalaryUnit, WorkplaceType } from '@repo/types'
 import { getAds } from './getAds'
 import { Contract } from './types'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
+import { createHash } from 'node:crypto'
 
 const theprotocol: () => Promise<JobAd[]> = async () => {
   const theProtocolAds = await getAds()
@@ -40,7 +41,7 @@ const theprotocol: () => Promise<JobAd[]> = async () => {
           : 'office'
 
     ads.push({
-      id: ad.id,
+      id: createHash('sha256').update(ad.offerUrlName).digest('hex'),
       title: ad.title,
       advertUrl: `https://theprotocol.it/szczegoly/praca/${ad.offerUrlName}`,
       companyLogoUrl: ad.logoUrl,

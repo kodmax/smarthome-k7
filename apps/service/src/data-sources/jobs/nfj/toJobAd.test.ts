@@ -23,7 +23,7 @@ const baseNfjAd: NoFluffJobsAd = {
 describe('toJobAd', () => {
   it('converts a standard NFJ ad to JobAd', () => {
     expect(toJobAd(baseNfjAd, new Set())).toEqual({
-      id: digestNfjId('nfj-123'),
+      id: digestNfjId(baseNfjAd.url),
       origin: 'nfj',
       title: 'Senior React Developer',
       advertUrl: 'https://nofluffjobs.com/pl/job/senior-react-developer-acme',

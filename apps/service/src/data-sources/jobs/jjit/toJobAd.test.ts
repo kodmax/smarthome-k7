@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 import { toJobAd } from './toJobAd'
 import { JustJoinAd } from './types'
@@ -106,7 +107,7 @@ const jjAd: JustJoinAd = {
 describe('toJobAd', () => {
   it('should convert justjoin ad to standard JobAd', () => {
     expect(toJobAd(jjAd)).toEqual({
-      id: '9c7585ec-bd78-43c7-8ae9-ee898c903012',
+      id: createHash('sha256').update(jjAd.slug).digest('hex'),
       title: 'Engineering Manager',
       advertUrl: 'https://justjoin.it/job-offer/monday-com-software-engineering-team-lead-warszawa-javascript',
       companyLogoUrl:

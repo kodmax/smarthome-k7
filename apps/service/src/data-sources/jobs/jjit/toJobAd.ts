@@ -1,12 +1,13 @@
 import { JobAd } from '@repo/types'
 import { JustJoinAd } from './types'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
+import { createHash } from 'node:crypto'
 
 export const toJobAd = (jjAd: JustJoinAd): JobAd => {
   const jjEmploymentType = jjAd.employmentTypes.find(item => item.currency === 'PLN')
 
   return {
-    id: jjAd.guid,
+    id: createHash('sha256').update(jjAd.slug).digest('hex'),
     origin: 'jj',
     title: jjAd.title,
     advertUrl: `https://justjoin.it/job-offer/${jjAd.slug}`,

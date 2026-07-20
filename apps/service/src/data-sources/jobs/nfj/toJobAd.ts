@@ -5,7 +5,7 @@ import { digestNfjId } from './digestNfjId'
 
 export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {
   return {
-    id: digestNfjId(ad.id),
+    id: digestNfjId(ad.url),
     origin: 'nfj',
     title: ad.title,
     advertUrl: `https://nofluffjobs.com/pl/job/${ad.url}`,
