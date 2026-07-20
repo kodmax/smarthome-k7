@@ -16,16 +16,15 @@ import { addAds } from './filters'
 import { theprotocol } from './theprotocol'
 import {
   applyStatusChange,
-  applicationMetaFromLegacyApplied,
   emptyApplicationMeta,
   parseApplicationMeta,
   parseChangeStateCommandArgs,
   resolveStatusChangedAt,
-  toAppliedAtIso,
 } from './applicationMeta'
 import { isMetaFlagTrue } from './metaFlag'
 
 const META_RETENTION_DAYS = 90
+const STALE_APPLIED_NO_RESPONSE_AFTER_DAYS = 14
 
 type MetaRow = {
   item_uid: string
@@ -40,9 +39,6 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
 
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
-      case 'applied':
-        await this.commandApplied(args)
-        break
       case 'change-state':
         await this.commandChangeState(args)
         break
@@ -53,10 +49,6 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
         await this.commandUnfav(args)
         break
     }
-  }
-
-  private async commandApplied(itemId: string): Promise<void> {
-    await this.saveApplicationChange(itemId, { applyStatus: 'applied' })
   }
 
   private async commandChangeState(args: string): Promise<void> {
@@ -136,9 +128,32 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
            and last_update_timestamp < current_timestamp() - interval ? day`,
         [this.getId(), META_RETENTION_DAYS],
       )
+
+      const changed = await this.markStaleAppliedAsNoResponse(conn)
+      if (changed) {
+        this.push()
+      }
     } finally {
       conn.release()
     }
+  }
+
+  private async markStaleAppliedAsNoResponse(conn: Awaited<ReturnType<Pool['getConnection']>>): Promise<boolean> {
+    const cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - STALE_APPLIED_NO_RESPONSE_AFTER_DAYS)
+
+    const result = await conn.query(
+      `update meta
+       set value = json_set(value, '$.applyStatus', 'no-response', '$.comment', cast(null as json))
+       where group_id = ?
+         and attribute_name = 'application'
+         and json_unquote(json_extract(value, '$.applyStatus')) = 'applied'
+         and json_extract(value, '$.appliedAt') is not null
+         and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
+      [this.getId(), cutoff.toISOString()],
+    )
+
+    return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
   }
 
   private async attachMeta(ads: JobAd[]): Promise<JobAdWithMeta[]> {
@@ -153,14 +168,13 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
         `select item_uid, attribute_name, value, last_update_timestamp
          from meta
          where group_id = ?
-           and attribute_name in ('application', 'applied', 'fav')
+           and attribute_name in ('application', 'fav')
            and item_uid in (?)`,
         [this.getId(), ids],
       )) as MetaRow[]
 
       const applicationById = new Map<string, JobAdApplicationMeta>()
       const applicationUpdatedAtById = new Map<string, Date | string>()
-      const legacyAppliedAtById = new Map<string, string>()
       const favIds = new Set<string>()
 
       for (const row of rows) {
@@ -175,11 +189,6 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
             }
             break
           }
-          case 'applied':
-            if (isMetaFlagTrue(row.value)) {
-              legacyAppliedAtById.set(row.item_uid, toAppliedAtIso(row.last_update_timestamp ?? new Date()))
-            }
-            break
           case 'fav':
             if (isMetaFlagTrue(row.value)) {
               favIds.add(row.item_uid)
@@ -189,12 +198,8 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
       }
 
       return ads.map(ad => {
-        const application =
-          applicationById.get(ad.id) ??
-          (legacyAppliedAtById.has(ad.id)
-            ? applicationMetaFromLegacyApplied(legacyAppliedAtById.get(ad.id)!)
-            : emptyApplicationMeta())
-        const lastStatusChangeAt = applicationUpdatedAtById.get(ad.id) ?? legacyAppliedAtById.get(ad.id)
+        const application = applicationById.get(ad.id) ?? emptyApplicationMeta()
+        const lastStatusChangeAt = applicationUpdatedAtById.get(ad.id)
 
         return {
           ...ad,
@@ -217,25 +222,20 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
     const conn = await this.db.getConnection()
     try {
       const rows = (await conn.query(
-        `select attribute_name, value, last_update_timestamp
+        `select value
          from meta
          where group_id = ?
            and item_uid = ?
-           and attribute_name in ('application', 'applied')`,
+           and attribute_name = 'application'`,
         [this.getId(), itemId],
       )) as MetaRow[]
 
-      const applicationRow = rows.find(row => row.attribute_name === 'application')
-      if (applicationRow !== undefined) {
-        return parseApplicationMeta(applicationRow.value) ?? emptyApplicationMeta()
+      const row = rows[0]
+      if (row === undefined) {
+        return emptyApplicationMeta()
       }
 
-      const appliedRow = rows.find(row => row.attribute_name === 'applied' && isMetaFlagTrue(row.value))
-      if (appliedRow !== undefined) {
-        return applicationMetaFromLegacyApplied(toAppliedAtIso(appliedRow.last_update_timestamp ?? new Date()))
-      }
-
-      return emptyApplicationMeta()
+      return parseApplicationMeta(row.value) ?? emptyApplicationMeta()
     } finally {
       conn.release()
     }
@@ -244,19 +244,23 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
   private async writeApplicationMeta(itemId: string, meta: JobAdApplicationMeta): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(
-        `insert into meta (item_uid, attribute_name, group_id, value)
-         values (?, 'application', ?, ?)
-         on duplicate key update value = values(value), group_id = values(group_id)`,
-        [itemId, this.getId(), JSON.stringify(meta)],
-      )
-      await conn.query(`delete from meta where group_id = ? and item_uid = ? and attribute_name = 'applied'`, [
-        this.getId(),
-        itemId,
-      ])
+      await this.writeApplicationMetaOnConnection(conn, itemId, meta)
     } finally {
       conn.release()
     }
+  }
+
+  private async writeApplicationMetaOnConnection(
+    conn: Awaited<ReturnType<Pool['getConnection']>>,
+    itemId: string,
+    meta: JobAdApplicationMeta,
+  ): Promise<void> {
+    await conn.query(
+      `insert into meta (item_uid, attribute_name, group_id, value)
+       values (?, 'application', ?, ?)
+       on duplicate key update value = values(value), group_id = values(group_id)`,
+      [itemId, this.getId(), JSON.stringify(meta)],
+    )
   }
 
   private async markMeta(itemUid: string, attributeName: string, value: boolean): Promise<void> {

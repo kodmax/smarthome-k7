@@ -58,14 +58,6 @@ export function parseApplicationMeta(value: unknown): JobAdApplicationMeta | nul
   }
 }
 
-export function applicationMetaFromLegacyApplied(appliedAt: string): JobAdApplicationMeta {
-  return {
-    applyStatus: 'applied',
-    comment: null,
-    appliedAt,
-  }
-}
-
 export function toAppliedAtIso(value: Date | string): string {
   if (typeof value === 'string') {
     return value
