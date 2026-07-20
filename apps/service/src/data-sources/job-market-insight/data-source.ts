@@ -7,6 +7,7 @@ import { addAllAds } from './addAllAds'
 import { computeMedianSalary } from './computeMedianSalary'
 import { computeOffersWithSalaryRangePercent } from './computeOffersWithSalaryRangePercent'
 import { computePermanentEmploymentPercent } from './computePermanentEmploymentPercent'
+import { computePopularTechnologies } from './computePopularTechnologies'
 import { computeRemoteWorkPercent } from './computeRemoteWorkPercent'
 import { countNewOffers } from './countNewOffers'
 
@@ -43,6 +44,7 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
       offersWithSalaryRangePercent: computeOffersWithSalaryRangePercent(cached.ads),
       remoteWorkPercent: computeRemoteWorkPercent(cached.ads),
       permanentEmploymentPercent: computePermanentEmploymentPercent(cached.ads),
+      popularTechnologies: computePopularTechnologies(cached.ads),
     }
   }
 }

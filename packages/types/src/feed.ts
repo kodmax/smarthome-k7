@@ -340,6 +340,14 @@ export type JobsCachedFeed = {
   ads: JobAd[]
 }
 
+export type JobMarketPopularTechnology = {
+  id: string
+  name: string
+  offersCount: number
+  sharePercent: number
+  medianSalary: number | null
+}
+
 export type JobMarketInsightFeed = {
   adsCount: number
   newOffersCount: number
@@ -347,6 +355,7 @@ export type JobMarketInsightFeed = {
   offersWithSalaryRangePercent: number
   remoteWorkPercent: number
   permanentEmploymentPercent: number
+  popularTechnologies: JobMarketPopularTechnology[]
 }
 
 export type JobMarketInsightCachedFeed = {
