@@ -1,7 +1,6 @@
-import { designTokens, scaleBelow2xl } from '@repo/design-tokens'
+import { designTokens } from '@repo/design-tokens'
 
 const { layout, breakpoint, shadow } = designTokens
-const sideMenu = designTokens.components.sideMenu
 
 const containerCenterOffset = `max(0px, (100vw - ${layout.containerMax}px) / 2)`
 
@@ -24,14 +23,6 @@ export const drawerHeight = {
   md: `calc(100dvh - ${layout.paddingTablet * 2}px)`,
   lg: `calc(100dvh - ${layout.paddingDesktop * 2}px)`,
 }
-
-export const toggleTopClosed = `${sideMenu.toggleClosedOffset}px`
-
-export const toggleTopClosedBelow2xl = toggleTopClosed
-
-export const toggleLeftClosed = offsetFromContainerLeft(sideMenu.toggleClosedOffset)
-
-export const toggleLeftClosedBelow2xl = offsetFromContainerLeft(scaleBelow2xl(sideMenu.toggleClosedOffset))
 
 export const drawerPaperSx = {
   top: drawerTop,
