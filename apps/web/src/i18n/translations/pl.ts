@@ -26,6 +26,36 @@ export const pl: Translations = {
   jobMarket: {
     title: 'Rynek Pracy',
     description: 'Przeglądaj oferty pracy i śledź aplikacje.',
+    summary: {
+      activeOffers: 'Aktywne oferty',
+      newOffers: 'Nowe oferty (7 dni)',
+      medianSalary: 'Mediana wynagrodzenia',
+      offersWithSalaryRange: 'Oferty z widełkami',
+      workModeSplit: 'Praca zdalna',
+      vsPreviousPeriod: 'vs. poprzednie 7 dni',
+    },
+    salaryDistribution: {
+      title: 'Rozkład wynagrodzeń',
+      brackets: {
+        below20k: 'Poniżej 20k',
+        from20to25k: '20k – 25k',
+        from25to30k: '25k – 30k',
+        from30to35k: '30k – 35k',
+        from35to40k: '35k – 40k',
+        above40k: 'Powyżej 40k',
+        noSalaryRange: 'Brak widełek',
+      },
+    },
+    popularTechnologies: {
+      title: 'Najpopularniejsze technologie',
+      columns: {
+        rank: '#',
+        technology: 'Technologia',
+        offers: 'Oferty',
+        share: 'Udział',
+        median: 'Mediana',
+      },
+    },
   },
   energyMeter: {
     title: 'Pomiar energii',

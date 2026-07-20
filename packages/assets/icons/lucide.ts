@@ -1,6 +1,7 @@
 import {
   Activity,
   AirVent,
+  Banknote,
   BriefcaseBusiness,
   Camera,
   ChartCandlestick,
@@ -18,6 +19,7 @@ import {
   Droplets,
   Fan,
   Flame,
+  Globe,
   Heater,
   House,
   Info,
@@ -30,6 +32,7 @@ import {
   Menu,
   Moon,
   Newspaper,
+  PieChart,
   ShieldCheck,
   Snowflake,
   Star,
@@ -72,6 +75,7 @@ export const CoolingIcon = createStyledIcon(Snowflake, iconStyles.weather)
 export const FanIcon = createStyledIcon(Fan, iconStyles.weather)
 export const HumidityIcon = createStyledIcon(Droplets, iconStyles.weather)
 export const AirQualityIcon = createStyledIcon(Leaf, iconStyles.air)
+export const GlobeIcon = createStyledIcon(Globe, iconStyles.air)
 export const WindIcon = createStyledIcon(Wind, iconStyles.weather)
 export const WeatherIcon = createStyledIcon(CloudSun, iconStyles.weather)
 export const RainIcon = createStyledIcon(CloudRain, iconStyles.weather)
@@ -91,6 +95,10 @@ export const NewsIcon = createStyledIcon(Newspaper, iconStyles.neutral)
 export const MoviesIcon = createStyledIcon(Clapperboard, iconStyles.neutral)
 export const CameraIcon = createStyledIcon(Camera, iconStyles.warning)
 export const JobsIcon = createStyledIcon(BriefcaseBusiness, iconStyles.neutral)
+export const JobMarketActiveOffersIcon = createStyledIcon(BriefcaseBusiness, iconStyles.jobs)
+export const JobMarketNewOffersIcon = createStyledIcon(TrendingUp, iconStyles.energy)
+export const BanknoteIcon = createStyledIcon(Banknote, iconStyles.media)
+export const PieChartIcon = createStyledIcon(PieChart, iconStyles.temperature)
 export const ListIcon = createStyledIcon(List, iconStyles.muted)
 export const FilterIcon = createStyledIcon(Funnel, iconStyles.muted)
 export const FilterOffIcon = createStyledIcon(FunnelX, iconStyles.muted)

@@ -26,6 +26,36 @@ export const en: Translations = {
   jobMarket: {
     title: 'Job Market',
     description: 'Browse job listings and track applications.',
+    summary: {
+      activeOffers: 'Active listings',
+      newOffers: 'New listings (7 days)',
+      medianSalary: 'Median salary',
+      offersWithSalaryRange: 'Listings with salary range',
+      workModeSplit: 'Remote work',
+      vsPreviousPeriod: 'vs. previous 7 days',
+    },
+    salaryDistribution: {
+      title: 'Salary distribution',
+      brackets: {
+        below20k: 'Below 20k',
+        from20to25k: '20k – 25k',
+        from25to30k: '25k – 30k',
+        from30to35k: '30k – 35k',
+        from35to40k: '35k – 40k',
+        above40k: 'Above 40k',
+        noSalaryRange: 'No salary range',
+      },
+    },
+    popularTechnologies: {
+      title: 'Most popular technologies',
+      columns: {
+        rank: '#',
+        technology: 'Technology',
+        offers: 'Listings',
+        share: 'Share',
+        median: 'Median',
+      },
+    },
   },
   energyMeter: {
     title: 'Energy Meter',

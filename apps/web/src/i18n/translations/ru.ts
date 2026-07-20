@@ -26,6 +26,36 @@ export const ru: Translations = {
   jobMarket: {
     title: 'Рынок труда',
     description: 'Просматривайте вакансии и отслеживайте отклики.',
+    summary: {
+      activeOffers: 'Активные вакансии',
+      newOffers: 'Новые вакансии (7 дней)',
+      medianSalary: 'Медианная зарплата',
+      offersWithSalaryRange: 'Вакансии с вилкой',
+      workModeSplit: 'Удалённая работа',
+      vsPreviousPeriod: 'vs. предыдущие 7 дней',
+    },
+    salaryDistribution: {
+      title: 'Распределение зарплат',
+      brackets: {
+        below20k: 'Ниже 20k',
+        from20to25k: '20k – 25k',
+        from25to30k: '25k – 30k',
+        from30to35k: '30k – 35k',
+        from35to40k: '35k – 40k',
+        above40k: 'Выше 40k',
+        noSalaryRange: 'Без вилки',
+      },
+    },
+    popularTechnologies: {
+      title: 'Самые популярные технологии',
+      columns: {
+        rank: '#',
+        technology: 'Технология',
+        offers: 'Вакансии',
+        share: 'Доля',
+        median: 'Медиана',
+      },
+    },
   },
   energyMeter: {
     title: 'Учёт энергии',

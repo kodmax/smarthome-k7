@@ -24,6 +24,36 @@ export type Translations = {
   jobMarket: {
     title: string
     description: string
+    summary: {
+      activeOffers: string
+      newOffers: string
+      medianSalary: string
+      offersWithSalaryRange: string
+      workModeSplit: string
+      vsPreviousPeriod: string
+    }
+    salaryDistribution: {
+      title: string
+      brackets: {
+        below20k: string
+        from20to25k: string
+        from25to30k: string
+        from30to35k: string
+        from35to40k: string
+        above40k: string
+        noSalaryRange: string
+      }
+    }
+    popularTechnologies: {
+      title: string
+      columns: {
+        rank: string
+        technology: string
+        offers: string
+        share: string
+        median: string
+      }
+    }
   }
   energyMeter: {
     title: string
