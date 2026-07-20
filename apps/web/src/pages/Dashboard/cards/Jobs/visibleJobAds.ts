@@ -1,28 +1,28 @@
-import { JobAdWithMeta, isTerminalApplyStatus } from '@repo/types'
+import { JobAdWithMeta, isHiddenApplyStatus } from '@repo/types'
 
 export function isJobAdVisibleInNormalView(ad: Pick<JobAdWithMeta, 'meta'>): boolean {
-  const status = ad.meta.application.status
-
-  if (status === 'not-interested') {
-    return false
-  }
-
-  return !isTerminalApplyStatus(status)
+  return !isHiddenApplyStatus(ad.meta.application.status)
 }
 
 export function filterVisibleJobAds(ads: JobAdWithMeta[]): JobAdWithMeta[] {
   return ads.filter(isJobAdVisibleInNormalView)
 }
 
+export function filterHiddenJobAds(ads: JobAdWithMeta[]): JobAdWithMeta[] {
+  return ads.filter(ad => !isJobAdVisibleInNormalView(ad))
+}
+
 export function getDisplayedJobAds(
   ads: JobAdWithMeta[] | undefined,
-  { editMode, showAllAds }: { editMode: boolean; showAllAds: boolean },
+  { editMode, showHiddenAds }: { editMode: boolean; showHiddenAds: boolean },
 ): JobAdWithMeta[] {
-  const visibleAds = ads ? filterVisibleJobAds(ads) : []
-
-  if (editMode && showAllAds) {
-    return ads ?? []
+  if (!ads) {
+    return []
   }
 
-  return visibleAds
+  if (editMode && showHiddenAds) {
+    return filterHiddenJobAds(ads)
+  }
+
+  return filterVisibleJobAds(ads)
 }

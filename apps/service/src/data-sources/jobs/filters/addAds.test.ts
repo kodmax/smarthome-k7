@@ -55,12 +55,6 @@ describe('addAds', () => {
     expect(allAds.size).toBe(0)
   })
 
-  it('rejects ads without React', () => {
-    const allAds = new Map<string, JobAd>()
-    addAds(allAds, [makeAd({ requiredSkills: ['TypeScript'] })])
-    expect(allAds.size).toBe(0)
-  })
-
   it('deduplicates by company name and title (case-insensitive)', () => {
     const allAds = new Map<string, JobAd>()
     const first = makeAd({ id: '1', companyName: 'Acme', title: 'React Dev' })

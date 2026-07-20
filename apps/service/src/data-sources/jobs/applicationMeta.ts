@@ -4,6 +4,7 @@ const APPLY_STATUSES = new Set<JobApplyStatus>([
   'not-applied',
   'applied',
   'not-interested',
+  'unmet-requirements',
   'rejected',
   'no-response',
   'interview',
@@ -103,7 +104,7 @@ export function applyStatusChange(
 
     return {
       ...current,
-      comment,
+      comment: comment || null,
     }
   }
 
@@ -113,7 +114,7 @@ export function applyStatusChange(
 
   const next: JobAdApplicationMeta = {
     applyStatus: to,
-    comment: comment !== undefined ? comment : current.comment,
+    comment: comment !== undefined ? comment || null : null,
     appliedAt: current.appliedAt,
   }
 

@@ -55,6 +55,53 @@ describe('applicationMeta', () => {
     expect(applyStatusChange(emptyApplicationMeta(), { applyStatus: 'offer-accepted' })).toBeNull()
   })
 
+  it('allows transition from not-applied to unmet-requirements', () => {
+    expect(
+      applyStatusChange(emptyApplicationMeta(), {
+        applyStatus: 'unmet-requirements',
+        comment: 'React',
+      }),
+    ).toEqual({
+      applyStatus: 'unmet-requirements',
+      comment: 'React',
+      appliedAt: null,
+    })
+  })
+
+  it('clears comment when changing status without a new comment', () => {
+    expect(
+      applyStatusChange(
+        {
+          applyStatus: 'applied',
+          comment: 'Old note',
+          appliedAt: '2026-07-19T12:00:00.000Z',
+        },
+        { applyStatus: 'interview' },
+      ),
+    ).toEqual({
+      applyStatus: 'interview',
+      comment: null,
+      appliedAt: '2026-07-19T12:00:00.000Z',
+    })
+  })
+
+  it('clears comment on comment-only update with empty string', () => {
+    expect(
+      applyStatusChange(
+        {
+          applyStatus: 'applied',
+          comment: 'Old note',
+          appliedAt: '2026-07-19T12:00:00.000Z',
+        },
+        { applyStatus: 'applied', comment: '' },
+      ),
+    ).toEqual({
+      applyStatus: 'applied',
+      comment: null,
+      appliedAt: '2026-07-19T12:00:00.000Z',
+    })
+  })
+
   it('ignores legacy statusChangedAt field in stored application meta', () => {
     expect(
       parseApplicationMeta({

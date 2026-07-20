@@ -188,7 +188,7 @@ export type Translations = {
       applicationComment: string
       save: string
       cancel: string
-      showAll: string
+      showHidden: string
       showActiveOnly: string
       workplaceType: {
         office: string
@@ -199,6 +199,7 @@ export type Translations = {
         'not-applied': string
         applied: string
         'not-interested': string
+        'unmet-requirements': string
         rejected: string
         'no-response': string
         interview: string

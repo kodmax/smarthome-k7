@@ -222,7 +222,7 @@ export const pl: Translations = {
       applicationComment: 'Komentarz',
       save: 'Zapisz',
       cancel: 'Anuluj',
-      showAll: 'Pokaż wszystkie',
+      showHidden: 'Pokaż ukryte',
       showActiveOnly: 'Pokaż aktywne',
       workplaceType: {
         office: 'Biuro',
@@ -233,6 +233,7 @@ export const pl: Translations = {
         'not-applied': 'Nie aplikowano',
         applied: 'Zaaplikowane',
         'not-interested': 'Nie interesuje mnie',
+        'unmet-requirements': 'Niespełnione wymagania',
         rejected: 'Odrzucone',
         'no-response': 'Brak odpowiedzi',
         interview: 'Rozmowa',

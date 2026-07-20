@@ -222,7 +222,7 @@ export const ru: Translations = {
       applicationComment: 'Комментарий',
       save: 'Сохранить',
       cancel: 'Отмена',
-      showAll: 'Показать все',
+      showHidden: 'Показать скрытые',
       showActiveOnly: 'Показать активные',
       workplaceType: {
         office: 'Офис',
@@ -233,6 +233,7 @@ export const ru: Translations = {
         'not-applied': 'Не откликался',
         applied: 'Отклик отправлен',
         'not-interested': 'Не интересует',
+        'unmet-requirements': 'Невыполненные требования',
         rejected: 'Отказ',
         'no-response': 'Нет ответа',
         interview: 'Собеседование',

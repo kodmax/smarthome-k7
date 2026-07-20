@@ -1,6 +1,6 @@
 import { TableBody } from '@mui/material'
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
-import { JobsIcon, FilterIcon, FilterOffIcon, SettingsIcon } from '@repo/assets'
+import { JobsIcon, SettingsIcon, ShowTerminalJobsIcon, ShowUnreviewedJobsIcon } from '@repo/assets'
 import { ApolloCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
 import { useCommand, useFeed } from '@repo/feed-client'
 import { ApolloDataTable, TableEmptyMessage, TablePlaceholder } from '@/card-components'
@@ -14,7 +14,7 @@ const cardTableFontSize = designTokens.font.body.size
 
 export const Jobs: FC<Record<string, never>> = () => {
   const [editMode, setEditMode] = useState<boolean>(false)
-  const [showAllAds, setShowAllAds] = useState<boolean>(false)
+  const [showHiddenAds, setShowHiddenAds] = useState<boolean>(false)
   const [expandedAdId, setExpandedAdId] = useState<string | null>(null)
 
   const zoom = useZoom('jobs')
@@ -55,26 +55,29 @@ export const Jobs: FC<Record<string, never>> = () => {
     setEditMode(current => !current)
   }, [])
 
-  const onToggleShowAllAds = useCallback(() => {
-    setShowAllAds(current => !current)
+  const onToggleShowHiddenAds = useCallback(() => {
+    setShowHiddenAds(current => !current)
   }, [])
 
   useEffect(() => {
     if (!zoom) {
       setEditMode(false)
-      setShowAllAds(false)
+      setShowHiddenAds(false)
       setExpandedAdId(null)
     }
   }, [zoom])
 
   useEffect(() => {
     if (!editMode) {
-      setShowAllAds(false)
+      setShowHiddenAds(false)
       setExpandedAdId(null)
     }
   }, [editMode])
 
-  const ads = useMemo(() => getDisplayedJobAds(feed?.ads, { editMode, showAllAds }), [editMode, feed?.ads, showAllAds])
+  const ads = useMemo(
+    () => getDisplayedJobAds(feed?.ads, { editMode, showHiddenAds }),
+    [editMode, feed?.ads, showHiddenAds],
+  )
 
   return (
     <ApolloCard
@@ -87,9 +90,9 @@ export const Jobs: FC<Record<string, never>> = () => {
         <>
           {editMode ? (
             <ApolloCardAction
-              title={showAllAds ? labels.showActiveOnly : labels.showAll}
-              onClick={onToggleShowAllAds}
-              Icon={showAllAds ? FilterIcon : FilterOffIcon}
+              title={showHiddenAds ? labels.showActiveOnly : labels.showHidden}
+              onClick={onToggleShowHiddenAds}
+              Icon={showHiddenAds ? ShowUnreviewedJobsIcon : ShowTerminalJobsIcon}
             />
           ) : null}
           <ApolloCardAction
