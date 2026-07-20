@@ -1,23 +1,22 @@
-import { JobMarketActiveOffersIcon } from '@repo/assets'
+import { FileTextIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
 import { JobMarketInsightFeed } from '@repo/types'
 import { type FC } from 'react'
 import { JobMarketSummaryTile } from '../../components/JobMarketSummaryTile'
-import { formatNumber } from '@/helpers/formatNumber'
 import { useTranslations } from '@/i18n'
 
-export const ActiveOffers: FC<Record<string, never>> = () => {
+export const PermanentEmployment: FC<Record<string, never>> = () => {
   const { t } = useTranslations()
   const labels = t.jobMarket.summary
   const feed = useFeed<JobMarketInsightFeed>('job-market-insight')
 
   return (
     <JobMarketSummaryTile
-      cardId='job-market-active-offers'
-      icon={JobMarketActiveOffersIcon}
-      title={labels.activeOffers}
-      value={feed !== undefined ? formatNumber(feed.adsCount, { fractionDigits: 0 }) : '--'}
-      change='+256 (9,95%)'
+      cardId='job-market-permanent-employment'
+      icon={FileTextIcon}
+      title={labels.permanentEmployment}
+      value={feed !== undefined ? `${feed.permanentEmploymentPercent}%` : '--'}
+      change='-2 pp'
       comparisonLabel={labels.vsPreviousPeriod}
     />
   )

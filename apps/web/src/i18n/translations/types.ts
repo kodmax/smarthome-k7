@@ -30,6 +30,7 @@ export type Translations = {
       medianSalary: string
       offersWithSalaryRange: string
       workModeSplit: string
+      permanentEmployment: string
       vsPreviousPeriod: string
     }
     salaryDistribution: {

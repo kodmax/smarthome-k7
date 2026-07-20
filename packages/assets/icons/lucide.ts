@@ -18,6 +18,7 @@ import {
   Copy,
   Droplets,
   Fan,
+  FileText,
   Flame,
   Globe,
   Heater,
@@ -34,6 +35,7 @@ import {
   Newspaper,
   PieChart,
   ShieldCheck,
+  SlidersHorizontal,
   Snowflake,
   Star,
   Sun,
@@ -97,6 +99,8 @@ export const CameraIcon = createStyledIcon(Camera, iconStyles.warning)
 export const JobsIcon = createStyledIcon(BriefcaseBusiness, iconStyles.neutral)
 export const JobMarketActiveOffersIcon = createStyledIcon(BriefcaseBusiness, iconStyles.jobs)
 export const JobMarketNewOffersIcon = createStyledIcon(TrendingUp, iconStyles.energy)
+export const JobMarketSalaryRangeIcon = createStyledIcon(SlidersHorizontal, iconStyles.jobs)
+export const FileTextIcon = createStyledIcon(FileText, iconStyles.jobs)
 export const BanknoteIcon = createStyledIcon(Banknote, iconStyles.media)
 export const PieChartIcon = createStyledIcon(PieChart, iconStyles.temperature)
 export const ListIcon = createStyledIcon(List, iconStyles.muted)

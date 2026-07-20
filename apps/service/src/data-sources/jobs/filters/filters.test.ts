@@ -13,6 +13,7 @@ const baseAd: JobAd = {
   workplaceType: 'remote',
   employmentType: 'permanent',
   monthlySalaryRangeAfterTaxes: { from: 26_000, to: 30_000 },
+  publishedAt: '2026-01-01T00:00:00.000Z',
 }
 
 describe('noUwantedSkills', () => {

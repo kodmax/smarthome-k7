@@ -43,7 +43,7 @@ export interface Ad {
   ]
   technologies: string[]
   new: false
-  publicationDateUtc: '2026-06-11T07:03:43.823'
+  publicationDateUtc: string
   lastCall: false
   language: 'en'
   salary: {

@@ -18,6 +18,7 @@ const baseNfjAd: NoFluffJobsAd = {
       { type: 'category', value: 'JavaScript' },
     ],
   },
+  posted: Date.parse('2026-07-17T11:59:45.314Z'),
 }
 
 describe('toJobAd', () => {
@@ -33,6 +34,7 @@ describe('toJobAd', () => {
       workplaceType: 'office',
       employmentType: 'permanent',
       monthlySalaryRangeAfterTaxes: { from: 18_000, to: 24_000 },
+      publishedAt: '2026-07-17T11:59:45.314Z',
     })
   })
 

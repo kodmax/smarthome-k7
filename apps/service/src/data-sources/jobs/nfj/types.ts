@@ -18,4 +18,6 @@ export type NoFluffJobsAd = {
       type: 'category' | 'requirement'
     }>
   }
+  posted: number
+  renewed?: number
 }

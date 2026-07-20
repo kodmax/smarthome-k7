@@ -28,10 +28,11 @@ export const pl: Translations = {
     description: 'Przeglądaj oferty pracy i śledź aplikacje.',
     summary: {
       activeOffers: 'Aktywne oferty',
-      newOffers: 'Nowe oferty (7 dni)',
-      medianSalary: 'Mediana wynagrodzenia',
-      offersWithSalaryRange: 'Oferty z widełkami',
+      newOffers: 'Nowe oferty',
+      medianSalary: 'Mediana',
+      offersWithSalaryRange: 'Widelki',
       workModeSplit: 'Praca zdalna',
+      permanentEmployment: 'UoP',
       vsPreviousPeriod: 'vs. poprzednie 7 dni',
     },
     salaryDistribution: {

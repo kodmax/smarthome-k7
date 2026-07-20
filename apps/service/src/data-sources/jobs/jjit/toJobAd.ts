@@ -25,5 +25,6 @@ export const toJobAd = (jjAd: JustJoinAd): JobAd => {
             jjEmploymentType.toPerUnit,
           )
         : undefined,
+    publishedAt: jjAd.lastPublishedAt,
   }
 }

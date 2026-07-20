@@ -18,6 +18,7 @@ export function jobAd(overrides: JobAdOverrides): JobAdWithMeta {
     workplaceType: 'remote',
     employmentType: 'permanent',
     origin: 'jj',
+    publishedAt: '2026-01-01T00:00:00.000Z',
     ...rest,
     meta: {
       ...emptyJobAdMeta(),

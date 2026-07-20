@@ -28,10 +28,11 @@ export const ru: Translations = {
     description: 'Просматривайте вакансии и отслеживайте отклики.',
     summary: {
       activeOffers: 'Активные вакансии',
-      newOffers: 'Новые вакансии (7 дней)',
-      medianSalary: 'Медианная зарплата',
-      offersWithSalaryRange: 'Вакансии с вилкой',
+      newOffers: 'Новые вакансии',
+      medianSalary: 'Медиана',
+      offersWithSalaryRange: 'Вилки',
       workModeSplit: 'Удалённая работа',
+      permanentEmployment: 'ТК',
       vsPreviousPeriod: 'vs. предыдущие 7 дней',
     },
     salaryDistribution: {

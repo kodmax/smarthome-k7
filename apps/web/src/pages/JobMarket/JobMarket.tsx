@@ -7,6 +7,8 @@ import { useTranslations } from '@/i18n'
 import { ActiveOffers } from './tiles/ActiveOffers/ActiveOffers'
 import { MedianSalary } from './tiles/MedianSalary/MedianSalary'
 import { NewOffers } from './tiles/NewOffers/NewOffers'
+import { OffersWithSalaryRange } from './tiles/OffersWithSalaryRange/OffersWithSalaryRange'
+import { PermanentEmployment } from './tiles/PermanentEmployment/PermanentEmployment'
 import { WorkModeSplit } from './tiles/WorkModeSplit/WorkModeSplit'
 import { PopularTechnologies } from './tiles/PopularTechnologies/PopularTechnologies'
 import { SalaryDistribution } from './tiles/SalaryDistribution/SalaryDistribution'
@@ -24,17 +26,23 @@ export const JobMarket: FC<Record<string, never>> = () => {
       />
 
       <Grid container spacing={3} sx={{ width: '100%' }}>
-        <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
           <ActiveOffers />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
           <NewOffers />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
           <MedianSalary />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
+          <OffersWithSalaryRange />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
           <WorkModeSplit />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
+          <PermanentEmployment />
         </Grid>
         <Grid size={{ xs: 12, lg: 5 }}>
           <PopularTechnologies />

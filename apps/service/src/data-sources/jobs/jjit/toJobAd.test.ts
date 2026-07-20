@@ -102,6 +102,9 @@ const jjAd: JustJoinAd = {
     },
   ],
   niceToHaveSkills: [],
+  publishedAt: '2026-07-17T17:00:06.1466809Z',
+  lastPublishedAt: '2026-05-13T16:16:35.807366Z',
+  expiredAt: '2026-08-12T21:59:59.999999Z',
 }
 
 describe('toJobAd', () => {
@@ -121,6 +124,7 @@ describe('toJobAd', () => {
         from: 30000,
         to: 40200,
       },
+      publishedAt: '2026-05-13T16:16:35.807366Z',
     })
   })
 })

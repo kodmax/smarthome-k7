@@ -325,6 +325,7 @@ export type JobAd = {
   employmentType: EmploymentType
   monthlySalaryRangeAfterTaxes?: SalaryRange
   origin: 'jj' | 'nfj' | 'theprotocol'
+  publishedAt: string
 }
 
 export type JobAdWithMeta = JobAd & {
@@ -336,6 +337,19 @@ export type JobsFeed = {
 }
 
 export type JobsCachedFeed = {
+  ads: JobAd[]
+}
+
+export type JobMarketInsightFeed = {
+  adsCount: number
+  newOffersCount: number
+  medianSalary: number | null
+  offersWithSalaryRangePercent: number
+  remoteWorkPercent: number
+  permanentEmploymentPercent: number
+}
+
+export type JobMarketInsightCachedFeed = {
   ads: JobAd[]
 }
 

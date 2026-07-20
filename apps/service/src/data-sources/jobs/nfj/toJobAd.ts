@@ -18,5 +18,6 @@ export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {
       ad.salary.from !== undefined && ad.salary.to !== undefined
         ? getMonthlySalaryAfterTax(ad.salary.type, 'Month', ad.salary.from, ad.salary.to)
         : undefined,
+    publishedAt: new Date(ad.posted).toISOString(),
   }
 }

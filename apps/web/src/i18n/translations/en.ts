@@ -28,10 +28,11 @@ export const en: Translations = {
     description: 'Browse job listings and track applications.',
     summary: {
       activeOffers: 'Active listings',
-      newOffers: 'New listings (7 days)',
-      medianSalary: 'Median salary',
-      offersWithSalaryRange: 'Listings with salary range',
+      newOffers: 'New listings',
+      medianSalary: 'Median',
+      offersWithSalaryRange: 'Ranges',
       workModeSplit: 'Remote work',
+      permanentEmployment: 'Permanent',
       vsPreviousPeriod: 'vs. previous 7 days',
     },
     salaryDistribution: {

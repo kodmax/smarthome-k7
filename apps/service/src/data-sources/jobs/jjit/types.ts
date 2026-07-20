@@ -34,4 +34,7 @@ export type JustJoinAd = {
   experienceLevel: string
   workplaceType: 'remote' | 'hybrid' | 'office'
   niceToHaveSkills: Skill[]
+  publishedAt: string
+  lastPublishedAt: string
+  expiredAt: string
 }
