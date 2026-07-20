@@ -44,10 +44,10 @@ export const JobMarket: FC<Record<string, never>> = () => {
         <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
           <PermanentEmployment />
         </Grid>
-        <Grid size={{ xs: 12, lg: 5 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <PopularTechnologies />
         </Grid>
-        <Grid size={{ xs: 12, lg: 7 }}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <SalaryDistribution />
         </Grid>
       </Grid>
