@@ -1,10 +1,15 @@
 import { JobAd, JobMarketPopularTechnology } from '@repo/types'
 import { salaryUpperBounds } from './computeMedianSalary'
 import { median } from './median'
-import { POPULAR_TECHNOLOGIES_LIMIT, TRACKED_TECHNOLOGIES } from './trackedTechnologies'
+import { normalizeSkillKey, unifySkillName } from './normalizeSkillName'
 
-const adMatchesTechnology = (ad: JobAd, skills: string[]): boolean =>
-  ad.requiredSkills.some(skill => skills.includes(skill))
+export const POPULAR_TECHNOLOGIES_LIMIT = 50
+
+export const toTechnologyId = (skill: string): string =>
+  skill
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') || 'unknown'
 
 const computeTechnologyMedian = (ads: JobAd[]): number | null => {
   const result = median(salaryUpperBounds(ads))
@@ -17,17 +22,37 @@ export const computePopularTechnologies = (ads: JobAd[]): JobMarketPopularTechno
     return []
   }
 
-  return TRACKED_TECHNOLOGIES.map(({ id, name, skills }) => {
-    const matching = ads.filter(ad => adMatchesTechnology(ad, skills))
+  const adsBySkillKey = new Map<string, { name: string; ads: JobAd[] }>()
 
-    return {
-      id,
+  for (const ad of ads) {
+    const unifiedSkills = new Map<string, string>()
+
+    for (const skill of ad.requiredSkills) {
+      const key = normalizeSkillKey(skill)
+      if (!unifiedSkills.has(key)) {
+        unifiedSkills.set(key, unifySkillName(skill))
+      }
+    }
+
+    for (const [key, name] of unifiedSkills) {
+      const existing = adsBySkillKey.get(key)
+      if (existing === undefined) {
+        adsBySkillKey.set(key, { name, ads: [ad] })
+        continue
+      }
+
+      existing.ads.push(ad)
+    }
+  }
+
+  return [...adsBySkillKey.values()]
+    .map(({ name, ads: matching }) => ({
+      id: toTechnologyId(name),
       name,
       offersCount: matching.length,
       sharePercent: Math.round((matching.length / ads.length) * 100),
       medianSalary: computeTechnologyMedian(matching),
-    }
-  })
+    }))
     .sort((a, b) => b.offersCount - a.offersCount || a.name.localeCompare(b.name))
     .slice(0, POPULAR_TECHNOLOGIES_LIMIT)
 }

@@ -27,63 +27,65 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
       allowZoom={false}
     >
       {feed === undefined ? (
-        <TablePlaceholder rows={10} graph={false} value={true} />
+        <TablePlaceholder rows={50} graph={false} value={true} />
       ) : (
-        <ApolloDataTable sx={{ tableLayout: 'fixed' }}>
-          <TableHead>
-            <TableRow sx={headerRowSx}>
-              <ApolloTableCell sx={{ width: 32 }}>{labels.columns.rank}</ApolloTableCell>
-              <ApolloTableCell>{labels.columns.technology}</ApolloTableCell>
-              <ApolloValueCell sx={{ width: 72 }}>{labels.columns.offers}</ApolloValueCell>
-              <ApolloValueCell sx={{ width: 72 }}>{labels.columns.share}</ApolloValueCell>
-              <ApolloValueCell sx={{ width: 96 }}>{labels.columns.median}</ApolloValueCell>
-            </TableRow>
-          </TableHead>
+        <Box sx={{ overflow: 'auto', height: '100%' }}>
+          <ApolloDataTable sx={{ tableLayout: 'fixed' }}>
+            <TableHead>
+              <TableRow sx={headerRowSx}>
+                <ApolloTableCell sx={{ width: 32 }}>{labels.columns.rank}</ApolloTableCell>
+                <ApolloTableCell>{labels.columns.technology}</ApolloTableCell>
+                <ApolloValueCell sx={{ width: 72 }}>{labels.columns.offers}</ApolloValueCell>
+                <ApolloValueCell sx={{ width: 72 }}>{labels.columns.share}</ApolloValueCell>
+                <ApolloValueCell sx={{ width: 96 }}>{labels.columns.median}</ApolloValueCell>
+              </TableRow>
+            </TableHead>
 
-          <TableBody>
-            {feed.popularTechnologies.map((technology, index) => {
-              const presentation = getPopularTechnologyPresentation(technology.id)
+            <TableBody>
+              {feed.popularTechnologies.map((technology, index) => {
+                const presentation = getPopularTechnologyPresentation(technology.id)
 
-              return (
-                <TableRow key={technology.id} sx={{ height: 40 }}>
-                  <ApolloTableCell>{index + 1}</ApolloTableCell>
-                  <ApolloTableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-                      <Box
-                        sx={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: `${designTokens.radius.sm}px`,
-                          bgcolor: presentation.color,
-                          color: technology.id === 'javascript' ? 'text.primary' : '#fff',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                          fontSize: 10,
-                          fontWeight: 700,
-                          lineHeight: 1,
-                        }}
-                      >
-                        {presentation.abbreviation}
+                return (
+                  <TableRow key={technology.id} sx={{ height: 40 }}>
+                    <ApolloTableCell>{index + 1}</ApolloTableCell>
+                    <ApolloTableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                        <Box
+                          sx={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: `${designTokens.radius.sm}px`,
+                            bgcolor: presentation.color,
+                            color: technology.id === 'javascript' ? 'text.primary' : '#fff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            fontSize: 10,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                          }}
+                        >
+                          {presentation.abbreviation}
+                        </Box>
+                        <Typography variant='body2' noWrap>
+                          {technology.name}
+                        </Typography>
                       </Box>
-                      <Typography variant='body2' noWrap>
-                        {technology.name}
-                      </Typography>
-                    </Box>
-                  </ApolloTableCell>
-                  <ApolloValueCell>{formatNumber(technology.offersCount, { fractionDigits: 0 })}</ApolloValueCell>
-                  <ApolloValueCell>{`${technology.sharePercent}%`}</ApolloValueCell>
-                  <ApolloValueCell>
-                    {technology.medianSalary !== null
-                      ? `${formatNumber(technology.medianSalary, { fractionDigits: 0 })} zł`
-                      : '--'}
-                  </ApolloValueCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </ApolloDataTable>
+                    </ApolloTableCell>
+                    <ApolloValueCell>{formatNumber(technology.offersCount, { fractionDigits: 0 })}</ApolloValueCell>
+                    <ApolloValueCell>{`${technology.sharePercent}%`}</ApolloValueCell>
+                    <ApolloValueCell>
+                      {technology.medianSalary !== null
+                        ? `${formatNumber(technology.medianSalary, { fractionDigits: 0 })} zł`
+                        : '--'}
+                    </ApolloValueCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </ApolloDataTable>
+        </Box>
       )}
     </ApolloCard>
   )

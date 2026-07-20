@@ -1,6 +1,6 @@
 import { JobAd } from '@repo/types'
 import { describe, expect, it } from 'vitest'
-import { computePopularTechnologies } from './computePopularTechnologies'
+import { computePopularTechnologies, toTechnologyId } from './computePopularTechnologies'
 
 const makeAd = (requiredSkills: string[], salary?: { from: number; to: number }): JobAd => ({
   id: `${requiredSkills.join('-')}-${salary?.from ?? 'none'}`,
@@ -16,12 +16,19 @@ const makeAd = (requiredSkills: string[], salary?: { from: number; to: number })
   monthlySalaryRangeAfterTaxes: salary,
 })
 
+describe('toTechnologyId', () => {
+  it('slugifies skill names', () => {
+    expect(toTechnologyId('Node.js')).toBe('node-js')
+    expect(toTechnologyId('C++')).toBe('c')
+  })
+})
+
 describe('computePopularTechnologies', () => {
   it('returns an empty list when there are no ads', () => {
     expect(computePopularTechnologies([])).toEqual([])
   })
 
-  it('counts offers, share and median salary per tracked technology', () => {
+  it('counts offers, share and median salary per unified skill', () => {
     expect(
       computePopularTechnologies([
         makeAd(['JavaScript', 'React'], { from: 20_000, to: 24_000 }),
@@ -38,11 +45,18 @@ describe('computePopularTechnologies', () => {
         medianSalary: 28_000,
       },
       {
-        id: 'node',
+        id: 'node-js',
         name: 'Node.js',
         offersCount: 1,
         sharePercent: 25,
         medianSalary: 30_000,
+      },
+      {
+        id: 'python',
+        name: 'Python',
+        offersCount: 1,
+        sharePercent: 25,
+        medianSalary: null,
       },
       {
         id: 'react',
@@ -58,47 +72,22 @@ describe('computePopularTechnologies', () => {
         sharePercent: 25,
         medianSalary: 32_000,
       },
+    ])
+  })
+
+  it('unifies fragmented skill names and counts an ad once per skill group', () => {
+    expect(
+      computePopularTechnologies([
+        makeAd(['React', 'React.js', 'ReactJS'], { from: 20_000, to: 24_000 }),
+        makeAd(['ReactJS'], { from: 28_000, to: 32_000 }),
+      ]),
+    ).toEqual([
       {
-        id: 'aws',
-        name: 'AWS',
-        offersCount: 0,
-        sharePercent: 0,
-        medianSalary: null,
-      },
-      {
-        id: 'docker',
-        name: 'Docker',
-        offersCount: 0,
-        sharePercent: 0,
-        medianSalary: null,
-      },
-      {
-        id: 'git',
-        name: 'Git',
-        offersCount: 0,
-        sharePercent: 0,
-        medianSalary: null,
-      },
-      {
-        id: 'graphql',
-        name: 'GraphQL',
-        offersCount: 0,
-        sharePercent: 0,
-        medianSalary: null,
-      },
-      {
-        id: 'next',
-        name: 'Next.js',
-        offersCount: 0,
-        sharePercent: 0,
-        medianSalary: null,
-      },
-      {
-        id: 'postgresql',
-        name: 'PostgreSQL',
-        offersCount: 0,
-        sharePercent: 0,
-        medianSalary: null,
+        id: 'react',
+        name: 'React',
+        offersCount: 2,
+        sharePercent: 100,
+        medianSalary: 28_000,
       },
     ])
   })
