@@ -9,10 +9,9 @@ export const persistJobMarketInsightSnapshot = async (
   const conn = await db.getConnection()
 
   try {
-    await conn.query('insert into job_market_insight_snapshots (snapshot_at, metrics, ads_count) values (?, ?, ?)', [
+    await conn.query('insert into job_market_insight_snapshots (snapshot_at, metrics) values (?, ?)', [
       snapshotAt,
       JSON.stringify(metrics),
-      metrics.adsCount,
     ])
   } finally {
     conn.release()

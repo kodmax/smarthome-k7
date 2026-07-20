@@ -1,19 +1,17 @@
 import { JobAd, JobMarketInsightMetrics } from '@repo/types'
 import { countNewOffers } from './countNewOffers'
 import { computeMedianSalary } from './computeMedianSalary'
-import { computeOffersWithSalaryRangePercent } from './computeOffersWithSalaryRangePercent'
-import { computePermanentEmploymentPercent } from './computePermanentEmploymentPercent'
+import { computePercent } from './computePercent'
 import { computePopularTechnologies } from './computePopularTechnologies'
-import { computeRemoteWorkPercent } from './computeRemoteWorkPercent'
 import { computeSalaryDistribution } from './computeSalaryDistribution'
 
 export const buildJobMarketInsightFeed = (ads: JobAd[]): JobMarketInsightMetrics => ({
   adsCount: ads.length,
   newOffersCount: countNewOffers(ads),
   medianSalary: computeMedianSalary(ads),
-  offersWithSalaryRangePercent: computeOffersWithSalaryRangePercent(ads),
-  remoteWorkPercent: computeRemoteWorkPercent(ads),
-  permanentEmploymentPercent: computePermanentEmploymentPercent(ads),
+  offersWithSalaryRangePercent: computePercent(ads, ad => ad.monthlySalaryRangeAfterTaxes !== undefined),
+  remoteWorkPercent: computePercent(ads, ad => ad.workplaceType === 'remote' || ad.workplaceType === 'hybrid'),
+  permanentEmploymentPercent: computePercent(ads, ad => ad.employmentType === 'permanent'),
   popularTechnologies: computePopularTechnologies(ads),
   salaryDistribution: computeSalaryDistribution(ads),
 })
