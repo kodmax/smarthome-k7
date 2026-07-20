@@ -222,8 +222,13 @@ export const en: Translations = {
       applicationComment: 'Comment',
       save: 'Save',
       cancel: 'Cancel',
-      showHidden: 'Show hidden',
-      showActiveOnly: 'Show active only',
+      filters: {
+        label: 'Filter',
+        new: 'New',
+        inProgress: 'In progress',
+        notInterested: 'Not interested',
+        finished: 'Finished',
+      },
       workplaceType: {
         office: 'Office',
         remote: 'Remote',

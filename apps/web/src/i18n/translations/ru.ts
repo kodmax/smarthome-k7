@@ -222,8 +222,13 @@ export const ru: Translations = {
       applicationComment: 'Комментарий',
       save: 'Сохранить',
       cancel: 'Отмена',
-      showHidden: 'Показать скрытые',
-      showActiveOnly: 'Показать активные',
+      filters: {
+        label: 'Фильтр',
+        new: 'Новые',
+        inProgress: 'В процессе',
+        notInterested: 'Не интересует',
+        finished: 'Завершённые',
+      },
       workplaceType: {
         office: 'Офис',
         remote: 'Удалённо',

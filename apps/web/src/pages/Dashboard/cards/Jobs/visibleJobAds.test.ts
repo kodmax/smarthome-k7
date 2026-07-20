@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { jobAd } from '@/pages/Dashboard/test/fixtures/jobs'
-import {
-  filterHiddenJobAds,
-  filterVisibleJobAds,
-  getDisplayedJobAds,
-  isJobAdVisibleInNormalView,
-} from './visibleJobAds'
+import { filterVisibleJobAds, getDisplayedJobAds, isJobAdVisibleInNormalView } from './visibleJobAds'
 
 describe('visibleJobAds', () => {
   it('hides ads in hidden apply statuses', () => {
@@ -38,30 +33,26 @@ describe('visibleJobAds', () => {
     ).toEqual(['1'])
   })
 
-  it('filters hidden ads from a list', () => {
-    expect(
-      filterHiddenJobAds([
-        jobAd({ id: '1', title: 'Open', meta: { application: { status: 'applied' } } }),
-        jobAd({ id: '2', title: 'Rejected', meta: { application: { status: 'rejected' } } }),
-      ]).map(ad => ad.id),
-    ).toEqual(['2'])
-  })
-
-  it('keeps the reading filter in edit mode by default', () => {
+  it('keeps the normal view filter outside edit mode', () => {
     const ads = [
       jobAd({ id: '1', title: 'Open', meta: { application: { status: 'applied' } } }),
       jobAd({ id: '2', title: 'Rejected', meta: { application: { status: 'rejected' } } }),
     ]
 
-    expect(getDisplayedJobAds(ads, { editMode: true, showHiddenAds: false }).map(ad => ad.id)).toEqual(['1'])
+    expect(getDisplayedJobAds(ads, { editMode: false, filter: 'finished' }).map(ad => ad.id)).toEqual(['1'])
   })
 
-  it('shows only hidden ads in edit mode when filter is inverted', () => {
+  it('uses the selected category filter in edit mode', () => {
     const ads = [
-      jobAd({ id: '1', title: 'Open', meta: { application: { status: 'applied' } } }),
-      jobAd({ id: '2', title: 'Rejected', meta: { application: { status: 'rejected' } } }),
+      jobAd({ id: '1', title: 'New', meta: { application: { status: 'not-applied' } } }),
+      jobAd({ id: '2', title: 'Applied', meta: { application: { status: 'applied' } } }),
+      jobAd({ id: '3', title: 'Skipped', meta: { application: { status: 'not-interested' } } }),
+      jobAd({ id: '4', title: 'Rejected', meta: { application: { status: 'rejected' } } }),
     ]
 
-    expect(getDisplayedJobAds(ads, { editMode: true, showHiddenAds: true }).map(ad => ad.id)).toEqual(['2'])
+    expect(getDisplayedJobAds(ads, { editMode: true, filter: 'new' }).map(ad => ad.id)).toEqual(['1'])
+    expect(getDisplayedJobAds(ads, { editMode: true, filter: 'in-progress' }).map(ad => ad.id)).toEqual(['2'])
+    expect(getDisplayedJobAds(ads, { editMode: true, filter: 'not-interested' }).map(ad => ad.id)).toEqual(['3'])
+    expect(getDisplayedJobAds(ads, { editMode: true, filter: 'finished' }).map(ad => ad.id)).toEqual(['4'])
   })
 })

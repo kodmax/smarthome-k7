@@ -188,8 +188,13 @@ export type Translations = {
       applicationComment: string
       save: string
       cancel: string
-      showHidden: string
-      showActiveOnly: string
+      filters: {
+        label: string
+        new: string
+        inProgress: string
+        notInterested: string
+        finished: string
+      }
       workplaceType: {
         office: string
         remote: string
