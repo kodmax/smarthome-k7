@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const outputDir = path.resolve(__dirname, '../src/assets/technology-logos')
 
-/** Top 50 technologies from live job market feed (technology id -> logo URL). */
+/** Job market technology ids (from toTechnologyId) -> logo URL. */
 const TECHNOLOGY_LOGOS = {
   javascript: 'https://svgl.app/library/javascript.svg',
   react: 'https://svgl.app/library/react_light.svg',
@@ -31,7 +31,7 @@ const TECHNOLOGY_LOGOS = {
   postgresql: 'https://svgl.app/library/postgresql.svg',
   redux: 'https://svgl.app/library/redux.svg',
   rxjs: 'https://svgl.app/library/rxjs.svg',
-  sql: 'https://svgl.app/library/sqlite.svg',
+  sql: 'https://svgl.app/library/mysql-icon-light.svg',
   'react-native': 'https://reactnative.dev/img/header_logo.svg',
   rest: 'https://svgl.app/library/swagger.svg',
   api: 'https://svgl.app/library/postman.svg',
@@ -57,6 +57,15 @@ const TECHNOLOGY_LOGOS = {
   php: 'https://svgl.app/library/php.svg',
   'spring-framework': 'https://svgl.app/library/spring.svg',
   mysql: 'https://svgl.app/library/mysql-icon-light.svg',
+  webpack: 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/webpack.svg',
+  bootstrap: 'https://svgl.app/library/bootstrap.svg',
+  figma: 'https://svgl.app/library/figma.svg',
+  gcp: 'https://svgl.app/library/google-cloud.svg',
+  golang: 'https://svgl.app/library/golang.svg',
+  jasmine: 'https://svgl.app/library/jasmine.svg',
+  karma: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/karma/karma-original.svg',
+  playwright: 'https://svgl.app/library/playwright.svg',
+  'automated-testing': 'https://svgl.app/library/playwright.svg',
 }
 
 const downloadLogo = async (id, url) => {

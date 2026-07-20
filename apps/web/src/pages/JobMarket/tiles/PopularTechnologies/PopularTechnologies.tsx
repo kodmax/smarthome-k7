@@ -33,11 +33,11 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
           <ApolloDataTable sx={{ tableLayout: 'fixed' }}>
             <TableHead>
               <TableRow sx={headerRowSx}>
-                <ApolloTableCell sx={{ width: 32 }}>{labels.columns.rank}</ApolloTableCell>
+                <ApolloTableCell sx={{ width: 24 }}>{labels.columns.rank}</ApolloTableCell>
                 <ApolloTableCell>{labels.columns.technology}</ApolloTableCell>
-                <ApolloValueCell sx={{ width: 72 }}>{labels.columns.offers}</ApolloValueCell>
-                <ApolloValueCell sx={{ width: 72 }}>{labels.columns.share}</ApolloValueCell>
-                <ApolloValueCell sx={{ width: 96 }}>{labels.columns.median}</ApolloValueCell>
+                <ApolloValueCell sx={{ width: 48 }}>{labels.columns.offers}</ApolloValueCell>
+                <ApolloValueCell sx={{ width: 48 }}>{labels.columns.share}</ApolloValueCell>
+                <ApolloValueCell sx={{ width: 80 }}>{labels.columns.median}</ApolloValueCell>
               </TableRow>
             </TableHead>
 

@@ -1,7 +1,7 @@
 import { JobAd, JobMarketPopularTechnology } from '@repo/types'
 import { salaryUpperBounds } from './computeMedianSalary'
 import { median } from './median'
-import { normalizeSkillKey, unifySkillName } from './normalizeSkillName'
+import { normalizeSkillKey, isIgnoredSkillKey, unifySkillName } from './normalizeSkillName'
 
 export const POPULAR_TECHNOLOGIES_LIMIT = 50
 
@@ -29,6 +29,9 @@ export const computePopularTechnologies = (ads: JobAd[]): JobMarketPopularTechno
 
     for (const skill of ad.requiredSkills) {
       const key = normalizeSkillKey(skill)
+      if (isIgnoredSkillKey(key)) {
+        continue
+      }
       if (!unifiedSkills.has(key)) {
         unifiedSkills.set(key, unifySkillName(skill))
       }

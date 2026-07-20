@@ -3,14 +3,14 @@ const CANONICAL_SKILL_NAMES: Record<string, string> = {
   agile: 'Agile',
   angular: 'Angular',
   angularjs: 'AngularJS',
-  api: 'API',
+  api: 'REST API',
+  automatedtesting: 'Automated Testing',
   aws: 'AWS',
   azure: 'Azure',
   backend: 'Backend',
   cicd: 'CI/CD',
   csharp: 'C#',
   css: 'CSS',
-  css3: 'CSS3',
   cypress: 'Cypress',
   docker: 'Docker',
   dotnet: '.NET',
@@ -20,10 +20,8 @@ const CANONICAL_SKILL_NAMES: Record<string, string> = {
   fullstack: 'Fullstack',
   git: 'Git',
   github: 'GitHub',
-  gitlab: 'GitLab',
   graphql: 'GraphQL',
   html: 'HTML',
-  html5: 'HTML5',
   java: 'Java',
   javascript: 'JavaScript',
   jest: 'Jest',
@@ -42,8 +40,6 @@ const CANONICAL_SKILL_NAMES: Record<string, string> = {
   react: 'React',
   reactnative: 'React Native',
   redux: 'Redux',
-  rest: 'REST',
-  restapi: 'REST API',
   rxjs: 'RxJS',
   scss: 'SCSS',
   springboot: 'Spring Boot',
@@ -58,6 +54,23 @@ const CANONICAL_SKILL_NAMES: Record<string, string> = {
 
 const SCRIPT_SKILL_KEYS = new Set(['javascript', 'typescript'])
 
+const IGNORED_SKILL_KEYS = new Set([
+  'agile',
+  'backend',
+  'datascience',
+  'degree',
+  'frontend',
+  'fullstack',
+  'jira',
+  'json',
+  'softwaredevelopment',
+  'scrum',
+  'testing',
+  'ui',
+])
+
+export const isIgnoredSkillKey = (key: string): boolean => IGNORED_SKILL_KEYS.has(key)
+
 export const normalizeSkillKey = (skill: string): string => {
   let normalized = skill
     .trim()
@@ -71,6 +84,42 @@ export const normalizeSkillKey = (skill: string): string => {
 
   if (normalized === 'amazonaws') {
     return 'aws'
+  }
+
+  if (normalized === 'rest' || normalized === 'restapi' || normalized === 'restapis' || normalized === 'restfulapi') {
+    return 'api'
+  }
+
+  if (normalized === 'gitlab') {
+    return 'git'
+  }
+
+  if (normalized === 'aitools' || normalized === 'aitool') {
+    return 'ai'
+  }
+
+  if (normalized === 'testautomation') {
+    return 'automatedtesting'
+  }
+
+  if (normalized === 'html5') {
+    return 'html'
+  }
+
+  if (normalized === 'css3') {
+    return 'css'
+  }
+
+  if (normalized === 'js') {
+    return 'javascript'
+  }
+
+  if (normalized === 'spring') {
+    return 'springboot'
+  }
+
+  if (normalized === 'tailwind') {
+    return 'tailwindcss'
   }
 
   if (normalized.endsWith('js') && normalized.length > 4 && !SCRIPT_SKILL_KEYS.has(normalized) && normalized !== 'js') {

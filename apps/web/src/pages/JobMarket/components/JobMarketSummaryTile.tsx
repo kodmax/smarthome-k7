@@ -46,13 +46,13 @@ export const JobMarketSummaryTile: FC<JobMarketSummaryTileProps> = ({
   const changeAbsolute = hasChange ? getAbsoluteChange(value, previous) : 0
 
   return (
-    <ApolloCard cardId={cardId} title={title} icon={icon} height={3} allowZoom={false}>
+    <ApolloCard cardId={cardId} title={title} icon={icon} height={4} allowZoom={false}>
       <Typography
         sx={{
           fontSize: designTokens.font.h1.size,
           fontWeight: designTokens.font.h1.weight,
           lineHeight: designTokens.font.h1.lineHeight,
-          mb: value !== undefined ? 0.75 : 0,
+          mb: 3,
         }}
       >
         {value !== undefined ? formatMetricValue(value, variant) : '--'}
