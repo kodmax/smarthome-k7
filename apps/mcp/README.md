@@ -52,14 +52,17 @@ każdej maszynie.
 Przed pierwszym użyciem zbuduj serwer (`yarn workspace mcp build`), uruchom `apps/service` (WebSocket :3678), potem
 włącz **dashboard** w **Cursor Settings → MCP**.
 
-Dedykowane narzędzia MCP (cache z WebSocket Apollo):
+Narzędzia MCP (15 łącznie — cache z WebSocket Apollo):
 
 | Narzędzie               | Kiedy użyć                                       |
 | ----------------------- | ------------------------------------------------ |
+| `ping`                  | Sprawdzenie, czy serwer MCP odpowiada            |
 | `knx_temperatures`      | Temperatura w pokojach (KNX)                     |
 | `home_heating`          | Ogrzewanie i tryby HVAC                          |
 | `home_air_quality`      | CO₂ i wilgotność w domu                          |
 | `home_energy`           | Zużycie prądu i koszty                           |
+| `home_lights`           | Stan obwodów oświetlenia KNX                     |
+| `control_light`         | Włącz/wyłącz obwód KNX (wymaga działającego WS)  |
 | `outdoor_weather`       | Pogoda na zewnątrz                               |
 | `stock_quote`           | Cena konkretnej akcji (symbol)                   |
 | `stock_market_overview` | Ogólny przegląd giełdy                           |

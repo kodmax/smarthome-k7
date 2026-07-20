@@ -16,10 +16,10 @@ Exports from `index.js`: TypeScript ESLint + Prettier rules (`eslint-config-pret
 
 ## Consumers
 
-- `apps/web`
-- `@repo/feed-client`, `@repo/knx-schema`, `@repo/types`, `@repo/assets`
-
-`apps/service` uses a separate config based on `eslint-config-standard`.
+- `apps/web`, `apps/service`, `apps/mcp`
+- `@repo/apollo-ws`, `@repo/apollo-card`, `@repo/chronos`, `@repo/feed-client`, `@repo/i18n-react`
+- `@repo/knx-schema`, `@repo/types`, `@repo/assets`
+- Root `.eslintrc.js`
 
 ## Scripts
 

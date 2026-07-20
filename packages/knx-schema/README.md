@@ -10,6 +10,7 @@ Exports `knxSchema` from `src/home.knx-schema.ts` — sections include:
 - air quality (CO₂, humidity)
 - energy and heating
 - room temperatures
+- lights (`home.lights.ts`)
 
 ## Usage
 

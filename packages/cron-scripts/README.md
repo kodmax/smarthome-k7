@@ -34,7 +34,7 @@ Service loads `apps/service/.env`. For `tv/sony.ts`, development uses `.env` via
 
 ## Monorepo dependencies
 
-- `@repo/chronos` — cron scheduler
+- `@repo/chronos` — cron scheduler ([`packages/chronos`](../chronos))
 - `@repo/db` — shared MariaDB pool
 - `@repo/knx-schema` — KNX addresses (same as service)
 - `@repo/typescript-config` — TypeScript config

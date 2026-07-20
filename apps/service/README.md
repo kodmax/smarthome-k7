@@ -40,7 +40,7 @@ Copy `.env.example` and fill in:
 
 **Web (scraping):** `weather`, `stock-market`, `news`, `jobs`, `top-torrents`, `transmission`
 
-**KNX:** energy, heating, CO₂, humidity, room temperatures
+**KNX:** energy, heating, CO₂, humidity, room temperatures, lights (`home.lights`)
 
 KNX cron jobs (energy logging, clock sync, indoor readings) run in-process via `@repo/cron-scripts` →
 `initKnxCronJobs()`. Disabled with `NO_CRON=1` or `NO_KNX=1`.

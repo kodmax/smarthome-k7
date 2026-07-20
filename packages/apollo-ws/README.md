@@ -31,7 +31,8 @@ yarn workspace @repo/apollo-ws test
 | `test`            | Vitest                         |
 | `lint` / `format` | ESLint / Prettier              |
 
-Package entry: `dist/index.js` with types in `dist/index.d.ts`. Agent notes: [`AGENTS.md`](./AGENTS.md).
+Package entry: `dist/index.js` with types in `dist/index.d.ts`. Cron scheduling lives in [`@repo/chronos`](../chronos).
+Agent notes: [`AGENTS.md`](./AGENTS.md).
 
 ## Stack
 

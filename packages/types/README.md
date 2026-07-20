@@ -7,9 +7,10 @@ Shared TypeScript types for feed payloads and domain models — the contract bet
 Types in `src/feed.ts` (re-exported from `src/index.ts`):
 
 - weather, energy, heating, air quality
-- stock market, currencies, commodities
-- news, jobs, torrents
-- KNX readings
+- stock market, currencies, commodities, interest rates
+- news, jobs, torrents, transmission
+- KNX readings (temperatures, lights)
+- allergens, fuel prices
 
 ## Usage
 

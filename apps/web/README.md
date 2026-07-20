@@ -65,6 +65,7 @@ Run this after changing the source icon, then rebuild/deploy.
 | `@repo/types`                                    | Feed payload types                      |
 | `@repo/assets`                                   | Lucide icons and weather SVGs in cards  |
 | `@repo/design-tokens`                            | Shared MUI theme                        |
+| `@repo/i18n-react`                               | Locale provider and translation hooks   |
 | `@repo/eslint-config`, `@repo/typescript-config` | Tooling                                 |
 
 Cards in `src/pages/Dashboard/cards/` map WebSocket topics to UI components. App entry point: `src/main.tsx`.
