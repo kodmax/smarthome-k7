@@ -69,6 +69,10 @@ export const normalizeSkillKey = (skill: string): string => {
     return normalized === 'netcore' ? 'dotnetcore' : 'dotnet'
   }
 
+  if (normalized === 'amazonaws') {
+    return 'aws'
+  }
+
   if (normalized.endsWith('js') && normalized.length > 4 && !SCRIPT_SKILL_KEYS.has(normalized) && normalized !== 'js') {
     normalized = normalized.slice(0, -2)
   }

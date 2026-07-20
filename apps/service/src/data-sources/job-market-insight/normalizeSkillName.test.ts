@@ -24,6 +24,11 @@ describe('normalizeSkillKey', () => {
     expect(normalizeSkillKey('.NET')).toBe('dotnet')
     expect(normalizeSkillKey('.Net')).toBe('dotnet')
   })
+
+  it('groups aws variants', () => {
+    expect(normalizeSkillKey('AWS')).toBe('aws')
+    expect(normalizeSkillKey('Amazon AWS')).toBe('aws')
+  })
 })
 
 describe('unifySkillName', () => {
@@ -33,6 +38,7 @@ describe('unifySkillName', () => {
     expect(unifySkillName('NodeJS')).toBe('Node.js')
     expect(unifySkillName('Front-End')).toBe('Frontend')
     expect(unifySkillName('TailwindCSS')).toBe('Tailwind CSS')
+    expect(unifySkillName('Amazon AWS')).toBe('AWS')
   })
 
   it('preserves unknown skills as trimmed originals', () => {

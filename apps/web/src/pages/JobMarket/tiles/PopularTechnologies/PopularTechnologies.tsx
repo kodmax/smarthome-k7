@@ -23,7 +23,7 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
       cardId='job-market-popular-technologies'
       title={labels.title}
       icon={ListIcon}
-      height={16}
+      height={24}
       allowZoom={false}
     >
       {feed === undefined ? (

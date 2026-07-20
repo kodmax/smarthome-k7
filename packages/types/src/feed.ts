@@ -373,9 +373,7 @@ export type JobMarketInsightFeed = {
   salaryDistribution: JobMarketSalaryDistributionBracket[]
 }
 
-export type JobMarketInsightCachedFeed = {
-  ads: JobAd[]
-}
+export type JobMarketInsightCachedFeed = JobMarketInsightFeed
 
 export function emptyJobAdApplication(): JobAdApplication {
   return {
