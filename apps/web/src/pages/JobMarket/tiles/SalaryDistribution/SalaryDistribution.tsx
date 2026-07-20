@@ -1,9 +1,11 @@
 import { Box, Typography } from '@mui/material'
 import { PowerIcon } from '@repo/assets'
 import { ApolloCard } from '@repo/apollo-card'
+import { useFeed } from '@repo/feed-client'
+import { JobMarketInsightFeed } from '@repo/types'
 import { type FC } from 'react'
 import { useTranslations } from '@/i18n'
-import { salaryDistributionAxisTicks, salaryDistributionBrackets } from './salaryDistributionData'
+import { salaryDistributionAxisTicks, salaryDistributionChartMaxPercent } from './salaryDistributionConfig'
 
 const labelWidth = 108
 const valueWidth = 40
@@ -13,23 +15,25 @@ const rowGap = 2.5
 export const SalaryDistribution: FC<Record<string, never>> = () => {
   const { t } = useTranslations()
   const labels = t.jobMarket.salaryDistribution
+  const feed = useFeed<JobMarketInsightFeed>('job-market-insight')
+  const brackets = feed?.salaryDistribution ?? []
 
   return (
     <ApolloCard
       cardId='job-market-salary-distribution'
       title={labels.title}
       icon={PowerIcon}
-      height={9}
+      height={13}
       allowZoom={false}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: rowGap }}>
-        {salaryDistributionBrackets.map(bracket => (
+        {brackets.map(bracket => (
           <Box key={bracket.id} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Typography
               variant='body1'
               sx={{ width: labelWidth, flexShrink: 0, color: 'text.secondary', whiteSpace: 'nowrap' }}
             >
-              {labels.brackets[bracket.labelKey]}
+              {labels.brackets[bracket.id]}
             </Typography>
 
             <Box sx={{ position: 'relative', flex: 1, height: chartHeight }}>
@@ -63,7 +67,7 @@ export const SalaryDistribution: FC<Record<string, never>> = () => {
                   return {
                     position: 'relative',
                     height: '100%',
-                    width: `${(bracket.percentage / 40) * 100}%`,
+                    width: `${(bracket.percentage / salaryDistributionChartMaxPercent) * 100}%`,
                     maxWidth: '100%',
                     borderRadius: chartHeight / 2,
                     background: `linear-gradient(90deg, ${barColor} 0, ${barColor} calc(100% - ${fadeWidth}px), ${barTipColor} 100%)`,
@@ -88,8 +92,13 @@ export const SalaryDistribution: FC<Record<string, never>> = () => {
               variant='caption'
               sx={{
                 position: 'absolute',
-                left: `${(tick / 40) * 100}%`,
-                transform: tick === 0 ? undefined : tick === 40 ? 'translateX(-100%)' : 'translateX(-50%)',
+                left: `${(tick / salaryDistributionChartMaxPercent) * 100}%`,
+                transform:
+                  tick === 0
+                    ? undefined
+                    : tick === salaryDistributionChartMaxPercent
+                      ? 'translateX(-100%)'
+                      : 'translateX(-50%)',
                 color: 'text.secondary',
               }}
             >

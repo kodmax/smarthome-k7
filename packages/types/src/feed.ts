@@ -340,6 +340,20 @@ export type JobsCachedFeed = {
   ads: JobAd[]
 }
 
+export type JobMarketSalaryDistributionBracket = {
+  id:
+    | 'below5k'
+    | 'from5to10k'
+    | 'from10to15k'
+    | 'from15to20k'
+    | 'from20to25k'
+    | 'from25to30k'
+    | 'from30to35k'
+    | 'from35to40k'
+    | 'above40k'
+  percentage: number
+}
+
 export type JobMarketPopularTechnology = {
   id: string
   name: string
@@ -356,6 +370,7 @@ export type JobMarketInsightFeed = {
   remoteWorkPercent: number
   permanentEmploymentPercent: number
   popularTechnologies: JobMarketPopularTechnology[]
+  salaryDistribution: JobMarketSalaryDistributionBracket[]
 }
 
 export type JobMarketInsightCachedFeed = {

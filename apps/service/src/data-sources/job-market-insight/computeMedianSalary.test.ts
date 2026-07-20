@@ -21,17 +21,17 @@ describe('computeMedianSalary', () => {
     expect(computeMedianSalary([makeAd(), makeAd()])).toBeNull()
   })
 
-  it('computes the median of salary range midpoints', () => {
+  it('computes the median of salary range upper bounds', () => {
     expect(
       computeMedianSalary([
         makeAd({ from: 20_000, to: 24_000 }),
         makeAd({ from: 26_000, to: 30_000 }),
         makeAd({ from: 28_000, to: 32_000 }),
       ]),
-    ).toBe(28_000)
+    ).toBe(30_000)
   })
 
   it('ignores ads without salary ranges', () => {
-    expect(computeMedianSalary([makeAd(), makeAd({ from: 20_000, to: 24_000 })])).toBe(22_000)
+    expect(computeMedianSalary([makeAd(), makeAd({ from: 20_000, to: 24_000 })])).toBe(24_000)
   })
 })

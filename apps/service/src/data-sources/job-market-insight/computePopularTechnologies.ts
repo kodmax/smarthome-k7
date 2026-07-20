@@ -1,4 +1,5 @@
 import { JobAd, JobMarketPopularTechnology } from '@repo/types'
+import { salaryUpperBounds } from './computeMedianSalary'
 import { median } from './median'
 import { POPULAR_TECHNOLOGIES_LIMIT, TRACKED_TECHNOLOGIES } from './trackedTechnologies'
 
@@ -6,16 +7,7 @@ const adMatchesTechnology = (ad: JobAd, skills: string[]): boolean =>
   ad.requiredSkills.some(skill => skills.includes(skill))
 
 const computeTechnologyMedian = (ads: JobAd[]): number | null => {
-  const midpoints = ads.flatMap(ad => {
-    const range = ad.monthlySalaryRangeAfterTaxes
-    if (range === undefined) {
-      return []
-    }
-
-    return [(range.from + range.to) / 2]
-  })
-
-  const result = median(midpoints)
+  const result = median(salaryUpperBounds(ads))
 
   return result === null ? null : Math.round(result)
 }

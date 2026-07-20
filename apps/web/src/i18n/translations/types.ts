@@ -36,13 +36,15 @@ export type Translations = {
     salaryDistribution: {
       title: string
       brackets: {
-        below20k: string
+        below5k: string
+        from5to10k: string
+        from10to15k: string
+        from15to20k: string
         from20to25k: string
         from25to30k: string
         from30to35k: string
         from35to40k: string
         above40k: string
-        noSalaryRange: string
       }
     }
     popularTechnologies: {
