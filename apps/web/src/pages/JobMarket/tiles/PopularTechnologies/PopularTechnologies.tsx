@@ -8,7 +8,7 @@ import { type FC } from 'react'
 import { ApolloDataTable, ApolloTableCell, ApolloValueCell, TablePlaceholder } from '@/card-components'
 import { formatNumber } from '@/helpers/formatNumber'
 import { useTranslations } from '@/i18n'
-import { getPopularTechnologyPresentation } from './popularTechnologyPresentation'
+import { TechnologyLogo } from './TechnologyLogo'
 
 const tableHeaderGap = designTokens.space[3]
 const headerRowSx = { '& .MuiTableCell-root': { pb: `${tableHeaderGap}px`, color: 'text.secondary' } }
@@ -42,47 +42,26 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
             </TableHead>
 
             <TableBody>
-              {feed.popularTechnologies.map((technology, index) => {
-                const presentation = getPopularTechnologyPresentation(technology.id)
-
-                return (
-                  <TableRow key={technology.id} sx={{ height: 40 }}>
-                    <ApolloTableCell>{index + 1}</ApolloTableCell>
-                    <ApolloTableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-                        <Box
-                          sx={{
-                            width: 24,
-                            height: 24,
-                            borderRadius: `${designTokens.radius.sm}px`,
-                            bgcolor: presentation.color,
-                            color: technology.id === 'javascript' ? 'text.primary' : '#fff',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                            fontSize: 10,
-                            fontWeight: 700,
-                            lineHeight: 1,
-                          }}
-                        >
-                          {presentation.abbreviation}
-                        </Box>
-                        <Typography variant='body2' noWrap>
-                          {technology.name}
-                        </Typography>
-                      </Box>
-                    </ApolloTableCell>
-                    <ApolloValueCell>{formatNumber(technology.offersCount, { fractionDigits: 0 })}</ApolloValueCell>
-                    <ApolloValueCell>{`${technology.sharePercent}%`}</ApolloValueCell>
-                    <ApolloValueCell>
-                      {technology.medianSalary !== null
-                        ? `${formatNumber(technology.medianSalary, { fractionDigits: 0 })} zł`
-                        : '--'}
-                    </ApolloValueCell>
-                  </TableRow>
-                )
-              })}
+              {feed.popularTechnologies.map((technology, index) => (
+                <TableRow key={technology.id} sx={{ height: 40 }}>
+                  <ApolloTableCell>{index + 1}</ApolloTableCell>
+                  <ApolloTableCell>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                      <TechnologyLogo id={technology.id} name={technology.name} />
+                      <Typography variant='body2' noWrap>
+                        {technology.name}
+                      </Typography>
+                    </Box>
+                  </ApolloTableCell>
+                  <ApolloValueCell>{formatNumber(technology.offersCount, { fractionDigits: 0 })}</ApolloValueCell>
+                  <ApolloValueCell>{`${technology.sharePercent}%`}</ApolloValueCell>
+                  <ApolloValueCell>
+                    {technology.medianSalary !== null
+                      ? `${formatNumber(technology.medianSalary, { fractionDigits: 0 })} zł`
+                      : '--'}
+                  </ApolloValueCell>
+                </TableRow>
+              ))}
             </TableBody>
           </ApolloDataTable>
         </Box>

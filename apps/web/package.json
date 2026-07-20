@@ -11,7 +11,8 @@
     "lint": "eslint \"src/**/*.ts?\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "icons:generate": "node scripts/generate-pwa-icons.mjs"
+    "icons:generate": "node scripts/generate-pwa-icons.mjs",
+    "technology-logos:download": "node scripts/download-technology-logos.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
