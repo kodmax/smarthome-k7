@@ -362,7 +362,7 @@ export type JobMarketPopularTechnology = {
   medianSalary: number | null
 }
 
-export type JobMarketInsightFeed = {
+export type JobMarketInsightMetrics = {
   adsCount: number
   newOffersCount: number
   medianSalary: number | null
@@ -373,7 +373,29 @@ export type JobMarketInsightFeed = {
   salaryDistribution: JobMarketSalaryDistributionBracket[]
 }
 
-export type JobMarketInsightCachedFeed = JobMarketInsightFeed
+export type JobMarketInsightCountChange = {
+  absolute: number
+  relativePercent: number | null
+}
+
+export type JobMarketInsightPercentagePointChange = {
+  absolute: number
+}
+
+export type JobMarketInsightChanges = {
+  adsCount: JobMarketInsightCountChange
+  newOffersCount: JobMarketInsightCountChange
+  medianSalary: JobMarketInsightCountChange | null
+  offersWithSalaryRangePercent: JobMarketInsightPercentagePointChange
+  remoteWorkPercent: JobMarketInsightPercentagePointChange
+  permanentEmploymentPercent: JobMarketInsightPercentagePointChange
+}
+
+export type JobMarketInsightFeed = JobMarketInsightMetrics & {
+  changes: JobMarketInsightChanges | null
+}
+
+export type JobMarketInsightCachedFeed = JobMarketInsightMetrics
 
 export function emptyJobAdApplication(): JobAdApplication {
   return {

@@ -8,7 +8,11 @@ import { nfj } from '../jobs/nfj/nfj'
 import { theprotocol } from '../jobs/theprotocol'
 import { addAllAds } from './addAllAds'
 import { buildJobMarketInsightFeed } from './buildJobMarketInsightFeed'
+import { computeJobMarketInsightChanges } from './computeJobMarketInsightChanges'
+import { loadJobMarketInsightSnapshotAtOrBefore } from './loadJobMarketInsightSnapshotAtOrBefore'
 import { persistJobMarketInsightSnapshot } from './persistJobMarketInsightSnapshot'
+
+const COMPARISON_WINDOW_DAYS = 1 // TODO: revert to 7 after verifying change metrics
 
 export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsightFeed, JobMarketInsightCachedFeed> {
   @Inject('db')
@@ -43,6 +47,12 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
   }
 
   async composeContent(cached: JobMarketInsightCachedFeed): Promise<JobMarketInsightFeed> {
-    return cached
+    const baselineAt = DateTime.shift(-COMPARISON_WINDOW_DAYS, CacheAgeUnit.DAYS).getDateTime()
+    const previous = await loadJobMarketInsightSnapshotAtOrBefore(this.db, baselineAt)
+
+    return {
+      ...cached,
+      changes: previous === null ? null : computeJobMarketInsightChanges(cached, previous),
+    }
   }
 }

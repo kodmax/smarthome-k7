@@ -1,4 +1,4 @@
-import { JobAd, JobMarketInsightFeed } from '@repo/types'
+import { JobAd, JobMarketInsightMetrics } from '@repo/types'
 import { countNewOffers } from './countNewOffers'
 import { computeMedianSalary } from './computeMedianSalary'
 import { computeOffersWithSalaryRangePercent } from './computeOffersWithSalaryRangePercent'
@@ -7,7 +7,7 @@ import { computePopularTechnologies } from './computePopularTechnologies'
 import { computeRemoteWorkPercent } from './computeRemoteWorkPercent'
 import { computeSalaryDistribution } from './computeSalaryDistribution'
 
-export const buildJobMarketInsightFeed = (ads: JobAd[]): JobMarketInsightFeed => ({
+export const buildJobMarketInsightFeed = (ads: JobAd[]): JobMarketInsightMetrics => ({
   adsCount: ads.length,
   newOffersCount: countNewOffers(ads),
   medianSalary: computeMedianSalary(ads),

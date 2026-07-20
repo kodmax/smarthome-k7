@@ -1,10 +1,10 @@
-import { JobMarketInsightFeed } from '@repo/types'
+import { JobMarketInsightMetrics } from '@repo/types'
 import type { Pool } from 'mariadb'
 
 export const persistJobMarketInsightSnapshot = async (
   db: Pool,
   snapshotAt: string,
-  metrics: JobMarketInsightFeed,
+  metrics: JobMarketInsightMetrics,
 ): Promise<void> => {
   const conn = await db.getConnection()
 
