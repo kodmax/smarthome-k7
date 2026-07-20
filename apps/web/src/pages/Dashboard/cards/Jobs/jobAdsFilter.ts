@@ -4,7 +4,7 @@ export const JOB_ADS_FILTER_ORDER = ['new', 'in-progress', 'not-interested', 'fi
 
 export type JobAdsFilter = (typeof JOB_ADS_FILTER_ORDER)[number]
 
-export const DEFAULT_JOB_ADS_FILTER: JobAdsFilter = 'in-progress'
+export const DEFAULT_JOB_ADS_FILTER: JobAdsFilter = 'new'
 
 export function getJobAdFilterCategory(status: JobApplyStatus): JobAdsFilter {
   if (status === 'not-applied') {

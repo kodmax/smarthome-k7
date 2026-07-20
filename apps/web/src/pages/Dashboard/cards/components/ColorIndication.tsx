@@ -15,6 +15,7 @@ const Indicator = styled('span')({
   display: 'inline-block',
   height: '0.333em',
   width: '0.333em',
+  borderRadius: '50%',
 })
 
 export const ColorIndicator: FC<{ instant: number; range: ColorIndicationRange }> = ({ instant, range }) => {
