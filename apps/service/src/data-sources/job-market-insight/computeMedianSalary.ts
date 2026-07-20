@@ -11,8 +11,8 @@ export const salaryUpperBounds = (ads: JobAd[]): number[] =>
     return [range.to]
   })
 
-export const computeMedianSalary = (ads: JobAd[]): number | null => {
+export const computeMedianSalary = (ads: JobAd[]): number => {
   const result = median(salaryUpperBounds(ads))
 
-  return result === null ? null : Math.round(result)
+  return result === null ? 0 : Math.round(result)
 }

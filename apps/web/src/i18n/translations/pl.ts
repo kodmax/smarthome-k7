@@ -25,7 +25,7 @@ export const pl: Translations = {
   },
   jobMarket: {
     title: 'Rynek Pracy',
-    description: 'Przeglądaj oferty pracy i śledź aplikacje.',
+    description: 'Analiza rynku ofert pracy - JavaScript / TypeScript',
     summary: {
       activeOffers: 'Aktywne oferty',
       newOffers: 'Nowe oferty',

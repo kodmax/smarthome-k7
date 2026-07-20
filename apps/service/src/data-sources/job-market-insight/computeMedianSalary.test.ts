@@ -17,8 +17,8 @@ const makeAd = (salary?: { from: number; to: number }): JobAd => ({
 })
 
 describe('computeMedianSalary', () => {
-  it('returns null when no ads have salary ranges', () => {
-    expect(computeMedianSalary([makeAd(), makeAd()])).toBeNull()
+  it('returns zero when no ads have salary ranges', () => {
+    expect(computeMedianSalary([makeAd(), makeAd()])).toBe(0)
   })
 
   it('computes the median of salary range upper bounds', () => {

@@ -25,7 +25,7 @@ export const ru: Translations = {
   },
   jobMarket: {
     title: 'Рынок труда',
-    description: 'Просматривайте вакансии и отслеживайте отклики.',
+    description: 'Анализ рынка вакансий — JavaScript / TypeScript',
     summary: {
       activeOffers: 'Активные вакансии',
       newOffers: 'Новые вакансии',

@@ -365,7 +365,7 @@ export type JobMarketPopularTechnology = {
 export type JobMarketInsightMetrics = {
   adsCount: number
   newOffersCount: number
-  medianSalary: number | null
+  medianSalary: number
   offersWithSalaryRangePercent: number
   remoteWorkPercent: number
   permanentEmploymentPercent: number
@@ -373,26 +373,15 @@ export type JobMarketInsightMetrics = {
   salaryDistribution: JobMarketSalaryDistributionBracket[]
 }
 
-export type JobMarketInsightCountChange = {
-  absolute: number
-  relativePercent: number | null
-}
-
-export type JobMarketInsightPercentagePointChange = {
-  absolute: number
-}
-
-export type JobMarketInsightChanges = {
-  adsCount: JobMarketInsightCountChange
-  newOffersCount: JobMarketInsightCountChange
-  medianSalary: JobMarketInsightCountChange | null
-  offersWithSalaryRangePercent: JobMarketInsightPercentagePointChange
-  remoteWorkPercent: JobMarketInsightPercentagePointChange
-  permanentEmploymentPercent: JobMarketInsightPercentagePointChange
-}
-
-export type JobMarketInsightFeed = JobMarketInsightMetrics & {
-  changes: JobMarketInsightChanges | null
+export type JobMarketInsightFeed = {
+  adsCount: { value: number; previous: number | null }
+  newOffersCount: { value: number; previous: number | null }
+  medianSalary: { value: number; previous: number | null }
+  offersWithSalaryRangePercent: { value: number; previous: number | null }
+  remoteWorkPercent: { value: number; previous: number | null }
+  permanentEmploymentPercent: { value: number; previous: number | null }
+  popularTechnologies: JobMarketPopularTechnology[]
+  salaryDistribution: JobMarketSalaryDistributionBracket[]
 }
 
 export type JobMarketInsightCachedFeed = JobMarketInsightMetrics

@@ -25,7 +25,7 @@ export const en: Translations = {
   },
   jobMarket: {
     title: 'Job Market',
-    description: 'Browse job listings and track applications.',
+    description: 'JavaScript / TypeScript job market analysis',
     summary: {
       activeOffers: 'Active listings',
       newOffers: 'New listings',

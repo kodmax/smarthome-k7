@@ -1,5 +1,6 @@
-import { JobMarketInsightCountChange, JobMarketInsightPercentagePointChange } from '@repo/types'
 import { formatNumber } from '@/helpers/formatNumber'
+
+export type JobMarketMetricVariant = 'count' | 'currency' | 'percent'
 
 const formatSignedNumber = (value: number, fractionDigits = 0): string => {
   const formatted = formatNumber(Math.abs(value), { fractionDigits })
@@ -14,28 +15,58 @@ const formatSignedNumber = (value: number, fractionDigits = 0): string => {
   return formatted
 }
 
-export const formatCountChange = (change: JobMarketInsightCountChange): string => {
-  const absolute = formatSignedNumber(change.absolute)
+export const getAbsoluteChange = (value: number, previous: number): number => value - previous
 
-  if (change.relativePercent === null) {
-    return absolute
+const computeRelativePercent = (value: number, previous: number): number | null =>
+  previous === 0 ? null : ((value - previous) / previous) * 100
+
+const formatCountChange = (value: number, previous: number): string => {
+  const absolute = getAbsoluteChange(value, previous)
+  const relativePercent = computeRelativePercent(value, previous)
+
+  if (relativePercent === null) {
+    return formatSignedNumber(absolute)
   }
 
-  return `${absolute} (${formatSignedNumber(change.relativePercent, 1)}%)`
+  return `${formatSignedNumber(absolute)} (${formatSignedNumber(relativePercent, 1)}%)`
 }
 
-export const formatMedianSalaryChange = (change: JobMarketInsightCountChange): string => {
-  const absolute = `${formatSignedNumber(change.absolute)} zł`
+const formatCurrencyChange = (value: number, previous: number): string => {
+  const absolute = getAbsoluteChange(value, previous)
+  const relativePercent = computeRelativePercent(value, previous)
+  const formattedAbsolute = `${formatSignedNumber(absolute)} zł`
 
-  if (change.relativePercent === null) {
-    return absolute
+  if (relativePercent === null) {
+    return formattedAbsolute
   }
 
-  return `${absolute} (${formatSignedNumber(change.relativePercent, 1)}%)`
+  return `${formattedAbsolute} (${formatSignedNumber(relativePercent, 1)}%)`
 }
 
-export const formatPercentagePointChange = (change: JobMarketInsightPercentagePointChange): string =>
-  `${formatSignedNumber(change.absolute)} pp`
+const formatPercentagePointChange = (value: number, previous: number): string =>
+  `${formatSignedNumber(getAbsoluteChange(value, previous))} pp`
+
+export const formatMetricValue = (value: number, variant: JobMarketMetricVariant): string => {
+  switch (variant) {
+    case 'count':
+      return formatNumber(value, { fractionDigits: 0 })
+    case 'currency':
+      return `${formatNumber(value, { fractionDigits: 0 })} zł`
+    case 'percent':
+      return `${value}%`
+  }
+}
+
+export const formatMetricChange = (value: number, previous: number, variant: JobMarketMetricVariant): string => {
+  switch (variant) {
+    case 'count':
+      return formatCountChange(value, previous)
+    case 'currency':
+      return formatCurrencyChange(value, previous)
+    case 'percent':
+      return formatPercentagePointChange(value, previous)
+  }
+}
 
 export const getChangeTone = (value: number): 'positive' | 'negative' | 'neutral' => {
   if (value > 0) {

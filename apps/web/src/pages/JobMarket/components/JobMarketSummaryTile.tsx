@@ -3,16 +3,22 @@ import { type StyledLucideIcon } from '@repo/assets'
 import { ApolloCard } from '@repo/apollo-card'
 import { designTokens } from '@repo/design-tokens'
 import { type FC } from 'react'
-import { getChangeTone } from '../formatJobMarketChange'
+import {
+  type JobMarketMetricVariant,
+  formatMetricChange,
+  formatMetricValue,
+  getAbsoluteChange,
+  getChangeTone,
+} from '../formatJobMarketChange'
+import { useTranslations } from '@/i18n'
 
 export type JobMarketSummaryTileProps = {
   cardId: string
   icon: StyledLucideIcon
   title: string
-  value: string
-  change?: string
-  changeValue?: number
-  comparisonLabel?: string
+  value?: number
+  previous?: number | null
+  variant: JobMarketMetricVariant
 }
 
 const changeToneColor = (tone: ReturnType<typeof getChangeTone>): string => {
@@ -31,37 +37,37 @@ export const JobMarketSummaryTile: FC<JobMarketSummaryTileProps> = ({
   icon,
   title,
   value,
-  change,
-  changeValue = 0,
-  comparisonLabel,
-}) => (
-  <ApolloCard cardId={cardId} title={title} icon={icon} height={3} allowZoom={false}>
-    <Typography
-      sx={{
-        fontSize: designTokens.font.h1.size,
-        fontWeight: designTokens.font.h1.weight,
-        lineHeight: designTokens.font.h1.lineHeight,
-        mb: change === undefined ? 0 : 0.75,
-      }}
-    >
-      {value}
-    </Typography>
+  previous,
+  variant,
+}) => {
+  const { t } = useTranslations()
+  const labels = t.jobMarket.summary
+  const hasChange = value !== undefined && previous != null
+  const changeAbsolute = hasChange ? getAbsoluteChange(value, previous) : 0
 
-    {change !== undefined && (
-      <>
-        <Typography
-          variant='body2'
-          sx={{ color: changeToneColor(getChangeTone(changeValue)), fontWeight: 600, mb: 0.5 }}
-        >
-          {change}
-        </Typography>
+  return (
+    <ApolloCard cardId={cardId} title={title} icon={icon} height={3} allowZoom={false}>
+      <Typography
+        sx={{
+          fontSize: designTokens.font.h1.size,
+          fontWeight: designTokens.font.h1.weight,
+          lineHeight: designTokens.font.h1.lineHeight,
+          mb: value !== undefined ? 0.75 : 0,
+        }}
+      >
+        {value !== undefined ? formatMetricValue(value, variant) : '--'}
+      </Typography>
 
-        {comparisonLabel !== undefined && (
-          <Typography variant='caption' sx={{ color: 'text.secondary' }}>
-            {comparisonLabel}
-          </Typography>
-        )}
-      </>
-    )}
-  </ApolloCard>
-)
+      <Typography
+        variant='body2'
+        sx={{ color: changeToneColor(getChangeTone(changeAbsolute)), fontWeight: 600, mb: 0.5 }}
+      >
+        {hasChange ? formatMetricChange(value, previous, variant) : '--'}
+      </Typography>
+
+      <Typography variant='caption' sx={{ color: 'text.secondary' }}>
+        {labels.vsPreviousPeriod}
+      </Typography>
+    </ApolloCard>
+  )
+}

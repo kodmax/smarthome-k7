@@ -8,7 +8,6 @@ import { nfj } from '../jobs/nfj/nfj'
 import { theprotocol } from '../jobs/theprotocol'
 import { addAllAds } from './addAllAds'
 import { buildJobMarketInsightFeed } from './buildJobMarketInsightFeed'
-import { computeJobMarketInsightChanges } from './computeJobMarketInsightChanges'
 import { loadJobMarketInsightSnapshotAtOrBefore } from './loadJobMarketInsightSnapshotAtOrBefore'
 import { persistJobMarketInsightSnapshot } from './persistJobMarketInsightSnapshot'
 
@@ -51,8 +50,20 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
     const previous = await loadJobMarketInsightSnapshotAtOrBefore(this.db, baselineAt)
 
     return {
-      ...cached,
-      changes: previous === null ? null : computeJobMarketInsightChanges(cached, previous),
+      adsCount: { value: cached.adsCount, previous: previous?.adsCount ?? null },
+      newOffersCount: { value: cached.newOffersCount, previous: previous?.newOffersCount ?? null },
+      medianSalary: { value: cached.medianSalary, previous: previous?.medianSalary ?? null },
+      offersWithSalaryRangePercent: {
+        value: cached.offersWithSalaryRangePercent,
+        previous: previous?.offersWithSalaryRangePercent ?? null,
+      },
+      remoteWorkPercent: { value: cached.remoteWorkPercent, previous: previous?.remoteWorkPercent ?? null },
+      permanentEmploymentPercent: {
+        value: cached.permanentEmploymentPercent,
+        previous: previous?.permanentEmploymentPercent ?? null,
+      },
+      popularTechnologies: cached.popularTechnologies,
+      salaryDistribution: cached.salaryDistribution,
     }
   }
 }
