@@ -3,6 +3,7 @@ import { type Translations } from './types'
 export const en: Translations = {
   nav: {
     dashboard: 'Dashboard',
+    jobMarket: 'Job Market',
     energyMeter: 'Energy Meter',
     appearance: 'Appearance',
     about: 'About',
@@ -21,6 +22,10 @@ export const en: Translations = {
     darkAriaLabel: 'Dark theme',
     language: 'Language',
     languageAriaLabel: 'Application language',
+  },
+  jobMarket: {
+    title: 'Job Market',
+    description: 'Browse job listings and track applications.',
   },
   energyMeter: {
     title: 'Energy Meter',
@@ -64,6 +69,8 @@ export const en: Translations = {
     },
   },
   dashboard: {
+    title: 'Dashboard',
+    description: 'Summary of the most important information from your home.',
     common: {
       emptyMessage: 'Nothing new here yet',
       editPreferences: 'Edit preferences',

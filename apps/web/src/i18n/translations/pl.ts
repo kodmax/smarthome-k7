@@ -3,6 +3,7 @@ import { type Translations } from './types'
 export const pl: Translations = {
   nav: {
     dashboard: 'Pulpit główny',
+    jobMarket: 'Rynek Pracy',
     energyMeter: 'Pomiar energii',
     appearance: 'Wygląd',
     about: 'O aplikacji',
@@ -21,6 +22,10 @@ export const pl: Translations = {
     darkAriaLabel: 'Ciemny motyw',
     language: 'Język',
     languageAriaLabel: 'Język aplikacji',
+  },
+  jobMarket: {
+    title: 'Rynek Pracy',
+    description: 'Przeglądaj oferty pracy i śledź aplikacje.',
   },
   energyMeter: {
     title: 'Pomiar energii',
@@ -64,6 +69,8 @@ export const pl: Translations = {
     },
   },
   dashboard: {
+    title: 'Pulpit główny',
+    description: 'Podsumowanie najważniejszych informacji z domu.',
     common: {
       emptyMessage: 'Na razie nie ma tu nic nowego',
       editPreferences: 'Edytuj preferencje',

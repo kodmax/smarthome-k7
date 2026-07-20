@@ -1,7 +1,10 @@
 import { Grid } from '@mui/material'
 import { ZoomStateProvider } from '@repo/apollo-card'
+import { DashboardIcon, iconStyles } from '@repo/assets'
 import { type FC } from 'react'
+import { PageHeader } from '@/app/components/PageHeader'
 import { PageWrapper } from '@/app/components/PageWrapper'
+import { useTranslations } from '@/i18n'
 import { Indoor } from './cards/Indoor'
 import { Energy } from './cards/Energy'
 import { Temperature } from './cards/Temperature'
@@ -14,8 +17,17 @@ import { News } from './cards/News'
 const dashboardMdOrder = (md: number) => ({ order: { md, xl: 0 } })
 
 export const Dashboard: FC<Record<string, never>> = () => {
+  const { t } = useTranslations()
+
   return (
     <PageWrapper>
+      <PageHeader
+        icon={DashboardIcon}
+        iconColor={iconStyles.weather.color}
+        title={t.dashboard.title}
+        description={t.dashboard.description}
+      />
+
       <ZoomStateProvider>
         <Grid container spacing={3} sx={{ width: '100%' }}>
           <Grid size={{ xs: 12, md: 6, xl: 3 }} sx={dashboardMdOrder(1)}>

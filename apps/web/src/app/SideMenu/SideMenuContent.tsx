@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import { DashboardIcon, EnergyIcon, InfoIcon, SunMoonIcon, type StyledLucideIcon } from '@repo/assets'
+import { DashboardIcon, EnergyIcon, InfoIcon, JobsIcon, SunMoonIcon, type StyledLucideIcon } from '@repo/assets'
 import { type FC, useMemo } from 'react'
 import { useTranslations } from '@/i18n'
 import { SideMenuFooter } from './SideMenuFooter'
@@ -30,6 +30,7 @@ export const SideMenuContent: FC<SideMenuContentProps> = ({ onNavigate }) => {
       {
         items: [
           { id: 'dashboard', label: t.nav.dashboard, path: '/dashboard', icon: DashboardIcon },
+          { id: 'job-market', label: t.nav.jobMarket, path: '/job-market', icon: JobsIcon },
           { id: 'energy-meter', label: t.nav.energyMeter, path: '/energy-meter', icon: EnergyIcon },
         ],
       },

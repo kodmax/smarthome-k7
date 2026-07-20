@@ -9,6 +9,7 @@ export const iconStyles = {
   weather: { color: paletteMain('info') },
   error: { color: paletteMain('error') },
   media: { color: paletteMain('media') },
+  jobs: { color: paletteMain('jobs') },
   warning: { color: paletteMain('warning') },
   neutral: { color: 'var(--mui-palette-text-primary)' },
   muted: { color: 'var(--mui-palette-text-secondary)' },

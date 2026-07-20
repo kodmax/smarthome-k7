@@ -13,7 +13,7 @@ type PageHeaderProps = {
 const { pageHeader } = designTokens.components
 
 export const PageHeader: FC<PageHeaderProps> = ({ title, description, icon: Icon, iconColor }) => (
-  <Box sx={{ mb: 4 }}>
+  <Box sx={{ mb: 3 }}>
     <Box
       sx={{
         display: 'flex',
@@ -21,15 +21,15 @@ export const PageHeader: FC<PageHeaderProps> = ({ title, description, icon: Icon
         alignItems: 'flex-start',
         justifyContent: 'space-between',
         gap: 2,
-        mb: 1,
+        mb: 0.75,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0 }}>
         <Icon size={pageHeader.iconSize} strokeWidth={designTokens.icon.strokeWidth} color={iconColor} />
         <Typography
           component='h1'
           sx={{
-            fontSize: { xs: designTokens.font.h1.size, md: designTokens.font.display2.size },
+            fontSize: { xs: designTokens.font.h2.size, md: designTokens.font.h1.size },
             fontWeight: pageHeader.titleWeight,
             lineHeight: pageHeader.titleLineHeight,
           }}
@@ -39,7 +39,7 @@ export const PageHeader: FC<PageHeaderProps> = ({ title, description, icon: Icon
       </Box>
     </Box>
 
-    <Typography variant='body1' sx={{ color: 'text.secondary' }}>
+    <Typography variant='body2' sx={{ color: 'text.secondary' }}>
       {description}
     </Typography>
   </Box>

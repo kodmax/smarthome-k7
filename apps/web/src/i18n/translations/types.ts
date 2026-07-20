@@ -1,6 +1,7 @@
 export type Translations = {
   nav: {
     dashboard: string
+    jobMarket: string
     energyMeter: string
     appearance: string
     about: string
@@ -19,6 +20,10 @@ export type Translations = {
     darkAriaLabel: string
     language: string
     languageAriaLabel: string
+  }
+  jobMarket: {
+    title: string
+    description: string
   }
   energyMeter: {
     title: string
@@ -62,6 +67,8 @@ export type Translations = {
     }
   }
   dashboard: {
+    title: string
+    description: string
     common: {
       emptyMessage: string
       editPreferences: string

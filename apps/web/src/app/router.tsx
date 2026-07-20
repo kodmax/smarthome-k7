@@ -3,6 +3,7 @@ import { AppLayout } from './AppLayout'
 import { PersistentPages } from './PersistentPages'
 import { Appearance } from '@/pages/Appearance/Appearance'
 import { EnergyMeter } from '@/pages/EnergyMeter/EnergyMeter'
+import { JobMarket } from '@/pages/JobMarket/JobMarket'
 import { Offline } from '@/pages/Offline/Offline'
 
 export const router = createBrowserRouter([
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
           {
             path: 'energy-meter',
             element: <EnergyMeter />,
+          },
+          {
+            path: 'job-market',
+            element: <JobMarket />,
           },
           {
             path: 'appearance',
