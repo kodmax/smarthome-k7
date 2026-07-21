@@ -15,7 +15,7 @@ export function getJobAdFilterCategory(status: JobApplyStatus): JobAdsFilter {
     return 'not-interested'
   }
 
-  if (isTerminalApplyStatus(status)) {
+  if (isTerminalApplyStatus(status) || status === 'no-response') {
     return 'finished'
   }
 

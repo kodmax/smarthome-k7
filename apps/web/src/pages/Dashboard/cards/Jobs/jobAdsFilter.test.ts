@@ -7,7 +7,7 @@ describe('jobAdsFilter', () => {
     expect(getJobAdFilterCategory('not-applied')).toBe('new')
     expect(getJobAdFilterCategory('applied')).toBe('in-progress')
     expect(getJobAdFilterCategory('not-interested')).toBe('not-interested')
-    expect(getJobAdFilterCategory('no-response')).toBe('in-progress')
+    expect(getJobAdFilterCategory('no-response')).toBe('finished')
     expect(getJobAdFilterCategory('interview')).toBe('in-progress')
     expect(getJobAdFilterCategory('offer')).toBe('in-progress')
     expect(getJobAdFilterCategory('rejected')).toBe('finished')
