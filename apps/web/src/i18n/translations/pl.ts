@@ -3,6 +3,7 @@ import { type Translations } from './types'
 export const pl: Translations = {
   nav: {
     dashboard: 'Pulpit główny',
+    stockMarket: 'Giełda',
     jobMarket: 'Rynek Pracy',
     energyMeter: 'Pomiar energii',
     appearance: 'Wygląd',
@@ -22,6 +23,13 @@ export const pl: Translations = {
     darkAriaLabel: 'Ciemny motyw',
     language: 'Język',
     languageAriaLabel: 'Język aplikacji',
+  },
+  stockMarket: {
+    title: 'Giełda',
+    description: 'Notowania giełdowe i analiza spółek',
+  },
+  stockQuotes: {
+    title: 'Notowania',
   },
   jobMarket: {
     title: 'Rynek Pracy',

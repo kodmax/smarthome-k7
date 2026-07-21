@@ -5,6 +5,7 @@ import { Appearance } from '@/pages/Appearance/Appearance'
 import { EnergyMeter } from '@/pages/EnergyMeter/EnergyMeter'
 import { JobMarket } from '@/pages/JobMarket/JobMarket'
 import { Offline } from '@/pages/Offline/Offline'
+import { StockMarket } from '@/pages/StockMarket/StockMarket'
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ export const router = createBrowserRouter([
           {
             path: 'job-market',
             element: <JobMarket />,
+          },
+          {
+            path: 'stock-market',
+            element: <StockMarket />,
           },
           {
             path: 'appearance',

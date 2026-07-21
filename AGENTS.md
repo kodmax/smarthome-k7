@@ -7,3 +7,6 @@ root `.gitignore`, shared ESLint presets in `packages/eslint-config/`, and share
 `packages/typescript-config/`. When reading or changing a package's local `.eslintrc.cjs`, `tsconfig.json`, or
 `.gitignore`, take the root and shared presets into account — local files often extend or complement them, and both
 layers matter for lint, build, and ignore rules.
+
+When running build commands (`npm run build`, `yarn build`, `tsc`, `vite build`, etc.), do not use the sandbox — run
+them with full permissions instead. Builds hang or fail in the sandbox in this environment.

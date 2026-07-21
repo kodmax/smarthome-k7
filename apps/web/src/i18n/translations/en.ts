@@ -3,6 +3,7 @@ import { type Translations } from './types'
 export const en: Translations = {
   nav: {
     dashboard: 'Dashboard',
+    stockMarket: 'Stock Market',
     jobMarket: 'Job Market',
     energyMeter: 'Energy Meter',
     appearance: 'Appearance',
@@ -22,6 +23,13 @@ export const en: Translations = {
     darkAriaLabel: 'Dark theme',
     language: 'Language',
     languageAriaLabel: 'Application language',
+  },
+  stockMarket: {
+    title: 'Stock Market',
+    description: 'Stock quotes and company analysis',
+  },
+  stockQuotes: {
+    title: 'Quotes',
   },
   jobMarket: {
     title: 'Job Market',

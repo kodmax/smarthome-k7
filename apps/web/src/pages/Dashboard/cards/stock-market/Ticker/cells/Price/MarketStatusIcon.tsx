@@ -5,7 +5,7 @@ import { Circle } from 'lucide-react'
 import { FC } from 'react'
 
 const iconStyle = { verticalAlign: 'middle' as const }
-const iconSize = designTokens.icon.sizeXs - 4
+const iconSize = designTokens.icon.sizeSm
 
 export const MarketStatusIcon: FC<{ marketStatus: MarketStatus }> = ({ marketStatus }) => {
   switch (marketStatus) {

@@ -2,6 +2,7 @@ export type Translations = {
   nav: {
     dashboard: string
     jobMarket: string
+    stockMarket: string
     energyMeter: string
     appearance: string
     about: string
@@ -20,6 +21,13 @@ export type Translations = {
     darkAriaLabel: string
     language: string
     languageAriaLabel: string
+  }
+  stockMarket: {
+    title: string
+    description: string
+  }
+  stockQuotes: {
+    title: string
   }
   jobMarket: {
     title: string

@@ -1,10 +1,13 @@
 import { MarketStatus } from '@repo/types'
-import { type Translations } from '@/i18n/translations/types'
 
-export const getMarketStatusTitle = (
-  status: MarketStatus,
-  labels: Translations['dashboard']['stockMarket']['status'],
-) => {
+type MarketStatusLabels = {
+  afterHours: string
+  preMarket: string
+  closed: string
+  open: string
+}
+
+export const getMarketStatusTitle = (status: MarketStatus, labels: MarketStatusLabels) => {
   switch (status) {
     case 'After-Hours':
       return labels.afterHours
