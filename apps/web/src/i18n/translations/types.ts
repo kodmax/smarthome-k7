@@ -293,6 +293,7 @@ export type Translations = {
       priceTarget: string
       peAtTarget: string
       quote: string
+      change: string
       status: {
         afterHours: string
         preMarket: string

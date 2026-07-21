@@ -40,7 +40,7 @@ export const pl: Translations = {
       title: 'Raport kwartalny wkrótce',
     },
     screener: {
-      title: 'Notowania spółek',
+      title: 'Przegląd',
     },
     filters: {
       label: 'Filtr',
@@ -327,6 +327,7 @@ export const pl: Translations = {
       priceTarget: 'Cel',
       peAtTarget: 'C/Z@Cel',
       quote: 'Notowanie',
+      change: 'Zmiana',
       status: {
         afterHours: 'Po zamknięciu',
         preMarket: 'Przed otwarciem',

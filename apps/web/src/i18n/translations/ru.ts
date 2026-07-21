@@ -40,7 +40,7 @@ export const ru: Translations = {
       title: 'Квартальный отчёт скоро',
     },
     screener: {
-      title: 'Котировки акций',
+      title: 'Обзор',
     },
     filters: {
       label: 'Фильтр',
@@ -327,6 +327,7 @@ export const ru: Translations = {
       priceTarget: 'Цель',
       peAtTarget: 'P/E@Цель',
       quote: 'Котировка',
+      change: 'Изменение',
       status: {
         afterHours: 'После закрытия',
         preMarket: 'Предторговый период',

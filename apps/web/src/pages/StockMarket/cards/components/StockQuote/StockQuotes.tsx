@@ -5,8 +5,9 @@ import { ApolloDataTable, ApolloTableCell, TablePlaceholder } from '@/card-compo
 import { designTokens } from '@repo/design-tokens'
 import { TickerData } from '@repo/types'
 import { useTranslations } from '@/i18n'
-import { Ticker } from '@/pages/Dashboard/cards/stock-market/Ticker'
 import { TableBody, TableHead, TableRow } from '@mui/material'
+import { Ticker } from './Ticker'
+import { ColumnContent } from './types'
 
 const cardTableFontSize = designTokens.font.body.size
 const tableHeaderGap = designTokens.space[3]
@@ -19,6 +20,8 @@ type StockQuotesProps = {
   cardId?: string
   height?: number
   headingInfo?: ReactNode
+  customColumnTitle: string
+  CustomColumnContent: ColumnContent
 }
 
 export const StockQuotes: FC<StockQuotesProps> = ({
@@ -28,6 +31,8 @@ export const StockQuotes: FC<StockQuotesProps> = ({
   cardId = 'stock-quotes',
   height = 24,
   headingInfo,
+  customColumnTitle,
+  CustomColumnContent,
 }) => {
   const { t } = useTranslations()
   const labels = t.dashboard.stockMarket
@@ -47,17 +52,15 @@ export const StockQuotes: FC<StockQuotesProps> = ({
           <TableRow sx={headerRowSx}>
             <ApolloTableCell sx={{ width: '14px' }} />
             <ApolloTableCell>{labels.symbol}</ApolloTableCell>
-            <ApolloTableCell>{labels.earnings}</ApolloTableCell>
+            <ApolloTableCell>{customColumnTitle}</ApolloTableCell>
             <ApolloTableCell>{labels.pe}</ApolloTableCell>
-            <ApolloTableCell>{labels.toPriceTarget}</ApolloTableCell>
-            <ApolloTableCell>{labels.priceTarget}</ApolloTableCell>
-            <ApolloTableCell>{labels.peAtTarget}</ApolloTableCell>
             <ApolloTableCell>{labels.quote}</ApolloTableCell>
+            <ApolloTableCell>{labels.change}</ApolloTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {tickers.map(item => (
-            <Ticker key={item.symbol} ticker={item} zoom={true} />
+            <Ticker key={item.symbol} ticker={item} CustomColumnContent={CustomColumnContent} />
           ))}
         </TableBody>
       </ApolloDataTable>

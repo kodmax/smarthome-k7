@@ -40,7 +40,7 @@ export const en: Translations = {
       title: 'Quarterly report soon',
     },
     screener: {
-      title: 'Stock quotes',
+      title: 'Overview',
     },
     filters: {
       label: 'Filter',
@@ -327,6 +327,7 @@ export const en: Translations = {
       priceTarget: 'Target',
       peAtTarget: 'P/E@Target',
       quote: 'Quote',
+      change: 'Change',
       status: {
         afterHours: 'After hours',
         preMarket: 'Pre-market',

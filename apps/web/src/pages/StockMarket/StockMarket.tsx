@@ -23,7 +23,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
           <MarketStatusTile />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, xl: 9 }} />
-        <Grid size={{ xs: 12, xl: 6 }}>
+        <Grid size={{ xs: 12, sm: 6, xl: 4 }}>
           <FilteredStockQuotesCard />
         </Grid>
       </Grid>

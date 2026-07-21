@@ -37,7 +37,7 @@ describe('FilteredStockQuotesCard', () => {
 
     render(<FilteredStockQuotesCard />)
 
-    expect(screen.getByText('Notowania spółek')).toBeInTheDocument()
+    expect(screen.getByText('Przegląd')).toBeInTheDocument()
     expect(screen.getByText('Duży upside')).toBeInTheDocument()
     expect(screen.getByText('50%')).toBeInTheDocument()
     expect(screen.getByText('45%')).toBeInTheDocument()
