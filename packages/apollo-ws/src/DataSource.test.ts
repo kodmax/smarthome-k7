@@ -3,7 +3,7 @@ import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApolloEvents } from './ApolloEvents'
-import { Cache } from './cache'
+import { FSCache } from './cache'
 import { DataSource, DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
 import { NoRecentContent } from './Errors'
 
@@ -68,7 +68,7 @@ describe('DataSource', () => {
     cacheDirs.push(cacheDir)
 
     const vent = new ApolloEvents()
-    const cache = new Cache(cacheDir)
+    const cache = new FSCache(cacheDir)
     const dataSource = await DataSource.fromClass(SourceClass, cache, vent)
 
     return {
@@ -214,7 +214,7 @@ describe('DataSource', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-ds-'))
     cacheDirs.push(cacheDir)
     const vent = new ApolloEvents()
-    const cache = new Cache(cacheDir)
+    const cache = new FSCache(cacheDir)
     const dataSource = await DataSource.fromClass(NotifySource, cache, vent)
 
     vent.on('data-update', sourceId => updates.push(sourceId))

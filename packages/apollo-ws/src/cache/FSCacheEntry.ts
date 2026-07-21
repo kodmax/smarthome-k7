@@ -1,18 +1,14 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import { Snapshot } from './Snapshot'
-import { SnapshotContent } from './types'
+import type { CacheEntry, SnapshotContent } from './types'
 
-class CacheEntry<T> {
-  private readonly content: Snapshot<T>
-
+class FSCacheEntry<T> implements CacheEntry<T> {
   public constructor(
     private readonly path: string,
     private readonly snapshot: SnapshotContent<T>,
     private fileName?: string,
-  ) {
-    this.content = new Snapshot<T>(this.snapshot)
-  }
+  ) {}
 
   public async write(data: T): Promise<T> {
     this.snapshot.timestamp = new Date().getTime()
@@ -25,13 +21,16 @@ class CacheEntry<T> {
     return data
   }
 
-  public getSnapshot(): Snapshot<T> {
-    return this.content
-  }
+  public getSnapshot(): Snapshot<T> | null {
+    if (this.snapshot.content === undefined) {
+      return null
+    }
 
-  public isEmpty(): boolean {
-    return this.snapshot.content === undefined
+    return new Snapshot({
+      timestamp: this.snapshot.timestamp,
+      content: this.snapshot.content,
+    })
   }
 }
 
-export { CacheEntry }
+export { FSCacheEntry }

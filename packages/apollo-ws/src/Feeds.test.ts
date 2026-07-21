@@ -4,7 +4,7 @@ import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApolloEvents } from './ApolloEvents'
 import type { ApolloEvents as ApolloEventsType } from './ApolloEvents'
-import { Cache } from './cache'
+import { FSCache } from './cache'
 import { DuplicateDataSourceIdError } from './Errors'
 import { Feeds } from './Feeds'
 import { DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
@@ -75,7 +75,7 @@ describe('Feeds data source registration', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
 
-    return new Feeds(new Cache(cacheDir), new ApolloEvents())
+    return new Feeds(new FSCache(cacheDir), new ApolloEvents())
   }
 
   it('reuses the same DataSource when the same definition class is registered in multiple feeds', async () => {
@@ -110,7 +110,7 @@ describe('Feeds data source registration', () => {
     const vent = new ApolloEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new Feeds(new Cache(cacheDir), vent)
+    const feeds = new Feeds(new FSCache(cacheDir), vent)
 
     const SourceClass = createTestSourceClass({
       id: 'routed-src',
@@ -183,7 +183,7 @@ describe('Feeds composition', () => {
     const vent = new ApolloEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new Feeds(new Cache(cacheDir), vent)
+    const feeds = new Feeds(new FSCache(cacheDir), vent)
 
     let pushA: (content: { value: number }) => void = () => {}
     let pushB: (content: { value: number }) => void = () => {}
@@ -228,7 +228,7 @@ describe('Feeds composition', () => {
     const vent = new ApolloEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new Feeds(new Cache(cacheDir), vent)
+    const feeds = new Feeds(new FSCache(cacheDir), vent)
 
     let pushWarm: (content: { value: number }) => void = () => {}
     const WarmSource = createTestSourceClass({
@@ -262,7 +262,7 @@ describe('Feeds composition', () => {
     const vent = new ApolloEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new Feeds(new Cache(cacheDir), vent)
+    const feeds = new Feeds(new FSCache(cacheDir), vent)
 
     const getDataA = vi.fn(async () => ({ value: 1 }))
     const getDataB = vi.fn(async () => ({ value: 2 }))

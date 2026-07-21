@@ -3,9 +3,9 @@ import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { CorruptCacheError } from '../Errors'
-import { Cache } from './Cache'
+import { FSCache } from './FSCache'
 
-describe('Cache', () => {
+describe('FSCache', () => {
   const cacheDirs: string[] = []
 
   afterEach(() => {
@@ -17,7 +17,7 @@ describe('Cache', () => {
   function createCache() {
     const dir = mkdtempSync(join(tmpdir(), 'apollo-ws-cache-'))
     cacheDirs.push(dir)
-    return new Cache(dir)
+    return new FSCache(dir)
   }
 
   it('returns an empty entry when cache file is missing (ENOENT)', async () => {
@@ -25,7 +25,7 @@ describe('Cache', () => {
 
     const entry = await cache.getEntry<{ value: number }>('missing')
 
-    expect(entry.isEmpty()).toBe(true)
+    expect(entry.getSnapshot()).toBeNull()
   })
 
   it('persists and reloads content from disk', async () => {

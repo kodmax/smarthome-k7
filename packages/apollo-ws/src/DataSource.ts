@@ -1,4 +1,4 @@
-import { Cache, CacheEntry } from './cache'
+import type { Cache, CacheEntry } from './cache'
 import { NoRecentContent } from './Errors'
 import { ApolloEvents } from './ApolloEvents'
 
@@ -129,11 +129,11 @@ class DataSource<T, TCache = T> {
   }
 
   public isCacheFresh(): boolean {
-    if (this.cacheEntry.isEmpty()) {
+    const snapshot = this.cacheEntry.getSnapshot()
+    if (snapshot === null) {
       return false
     }
 
-    const snapshot = this.cacheEntry.getSnapshot()
     const ageMs = Date.now() - snapshot.getTimestamp()
 
     const ttl = this.definition.getCacheTTL()
@@ -146,11 +146,12 @@ class DataSource<T, TCache = T> {
   }
 
   public async getRecentContent(): Promise<T> {
-    if (this.cacheEntry.isEmpty()) {
+    const snapshot = this.cacheEntry.getSnapshot()
+    if (snapshot === null) {
       throw new NoRecentContent()
     }
 
-    return this.definition.composeContent(this.cacheEntry.getSnapshot().getContent())
+    return this.definition.composeContent(snapshot.getContent())
   }
 
   public async getData(forceRefresh = false): Promise<T> {
@@ -159,7 +160,8 @@ class DataSource<T, TCache = T> {
     } else if (!forceRefresh && this.isCacheFresh()) {
       this.vent.emit('sys-log', 7, `Cache hit on data source <${this.definition.getId()}>`)
 
-      return this.definition.composeContent(this.cacheEntry.getSnapshot().getContent())
+      const snapshot = this.cacheEntry.getSnapshot()
+      return this.definition.composeContent(snapshot!.getContent())
     } else {
       this.updating = new Promise((resolve, reject) => {
         this.definition

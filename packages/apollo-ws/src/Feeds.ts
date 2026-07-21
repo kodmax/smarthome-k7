@@ -1,6 +1,6 @@
 import { Chronos } from '@repo/chronos'
 import { DataSource, DSCT, AnyDataSourceDefinitionClass } from './DataSource'
-import { Cache } from './cache'
+import type { Cache } from './cache'
 import type { DS, Feed, FeedCb, FeedSources, SourceDataTypes, SourceRegistration } from './Feeds.types'
 import { ApolloEvents } from './ApolloEvents'
 
