@@ -4,7 +4,7 @@ import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApolloEvents } from './ApolloEvents'
 import type { ApolloEvents as ApolloEventsType } from './ApolloEvents'
-import { Cache, Snapshot } from './cache'
+import { Cache } from './cache'
 import { DuplicateDataSourceIdError } from './Errors'
 import { Feeds } from './Feeds'
 import { DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
@@ -23,7 +23,7 @@ function waitForDataUpdate(vent: ApolloEventsType, sourceId: string): Promise<vo
 
 function createTestSourceClass<T>(options: {
   id: string
-  isSnapshotExpired?: (snapshot: Snapshot<unknown>) => boolean
+  getCacheTTL?: () => number
   getData?: () => Promise<T>
   isVolatile?: boolean
   onInit?: (ctx: { push: (content?: T) => void }) => void
@@ -44,8 +44,8 @@ function createTestSourceClass<T>(options: {
       return options.id
     }
 
-    public isSnapshotExpired(snapshot: Snapshot<unknown>): boolean {
-      return options.isSnapshotExpired?.(snapshot) ?? true
+    public getCacheTTL(): number {
+      return options.getCacheTTL?.() ?? 0
     }
 
     public async getData(): Promise<T> {

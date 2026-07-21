@@ -62,8 +62,8 @@ export class TransmissionSource extends DataSourceDefinition<TransmissionFeed> {
     return '* * * * *'
   }
 
-  public isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }): boolean {
-    return snapshot.age(CacheAgeUnit.MINUTES) > 1
+  public getCacheTTL(): number {
+    return CacheAgeUnit.MINUTES
   }
 
   public async getData(): Promise<TransmissionFeed> {

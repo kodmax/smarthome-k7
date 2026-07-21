@@ -22,8 +22,8 @@ export class TorrentSource extends DataSourceDefinition<Torrent[]> {
     return '0 3 * * *'
   }
 
-  public isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }): boolean {
-    return snapshot.age(CacheAgeUnit.HOURS) > 12
+  public getCacheTTL(): number {
+    return CacheAgeUnit.HOURS * 12
   }
 
   public async getData(): Promise<Torrent[]> {

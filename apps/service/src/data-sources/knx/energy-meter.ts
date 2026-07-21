@@ -66,8 +66,8 @@ export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> 
     return true
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.SECONDS) > 3
+  getCacheTTL() {
+    return CacheAgeUnit.SECONDS * 3
   }
 
   async getData() {

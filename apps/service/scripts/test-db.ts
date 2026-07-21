@@ -1,4 +1,3 @@
-import { CacheAgeUnit } from '@repo/apollo-ws'
 import DateTime from '../src/DateTime'
 import db from '../src/db'
 import {
@@ -15,8 +14,8 @@ const test = async () => {
   const conn = await db.getConnection()
   try {
     const today = DateTime.now().getDate()
-    const yesterday = DateTime.shift(-1, CacheAgeUnit.DAYS).getDate()
-    const periodStart = DateTime.shift(-AVG_PERIOD_DAYS, CacheAgeUnit.DAYS).getDate()
+    const yesterday = DateTime.shift(-1, DateTime.DAY).getDate()
+    const periodStart = DateTime.shift(-AVG_PERIOD_DAYS, DateTime.DAY).getDate()
     const start = await getFirstReadingSince(conn, dayStart(periodStart))
     const end = await getEndReading(conn, today, yesterday)
 

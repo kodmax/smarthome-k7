@@ -1,4 +1,3 @@
-import { CacheAgeUnit } from '@repo/apollo-ws'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DateTime from './DateTime'
 
@@ -28,8 +27,8 @@ describe('DateTime', () => {
   })
 
   it('shifts back by hours', () => {
-    const dt = DateTime.shift(-2, CacheAgeUnit.HOURS)
-    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 2 * CacheAgeUnit.HOURS * 1000)
+    const dt = DateTime.shift(-2, DateTime.HOUR)
+    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 2 * DateTime.HOUR * 1000)
       .toISOString()
       .substring(0, 10)
 
@@ -37,8 +36,8 @@ describe('DateTime', () => {
   })
 
   it('shifts back by days', () => {
-    const dt = DateTime.shift(-7, CacheAgeUnit.DAYS)
-    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 7 * CacheAgeUnit.DAYS * 1000)
+    const dt = DateTime.shift(-7, DateTime.DAY)
+    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 7 * DateTime.DAY * 1000)
       .toISOString()
       .substring(0, 10)
 
@@ -47,8 +46,8 @@ describe('DateTime', () => {
 
   it('shifted shifts back by hours from existing datetime', () => {
     const base = DateTime.now()
-    const dt = base.shifted(-2, CacheAgeUnit.HOURS)
-    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 2 * CacheAgeUnit.HOURS * 1000)
+    const dt = base.shifted(-2, DateTime.HOUR)
+    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 2 * DateTime.HOUR * 1000)
       .toISOString()
       .substring(0, 10)
 
@@ -56,9 +55,9 @@ describe('DateTime', () => {
   })
 
   it('shifted shifts back by days from existing datetime', () => {
-    const base = DateTime.shift(-3, CacheAgeUnit.DAYS)
-    const dt = base.shifted(-7, CacheAgeUnit.DAYS)
-    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 10 * CacheAgeUnit.DAYS * 1000)
+    const base = DateTime.shift(-3, DateTime.DAY)
+    const dt = base.shifted(-7, DateTime.DAY)
+    const expected = new Date(fixedNow.getTime() - fixedNow.getTimezoneOffset() * 60000 - 10 * DateTime.DAY * 1000)
       .toISOString()
       .substring(0, 10)
 
@@ -69,7 +68,7 @@ describe('DateTime', () => {
     const base = DateTime.now()
     const originalDateTime = base.getDateTime()
 
-    base.shifted(-5, CacheAgeUnit.HOURS)
+    base.shifted(-5, DateTime.HOUR)
 
     expect(base.getDateTime()).toBe(originalDateTime)
   })

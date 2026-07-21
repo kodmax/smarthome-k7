@@ -20,15 +20,15 @@ export class EnergyHourlySource extends DataSourceDefinition<{
     return '1 * * * *'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.MINUTES) > 5
+  getCacheTTL() {
+    return CacheAgeUnit.MINUTES * 5
   }
 
   async getData() {
     const conn = await this.db.getConnection()
     try {
       const today = DateTime.now().getDate()
-      const yesterday = DateTime.shift(-1, CacheAgeUnit.DAYS).getDate()
+      const yesterday = DateTime.shift(-1, DateTime.DAY).getDate()
       const startOfDayValue = await getStartOfDayReading(conn, today, yesterday)
 
       const bars = await conn.query(

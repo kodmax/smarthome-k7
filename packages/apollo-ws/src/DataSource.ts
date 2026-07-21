@@ -1,4 +1,4 @@
-import { Cache, CacheEntry, Snapshot } from './cache'
+import { Cache, CacheEntry } from './cache'
 import { NoRecentContent } from './Errors'
 import { ApolloEvents } from './ApolloEvents'
 
@@ -14,8 +14,13 @@ export abstract class DataSourceDefinition<T, TCache = T> {
   }
 
   public abstract getId(): string
-  public abstract isSnapshotExpired(snapshot: Snapshot<unknown>): boolean
+  public abstract getCacheTTL(): number
   public abstract getData(): Promise<TCache>
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public isCacheValid(_cached: TCache): boolean {
+    return true
+  }
 
   public composeContent(cached: TCache): Promise<T> {
     return Promise.resolve(cached as unknown as T)
@@ -124,7 +129,16 @@ class DataSource<T, TCache = T> {
   }
 
   public isCacheFresh(): boolean {
-    return !this.cacheEntry.isEmpty() && !this.definition.isSnapshotExpired(this.cacheEntry.getSnapshot())
+    if (this.cacheEntry.isEmpty()) {
+      return false
+    }
+
+    const snapshot = this.cacheEntry.getSnapshot()
+    const ageMs = Date.now() - snapshot.getTimestamp()
+
+    const ttl = this.definition.getCacheTTL()
+
+    return ttl > 0 && ageMs <= ttl && this.definition.isCacheValid(snapshot.getContent())
   }
 
   public getId(): string {

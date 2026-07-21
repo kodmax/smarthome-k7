@@ -24,16 +24,20 @@ export class EnergyCostSource extends DataSourceDefinition<EnergyCost> {
     return '0 0 * * *'
   }
 
-  isSnapshotExpired(snapshot: { getContent: () => unknown }) {
-    return (snapshot.getContent() as EnergyCost).datetime !== DateTime.now().getDate()
+  isCacheValid(cached: EnergyCost) {
+    return cached.datetime === DateTime.now().getDate()
+  }
+
+  getCacheTTL() {
+    return CacheAgeUnit.DAYS
   }
 
   async getData() {
     const conn = await this.db.getConnection()
     try {
       const today = DateTime.now().getDate()
-      const yesterday = DateTime.shift(-1, CacheAgeUnit.DAYS).getDate()
-      const periodStart = DateTime.shift(-AVG_PERIOD_DAYS, CacheAgeUnit.DAYS).getDate()
+      const yesterday = DateTime.shift(-1, DateTime.DAY).getDate()
+      const periodStart = DateTime.shift(-AVG_PERIOD_DAYS, DateTime.DAY).getDate()
       const start = await getFirstReadingSince(conn, dayStart(periodStart))
 
       if (!start) {

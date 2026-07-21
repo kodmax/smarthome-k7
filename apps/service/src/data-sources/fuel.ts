@@ -17,8 +17,8 @@ export class FuelSource extends DataSourceDefinition<FuelPricesFeed> {
     return '0 10 * * *'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.HOURS) > 24
+  getCacheTTL() {
+    return CacheAgeUnit.HOURS * 24
   }
 
   async getData() {
@@ -36,7 +36,7 @@ export class FuelSource extends DataSourceDefinition<FuelPricesFeed> {
           }),
         )
 
-        const timeWindow = DateTime.shift(-30, CacheAgeUnit.DAYS).getDateTime()
+        const timeWindow = DateTime.shift(-30, DateTime.DAY).getDateTime()
         const now = DateTime.now().getDateTime()
         const conn = await this.db.getConnection()
 

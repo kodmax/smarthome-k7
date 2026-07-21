@@ -12,8 +12,8 @@ export class YahooMarketDataSource extends DataSourceDefinition<YahooTickerData[
     return '5 10 * * Mon-Fri'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.HOURS) > 24
+  getCacheTTL() {
+    return CacheAgeUnit.HOURS * 24
   }
 
   async getData() {

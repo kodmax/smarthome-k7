@@ -25,8 +25,8 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
     return '0 8 * * *'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.MINUTES) > 15
+  getCacheTTL() {
+    return CacheAgeUnit.MINUTES * 15
   }
 
   async getData() {
@@ -46,7 +46,7 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
   }
 
   async composeContent(cached: JobMarketInsightCachedFeed): Promise<JobMarketInsightFeed> {
-    const baselineAt = DateTime.shift(-COMPARISON_WINDOW_DAYS, CacheAgeUnit.DAYS).getDateTime()
+    const baselineAt = DateTime.shift(-COMPARISON_WINDOW_DAYS, DateTime.DAY).getDateTime()
     const previous = await loadJobMarketInsightSnapshotAtOrBefore(this.db, baselineAt)
 
     return {

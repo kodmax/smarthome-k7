@@ -43,8 +43,8 @@ export class IndoorTempHistorySource extends DataSourceDefinition<TempHistory> {
     return true
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.MINUTES) > 5
+  getCacheTTL() {
+    return CacheAgeUnit.MINUTES * 5
   }
 
   async getData() {

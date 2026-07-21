@@ -21,8 +21,8 @@ export class WeatherSource extends DataSourceDefinition<WeatherFeed> {
     return '*/15 * * * *'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.MINUTES) > 15
+  getCacheTTL() {
+    return CacheAgeUnit.MINUTES * 15
   }
 
   async getData() {

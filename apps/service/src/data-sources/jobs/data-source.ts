@@ -95,8 +95,8 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
     return '0 8 * * *'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.MINUTES) > 15
+  getCacheTTL() {
+    return CacheAgeUnit.MINUTES * 15
   }
 
   async getData() {

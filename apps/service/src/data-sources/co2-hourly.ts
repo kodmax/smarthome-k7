@@ -16,8 +16,8 @@ export class Co2HourlySource extends DataSourceDefinition<{ date: string; today:
     return '1 * * * *'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.MINUTES) > 5
+  getCacheTTL() {
+    return CacheAgeUnit.MINUTES * 5
   }
 
   async getData() {

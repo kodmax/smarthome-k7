@@ -21,8 +21,8 @@ export class CommoditiesSource extends DataSourceDefinition<Commodities> {
     return '15 * * * *'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.MINUTES) > 30
+  getCacheTTL() {
+    return CacheAgeUnit.MINUTES * 30
   }
 
   async getData() {
@@ -35,7 +35,7 @@ export class CommoditiesSource extends DataSourceDefinition<Commodities> {
       fetchInflationData(),
     ])
 
-    const timeWindow = DateTime.shift(-30, CacheAgeUnit.DAYS).getDateTime()
+    const timeWindow = DateTime.shift(-30, DateTime.DAY).getDateTime()
     const now = DateTime.now().getDateTime()
     const conn = await this.db.getConnection()
 

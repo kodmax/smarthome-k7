@@ -17,8 +17,8 @@ export class InterestRatesSource extends DataSourceDefinition<InterestRatesFeed>
     return '5 11,17 * * 1-5'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.HOURS) > 12
+  getCacheTTL() {
+    return CacheAgeUnit.HOURS * 12
   }
 
   async getData() {
@@ -30,7 +30,7 @@ export class InterestRatesSource extends DataSourceDefinition<InterestRatesFeed>
       accept: 'text/html',
     }).then(parseNbpRatesFromDocument)
 
-    const timeWindow = DateTime.shift(-30, CacheAgeUnit.DAYS).getDateTime()
+    const timeWindow = DateTime.shift(-30, DateTime.DAY).getDateTime()
     const now = DateTime.now().getDateTime()
     const conn = await this.db.getConnection()
 

@@ -3,13 +3,14 @@ import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApolloEvents } from './ApolloEvents'
-import { Cache, Snapshot } from './cache'
+import { Cache } from './cache'
 import { DataSource, DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
 import { NoRecentContent } from './Errors'
 
 function createTestSourceClass<T, TCache = T>(options: {
   id: string
-  isSnapshotExpired?: (snapshot: Snapshot<unknown>) => boolean
+  getCacheTTL?: () => number
+  isCacheValid?: (cached: TCache) => boolean
   getData?: () => Promise<TCache>
   composeContent?: (cached: TCache) => Promise<T>
   isVolatile?: boolean
@@ -25,8 +26,12 @@ function createTestSourceClass<T, TCache = T>(options: {
       return options.id
     }
 
-    public isSnapshotExpired(snapshot: Snapshot<unknown>): boolean {
-      return options.isSnapshotExpired?.(snapshot) ?? true
+    public getCacheTTL(): number {
+      return options.getCacheTTL?.() ?? 0
+    }
+
+    public isCacheValid(cached: TCache): boolean {
+      return options.isCacheValid?.(cached) ?? true
     }
 
     public async getData(): Promise<TCache> {
@@ -77,7 +82,7 @@ describe('DataSource', () => {
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'cache-hit',
-        isSnapshotExpired: () => false,
+        getCacheTTL: () => Number.MAX_SAFE_INTEGER,
         getData,
       }),
     )
@@ -167,7 +172,7 @@ describe('DataSource', () => {
     const { dataSource } = await createDataSource(
       createTestSourceClass<{ value: number; meta: string }, { value: number }>({
         id: 'compose-hit',
-        isSnapshotExpired: () => false,
+        getCacheTTL: () => Number.MAX_SAFE_INTEGER,
         getData,
         composeContent,
       }),
@@ -197,8 +202,8 @@ describe('DataSource', () => {
         return 'notify-src'
       }
 
-      public isSnapshotExpired(): boolean {
-        return false
+      public getCacheTTL(): number {
+        return Number.MAX_SAFE_INTEGER
       }
 
       public async getData(): Promise<{ value: number }> {

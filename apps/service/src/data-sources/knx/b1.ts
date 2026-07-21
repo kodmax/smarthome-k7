@@ -18,8 +18,8 @@ export default (id: string, dp: DPT_Generic_B1): DataSourceDefinitionClass<KnxRe
       return true
     }
 
-    public isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }): boolean {
-      return snapshot.age(CacheAgeUnit.SECONDS) > 60
+    public getCacheTTL(): number {
+      return CacheAgeUnit.SECONDS * 60
     }
 
     public async getData(): Promise<KnxReading<number>> {

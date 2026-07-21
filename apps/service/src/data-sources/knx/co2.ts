@@ -18,8 +18,8 @@ export default (id: string, dp: DPT_Value_AirQuality): DataSourceDefinitionClass
       return true
     }
 
-    public isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }): boolean {
-      return snapshot.age(CacheAgeUnit.SECONDS) > 3
+    public getCacheTTL(): number {
+      return CacheAgeUnit.SECONDS * 3
     }
 
     public async getData(): Promise<KnxReading<number>> {

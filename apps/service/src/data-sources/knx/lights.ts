@@ -42,8 +42,8 @@ export default (knx: KnxLink): DataSourceDefinitionClass<LightsFeed> => {
       return true
     }
 
-    public isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }): boolean {
-      return snapshot.age(CacheAgeUnit.HOURS) >= 1
+    public getCacheTTL(): number {
+      return CacheAgeUnit.HOURS
     }
 
     public async getData(): Promise<LightsFeed> {

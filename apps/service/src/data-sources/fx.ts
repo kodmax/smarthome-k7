@@ -17,8 +17,8 @@ export class FxSource extends DataSourceDefinition<FXFeed> {
     return '0 */3 * * *'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.HOURS) > 1
+  getCacheTTL() {
+    return CacheAgeUnit.HOURS
   }
 
   async getData() {
@@ -59,7 +59,7 @@ export class FxSource extends DataSourceDefinition<FXFeed> {
       'PLN/RUB': Number(rub).toFixed(4),
     }
 
-    const timeWindow = DateTime.shift(-30, CacheAgeUnit.DAYS).getDateTime()
+    const timeWindow = DateTime.shift(-30, DateTime.DAY).getDateTime()
     const now = DateTime.now().getDateTime()
     const conn = await this.db.getConnection()
 

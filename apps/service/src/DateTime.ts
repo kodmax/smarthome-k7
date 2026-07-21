@@ -1,10 +1,13 @@
-import { CacheAgeUnit } from '@repo/apollo-ws'
-
 export default class DateTime {
+  static readonly SECOND = 1
+  static readonly MINUTE = 60
+  static readonly HOUR = 3600
+  static readonly DAY = 86400
+
   private readonly datetime: string
   private readonly timestamp: number
 
-  static shift(shift = 0, unit: CacheAgeUnit = CacheAgeUnit.HOURS) {
+  static shift(shift = 0, unit = DateTime.HOUR) {
     return new DateTime(new Date().getTime() - new Date().getTimezoneOffset() * 60000 + shift * unit * 1000)
   }
 
@@ -17,7 +20,7 @@ export default class DateTime {
     this.datetime = new Date(this.timestamp).toISOString()
   }
 
-  shifted(shift = 0, unit: CacheAgeUnit = CacheAgeUnit.HOURS): DateTime {
+  shifted(shift = 0, unit = DateTime.HOUR): DateTime {
     return new DateTime(this.timestamp + shift * unit * 1000)
   }
 

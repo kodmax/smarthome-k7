@@ -1,8 +1,8 @@
 export enum CacheAgeUnit {
-  SECONDS = 1,
-  MINUTES = 60,
-  HOURS = 3600,
-  DAYS = 86400,
+  SECONDS = 1000,
+  MINUTES = 60_000,
+  HOURS = 3_600_000,
+  DAYS = 86_400_000,
 }
 
 export type SnapshotContent<T> = {

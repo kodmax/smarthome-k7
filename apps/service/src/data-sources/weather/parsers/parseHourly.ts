@@ -5,7 +5,6 @@ import { basename } from 'path'
 import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
 import DateTime from '@/DateTime'
-import { CacheAgeUnit } from '@repo/apollo-ws'
 import { hourlyHourSelector, parseHourlyUv, parseHourlyWind } from './parseHourlyHelpers'
 import { parsePrecipType } from './parsePrecipType'
 
@@ -57,10 +56,10 @@ export const parseHourly = async (latitude: number, longitude: number): Promise<
 
   let todayDate = DateTime.now()
   if (warsawHour >= 23) {
-    todayDate = todayDate.shifted(1, CacheAgeUnit.DAYS)
+    todayDate = todayDate.shifted(1, DateTime.DAY)
   }
 
-  const tomorrowDate = todayDate.shifted(1, CacheAgeUnit.DAYS)
+  const tomorrowDate = todayDate.shifted(1, DateTime.DAY)
   const today = parseHourlyFromDocument(
     await fetchDocument(weatherPageUrls.hourly),
     todayDate.getDate(),

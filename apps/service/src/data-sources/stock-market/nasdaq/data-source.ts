@@ -12,8 +12,8 @@ export class NasdaqMarketDataSource extends DataSourceDefinition<NasdaqMarketDat
     return '*/5 9-3 * * Mon-Fri'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.HOURS) > 24
+  getCacheTTL() {
+    return CacheAgeUnit.HOURS * 24
   }
 
   async getData() {

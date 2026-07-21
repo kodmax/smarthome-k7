@@ -47,8 +47,8 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
     return '*/15 * * * *'
   }
 
-  isSnapshotExpired(snapshot: { age: (unit: CacheAgeUnit) => number }) {
-    return snapshot.age(CacheAgeUnit.MINUTES) > 5
+  getCacheTTL() {
+    return CacheAgeUnit.MINUTES * 5
   }
 
   async getData() {
