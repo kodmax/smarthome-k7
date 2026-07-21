@@ -39,6 +39,9 @@ export const pl: Translations = {
     earningsSoon: {
       title: 'Raport kwartalny wkrótce',
     },
+    priceTargetChange: {
+      title: 'Zmiana celu',
+    },
     quotesOverview: {
       title: 'Przegląd',
     },
@@ -328,6 +331,7 @@ export const pl: Translations = {
       peAtTarget: 'C/Z@Cel',
       quote: 'Notowanie',
       change: 'Zmiana',
+      priceTargetChange: 'Zmiana celu',
       status: {
         afterHours: 'Po zamknięciu',
         preMarket: 'Przed otwarciem',

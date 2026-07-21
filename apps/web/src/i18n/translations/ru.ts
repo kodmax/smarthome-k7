@@ -39,6 +39,9 @@ export const ru: Translations = {
     earningsSoon: {
       title: 'Квартальный отчёт скоро',
     },
+    priceTargetChange: {
+      title: 'Изменение цели',
+    },
     quotesOverview: {
       title: 'Обзор',
     },
@@ -328,6 +331,7 @@ export const ru: Translations = {
       peAtTarget: 'P/E@Цель',
       quote: 'Котировка',
       change: 'Изменение',
+      priceTargetChange: 'Изменение цели',
       status: {
         afterHours: 'После закрытия',
         preMarket: 'Предторговый период',

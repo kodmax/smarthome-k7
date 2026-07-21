@@ -39,6 +39,9 @@ export const en: Translations = {
     earningsSoon: {
       title: 'Quarterly report soon',
     },
+    priceTargetChange: {
+      title: 'Target change',
+    },
     quotesOverview: {
       title: 'Overview',
     },
@@ -328,6 +331,7 @@ export const en: Translations = {
       peAtTarget: 'P/E@Target',
       quote: 'Quote',
       change: 'Change',
+      priceTargetChange: 'Target change',
       status: {
         afterHours: 'After hours',
         preMarket: 'Pre-market',

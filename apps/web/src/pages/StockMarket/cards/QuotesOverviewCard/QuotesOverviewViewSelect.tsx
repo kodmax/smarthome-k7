@@ -20,6 +20,7 @@ export const QuotesOverviewViewSelect: FC<Props> = ({ value, onChange }) => {
     'high-upside': t.stockMarket.highUpside.title,
     'low-forward-pe': t.stockMarket.lowForwardPE.title,
     'earnings-soon': t.stockMarket.earningsSoon.title,
+    'price-target-change': t.stockMarket.priceTargetChange.title,
   }
 
   return (

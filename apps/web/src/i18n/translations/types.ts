@@ -37,6 +37,9 @@ export type Translations = {
     earningsSoon: {
       title: string
     }
+    priceTargetChange: {
+      title: string
+    }
     quotesOverview: {
       title: string
     }
@@ -294,6 +297,7 @@ export type Translations = {
       peAtTarget: string
       quote: string
       change: string
+      priceTargetChange: string
       status: {
         afterHours: string
         preMarket: string

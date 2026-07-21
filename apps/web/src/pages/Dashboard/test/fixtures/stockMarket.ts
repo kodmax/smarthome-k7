@@ -24,14 +24,21 @@ const defaultMarketInfo: MarketInfo = {
   afterHoursMarketClosingTime: 1783468800000,
 }
 
-type TickerOverrides = Omit<Partial<TickerData>, 'price' | 'statistics'> &
+type QuoteSummaryOverrides = {
+  ratingsCount?: Partial<TickerData['quoteSummary']['ratingsCount']>
+  priceTarget?: Partial<TickerData['quoteSummary']['priceTarget']>
+  priceTargetChange?: Partial<TickerData['quoteSummary']['priceTargetChange']>
+}
+
+type TickerOverrides = Omit<Partial<TickerData>, 'price' | 'statistics' | 'quoteSummary'> &
   Pick<TickerData, 'symbol'> & {
     price?: Partial<TickerData['price']>
     statistics?: Partial<TickerData['statistics']>
+    quoteSummary?: QuoteSummaryOverrides
   }
 
 export function ticker(overrides: TickerOverrides): TickerData {
-  const { symbol, price, statistics, ...rest } = overrides
+  const { symbol, price, statistics, quoteSummary, ...rest } = overrides
 
   return {
     title: symbol,
@@ -49,7 +56,22 @@ export function ticker(overrides: TickerOverrides): TickerData {
     },
     statistics: { trailingEPS: 5, forwardEPS: 6, ...statistics },
     earningsDate: {},
-    quoteSummary: emptyQuoteSummary,
+    quoteSummary: {
+      ...emptyQuoteSummary,
+      ...quoteSummary,
+      priceTargetChange: {
+        ...emptyQuoteSummary.priceTargetChange,
+        ...quoteSummary?.priceTargetChange,
+      },
+      priceTarget: {
+        ...emptyQuoteSummary.priceTarget,
+        ...quoteSummary?.priceTarget,
+      },
+      ratingsCount: {
+        ...emptyQuoteSummary.ratingsCount,
+        ...quoteSummary?.ratingsCount,
+      },
+    },
     symbol,
     ...rest,
   }

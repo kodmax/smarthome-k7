@@ -1,5 +1,5 @@
 import { ColumnContent } from '../components/StockQuote'
-import { EarningsDate, EG, PEAtPT } from './cells'
+import { EarningsDate, EG, PEAtPT, PriceTargetChange } from './cells'
 import { type QuotesOverviewView } from './quotesOverviewViews'
 
 export const useCustomColumnContent = (view: QuotesOverviewView): ColumnContent => {
@@ -12,5 +12,8 @@ export const useCustomColumnContent = (view: QuotesOverviewView): ColumnContent 
 
     case 'low-forward-pe':
       return PEAtPT
+
+    case 'price-target-change':
+      return PriceTargetChange
   }
 }

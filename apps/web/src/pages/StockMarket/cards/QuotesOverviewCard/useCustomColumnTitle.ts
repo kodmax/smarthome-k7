@@ -14,5 +14,8 @@ export const useCustomColumnTitle = (view: QuotesOverviewView): string => {
 
     case 'low-forward-pe':
       return labels.peAtTarget
+
+    case 'price-target-change':
+      return labels.priceTargetChange
   }
 }
