@@ -9,6 +9,7 @@ import { registerDependency } from './di'
 import { initKnxFeeds, initWebFeeds } from './feeds'
 import { knxInit } from './knx-init'
 import { registerApollo, registerKnxCron, setupGracefulShutdown } from './graceful-shutdown'
+import { initRedisClient } from './redis'
 
 registerDependency('config', config)
 registerDependency('db', getDbPool())
@@ -16,6 +17,11 @@ registerDependency('db', getDbPool())
 setupGracefulShutdown()
 
 Server.listen({}, async apollo => {
+  if (!config.redis.disabled) {
+    registerDependency('redis', await initRedisClient())
+    console.log('Redis connected')
+  }
+
   console.log('Feed cache directory:', path.resolve(config.cache.dir))
   const feeds = new Feeds(new Cache(config.cache.dir), apollo.vent)
 

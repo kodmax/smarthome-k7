@@ -1,5 +1,6 @@
 import type { Feeds, Server } from '@repo/apollo-ws'
 import { closeDbPool } from '@repo/db'
+import { closeRedisClient } from './redis'
 import type { KnxLink } from 'js-knx'
 
 let knxLink: KnxLink | undefined
@@ -45,6 +46,7 @@ const closeConnections = async (): Promise<void> => {
     await apolloServer.close()
   }
 
+  await closeRedisClient()
   await closeDbPool()
 }
 

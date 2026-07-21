@@ -4,10 +4,13 @@ declare module 'process' {
       interface ProcessEnv {
         readonly NO_KNX?: string
         readonly NO_CRON?: string
+        readonly NO_REDIS?: string
         readonly DB_PASSWORD: string
         readonly DB_HOST: string
         readonly DB_SCHEMA: string
         readonly DB_USER: string
+
+        readonly REDIS_URL?: string
 
         readonly KNX_HOST?: string
 

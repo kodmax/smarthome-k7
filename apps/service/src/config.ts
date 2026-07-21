@@ -25,6 +25,7 @@ const getNumber = (name: string): number => {
 
 const knxDisabled = process.env.NO_KNX === '1'
 const cronDisabled = process.env.NO_CRON === '1' || knxDisabled
+const redisDisabled = process.env.NO_REDIS === '1'
 
 export const config = {
   geoLocation: {
@@ -47,6 +48,10 @@ export const config = {
   },
   cron: {
     disabled: cronDisabled,
+  },
+  redis: {
+    disabled: redisDisabled,
+    url: redisDisabled ? (process.env.REDIS_URL ?? '') : getString('REDIS_URL'),
   },
   transmission: {
     url: getString('TRANSMISSION_URL'),

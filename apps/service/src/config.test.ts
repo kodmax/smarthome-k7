@@ -13,4 +13,8 @@ describe('config in tests', () => {
     expect(config.transmission.username).toBe(setupEnv.TRANSMISSION_USERNAME)
     expect(config.transmission.password).toBe(setupEnv.TRANSMISSION_PASSWORD)
   })
+
+  it('disables redis in tests via NO_REDIS', () => {
+    expect(config.redis.disabled).toBe(true)
+  })
 })

@@ -15,6 +15,7 @@ export const setupEnv = {
   TRANSMISSION_PASSWORD: 'test',
   NO_KNX: '1',
   NO_CRON: '1',
+  NO_REDIS: '1',
 } as const
 
 export function applySetupEnv(): void {
