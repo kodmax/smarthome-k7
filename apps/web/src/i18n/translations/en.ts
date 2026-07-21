@@ -39,11 +39,11 @@ export const en: Translations = {
     earningsSoon: {
       title: 'Quarterly report soon',
     },
-    screener: {
+    quotesOverview: {
       title: 'Overview',
     },
-    filters: {
-      label: 'Filter',
+    views: {
+      label: 'View',
     },
   },
   stockQuotes: {

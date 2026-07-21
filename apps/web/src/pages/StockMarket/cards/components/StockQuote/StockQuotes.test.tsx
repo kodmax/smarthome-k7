@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { PowerIcon } from '@repo/assets'
 import { ticker } from '@/pages/Dashboard/test/fixtures/stockMarket'
 import { StockQuotes } from './StockQuotes'
-import { EG } from '../../FilteredStockQuotesCard/cells/EG'
+import { EG } from '../../QuotesOverviewCard/cells/EG'
 
 describe('StockQuotes', () => {
   it('renders a loading placeholder when tickers are unavailable', () => {

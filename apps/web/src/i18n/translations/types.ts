@@ -37,10 +37,10 @@ export type Translations = {
     earningsSoon: {
       title: string
     }
-    screener: {
+    quotesOverview: {
       title: string
     }
-    filters: {
+    views: {
       label: string
     }
   }

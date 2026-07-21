@@ -1,2 +1,1 @@
 export * from './QuotesOverviewCard'
-export * from './MarketStatusTile'

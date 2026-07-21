@@ -1,20 +1,20 @@
 import { StockMarketFeed, TickerData } from '@repo/types'
 import { useMemo } from 'react'
-import { type StockQuotesFilter } from '../stockQuotesFilter'
+import { type QuotesOverviewView } from '../quotesOverviewViews'
 import { sortEarningsSoonTickers } from './sortEarningsSoonTickers'
 import { sortHighUpsideTickers } from './sortHighUpsideTickers'
 import { sortLowForwardPETickers } from './sortLowForwardPETickers'
 
 export const useSortedTickers = (
   feed: StockMarketFeed | undefined,
-  filter: StockQuotesFilter,
+  view: QuotesOverviewView,
 ): TickerData[] | undefined => {
   return useMemo<TickerData[] | undefined>(() => {
     if (feed === undefined) {
       return undefined
     }
 
-    switch (filter) {
+    switch (view) {
       case 'high-upside':
         return sortHighUpsideTickers(feed.tickers)
       case 'low-forward-pe':
@@ -22,5 +22,5 @@ export const useSortedTickers = (
       case 'earnings-soon':
         return sortEarningsSoonTickers(feed.tickers)
     }
-  }, [feed, filter])
+  }, [feed, view])
 }

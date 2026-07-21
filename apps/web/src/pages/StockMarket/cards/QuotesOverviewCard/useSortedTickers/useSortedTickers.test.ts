@@ -10,7 +10,7 @@ describe('useSortedTickers', () => {
     expect(result.current).toBeUndefined()
   })
 
-  it('delegates sorting to the selected filter', () => {
+  it('delegates sorting to the selected view', () => {
     const { result } = renderHook(() =>
       useSortedTickers(
         stockMarketFeed(ticker({ symbol: 'LOW', price: { eg: 45 } }), ticker({ symbol: 'HIGH', price: { eg: 60 } })),

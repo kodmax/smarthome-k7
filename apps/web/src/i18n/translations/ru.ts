@@ -39,11 +39,11 @@ export const ru: Translations = {
     earningsSoon: {
       title: 'Квартальный отчёт скоро',
     },
-    screener: {
+    quotesOverview: {
       title: 'Обзор',
     },
-    filters: {
-      label: 'Фильтр',
+    views: {
+      label: 'Вид',
     },
   },
   stockQuotes: {
