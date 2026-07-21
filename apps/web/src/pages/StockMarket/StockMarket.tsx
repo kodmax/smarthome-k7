@@ -3,7 +3,7 @@ import { StockMarketIcon, iconStyles } from '@repo/assets'
 import { type FC } from 'react'
 import { PageHeader } from '@/app/components/PageHeader'
 import { PageWrapper } from '@/app/components/PageWrapper'
-import { QuotesOverviewCard, MarketStatusTile } from '@/pages/StockMarket/cards'
+import { MarketStatusTile, QuotesOverviewCard, TomorrowEarningsTile } from '@/pages/StockMarket/cards'
 import { useTranslations } from '@/i18n'
 
 export const StockMarket: FC<Record<string, never>> = () => {
@@ -22,8 +22,11 @@ export const StockMarket: FC<Record<string, never>> = () => {
         <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
           <MarketStatusTile />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, xl: 9 }} />
-        <Grid size={{ xs: 12, sm: 6, xl: 4 }}>
+        <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
+          <TomorrowEarningsTile />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 12, xl: 6 }} />
+        <Grid size={{ xs: 12, md: 8, lg: 6, xl: 4 }}>
           <QuotesOverviewCard />
         </Grid>
       </Grid>

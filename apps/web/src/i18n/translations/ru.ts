@@ -30,6 +30,9 @@ export const ru: Translations = {
     marketStatus: {
       title: 'Сессия биржи',
     },
+    earningsTomorrow: {
+      title: 'Квартальный отчёт завтра',
+    },
     highUpside: {
       title: 'Большой upside',
     },

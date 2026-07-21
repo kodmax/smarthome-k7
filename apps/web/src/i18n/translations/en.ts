@@ -30,6 +30,9 @@ export const en: Translations = {
     marketStatus: {
       title: 'Market session',
     },
+    earningsTomorrow: {
+      title: 'Earnings tomorrow',
+    },
     highUpside: {
       title: 'High upside',
     },

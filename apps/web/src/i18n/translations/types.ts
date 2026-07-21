@@ -28,6 +28,9 @@ export type Translations = {
     marketStatus: {
       title: string
     }
+    earningsTomorrow: {
+      title: string
+    }
     highUpside: {
       title: string
     }
