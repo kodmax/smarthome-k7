@@ -1,6 +1,6 @@
 import { Day, WeekContainer } from './Day'
 import { WeatherIcon as WeatherCardIcon } from '@repo/assets'
-import { ApolloCard } from '@repo/apollo-card'
+import { BaseCard } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { type FC } from 'react'
 import { DayWeatherForecast, WeatherFeed } from '@repo/types'
@@ -17,25 +17,25 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
   if (feed === undefined) {
     const placeholders = new Array(15).fill(undefined)
     return (
-      <ApolloCard cardId='weather-forecast' title={title} icon={WeatherCardIcon} height={7} allowZoom={false}>
+      <BaseCard cardId='weather-forecast' title={title} icon={WeatherCardIcon} height={7} allowZoom={false}>
         <WeekContainer>
           {placeholders.map((_, i) => (
             <Day key={i} />
           ))}
         </WeekContainer>
-      </ApolloCard>
+      </BaseCard>
     )
   }
 
   if (isSmallScreen) {
     return (
-      <ApolloCard cardId='weather-forecast' title={title} icon={WeatherCardIcon} height={5} allowZoom={false}>
+      <BaseCard cardId='weather-forecast' title={title} icon={WeatherCardIcon} height={5} allowZoom={false}>
         <DaysContainer>
           {feed.forecast.map((day: DayWeatherForecast) => (
             <Day key={day.date} forecast={day} dayLabel={formatForecastDayLabel(day.date, t)} />
           ))}
         </DaysContainer>
-      </ApolloCard>
+      </BaseCard>
     )
   }
 
@@ -43,7 +43,7 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
   const passedDays = new Array(firstDayIndex).fill(undefined)
 
   return (
-    <ApolloCard cardId='weather-forecast' title={title} icon={WeatherCardIcon} height={7} allowZoom={false}>
+    <BaseCard cardId='weather-forecast' title={title} icon={WeatherCardIcon} height={7} allowZoom={false}>
       <WeekContainer>
         {passedDays.map((_, i) => (
           <Day key={i} />
@@ -52,6 +52,6 @@ export const WeatherForecast: FC<Record<string, never>> = () => {
           <Day key={day.date} forecast={day} dayLabel={formatForecastDayLabel(day.date, t)} />
         ))}
       </WeekContainer>
-    </ApolloCard>
+    </BaseCard>
   )
 }

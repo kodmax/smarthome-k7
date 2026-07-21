@@ -2,7 +2,7 @@ import { TableBody } from '@mui/material'
 import { type FC } from 'react'
 import { AirVentIcon, FanIcon, HeaterIcon, HeatingIcon, NightIcon, SunIcon, TemperatureIcon } from '@repo/assets'
 import { ApolloDataTable, KnxReading, KnxStateIcon } from '@/card-components'
-import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { BaseCard, useZoom } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import type { LucideIcon } from 'lucide-react'
 import { HomeTempFeedData, TemperatureData } from '@repo/types'
@@ -26,7 +26,7 @@ export const Temperature: FC<Record<string, never>> = () => {
   const bedroomTemp = bedroomFeed?.reading.value
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='indoor-temp'
       title={labels.title}
       icon={TemperatureIcon}
@@ -114,6 +114,6 @@ export const Temperature: FC<Record<string, never>> = () => {
           />
         </TableBody>
       </ApolloDataTable>
-    </ApolloCard>
+    </BaseCard>
   )
 }

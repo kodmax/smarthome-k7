@@ -15,7 +15,7 @@ import {
 } from './styled'
 import { ZoomCurtain } from './ZoomCurtain'
 
-type ApolloCardProps = {
+type BaseCardProps = {
   title: string
   icon: StyledLucideIcon
   children: ReactNode
@@ -27,7 +27,7 @@ type ApolloCardProps = {
   headingInfo?: ReactNode
 }
 
-export const ApolloCard: FC<ApolloCardProps> = ({
+export const BaseCard: FC<BaseCardProps> = ({
   height = 4,
   children,
   title,

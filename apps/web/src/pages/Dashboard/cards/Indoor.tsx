@@ -3,7 +3,7 @@ import { type FC } from 'react'
 import { AirQualityIcon, AirVentIcon, AlertIcon } from '@repo/assets'
 
 import { ApolloDataTable, KnxReading, KnxStateIcon, Reading, TablePlaceholder } from '@/card-components'
-import { ApolloCard } from '@repo/apollo-card'
+import { BaseCard } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { Co2Data, WeatherFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
@@ -22,9 +22,9 @@ export const Indoor: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='air-quality' title={labels.title} icon={AirQualityIcon}>
+      <BaseCard cardId='air-quality' title={labels.title} icon={AirQualityIcon}>
         <TablePlaceholder rows={4} graph={false} value={true} />
-      </ApolloCard>
+      </BaseCard>
     )
   }
 
@@ -33,7 +33,7 @@ export const Indoor: FC<Record<string, never>> = () => {
   const ventilateReasonKey = ventilate.reasonKey as keyof typeof hintExplanations.ventilate
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='air-quality'
       title={labels.title}
       icon={AirQualityIcon}
@@ -80,6 +80,6 @@ export const Indoor: FC<Record<string, never>> = () => {
           <Reading title={sun.timeOfDay === 'day' ? labels.dusk : labels.dawn} displayValue={sun.time} />
         </TableBody>
       </ApolloDataTable>
-    </ApolloCard>
+    </BaseCard>
   )
 }

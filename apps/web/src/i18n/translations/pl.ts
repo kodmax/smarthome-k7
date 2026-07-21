@@ -27,6 +27,9 @@ export const pl: Translations = {
   stockMarket: {
     title: 'Giełda',
     description: 'Notowania giełdowe i analiza spółek',
+    marketStatus: {
+      title: 'Sesja rynku',
+    },
   },
   stockQuotes: {
     title: 'Notowania',

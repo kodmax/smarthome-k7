@@ -25,6 +25,9 @@ export type Translations = {
   stockMarket: {
     title: string
     description: string
+    marketStatus: {
+      title: string
+    }
   }
   stockQuotes: {
     title: string

@@ -8,6 +8,8 @@ import { useAlignedTimeoutLoop } from './helpers/useAlignedTimeoutLoop'
 
 export type MarketSession = {
   countdown: string
+  countdownPrefix: string
+  countdownDuration: string
   status: ReturnType<typeof getEffectiveMarketStatus>
 }
 
@@ -43,6 +45,8 @@ export const useMarketSession = (marketInfo: MarketInfo | undefined): MarketSess
 
     return {
       status: getEffectiveMarketStatus(marketInfo, now),
+      countdownPrefix: prefix,
+      countdownDuration: formatMarketDuration(remaining, stockMarket.durationHourSuffix),
       countdown: `${prefix} ${formatMarketDuration(remaining, stockMarket.durationHourSuffix)}`,
     }
   }, [countdownLabels, marketInfo, now, stockMarket.durationHourSuffix])

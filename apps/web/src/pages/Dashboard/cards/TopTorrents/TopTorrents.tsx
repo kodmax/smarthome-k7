@@ -1,6 +1,6 @@
 import { type FC, useCallback } from 'react'
 import { MoviesIcon } from '@repo/assets'
-import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { BaseCard, useZoom } from '@repo/apollo-card'
 import { TablePlaceholder, TorrentSearch } from '@/card-components'
 import { useCommand, useFeed } from '@repo/feed-client'
 import { Torrent } from '@repo/types'
@@ -30,14 +30,14 @@ export const TopTorrents: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='the-pirate' title={title} icon={MoviesIcon} height={6} headingInfo={<DownloadsInfo />}>
+      <BaseCard cardId='the-pirate' title={title} icon={MoviesIcon} height={6} headingInfo={<DownloadsInfo />}>
         <TablePlaceholder rows={12} graph={false} value={false} />
-      </ApolloCard>
+      </BaseCard>
     )
   }
 
   return (
-    <ApolloCard cardId='the-pirate' title={title} icon={MoviesIcon} height={6} headingInfo={<DownloadsInfo />}>
+    <BaseCard cardId='the-pirate' title={title} icon={MoviesIcon} height={6} headingInfo={<DownloadsInfo />}>
       <div>
         <div>
           {zoom ? <TorrentSearch query={query} onQuery={onQuery} onSearch={onSearch} onClear={onClear} /> : null}
@@ -50,6 +50,6 @@ export const TopTorrents: FC<Record<string, never>> = () => {
           <TorrentsTableView torrents={feed} zoom={zoom} onDownload={onDownload} />
         )}
       </div>
-    </ApolloCard>
+    </BaseCard>
   )
 }

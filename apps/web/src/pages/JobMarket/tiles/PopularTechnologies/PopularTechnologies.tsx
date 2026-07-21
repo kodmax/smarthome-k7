@@ -1,6 +1,6 @@
 import { Box, TableBody, TableHead, TableRow, Typography } from '@mui/material'
 import { ListIcon } from '@repo/assets'
-import { ApolloCard } from '@repo/apollo-card'
+import { BaseCard } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { designTokens } from '@repo/design-tokens'
 import { JobMarketInsightFeed } from '@repo/types'
@@ -19,7 +19,7 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
   const feed = useFeed<JobMarketInsightFeed>('job-market-insight')
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='job-market-popular-technologies'
       title={labels.title}
       icon={ListIcon}
@@ -66,6 +66,6 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
           </ApolloDataTable>
         </Box>
       )}
-    </ApolloCard>
+    </BaseCard>
   )
 }

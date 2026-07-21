@@ -6,18 +6,19 @@ Zoomable dashboard card shell for the smart home UI — header, content area, op
 
 | Export                                           | Description                                    |
 | ------------------------------------------------ | ---------------------------------------------- |
-| `ApolloCard`                                     | Card container with title, icon, zoom, actions |
+| `BaseCard`                                       | Card container with title, icon, zoom, actions |
+| `SingleValueCard`                                | Compact 3-line metric card built on `BaseCard`   |
 | `ApolloCardAction`                               | Icon button for card header actions            |
 | `ZoomStateProvider`                              | Context for coordinating zoom across cards     |
 | `useZoom`                                        | Hook for zoom state on a card                  |
 | `apolloCardContentHeight`, `apolloCardRowHeight` | Layout helpers for card grid                   |
 
 ```tsx
-import { ApolloCard } from '@repo/apollo-card'
+import { BaseCard } from '@repo/apollo-card'
 import { WeatherIcon } from '@repo/assets'
-;<ApolloCard title='Weather' icon={WeatherIcon} cardId='weather'>
+;<BaseCard title='Weather' icon={WeatherIcon} cardId='weather'>
   ...
-</ApolloCard>
+</BaseCard>
 ```
 
 ## Usage

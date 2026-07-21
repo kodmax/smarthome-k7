@@ -27,6 +27,9 @@ export const ru: Translations = {
   stockMarket: {
     title: 'Биржа',
     description: 'Биржевые котировки и анализ компаний',
+    marketStatus: {
+      title: 'Сессия биржи',
+    },
   },
   stockQuotes: {
     title: 'Котировки',

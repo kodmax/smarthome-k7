@@ -1,8 +1,8 @@
 import { JobMarketActiveOffersIcon } from '@repo/assets'
+import { JobMarketMetricCard } from '../../components/JobMarketMetricCard'
 import { useFeed } from '@repo/feed-client'
 import { JobMarketInsightFeed } from '@repo/types'
 import { type FC } from 'react'
-import { JobMarketSummaryTile } from '../../components/JobMarketSummaryTile'
 import { useTranslations } from '@/i18n'
 
 export const ActiveOffers: FC<Record<string, never>> = () => {
@@ -10,7 +10,7 @@ export const ActiveOffers: FC<Record<string, never>> = () => {
   const feed = useFeed<JobMarketInsightFeed>('job-market-insight')
 
   return (
-    <JobMarketSummaryTile
+    <JobMarketMetricCard
       cardId='job-market-active-offers'
       icon={JobMarketActiveOffersIcon}
       title={t.jobMarket.summary.activeOffers}

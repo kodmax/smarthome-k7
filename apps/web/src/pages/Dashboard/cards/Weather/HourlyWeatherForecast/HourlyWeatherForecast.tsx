@@ -1,6 +1,6 @@
 import { type FC } from 'react'
 import { CoolingIcon, ThermometerSunIcon, UVIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
-import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { BaseCard, useZoom } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { HourWeatherForecast, WeatherFeed } from '@repo/types'
 import { formatIsoWeekdayLong, useTranslations } from '@/i18n'
@@ -56,7 +56,7 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
   const showFrost = shouldShowHourlyFrostHint(hourly)
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='hourly-weather-forecast'
       title={labels.title}
       icon={WeatherCardIcon}
@@ -122,6 +122,6 @@ export const HourlyWeatherForecast: FC<Record<string, never>> = () => {
           ))}
         </ForecastRow>
       </ScrollArea>
-    </ApolloCard>
+    </BaseCard>
   )
 }

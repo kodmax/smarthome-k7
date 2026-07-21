@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import { PowerIcon } from '@repo/assets'
-import { ApolloCard } from '@repo/apollo-card'
+import { BaseCard } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { JobMarketInsightFeed } from '@repo/types'
 import { type FC } from 'react'
@@ -19,7 +19,7 @@ export const SalaryDistribution: FC<Record<string, never>> = () => {
   const brackets = feed?.salaryDistribution ?? []
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='job-market-salary-distribution'
       title={labels.title}
       icon={PowerIcon}
@@ -108,6 +108,6 @@ export const SalaryDistribution: FC<Record<string, never>> = () => {
         </Box>
         <Box sx={{ width: valueWidth, flexShrink: 0 }} />
       </Box>
-    </ApolloCard>
+    </BaseCard>
   )
 }

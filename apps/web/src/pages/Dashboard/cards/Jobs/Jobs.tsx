@@ -1,6 +1,6 @@
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { JobsIcon, SettingsIcon } from '@repo/assets'
-import { ApolloCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
+import { BaseCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { TablePlaceholder } from '@/card-components'
 import { JobsFeed } from '@repo/types'
@@ -48,7 +48,7 @@ export const Jobs: FC<Record<string, never>> = () => {
   }, [adsFilter, editMode, feed])
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='jobs'
       title={labels.title}
       icon={JobsIcon}
@@ -72,7 +72,7 @@ export const Jobs: FC<Record<string, never>> = () => {
       ) : (
         <JobsReadingView ads={feed.ads} zoom={zoom} />
       )}
-    </ApolloCard>
+    </BaseCard>
   )
 }
 

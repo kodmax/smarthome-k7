@@ -27,6 +27,9 @@ export const en: Translations = {
   stockMarket: {
     title: 'Stock Market',
     description: 'Stock quotes and company analysis',
+    marketStatus: {
+      title: 'Market session',
+    },
   },
   stockQuotes: {
     title: 'Quotes',

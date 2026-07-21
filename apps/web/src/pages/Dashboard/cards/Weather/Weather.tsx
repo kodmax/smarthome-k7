@@ -2,7 +2,7 @@ import { TableBody } from '@mui/material'
 import { type FC } from 'react'
 import { CoolingIcon, ThermometerSunIcon, UVIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
 import { ApolloDataTable, HoursBars, Reading, TablePlaceholder } from '@/card-components'
-import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { BaseCard, useZoom } from '@repo/apollo-card'
 import { designTokens } from '@repo/design-tokens'
 import { ArrowUp } from 'lucide-react'
 import { getPosition, getMoonPosition } from 'suncalc'
@@ -29,9 +29,9 @@ export const Weather: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='current-weather' title={labels.title} icon={WeatherCardIcon}>
+      <BaseCard cardId='current-weather' title={labels.title} icon={WeatherCardIcon}>
         <TablePlaceholder rows={4} graph={true} value={true} />
-      </ApolloCard>
+      </BaseCard>
     )
   }
   const moonAlt = (getMoonPosition(new Date(), 52.2287755, 20.9756375).altitude / Math.PI) * 180
@@ -49,7 +49,7 @@ export const Weather: FC<Record<string, never>> = () => {
   const showFrost = shouldShowFrostHint(feed.instant.temp)
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='current-weather'
       title={labels.title}
       icon={WeatherCardIcon}
@@ -154,6 +154,6 @@ export const Weather: FC<Record<string, never>> = () => {
           )}
         </TableBody>
       </ApolloDataTable>
-    </ApolloCard>
+    </BaseCard>
   )
 }

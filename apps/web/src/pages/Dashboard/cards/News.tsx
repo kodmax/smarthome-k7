@@ -4,7 +4,7 @@ import { EyeOff, Undo2 } from 'lucide-react'
 import { NewsIcon, SettingsIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
 import { refreshFeeds, useCommand, useFeed } from '@repo/feed-client'
-import { ApolloCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
+import { BaseCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
 import {
   ApolloDataTable,
   ApolloTableCell,
@@ -68,7 +68,7 @@ export const News: FC<Record<string, never>> = () => {
   }, [editMode, news])
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='news'
       title={labels.title}
       icon={NewsIcon}
@@ -131,6 +131,6 @@ export const News: FC<Record<string, never>> = () => {
           </TableBody>
         </ApolloDataTable>
       )}
-    </ApolloCard>
+    </BaseCard>
   )
 }

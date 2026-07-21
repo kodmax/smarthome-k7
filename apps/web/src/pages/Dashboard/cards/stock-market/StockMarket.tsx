@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 import { StockMarketIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
-import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { BaseCard, useZoom } from '@repo/apollo-card'
 import { ApolloDataTable, ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
 import { StockMarketFeed } from '@repo/types'
@@ -30,16 +30,16 @@ export const StockMarket: FC<Record<string, never>> = () => {
 
   if (feed === undefined || tickers === undefined || marketSession === undefined) {
     return (
-      <ApolloCard cardId='stock-market' title={labels.title} icon={StockMarketIcon} height={cardHeight}>
+      <BaseCard cardId='stock-market' title={labels.title} icon={StockMarketIcon} height={cardHeight}>
         <TablePlaceholder rows={12} graph={false} value={true} />
-      </ApolloCard>
+      </BaseCard>
     )
   }
 
   const statusTitle = getMarketStatusTitle(marketSession.status, labels.status)
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='stock-market'
       title={labels.title}
       icon={StockMarketIcon}
@@ -72,6 +72,6 @@ export const StockMarket: FC<Record<string, never>> = () => {
           ))}
         </TableBody>
       </ApolloDataTable>
-    </ApolloCard>
+    </BaseCard>
   )
 }

@@ -2,7 +2,7 @@ import { TableBody } from '@mui/material'
 import { type FC, useCallback } from 'react'
 import { EnergyIcon } from '@repo/assets'
 import { refreshFeeds, useFeed } from '@repo/feed-client'
-import { ApolloCard, useZoom } from '@repo/apollo-card'
+import { BaseCard, useZoom } from '@repo/apollo-card'
 import { ApolloDataTable, KnxReading, Reading, TablePlaceholder } from '@/card-components'
 import { EnergyFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
@@ -22,9 +22,9 @@ export const Energy: FC<Record<string, never>> = () => {
 
   if (feed === undefined) {
     return (
-      <ApolloCard cardId='energy' title={labels.title} icon={EnergyIcon}>
+      <BaseCard cardId='energy' title={labels.title} icon={EnergyIcon}>
         <TablePlaceholder rows={4} graph={false} value={true} />
-      </ApolloCard>
+      </BaseCard>
     )
   }
 
@@ -38,7 +38,7 @@ export const Energy: FC<Record<string, never>> = () => {
     feed.cost.rates.vat
 
   return (
-    <ApolloCard
+    <BaseCard
       cardId='energy'
       title={labels.title}
       icon={EnergyIcon}
@@ -113,6 +113,6 @@ export const Energy: FC<Record<string, never>> = () => {
           </TableBody>
         </ApolloDataTable>
       )}
-    </ApolloCard>
+    </BaseCard>
   )
 }

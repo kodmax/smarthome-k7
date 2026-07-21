@@ -48,6 +48,8 @@ describe('useMarketSession', () => {
 
     expect(result.current).toEqual({
       status: 'Open',
+      countdownPrefix: 'Zamknięcie za',
+      countdownDuration: '6g 30m',
       countdown: 'Zamknięcie za 6g 30m',
     })
   })
@@ -59,6 +61,8 @@ describe('useMarketSession', () => {
 
     expect(result.current).toEqual({
       status: 'Pre-Market',
+      countdownPrefix: 'Otwarcie za',
+      countdownDuration: '16m',
       countdown: 'Otwarcie za 16m',
     })
   })
