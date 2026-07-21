@@ -4,15 +4,19 @@ import type { RedisClient } from './RedisClient'
 export type { RedisClient }
 
 export enum CacheAgeUnit {
-  SECONDS = 1000,
-  MINUTES = 60_000,
-  HOURS = 3_600_000,
-  DAYS = 86_400_000,
+  SECOND = 1000,
+  MINUTE = 60_000,
+  HOUR = 3_600_000,
+  DAY = 86_400_000,
 }
 
 export type SnapshotContent<T> = {
   timestamp: number
   content?: T
+}
+
+export type CacheOptions = {
+  ttlMs?: number
 }
 
 export interface CacheEntry<T> {
@@ -21,5 +25,5 @@ export interface CacheEntry<T> {
 }
 
 export interface Cache {
-  getEntry<T>(id?: string): Promise<CacheEntry<T>>
+  getEntry<T>(id?: string, options?: CacheOptions): Promise<CacheEntry<T>>
 }

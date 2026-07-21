@@ -22,7 +22,7 @@ export class CommoditiesSource extends DataSourceDefinition<Commodities> {
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTES * 30
+    return CacheAgeUnit.MINUTE * 30
   }
 
   async getData() {

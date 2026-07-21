@@ -16,7 +16,7 @@ export class HumidityHourlySource extends DataSourceDefinition<{ date: string; t
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTES * 5
+    return CacheAgeUnit.MINUTE * 5
   }
 
   async getData() {

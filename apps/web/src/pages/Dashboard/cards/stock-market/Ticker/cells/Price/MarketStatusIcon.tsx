@@ -11,7 +11,13 @@ export const MarketStatusIcon: FC<{ marketStatus: MarketStatus }> = ({ marketSta
   switch (marketStatus) {
     case 'Open':
       return (
-        <Circle size={iconSize / 2} fill='var(--mui-palette-success-main)' strokeWidth={0} style={iconStyle} aria-hidden />
+        <Circle
+          size={iconSize / 2}
+          fill='var(--mui-palette-success-main)'
+          strokeWidth={0}
+          style={iconStyle}
+          aria-hidden
+        />
       )
 
     case 'After-Hours':
@@ -22,7 +28,13 @@ export const MarketStatusIcon: FC<{ marketStatus: MarketStatus }> = ({ marketSta
 
     case 'Closed':
       return (
-        <Circle size={iconSize / 2} fill='var(--mui-palette-text-disabled)' strokeWidth={0} style={iconStyle} aria-hidden />
+        <Circle
+          size={iconSize / 2}
+          fill='var(--mui-palette-text-disabled)'
+          strokeWidth={0}
+          style={iconStyle}
+          aria-hidden
+        />
       )
 
     default:

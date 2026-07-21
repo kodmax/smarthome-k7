@@ -22,7 +22,7 @@ export class WeatherSource extends DataSourceDefinition<WeatherFeed> {
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTES * 15
+    return CacheAgeUnit.MINUTE * 15
   }
 
   async getData() {

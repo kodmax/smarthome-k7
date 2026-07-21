@@ -44,7 +44,7 @@ export class IndoorTempHistorySource extends DataSourceDefinition<TempHistory> {
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTES * 5
+    return CacheAgeUnit.MINUTE * 5
   }
 
   async getData() {

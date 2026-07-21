@@ -43,7 +43,7 @@ export default (knx: KnxLink): DataSourceDefinitionClass<LightsFeed> => {
     }
 
     public getCacheTTL(): number {
-      return CacheAgeUnit.HOURS
+      return CacheAgeUnit.HOUR
     }
 
     public async getData(): Promise<LightsFeed> {

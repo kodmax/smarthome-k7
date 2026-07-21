@@ -18,7 +18,7 @@ export class FuelSource extends DataSourceDefinition<FuelPricesFeed> {
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.HOURS * 24
+    return CacheAgeUnit.HOUR * 24
   }
 
   async getData() {

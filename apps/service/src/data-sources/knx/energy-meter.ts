@@ -67,7 +67,7 @@ export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> 
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.SECONDS * 3
+    return CacheAgeUnit.SECOND * 3
   }
 
   async getData() {

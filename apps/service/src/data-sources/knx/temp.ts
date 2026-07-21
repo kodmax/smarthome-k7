@@ -19,7 +19,7 @@ export default (id: string, dp: DPT_Value_Temp): DataSourceDefinitionClass<KnxRe
     }
 
     public getCacheTTL(): number {
-      return CacheAgeUnit.SECONDS * 60
+      return CacheAgeUnit.SECOND * 60
     }
 
     public async getData(): Promise<KnxReading<number>> {

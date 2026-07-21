@@ -3,7 +3,8 @@ import * as fs from 'fs'
 import { isFileSystemError } from '../fs-error'
 import { CorruptCacheError } from '../Errors'
 import { FSCacheEntry } from './FSCacheEntry'
-import type { Cache, CacheEntry } from './types'
+import { isExpired } from './ttl'
+import type { Cache, CacheEntry, CacheOptions } from './types'
 
 class FSCache implements Cache {
   private readonly path: string
@@ -14,26 +15,38 @@ class FSCache implements Cache {
     fs.mkdirSync(this.path, { recursive: true })
   }
 
-  public async getEntry<T>(id?: string): Promise<CacheEntry<T>> {
+  public async getEntry<T>(id?: string, options?: CacheOptions): Promise<CacheEntry<T>> {
+    const ttlMs = options?.ttlMs
+
     if (id === undefined) {
-      return new FSCacheEntry<T>(this.path, { timestamp: new Date().getTime() }, id)
+      return new FSCacheEntry<T>(this.path, { timestamp: new Date().getTime() }, id, ttlMs)
     }
 
+    const filePath = path.resolve(this.path, `${id}.json`)
+
     try {
-      const content = await fs.promises.readFile(path.resolve(this.path, `${id}.json`), { encoding: 'utf-8' })
-      const stat = await fs.promises.stat(path.resolve(this.path, `${id}.json`))
+      const content = await fs.promises.readFile(filePath, { encoding: 'utf-8' })
+      const stat = await fs.promises.stat(filePath)
+      const timestamp = stat.mtime.getTime()
+
+      if (isExpired(timestamp, ttlMs)) {
+        await this.deleteFile(filePath)
+
+        return new FSCacheEntry<T>(this.path, { timestamp: new Date().getTime() }, id, ttlMs)
+      }
 
       return new FSCacheEntry<T>(
         this.path,
         {
           content: JSON.parse(content),
-          timestamp: stat.mtime.getTime(),
+          timestamp,
         },
         id,
+        ttlMs,
       )
     } catch (e) {
       if (isFileSystemError(e) && e.code === 'ENOENT') {
-        return new FSCacheEntry<T>(this.path, { timestamp: new Date().getTime() }, id)
+        return new FSCacheEntry<T>(this.path, { timestamp: new Date().getTime() }, id, ttlMs)
       }
 
       if (e instanceof SyntaxError) {
@@ -41,6 +54,16 @@ class FSCache implements Cache {
       }
 
       throw e
+    }
+  }
+
+  private async deleteFile(filePath: string): Promise<void> {
+    try {
+      await fs.promises.unlink(filePath)
+    } catch (e) {
+      if (!isFileSystemError(e) || e.code !== 'ENOENT') {
+        throw e
+      }
     }
   }
 }

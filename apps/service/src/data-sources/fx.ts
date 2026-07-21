@@ -18,7 +18,7 @@ export class FxSource extends DataSourceDefinition<FXFeed> {
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.HOURS
+    return CacheAgeUnit.HOUR
   }
 
   async getData() {

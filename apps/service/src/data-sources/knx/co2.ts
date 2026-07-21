@@ -19,7 +19,7 @@ export default (id: string, dp: DPT_Value_AirQuality): DataSourceDefinitionClass
     }
 
     public getCacheTTL(): number {
-      return CacheAgeUnit.SECONDS * 3
+      return CacheAgeUnit.SECOND * 3
     }
 
     public async getData(): Promise<KnxReading<number>> {

@@ -20,11 +20,7 @@ export const MarketStatusTile: FC<Record<string, never>> = () => {
       title={t.stockMarket.marketStatus.title}
       icon={SunMoonIcon}
       headingInfo={marketSession ? <MarketStatusIcon marketStatus={marketSession.status} /> : null}
-      primary={
-        marketSession
-          ? getMarketStatusTitle(marketSession.status, labels.status)
-          : '--'
-      }
+      primary={marketSession ? getMarketStatusTitle(marketSession.status, labels.status) : '--'}
       secondary={marketSession?.countdown ?? '--'}
     />
   )

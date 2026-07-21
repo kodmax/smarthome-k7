@@ -48,7 +48,7 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTES * 5
+    return CacheAgeUnit.MINUTE * 5
   }
 
   async getData() {

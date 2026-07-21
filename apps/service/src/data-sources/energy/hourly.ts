@@ -21,7 +21,7 @@ export class EnergyHourlySource extends DataSourceDefinition<{
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTES * 5
+    return CacheAgeUnit.MINUTE * 5
   }
 
   async getData() {

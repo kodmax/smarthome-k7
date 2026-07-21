@@ -13,7 +13,7 @@ export class YahooMarketDataSource extends DataSourceDefinition<YahooTickerData[
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.HOURS * 24
+    return CacheAgeUnit.HOUR * 24
   }
 
   async getData() {

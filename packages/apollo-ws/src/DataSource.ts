@@ -91,7 +91,9 @@ class DataSource<T, TCache = T> {
       e => vent.emit('sys-log', 4, `Push data source <${definition.getId()}> update error: ${e}`, e),
     )
 
-    const cacheEntry = await cache.getEntry<TCache>(definition.isVolatile() ? undefined : definition.getId())
+    const cacheEntry = await cache.getEntry<TCache>(definition.isVolatile() ? undefined : definition.getId(), {
+      ttlMs: definition.getCacheTTL(),
+    })
     dataSource = new DataSource(definition, cacheEntry, vent)
 
     return dataSource
@@ -129,16 +131,16 @@ class DataSource<T, TCache = T> {
   }
 
   public isCacheFresh(): boolean {
+    if (this.definition.getCacheTTL() <= 0) {
+      return false
+    }
+
     const snapshot = this.cacheEntry.getSnapshot()
     if (snapshot === null) {
       return false
     }
 
-    const ageMs = Date.now() - snapshot.getTimestamp()
-
-    const ttl = this.definition.getCacheTTL()
-
-    return ttl > 0 && ageMs <= ttl && this.definition.isCacheValid(snapshot.getContent())
+    return this.definition.isCacheValid(snapshot.getContent())
   }
 
   public getId(): string {

@@ -58,6 +58,7 @@ describe('DataSource', () => {
   const cacheDirs: string[] = []
 
   afterEach(() => {
+    vi.useRealTimers()
     for (const dir of cacheDirs.splice(0)) {
       rmSync(dir, { recursive: true, force: true })
     }
@@ -92,6 +93,29 @@ describe('DataSource', () => {
 
     await expect(dataSource.getData()).resolves.toEqual({ value: 99 })
     expect(getData).not.toHaveBeenCalled()
+  })
+
+  it('refetches after cache TTL expires', async () => {
+    vi.useFakeTimers()
+
+    const getData = vi.fn().mockResolvedValueOnce({ value: 1 }).mockResolvedValueOnce({ value: 2 })
+    const { dataSource } = await createDataSource(
+      createTestSourceClass({
+        id: 'ttl-expire',
+        getCacheTTL: () => 1000,
+        getData,
+      }),
+    )
+
+    await expect(dataSource.getData()).resolves.toEqual({ value: 1 })
+    expect(getData).toHaveBeenCalledTimes(1)
+
+    await vi.advanceTimersByTimeAsync(1001)
+
+    await expect(dataSource.getData()).resolves.toEqual({ value: 2 })
+    expect(getData).toHaveBeenCalledTimes(2)
+
+    vi.useRealTimers()
   })
 
   it('calls script on cache miss and on force refresh', async () => {

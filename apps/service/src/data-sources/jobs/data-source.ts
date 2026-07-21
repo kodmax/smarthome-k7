@@ -96,7 +96,7 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTES * 15
+    return CacheAgeUnit.MINUTE * 15
   }
 
   async getData() {

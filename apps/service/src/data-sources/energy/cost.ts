@@ -29,7 +29,7 @@ export class EnergyCostSource extends DataSourceDefinition<EnergyCost> {
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.DAYS
+    return CacheAgeUnit.DAY
   }
 
   async getData() {

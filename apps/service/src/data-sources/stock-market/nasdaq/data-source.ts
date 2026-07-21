@@ -13,7 +13,7 @@ export class NasdaqMarketDataSource extends DataSourceDefinition<NasdaqMarketDat
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.HOURS * 24
+    return CacheAgeUnit.HOUR * 24
   }
 
   async getData() {

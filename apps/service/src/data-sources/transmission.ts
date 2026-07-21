@@ -63,7 +63,7 @@ export class TransmissionSource extends DataSourceDefinition<TransmissionFeed> {
   }
 
   public getCacheTTL(): number {
-    return CacheAgeUnit.MINUTES
+    return CacheAgeUnit.MINUTE
   }
 
   public async getData(): Promise<TransmissionFeed> {

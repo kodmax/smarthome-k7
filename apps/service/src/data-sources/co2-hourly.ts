@@ -17,7 +17,7 @@ export class Co2HourlySource extends DataSourceDefinition<{ date: string; today:
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTES * 5
+    return CacheAgeUnit.MINUTE * 5
   }
 
   async getData() {

@@ -26,7 +26,7 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTES * 15
+    return CacheAgeUnit.MINUTE * 15
   }
 
   async getData() {

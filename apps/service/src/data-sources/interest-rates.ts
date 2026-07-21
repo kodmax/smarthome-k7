@@ -18,7 +18,7 @@ export class InterestRatesSource extends DataSourceDefinition<InterestRatesFeed>
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.HOURS * 12
+    return CacheAgeUnit.HOUR * 12
   }
 
   async getData() {

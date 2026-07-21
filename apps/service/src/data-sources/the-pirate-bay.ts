@@ -23,7 +23,7 @@ export class TorrentSource extends DataSourceDefinition<Torrent[]> {
   }
 
   public getCacheTTL(): number {
-    return CacheAgeUnit.HOURS * 12
+    return CacheAgeUnit.HOUR * 12
   }
 
   public async getData(): Promise<Torrent[]> {
