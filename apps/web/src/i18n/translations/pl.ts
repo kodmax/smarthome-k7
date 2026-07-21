@@ -36,6 +36,15 @@ export const pl: Translations = {
     lowForwardPE: {
       title: 'Niskie prognozowane C/Z na celu',
     },
+    earningsSoon: {
+      title: 'Raport kwartalny wkrótce',
+    },
+    screener: {
+      title: 'Notowania spółek',
+    },
+    filters: {
+      label: 'Filtr',
+    },
   },
   stockQuotes: {
     title: 'Notowania',

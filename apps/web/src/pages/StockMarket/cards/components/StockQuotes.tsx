@@ -1,4 +1,4 @@
-import { type FC } from 'react'
+import { type FC, type ReactNode } from 'react'
 import { type StyledLucideIcon } from '@repo/assets'
 import { BaseCard } from '@repo/apollo-card'
 import { ApolloDataTable, ApolloTableCell, TablePlaceholder } from '@/card-components'
@@ -18,6 +18,7 @@ type StockQuotesProps = {
   icon: StyledLucideIcon
   cardId?: string
   height?: number
+  headingInfo?: ReactNode
 }
 
 export const StockQuotes: FC<StockQuotesProps> = ({
@@ -26,20 +27,21 @@ export const StockQuotes: FC<StockQuotesProps> = ({
   icon: Icon,
   cardId = 'stock-quotes',
   height = 24,
+  headingInfo,
 }) => {
   const { t } = useTranslations()
   const labels = t.dashboard.stockMarket
 
   if (tickers === undefined) {
     return (
-      <BaseCard cardId={cardId} title={title} icon={Icon} height={height} allowZoom={false}>
+      <BaseCard cardId={cardId} title={title} icon={Icon} height={height} allowZoom={false} headingInfo={headingInfo}>
         <TablePlaceholder rows={12} graph={false} value={true} />
       </BaseCard>
     )
   }
 
   return (
-    <BaseCard cardId={cardId} title={title} icon={Icon} height={height} allowZoom={false}>
+    <BaseCard cardId={cardId} title={title} icon={Icon} height={height} allowZoom={false} headingInfo={headingInfo}>
       <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: 2 }}>
         <TableHead>
           <TableRow sx={headerRowSx}>

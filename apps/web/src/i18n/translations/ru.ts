@@ -36,6 +36,15 @@ export const ru: Translations = {
     lowForwardPE: {
       title: 'Низкий прогнозный P/E на цели',
     },
+    earningsSoon: {
+      title: 'Квартальный отчёт скоро',
+    },
+    screener: {
+      title: 'Котировки акций',
+    },
+    filters: {
+      label: 'Фильтр',
+    },
   },
   stockQuotes: {
     title: 'Котировки',

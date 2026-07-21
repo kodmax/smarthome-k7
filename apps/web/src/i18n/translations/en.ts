@@ -36,6 +36,15 @@ export const en: Translations = {
     lowForwardPE: {
       title: 'Low forward P/E at target',
     },
+    earningsSoon: {
+      title: 'Quarterly report soon',
+    },
+    screener: {
+      title: 'Stock quotes',
+    },
+    filters: {
+      label: 'Filter',
+    },
   },
   stockQuotes: {
     title: 'Quotes',

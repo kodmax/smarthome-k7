@@ -34,6 +34,15 @@ export type Translations = {
     lowForwardPE: {
       title: string
     }
+    earningsSoon: {
+      title: string
+    }
+    screener: {
+      title: string
+    }
+    filters: {
+      label: string
+    }
   }
   stockQuotes: {
     title: string
