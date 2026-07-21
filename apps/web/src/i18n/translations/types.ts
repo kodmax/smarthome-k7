@@ -28,6 +28,12 @@ export type Translations = {
     marketStatus: {
       title: string
     }
+    highUpside: {
+      title: string
+    }
+    lowForwardPE: {
+      title: string
+    }
   }
   stockQuotes: {
     title: string

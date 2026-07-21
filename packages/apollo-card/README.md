@@ -7,7 +7,7 @@ Zoomable dashboard card shell for the smart home UI — header, content area, op
 | Export                                           | Description                                    |
 | ------------------------------------------------ | ---------------------------------------------- |
 | `BaseCard`                                       | Card container with title, icon, zoom, actions |
-| `SingleValueCard`                                | Compact 3-line metric card built on `BaseCard`   |
+| `SingleValueCard`                                | Compact 3-line metric card built on `BaseCard` |
 | `ApolloCardAction`                               | Icon button for card header actions            |
 | `ZoomStateProvider`                              | Context for coordinating zoom across cards     |
 | `useZoom`                                        | Hook for zoom state on a card                  |

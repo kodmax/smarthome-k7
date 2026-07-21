@@ -1,2 +1,4 @@
+export * from './HighUpsideCard'
+export * from './LowForwardPECard'
 export * from './MarketStatusTile'
-export * from './StockQuotes'
+export * from './StockQuotesCard'

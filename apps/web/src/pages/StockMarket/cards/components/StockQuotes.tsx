@@ -1,48 +1,45 @@
 import { type FC } from 'react'
-import { PowerIcon } from '@repo/assets'
-import { useFeed } from '@repo/feed-client'
+import { type StyledLucideIcon } from '@repo/assets'
 import { BaseCard } from '@repo/apollo-card'
 import { ApolloDataTable, ApolloTableCell, TablePlaceholder } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
-import { StockMarketFeed } from '@repo/types'
+import { TickerData } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { Ticker } from '@/pages/Dashboard/cards/stock-market/Ticker'
-import { useSortedTickers } from '@/pages/Dashboard/cards/stock-market/useSortedTickers'
 import { TableBody, TableHead, TableRow } from '@mui/material'
 
 const cardTableFontSize = designTokens.font.body.size
 const tableHeaderGap = designTokens.space[3]
 const headerRowSx = { '& .MuiTableCell-root': { pb: `${tableHeaderGap}px` } }
 
-export const StockQuotes: FC<Record<string, never>> = () => {
-  const cardHeight = 24
-  const feed = useFeed<StockMarketFeed>('stock-market')
-  const tickers = useSortedTickers(feed)
+type StockQuotesProps = {
+  tickers: TickerData[] | undefined
+  title: string
+  icon: StyledLucideIcon
+  cardId?: string
+  height?: number
+}
+
+export const StockQuotes: FC<StockQuotesProps> = ({
+  tickers,
+  title,
+  icon: Icon,
+  cardId = 'stock-quotes',
+  height = 24,
+}) => {
   const { t } = useTranslations()
   const labels = t.dashboard.stockMarket
 
-  if (feed === undefined || tickers === undefined) {
+  if (tickers === undefined) {
     return (
-      <BaseCard
-        cardId='stock-quotes'
-        title={t.stockQuotes.title}
-        icon={PowerIcon}
-        height={cardHeight}
-        allowZoom={false}
-      >
+      <BaseCard cardId={cardId} title={title} icon={Icon} height={height} allowZoom={false}>
         <TablePlaceholder rows={12} graph={false} value={true} />
       </BaseCard>
     )
   }
 
   return (
-    <BaseCard
-      cardId='stock-quotes'
-      title={t.stockQuotes.title}
-      icon={PowerIcon}
-      height={cardHeight}
-      allowZoom={false}
-    >
+    <BaseCard cardId={cardId} title={title} icon={Icon} height={height} allowZoom={false}>
       <ApolloDataTable style={{ fontSize: cardTableFontSize, lineHeight: 2 }}>
         <TableHead>
           <TableRow sx={headerRowSx}>

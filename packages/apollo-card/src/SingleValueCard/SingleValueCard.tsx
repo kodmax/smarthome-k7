@@ -44,7 +44,10 @@ export const SingleValueCard: FC<SingleValueCardProps> = ({
       </Typography>
 
       {secondary !== undefined ? (
-        <Typography variant='body2' sx={{ color: secondaryColor, fontWeight: 600, mb: tertiary !== undefined ? 0.5 : 0 }}>
+        <Typography
+          variant='body2'
+          sx={{ color: secondaryColor, fontWeight: 600, mb: tertiary !== undefined ? 0.5 : 0 }}
+        >
           {secondary}
         </Typography>
       ) : null}

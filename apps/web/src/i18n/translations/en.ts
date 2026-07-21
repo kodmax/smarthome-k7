@@ -30,6 +30,12 @@ export const en: Translations = {
     marketStatus: {
       title: 'Market session',
     },
+    highUpside: {
+      title: 'High upside',
+    },
+    lowForwardPE: {
+      title: 'Low forward P/E at target',
+    },
   },
   stockQuotes: {
     title: 'Quotes',

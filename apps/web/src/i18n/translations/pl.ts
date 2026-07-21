@@ -30,6 +30,12 @@ export const pl: Translations = {
     marketStatus: {
       title: 'Sesja rynku',
     },
+    highUpside: {
+      title: 'Duży upside',
+    },
+    lowForwardPE: {
+      title: 'Niskie prognozowane C/Z na celu',
+    },
   },
   stockQuotes: {
     title: 'Notowania',
