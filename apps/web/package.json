@@ -21,6 +21,7 @@
     "@mui/system": "^7.0.0",
     "@repo/apollo-card": "*",
     "@repo/assets": "*",
+    "@repo/common": "*",
     "@repo/design-tokens": "*",
     "@repo/feed-client": "*",
     "@repo/i18n-react": "*",

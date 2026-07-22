@@ -1,10 +1,20 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useFeed } from '@repo/feed-client'
 import { jobAd } from '@/pages/Dashboard/test/fixtures/jobs'
 import { renderWithTheme } from '@/test/test-utils'
 import { ApplicationStatusEditor } from './ApplicationStatusEditor'
 
+vi.mock('@repo/feed-client', () => ({
+  useFeed: vi.fn(),
+}))
+
+const mockedUseFeed = vi.mocked(useFeed)
+
 describe('ApplicationStatusEditor', () => {
+  beforeEach(() => {
+    mockedUseFeed.mockReturnValue(undefined)
+  })
   it('toggles favourite state immediately', () => {
     const onFav = vi.fn()
     const onUnfav = vi.fn()
@@ -77,6 +87,28 @@ describe('ApplicationStatusEditor', () => {
     expect(screen.getByText('TypeScript')).toBeInTheDocument()
     expect(screen.getByText('React')).toBeInTheDocument()
     expect(screen.getByText('shadcn')).toBeInTheDocument()
+  })
+
+  it('matches required skills to my-skills by normalized id', () => {
+    mockedUseFeed.mockReturnValue({
+      skills: [{ id: 'typescript', name: 'TypeScript', level: 'master', comment: null }],
+    })
+
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '8',
+          title: 'Role',
+          requiredSkills: ['TypeScript'],
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('TypeScript')).toBeInTheDocument()
+    expect(document.querySelector('svg')).toBeInTheDocument()
   })
 
   it('shows n/d when the ad has no required skills', () => {

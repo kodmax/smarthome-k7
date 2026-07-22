@@ -1,0 +1,19 @@
+{
+  "name": "@repo/common",
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "vitest run"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "eslint": "^8.57.0",
+    "typescript": "5.5.4",
+    "vitest": "^4.1.8"
+  }
+}

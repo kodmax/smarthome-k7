@@ -11,15 +11,18 @@ import {
   type SelectChangeEvent,
 } from '@mui/material'
 import { FavStarIcon } from '@repo/assets'
-import { JobAdWithMeta, JobApplyStatus } from '@repo/types'
+import { useFeed } from '@repo/feed-client'
+import { toSkillId } from '@repo/common'
+import { JobAdWithMeta, JobApplyStatus, MySkillsFeed } from '@repo/types'
 import { designTokens } from '@repo/design-tokens'
 import { Star } from 'lucide-react'
 import { FC, useEffect, useMemo, useState, type CSSProperties, type SyntheticEvent } from 'react'
-import { Tag, TagGroup } from '@/card-components'
+import { TagGroup } from '@/card-components'
 import { useLocale, useTranslations } from '@/i18n'
 import { ApplyStatusIcon } from './ApplyStatusIcon'
 import { applyStatusTargetOptions } from './applyStatusSelectOptions'
 import { formatAppliedDaysAgo, formatNotApplicable } from './formatAppliedDaysAgo'
+import { RequiredSkillTag } from './RequiredSkillTag'
 
 const favIconSize = designTokens.icon.sizeMd
 const emptyNextStatus = ''
@@ -44,6 +47,11 @@ export const ApplicationStatusEditor: FC<{
   const targetStatusOptions = useMemo(() => applyStatusTargetOptions(currentStatus), [currentStatus])
   const canSubmit = nextStatus !== emptyNextStatus
   const canChangeStatus = targetStatusOptions.length > 0
+  const mySkillsFeed = useFeed<MySkillsFeed>('my-skills')
+
+  const mySkillsById = useMemo(() => {
+    return new Map(mySkillsFeed?.skills.map(skill => [skill.id, skill]) ?? [])
+  }, [mySkillsFeed])
 
   const statusSelectMenuProps = useMemo(
     () => ({
@@ -156,9 +164,7 @@ export const ApplicationStatusEditor: FC<{
             {ad.requiredSkills.length > 0 ? (
               <TagGroup>
                 {ad.requiredSkills.map(skill => (
-                  <Tag key={skill} variant='neutral'>
-                    {skill}
-                  </Tag>
+                  <RequiredSkillTag key={skill} skill={skill} mySkill={mySkillsById.get(toSkillId(skill))} />
                 ))}
               </TagGroup>
             ) : (

@@ -23,7 +23,7 @@ Consumers:
 - [`apps/web`](../../apps/web) — types in card components
 - [`apps/service`](../../apps/service) — feed data shapes
 
-Types only — no runtime code, no build step.
+Types only — no runtime code, no build step. Shared runtime logic lives in [`@repo/common`](../common).
 
 ## Scripts
 

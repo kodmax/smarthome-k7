@@ -1,6 +1,7 @@
+import { toTechnologyId } from '@repo/common'
 import { JobAd } from '@repo/types'
 import { describe, expect, it } from 'vitest'
-import { computePopularTechnologies, toTechnologyId } from './computePopularTechnologies'
+import { computePopularTechnologies } from './computePopularTechnologies'
 
 const makeAd = (requiredSkills: string[], salary?: { from: number; to: number }): JobAd => ({
   id: `${requiredSkills.join('-')}-${salary?.from ?? 'none'}`,

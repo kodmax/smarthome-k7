@@ -5,6 +5,7 @@
   "type": "commonjs",
   "dependencies": {
     "@repo/apollo-ws": "*",
+    "@repo/common": "*",
     "@repo/di": "*",
     "@repo/cron-scripts": "*",
     "@repo/db": "*",

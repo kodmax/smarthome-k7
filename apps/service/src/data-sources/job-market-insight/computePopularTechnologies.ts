@@ -1,15 +1,9 @@
+import { isIgnoredSkillKey, normalizeSkillKey, toTechnologyId, unifySkillName } from '@repo/common'
 import { JobAd, JobMarketPopularTechnology } from '@repo/types'
 import { salaryUpperBounds } from './computeMedianSalary'
 import { median } from './median'
-import { normalizeSkillKey, isIgnoredSkillKey, unifySkillName } from './normalizeSkillName'
 
 export const POPULAR_TECHNOLOGIES_LIMIT = 50
-
-export const toTechnologyId = (skill: string): string =>
-  skill
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '') || 'unknown'
 
 const computeTechnologyMedian = (ads: JobAd[]): number | null => {
   const result = median(salaryUpperBounds(ads))
