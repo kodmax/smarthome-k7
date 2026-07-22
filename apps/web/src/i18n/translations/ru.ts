@@ -335,6 +335,7 @@ export const ru: Translations = {
         offer: 'Оффер',
         'offer-accepted': 'Оффер принят',
         withdrawn: 'Отозван',
+        archived: 'В архиве',
       },
     },
     news: {

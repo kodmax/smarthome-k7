@@ -301,6 +301,7 @@ export type Translations = {
         offer: string
         'offer-accepted': string
         withdrawn: string
+        archived: string
       }
     }
     news: {

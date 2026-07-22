@@ -335,6 +335,7 @@ export const en: Translations = {
         offer: 'Offer',
         'offer-accepted': 'Offer accepted',
         withdrawn: 'Withdrawn',
+        archived: 'Archived',
       },
     },
     news: {

@@ -1,5 +1,6 @@
 import { JobApplyStatus } from '@repo/types'
 import {
+  Archive,
   Ban,
   Calendar,
   CircleCheck,
@@ -26,6 +27,7 @@ export const APPLY_STATUS_ICONS: Record<JobApplyStatus, LucideIcon> = {
   offer: Handshake,
   'offer-accepted': CircleCheck,
   withdrawn: CircleX,
+  archived: Archive,
 }
 
 export const APPLY_STATUS_COLORS: Record<JobApplyStatus, string> = {
@@ -40,4 +42,5 @@ export const APPLY_STATUS_COLORS: Record<JobApplyStatus, string> = {
   offer: 'var(--mui-palette-warning-main)',
   'offer-accepted': 'var(--mui-palette-success-main)',
   withdrawn: 'var(--mui-palette-text-secondary)',
+  archived: 'var(--mui-palette-text-secondary)',
 }

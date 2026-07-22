@@ -12,6 +12,7 @@ const APPLY_STATUSES = new Set<JobApplyStatus>([
   'offer',
   'offer-accepted',
   'withdrawn',
+  'archived',
 ])
 
 export function emptyApplicationMeta(): JobAdApplicationMeta {

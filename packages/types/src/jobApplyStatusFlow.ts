@@ -10,6 +10,7 @@ export type JobApplyStatus =
   | 'offer'
   | 'offer-accepted'
   | 'withdrawn'
+  | 'archived'
 
 export const DEFAULT_JOB_APPLY_STATUS: JobApplyStatus = 'not-applied'
 
@@ -18,6 +19,7 @@ export const TERMINAL_APPLY_STATUS_ORDER = [
   'offer-accepted',
   'withdrawn',
   'stack-mismatch',
+  'archived',
 ] as const satisfies readonly JobApplyStatus[]
 
 export const HIDDEN_APPLY_STATUS_ORDER = [
@@ -49,6 +51,7 @@ const TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
   offer: ['offer-accepted', 'withdrawn'],
   'offer-accepted': [],
   withdrawn: [],
+  archived: [],
 }
 
 export function canTransition(from: JobApplyStatus, to: JobApplyStatus): boolean {

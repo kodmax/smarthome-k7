@@ -5,6 +5,7 @@ describe('applyStatusTargetOptions', () => {
   it('returns no options for terminal statuses', () => {
     expect(applyStatusTargetOptions('rejected')).toEqual([])
     expect(applyStatusTargetOptions('stack-mismatch')).toEqual([])
+    expect(applyStatusTargetOptions('archived')).toEqual([])
   })
 
   it('returns reset transitions from not-interested', () => {

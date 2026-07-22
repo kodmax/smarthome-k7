@@ -44,10 +44,17 @@ describe('jobApplyStatusFlow', () => {
   })
 
   it('lists terminal statuses in order', () => {
-    expect(TERMINAL_APPLY_STATUS_ORDER).toEqual(['rejected', 'offer-accepted', 'withdrawn', 'stack-mismatch'])
+    expect(TERMINAL_APPLY_STATUS_ORDER).toEqual([
+      'rejected',
+      'offer-accepted',
+      'withdrawn',
+      'stack-mismatch',
+      'archived',
+    ])
     expect(TERMINAL_APPLY_STATUS_ORDER.every(isTerminalApplyStatus)).toBe(true)
     expect(isTerminalApplyStatus('no-response')).toBe(false)
     expect(isTerminalApplyStatus('unmet-requirements')).toBe(false)
+    expect(isTerminalApplyStatus('archived')).toBe(true)
   })
 
   it('lists hidden statuses in order', () => {
@@ -56,6 +63,7 @@ describe('jobApplyStatusFlow', () => {
       'offer-accepted',
       'withdrawn',
       'stack-mismatch',
+      'archived',
       'not-interested',
       'no-response',
       'unmet-requirements',
@@ -85,5 +93,7 @@ describe('jobApplyStatusFlow', () => {
   it('blocks transitions from terminal statuses', () => {
     expect(canTransition('offer-accepted', 'withdrawn')).toBe(false)
     expect(canTransition('rejected', 'applied')).toBe(false)
+    expect(canTransition('archived', 'applied')).toBe(false)
+    expect(canTransition('no-response', 'archived')).toBe(false)
   })
 })

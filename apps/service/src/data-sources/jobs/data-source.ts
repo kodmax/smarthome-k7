@@ -25,6 +25,7 @@ import { isMetaFlagTrue } from './metaFlag'
 
 const META_RETENTION_DAYS = 90
 const STALE_APPLIED_NO_RESPONSE_AFTER_DAYS = 14
+const STALE_NO_RESPONSE_ARCHIVE_AFTER_DAYS = 30
 
 type MetaRow = {
   item_uid: string
@@ -129,8 +130,9 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
         [this.getId(), META_RETENTION_DAYS],
       )
 
-      const changed = await this.markStaleAppliedAsNoResponse(conn)
-      if (changed) {
+      const appliedChanged = await this.markStaleAppliedAsNoResponse(conn)
+      const archivedChanged = await this.markStaleNoResponseAsArchived(conn)
+      if (appliedChanged || archivedChanged) {
         this.push()
       }
     } finally {
@@ -148,6 +150,24 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
        where group_id = ?
          and attribute_name = 'application'
          and json_unquote(json_extract(value, '$.applyStatus')) = 'applied'
+         and json_extract(value, '$.appliedAt') is not null
+         and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
+      [this.getId(), cutoff.toISOString()],
+    )
+
+    return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
+  }
+
+  private async markStaleNoResponseAsArchived(conn: Awaited<ReturnType<Pool['getConnection']>>): Promise<boolean> {
+    const cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - STALE_NO_RESPONSE_ARCHIVE_AFTER_DAYS)
+
+    const result = await conn.query(
+      `update meta
+       set value = json_set(value, '$.applyStatus', 'archived', '$.comment', cast(null as json))
+       where group_id = ?
+         and attribute_name = 'application'
+         and json_unquote(json_extract(value, '$.applyStatus')) = 'no-response'
          and json_extract(value, '$.appliedAt') is not null
          and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
       [this.getId(), cutoff.toISOString()],

@@ -1,3 +1,5 @@
 import { designTokens } from '@repo/design-tokens'
 
-export const jobTitleIconSize = designTokens.icon.sizeXs - 4
+const jobTitleIconBaseSize = designTokens.icon.sizeXs - 4
+
+export const jobTitleIconSize = jobTitleIconBaseSize * 1.5
