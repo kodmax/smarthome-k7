@@ -4,7 +4,7 @@ import { filterJobAdsByCategory, getJobAdFilterCategory } from './jobAdsFilter'
 
 describe('jobAdsFilter', () => {
   it('maps apply statuses to filter categories', () => {
-    expect(getJobAdFilterCategory('not-applied')).toBe('new')
+    expect(getJobAdFilterCategory('not-applied')).toBe('latest')
     expect(getJobAdFilterCategory('applied')).toBe('in-progress')
     expect(getJobAdFilterCategory('not-interested')).toBe('not-interested')
     expect(getJobAdFilterCategory('no-response')).toBe('finished')
@@ -24,7 +24,7 @@ describe('jobAdsFilter', () => {
       jobAd({ id: '4', title: 'Rejected', meta: { application: { status: 'rejected' } } }),
     ]
 
-    expect(filterJobAdsByCategory(ads, 'new').map(ad => ad.id)).toEqual(['1'])
+    expect(filterJobAdsByCategory(ads, 'latest').map(ad => ad.id)).toEqual(['1'])
     expect(filterJobAdsByCategory(ads, 'in-progress').map(ad => ad.id)).toEqual(['2'])
     expect(filterJobAdsByCategory(ads, 'not-interested').map(ad => ad.id)).toEqual(['3'])
     expect(filterJobAdsByCategory(ads, 'finished').map(ad => ad.id)).toEqual(['4'])

@@ -260,9 +260,10 @@ export type Translations = {
       applicationComment: string
       save: string
       cancel: string
+      publishedTodayTag: string
       filters: {
         label: string
-        new: string
+        latest: string
         inProgress: string
         notInterested: string
         finished: string

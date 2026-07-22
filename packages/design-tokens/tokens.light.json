@@ -22,6 +22,8 @@
     "success": "#5E8268",
     "warning": "#D97706",
     "danger": "#A86058",
+    "accentRed": "#e07070",
+    "accentRedDark": "#d96868",
     "info": "#0284C7",
     "purple": "#7C3AED",
 

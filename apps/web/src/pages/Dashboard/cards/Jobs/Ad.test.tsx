@@ -38,7 +38,27 @@ describe('Ad', () => {
     renderAd(jobAd({ id: '1', title: 'Senior TypeScript Developer' }), false)
 
     expect(screen.getByText('Senior TypeScript Developer')).toBeInTheDocument()
+    expect(screen.queryByText('nowa')).not.toBeInTheDocument()
     expect(screen.queryByText('[Perm]')).not.toBeInTheDocument()
+  })
+
+  it('shows a new tag before the title when published today', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-07-19T12:00:00'))
+
+    renderAd(jobAd({ id: '1a', title: 'Fresh Role', publishedAt: '2026-07-19T08:00:00.000Z' }), false)
+
+    expect(screen.getByText('nowa')).toBeInTheDocument()
+    expect(screen.getByText('Fresh Role')).toBeInTheDocument()
+  })
+
+  it('does not show a new tag when published before today', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-07-19T12:00:00'))
+
+    renderAd(jobAd({ id: '1b', title: 'Older Role', publishedAt: '2026-07-18T08:00:00.000Z' }), false)
+
+    expect(screen.queryByText('nowa')).not.toBeInTheDocument()
   })
 
   it('renders extended details and favourite skills when zoomed', () => {

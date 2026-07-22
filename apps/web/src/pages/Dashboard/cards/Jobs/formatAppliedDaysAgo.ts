@@ -7,6 +7,10 @@ export function calendarDaysBetween(from: Date, to: Date): number {
   return Math.floor((startTo.getTime() - startFrom.getTime()) / (24 * 60 * 60 * 1000))
 }
 
+export function isPublishedToday(publishedAt: string, now = new Date()): boolean {
+  return calendarDaysBetween(new Date(publishedAt), now) === 0
+}
+
 function formatDaysAgo(locale: AppLocale, days: number): string {
   switch (locale) {
     case 'pl':

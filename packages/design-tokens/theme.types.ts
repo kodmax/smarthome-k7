@@ -21,6 +21,7 @@ declare module '@mui/material/styles' {
     media: PaletteColor
     news: PaletteColor
     jobs: PaletteColor
+    accentRed: PaletteColor
     surfaceElevated: PaletteColor
     borderStrong: PaletteColor
     cardHeaderBorder: PaletteColor
@@ -35,6 +36,7 @@ declare module '@mui/material/styles' {
     media?: PaletteColor
     news?: PaletteColor
     jobs?: PaletteColor
+    accentRed?: PaletteColor
     surfaceElevated?: PaletteColor
     borderStrong?: PaletteColor
     cardHeaderBorder?: PaletteColor

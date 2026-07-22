@@ -294,9 +294,10 @@ export const pl: Translations = {
       applicationComment: 'Komentarz',
       save: 'Zapisz',
       cancel: 'Anuluj',
+      publishedTodayTag: 'nowa',
       filters: {
         label: 'Filtr',
-        new: 'Nowe',
+        latest: 'Najnowsze',
         inProgress: 'W trakcie',
         notInterested: 'Nie interesują mnie',
         finished: 'Zakończone',

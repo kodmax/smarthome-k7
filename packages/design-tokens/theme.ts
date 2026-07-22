@@ -97,6 +97,11 @@ const buildPalette = (scheme: SchemeTokens) => {
       main: color.danger,
       contrastText: '#FFFFFF',
     },
+    accentRed: {
+      main: color.accentRed,
+      dark: color.accentRedDark,
+      contrastText: '#FFFFFF',
+    },
     warning: {
       main: color.warning,
       contrastText: '#FFFFFF',

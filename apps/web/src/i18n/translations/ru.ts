@@ -294,9 +294,10 @@ export const ru: Translations = {
       applicationComment: 'Комментарий',
       save: 'Сохранить',
       cancel: 'Отмена',
+      publishedTodayTag: 'новая',
       filters: {
         label: 'Фильтр',
-        new: 'Новые',
+        latest: 'Новейшие',
         inProgress: 'В процессе',
         notInterested: 'Не интересует',
         finished: 'Завершённые',

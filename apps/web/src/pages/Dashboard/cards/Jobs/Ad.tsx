@@ -1,11 +1,13 @@
 import { JobAdWithMeta, JobApplyStatus } from '@repo/types'
 import { FC, Fragment } from 'react'
 import { ApolloTableRow, LinkOpen } from '@/card-components'
+import { useTranslations } from '@/i18n'
 import { AdExpandedEditorRow } from './AdExpandedEditorRow'
 import { AdSalaryCells } from './AdSalaryCells'
 import { AdTitleText } from './AdTitleText'
 import { AdTitleTrailing } from './AdTitleTrailing'
-import { JobTitleCell, JobTitleContent } from './styled'
+import { isPublishedToday } from './formatAppliedDaysAgo'
+import { JobNewTag, JobTitleCell, JobTitleContent } from './styled'
 
 export const Ad: FC<{
   ad: JobAdWithMeta
@@ -17,6 +19,7 @@ export const Ad: FC<{
   onFav: (id: string) => void
   onUnfav: (id: string) => void
 }> = ({ ad, zoom, editMode, expanded, onToggleExpand, onChangeApplicationState, onFav, onUnfav }) => {
+  const { t } = useTranslations()
   const columnCount = zoom ? 4 : 2
 
   return (
@@ -25,6 +28,7 @@ export const Ad: FC<{
         {zoom ? <LinkOpen href={ad.advertUrl} /> : null}
         <JobTitleCell>
           <JobTitleContent>
+            {isPublishedToday(ad.publishedAt) ? <JobNewTag>{t.dashboard.jobs.publishedTodayTag}</JobNewTag> : null}
             <AdTitleText ad={ad} />
             <AdTitleTrailing
               ad={ad}
