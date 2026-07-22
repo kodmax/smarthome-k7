@@ -15,14 +15,24 @@ const CARD_CONTENT_HEIGHT_BUFFER = 2
 export const apolloCardRowHeight = Math.ceil(font.body.size * font.body.lineHeight)
 export const apolloCardContentRowHeight = apolloCardRowHeight + CARD_CONTENT_ROW_SLACK
 
-export const apolloCardContentHeight = (rows: number) =>
-  `${rows * apolloCardContentRowHeight + CARD_CONTENT_PADDING_TOP + CARD_CONTENT_PADDING_BOTTOM + CARD_CONTENT_HEIGHT_BUFFER}px`
+export const apolloCardContentHeightPx = (rows: number, extraHeight = 0) =>
+  rows * apolloCardContentRowHeight +
+  CARD_CONTENT_PADDING_TOP +
+  CARD_CONTENT_PADDING_BOTTOM +
+  CARD_CONTENT_HEIGHT_BUFFER +
+  extraHeight
+
+export const apolloCardContentHeight = (rows: number, extraHeight = 0) =>
+  `${apolloCardContentHeightPx(rows, extraHeight)}px`
 
 export const ApolloCardHeader = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: designTokens.space[2],
+  boxSizing: 'border-box',
+  height: apolloCardHeaderMinHeight,
   minHeight: apolloCardHeaderMinHeight,
+  overflow: 'hidden',
   padding: '12px 12px 12px 16px',
   paddingBottom: designTokens.space[2],
   borderBottom: `${designTokens.borderWidth.hairline}px solid ${theme.vars.palette.cardHeaderBorder.main}`,
@@ -114,13 +124,13 @@ export const ApolloCardBottomFade = styled(Box)(({ theme }) => ({
 }))
 
 export const ApolloCardContent = styled(CardContent, {
-  shouldForwardProp: prop => prop !== 'rows',
-})<{ rows?: number }>(({ rows }) => ({
+  shouldForwardProp: prop => prop !== 'rows' && prop !== 'extraHeight',
+})<{ rows?: number; extraHeight?: number }>(({ rows, extraHeight = 0 }) => ({
   boxSizing: 'border-box',
   overflowY: 'auto',
   fontSize: designTokens.font.body.size,
   WebkitTextSizeAdjust: '100%',
   textSizeAdjust: '100%',
   padding: `${CARD_CONTENT_PADDING_TOP}px ${CARD_CONTENT_PADDING_X}px ${CARD_CONTENT_PADDING_BOTTOM}px`,
-  ...(rows !== undefined ? { height: apolloCardContentHeight(rows) } : {}),
+  ...(rows !== undefined ? { height: apolloCardContentHeight(rows, extraHeight) } : {}),
 }))

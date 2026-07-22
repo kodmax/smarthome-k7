@@ -6,7 +6,16 @@ export {
   apolloCardHintIconStrokeWidth,
   CARD_HINT_ICON_SCALE,
 } from './cardHeaderLayout'
-export { apolloCardContentHeight, apolloCardContentRowHeight, apolloCardRowHeight } from './styled'
+export {
+  apolloCardContentHeight,
+  apolloCardContentHeightPx,
+  apolloCardContentRowHeight,
+  apolloCardRowHeight,
+} from './styled'
+export {
+  apolloCardStackedColumnExtraHeight,
+  type ApolloCardStackedColumnExtraHeightParams,
+} from './apolloCardStackedColumnExtraHeight'
 export { SingleValueCard } from './SingleValueCard/SingleValueCard'
 export type { SingleValueCardProps } from './SingleValueCard/SingleValueCard'
 export * from './ZoomStateProvider'

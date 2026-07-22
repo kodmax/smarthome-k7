@@ -5,6 +5,7 @@ import { useFeed } from '@repo/feed-client'
 import { JobMarketInsightFeed } from '@repo/types'
 import { type FC } from 'react'
 import { useTranslations } from '@/i18n'
+import { jobMarketSalaryHeight } from '../../jobMarketCardLayout'
 import { salaryDistributionAxisTicks, salaryDistributionChartMaxPercent } from './salaryDistributionConfig'
 
 const labelWidth = 108
@@ -23,7 +24,7 @@ export const SalaryDistribution: FC<Record<string, never>> = () => {
       cardId='job-market-salary-distribution'
       title={labels.title}
       icon={PowerIcon}
-      height={13}
+      height={jobMarketSalaryHeight}
       allowZoom={false}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: rowGap }}>

@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material'
+import { Box, Grid } from '@mui/material'
 import { ZoomStateProvider } from '@repo/apollo-card'
 import { JobsIcon, iconStyles } from '@repo/assets'
 import { type FC } from 'react'
@@ -28,34 +28,81 @@ export const JobMarket: FC<Record<string, never>> = () => {
       />
 
       <ZoomStateProvider>
-        <Grid container spacing={3} sx={{ width: '100%' }}>
-          <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
+        <Grid
+          container
+          spacing={3}
+          sx={{
+            display: 'grid',
+            alignItems: 'start',
+            width: '100%',
+            gap: 'var(--Grid-rowSpacing) var(--Grid-columnSpacing)',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, 1fr)',
+              xl: 'repeat(12, 1fr)',
+            },
+            gridTemplateAreas: {
+              xs: `
+                "activeOffers"
+                "newOffers"
+                "medianSalary"
+                "offersWithSalaryRange"
+                "workModeSplit"
+                "permanentEmployment"
+                "popular"
+                "salary"
+                "jobs"
+              `,
+              sm: `
+                "activeOffers newOffers"
+                "medianSalary offersWithSalaryRange"
+                "workModeSplit permanentEmployment"
+                "popular popular"
+                "salary salary"
+                "jobs jobs"
+              `,
+              lg: `
+                "activeOffers newOffers"
+                "medianSalary offersWithSalaryRange"
+                "workModeSplit permanentEmployment"
+                "popular salary"
+                "popular jobs"
+              `,
+              xl: `
+                "activeOffers activeOffers newOffers newOffers medianSalary medianSalary offersWithSalaryRange offersWithSalaryRange workModeSplit workModeSplit permanentEmployment permanentEmployment"
+                "popular popular popular popular salary salary salary salary salary salary salary salary"
+                "popular popular popular popular jobs jobs jobs jobs jobs jobs jobs jobs"
+              `,
+            },
+          }}
+        >
+          <Box sx={{ gridArea: 'activeOffers', minWidth: 0 }}>
             <ActiveOffers />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
+          </Box>
+          <Box sx={{ gridArea: 'newOffers', minWidth: 0 }}>
             <NewOffers />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
+          </Box>
+          <Box sx={{ gridArea: 'medianSalary', minWidth: 0 }}>
             <MedianSalary />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
+          </Box>
+          <Box sx={{ gridArea: 'offersWithSalaryRange', minWidth: 0 }}>
             <OffersWithSalaryRange />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
+          </Box>
+          <Box sx={{ gridArea: 'workModeSplit', minWidth: 0 }}>
             <WorkModeSplit />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, xl: 2 }}>
+          </Box>
+          <Box sx={{ gridArea: 'permanentEmployment', minWidth: 0 }}>
             <PermanentEmployment />
-          </Grid>
-          <Grid size={{ xs: 12, lg: 6, xl: 4 }}>
+          </Box>
+          <Box sx={{ gridArea: 'popular', minWidth: 0 }}>
             <PopularTechnologies />
-          </Grid>
-          <Grid size={{ xs: 12, lg: 6, xl: 6 }}>
+          </Box>
+          <Box sx={{ gridArea: 'salary', minWidth: 0 }}>
             <SalaryDistribution />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6, xl: 4 }}>
+          </Box>
+          <Box sx={{ gridArea: 'jobs', minWidth: 0 }}>
             <Jobs />
-          </Grid>
+          </Box>
         </Grid>
       </ZoomStateProvider>
     </PageWrapper>

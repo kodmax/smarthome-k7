@@ -21,6 +21,7 @@ type BaseCardProps = {
   children: ReactNode
   cardId: string
   height?: number
+  extraHeight?: number
   allowZoom?: boolean
   onZoom?: () => void
   actions?: ReactNode
@@ -30,6 +31,7 @@ type BaseCardProps = {
 
 export const BaseCard: FC<BaseCardProps> = ({
   height = 4,
+  extraHeight = 0,
   children,
   title,
   icon: Icon,
@@ -72,6 +74,7 @@ export const BaseCard: FC<BaseCardProps> = ({
             <ApolloCardContentArea zoom={zoom}>
               <ApolloCardContent
                 rows={zoom ? undefined : height}
+                extraHeight={zoom ? undefined : extraHeight}
                 sx={zoom ? { flex: '1 1 auto', minHeight: 0, overflowY: 'auto' } : undefined}
               >
                 {children}
