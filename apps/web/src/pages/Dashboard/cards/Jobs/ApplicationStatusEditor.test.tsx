@@ -50,12 +50,48 @@ describe('ApplicationStatusEditor', () => {
     expect(screen.getByText('Obecny status')).toBeInTheDocument()
     expect(screen.getByText('Data zaaplikowania')).toBeInTheDocument()
     expect(screen.getByText('Ostatnia zmiana statusu')).toBeInTheDocument()
+    expect(screen.getByText('Wymagane umiejętności')).toBeInTheDocument()
     expect(screen.getAllByText('Zaaplikowane').length).toBeGreaterThan(0)
     expect(screen.getByText('Komentarz')).toBeInTheDocument()
     expect(screen.getByText('Existing note')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Zmień stan' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Zapisz' })).not.toBeInTheDocument()
+  })
+
+  it('shows required skills from the ad', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '6',
+          title: 'Role',
+          requiredSkills: ['TypeScript', 'React', 'shadcn'],
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Wymagane umiejętności')).toBeInTheDocument()
+    expect(screen.getByText('TypeScript')).toBeInTheDocument()
+    expect(screen.getByText('React')).toBeInTheDocument()
+    expect(screen.getByText('shadcn')).toBeInTheDocument()
+  })
+
+  it('shows n/d when the ad has no required skills', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({ id: '7', title: 'Role', requiredSkills: [] })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+      />,
+    )
+
+    const requiredSkillsSection = screen.getByText('Wymagane umiejętności').parentElement
+
+    expect(requiredSkillsSection).toHaveTextContent('n/d')
   })
 
   it('shows n/d when the application has no appliedAt date', () => {

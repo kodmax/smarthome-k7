@@ -289,6 +289,7 @@ export const en: Translations = {
       currentApplicationStatus: 'Current status',
       applicationDate: 'Application date',
       lastStatusChange: 'Last status change',
+      requiredSkills: 'Required skills',
       changeApplicationStatus: 'Change status',
       newApplicationStatus: 'New status',
       applicationComment: 'Comment',

@@ -255,6 +255,7 @@ export type Translations = {
       currentApplicationStatus: string
       applicationDate: string
       lastStatusChange: string
+      requiredSkills: string
       changeApplicationStatus: string
       newApplicationStatus: string
       applicationComment: string

@@ -1,3 +1,5 @@
+export { Tag, TagGroup } from './Tag'
+export type { TagVariant } from './Tag'
 export { default as ApolloDataTable, ApolloTableCell, ApolloTableRow, ApolloValueCell } from './ApolloDataTable'
 export { default as AQI } from './AQI'
 export { ColorIndicator } from './ColorIndication'

@@ -15,6 +15,7 @@ import { JobAdWithMeta, JobApplyStatus } from '@repo/types'
 import { designTokens } from '@repo/design-tokens'
 import { Star } from 'lucide-react'
 import { FC, useEffect, useMemo, useState, type CSSProperties, type SyntheticEvent } from 'react'
+import { Tag, TagGroup } from '@/card-components'
 import { useLocale, useTranslations } from '@/i18n'
 import { ApplyStatusIcon } from './ApplyStatusIcon'
 import { applyStatusTargetOptions } from './applyStatusSelectOptions'
@@ -147,6 +148,22 @@ export const ApplicationStatusEditor: FC<{
               </Typography>
               <Typography>{statusChangedDaysAgo}</Typography>
             </Box>
+          </Box>
+          <Box sx={{ mt: `${designTokens.space[2]}px` }}>
+            <Typography variant='caption' color='text.secondary' display='block'>
+              {labels.requiredSkills}
+            </Typography>
+            {ad.requiredSkills.length > 0 ? (
+              <TagGroup>
+                {ad.requiredSkills.map(skill => (
+                  <Tag key={skill} variant='neutral'>
+                    {skill}
+                  </Tag>
+                ))}
+              </TagGroup>
+            ) : (
+              <Typography variant='body2'>{notApplicable}</Typography>
+            )}
           </Box>
           <Box sx={{ mt: `${designTokens.space[2]}px` }}>
             <Typography variant='caption' color='text.secondary' display='block'>

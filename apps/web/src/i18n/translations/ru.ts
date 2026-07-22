@@ -289,6 +289,7 @@ export const ru: Translations = {
       currentApplicationStatus: 'Текущий статус',
       applicationDate: 'Дата отклика',
       lastStatusChange: 'Последнее изменение статуса',
+      requiredSkills: 'Требуемые навыки',
       changeApplicationStatus: 'Изменить статус',
       newApplicationStatus: 'Новый статус',
       applicationComment: 'Комментарий',

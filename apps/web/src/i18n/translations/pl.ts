@@ -289,6 +289,7 @@ export const pl: Translations = {
       currentApplicationStatus: 'Obecny status',
       applicationDate: 'Data zaaplikowania',
       lastStatusChange: 'Ostatnia zmiana statusu',
+      requiredSkills: 'Wymagane umiejętności',
       changeApplicationStatus: 'Zmień stan',
       newApplicationStatus: 'Nowy status',
       applicationComment: 'Komentarz',
