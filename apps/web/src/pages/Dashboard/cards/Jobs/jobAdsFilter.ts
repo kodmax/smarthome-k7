@@ -1,6 +1,6 @@
 import { JobAdWithMeta, JobApplyStatus, isTerminalApplyStatus } from '@repo/types'
 
-export const JOB_ADS_FILTER_ORDER = ['latest', 'in-progress', 'not-interested', 'finished'] as const
+export const JOB_ADS_FILTER_ORDER = ['latest', 'in-progress', 'not-interested', 'stretch', 'finished'] as const
 
 export type JobAdsFilter = (typeof JOB_ADS_FILTER_ORDER)[number]
 
@@ -13,6 +13,10 @@ export function getJobAdFilterCategory(status: JobApplyStatus): JobAdsFilter {
 
   if (status === 'not-interested') {
     return 'not-interested'
+  }
+
+  if (status === 'unmet-requirements') {
+    return 'stretch'
   }
 
   if (isTerminalApplyStatus(status) || status === 'no-response') {

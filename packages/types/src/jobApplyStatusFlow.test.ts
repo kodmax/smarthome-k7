@@ -13,17 +13,19 @@ describe('jobApplyStatusFlow', () => {
     expect(canTransition('applied', 'applied')).toBe(true)
   })
 
-  it('allows not-applied to applied, not-interested, and unmet-requirements', () => {
+  it('allows not-applied to applied, not-interested, unmet-requirements, and stack-mismatch', () => {
     expect(canTransition('not-applied', 'applied')).toBe(true)
     expect(canTransition('not-applied', 'not-interested')).toBe(true)
     expect(canTransition('not-applied', 'unmet-requirements')).toBe(true)
+    expect(canTransition('not-applied', 'stack-mismatch')).toBe(true)
     expect(canTransition('not-applied', 'withdrawn')).toBe(false)
   })
 
-  it('allows not-interested to not-applied, applied, and unmet-requirements', () => {
+  it('allows not-interested to not-applied, applied, unmet-requirements, and stack-mismatch', () => {
     expect(canTransition('not-interested', 'not-applied')).toBe(true)
     expect(canTransition('not-interested', 'applied')).toBe(true)
     expect(canTransition('not-interested', 'unmet-requirements')).toBe(true)
+    expect(canTransition('not-interested', 'stack-mismatch')).toBe(true)
   })
 
   it('allows applied follow-up statuses', () => {
@@ -42,9 +44,10 @@ describe('jobApplyStatusFlow', () => {
   })
 
   it('lists terminal statuses in order', () => {
-    expect(TERMINAL_APPLY_STATUS_ORDER).toEqual(['rejected', 'offer-accepted', 'withdrawn', 'unmet-requirements'])
+    expect(TERMINAL_APPLY_STATUS_ORDER).toEqual(['rejected', 'offer-accepted', 'withdrawn', 'stack-mismatch'])
     expect(TERMINAL_APPLY_STATUS_ORDER.every(isTerminalApplyStatus)).toBe(true)
     expect(isTerminalApplyStatus('no-response')).toBe(false)
+    expect(isTerminalApplyStatus('unmet-requirements')).toBe(false)
   })
 
   it('lists hidden statuses in order', () => {
@@ -52,9 +55,10 @@ describe('jobApplyStatusFlow', () => {
       'rejected',
       'offer-accepted',
       'withdrawn',
-      'unmet-requirements',
+      'stack-mismatch',
       'not-interested',
       'no-response',
+      'unmet-requirements',
     ])
     expect(HIDDEN_APPLY_STATUS_ORDER.every(isHiddenApplyStatus)).toBe(true)
   })
@@ -63,11 +67,19 @@ describe('jobApplyStatusFlow', () => {
     expect(isHiddenApplyStatus('applied')).toBe(false)
     expect(isHiddenApplyStatus('interview')).toBe(false)
     expect(isHiddenApplyStatus('not-applied')).toBe(false)
+    expect(isHiddenApplyStatus('unmet-requirements')).toBe(true)
   })
 
-  it('blocks transitions from unmet-requirements', () => {
-    expect(availableTargetApplyStatuses('unmet-requirements')).toEqual([])
-    expect(canTransition('unmet-requirements', 'not-applied')).toBe(false)
+  it('allows transitions from unmet-requirements', () => {
+    expect(availableTargetApplyStatuses('unmet-requirements')).toEqual(['not-applied', 'applied', 'stack-mismatch'])
+    expect(canTransition('unmet-requirements', 'not-applied')).toBe(true)
+    expect(canTransition('unmet-requirements', 'applied')).toBe(true)
+    expect(canTransition('unmet-requirements', 'stack-mismatch')).toBe(true)
+  })
+
+  it('blocks transitions from stack-mismatch', () => {
+    expect(availableTargetApplyStatuses('stack-mismatch')).toEqual([])
+    expect(canTransition('stack-mismatch', 'not-applied')).toBe(false)
   })
 
   it('blocks transitions from terminal statuses', () => {

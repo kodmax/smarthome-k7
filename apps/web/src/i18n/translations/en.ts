@@ -300,6 +300,7 @@ export const en: Translations = {
         latest: 'Latest',
         inProgress: 'In progress',
         notInterested: 'Not interested',
+        stretch: 'Skill gap',
         finished: 'Finished',
       },
       workplaceType: {
@@ -312,6 +313,7 @@ export const en: Translations = {
         applied: 'Applied',
         'not-interested': 'Not interested',
         'unmet-requirements': 'Unmet requirements',
+        'stack-mismatch': 'Stack mismatch',
         rejected: 'Rejected',
         'no-response': 'No response',
         interview: 'Interview',

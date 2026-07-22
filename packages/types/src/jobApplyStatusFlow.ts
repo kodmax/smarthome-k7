@@ -3,6 +3,7 @@ export type JobApplyStatus =
   | 'applied'
   | 'not-interested'
   | 'unmet-requirements'
+  | 'stack-mismatch'
   | 'rejected'
   | 'no-response'
   | 'interview'
@@ -16,13 +17,14 @@ export const TERMINAL_APPLY_STATUS_ORDER = [
   'rejected',
   'offer-accepted',
   'withdrawn',
-  'unmet-requirements',
+  'stack-mismatch',
 ] as const satisfies readonly JobApplyStatus[]
 
 export const HIDDEN_APPLY_STATUS_ORDER = [
   ...TERMINAL_APPLY_STATUS_ORDER,
   'not-interested',
   'no-response',
+  'unmet-requirements',
 ] as const satisfies readonly JobApplyStatus[]
 
 const TERMINAL_APPLY_STATUSES = new Set<JobApplyStatus>(TERMINAL_APPLY_STATUS_ORDER)
@@ -36,10 +38,11 @@ const APPLIED_FOLLOW_UP_STATUSES = [
 ] as const satisfies readonly JobApplyStatus[]
 
 const TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
-  'not-applied': ['applied', 'not-interested', 'unmet-requirements'],
+  'not-applied': ['applied', 'not-interested', 'unmet-requirements', 'stack-mismatch'],
   applied: APPLIED_FOLLOW_UP_STATUSES,
-  'not-interested': ['not-applied', 'applied', 'unmet-requirements'],
-  'unmet-requirements': [],
+  'not-interested': ['not-applied', 'applied', 'unmet-requirements', 'stack-mismatch'],
+  'unmet-requirements': ['not-applied', 'applied', 'stack-mismatch'],
+  'stack-mismatch': [],
   rejected: [],
   'no-response': APPLIED_FOLLOW_UP_STATUSES,
   interview: ['rejected', 'withdrawn', 'offer'],

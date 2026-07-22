@@ -5,6 +5,7 @@ const APPLY_STATUSES = new Set<JobApplyStatus>([
   'applied',
   'not-interested',
   'unmet-requirements',
+  'stack-mismatch',
   'rejected',
   'no-response',
   'interview',

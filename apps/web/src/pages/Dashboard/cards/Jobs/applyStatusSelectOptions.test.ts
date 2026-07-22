@@ -4,18 +4,29 @@ import { applyStatusTargetOptions } from './applyStatusSelectOptions'
 describe('applyStatusTargetOptions', () => {
   it('returns no options for terminal statuses', () => {
     expect(applyStatusTargetOptions('rejected')).toEqual([])
+    expect(applyStatusTargetOptions('stack-mismatch')).toEqual([])
   })
 
   it('returns reset transitions from not-interested', () => {
-    expect(applyStatusTargetOptions('not-interested')).toEqual(['not-applied', 'applied', 'unmet-requirements'])
+    expect(applyStatusTargetOptions('not-interested')).toEqual([
+      'not-applied',
+      'applied',
+      'unmet-requirements',
+      'stack-mismatch',
+    ])
   })
 
-  it('returns no transitions from unmet-requirements', () => {
-    expect(applyStatusTargetOptions('unmet-requirements')).toEqual([])
+  it('returns follow-up transitions from unmet-requirements', () => {
+    expect(applyStatusTargetOptions('unmet-requirements')).toEqual(['not-applied', 'applied', 'stack-mismatch'])
   })
 
-  it('includes unmet-requirements from not-applied', () => {
-    expect(applyStatusTargetOptions('not-applied')).toEqual(['applied', 'not-interested', 'unmet-requirements'])
+  it('includes unmet-requirements and stack-mismatch from not-applied', () => {
+    expect(applyStatusTargetOptions('not-applied')).toEqual([
+      'applied',
+      'not-interested',
+      'unmet-requirements',
+      'stack-mismatch',
+    ])
   })
 
   it('returns the same follow-up transitions from no-response as from applied', () => {

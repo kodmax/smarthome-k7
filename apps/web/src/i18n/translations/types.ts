@@ -266,6 +266,7 @@ export type Translations = {
         latest: string
         inProgress: string
         notInterested: string
+        stretch: string
         finished: string
       }
       workplaceType: {
@@ -278,6 +279,7 @@ export type Translations = {
         applied: string
         'not-interested': string
         'unmet-requirements': string
+        'stack-mismatch': string
         rejected: string
         'no-response': string
         interview: string
