@@ -83,7 +83,7 @@ export const pl: Translations = {
       },
     },
     popularTechnologies: {
-      title: 'Najpopularniejsze technologie',
+      title: 'Technologie w P90',
       editExperience: 'Edytuj doświadczenie',
       experienceLevelLabel: 'Moje doświadczenie',
       experienceLevelPlaceholder: 'Wybierz poziom',

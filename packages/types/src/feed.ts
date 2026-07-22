@@ -370,6 +370,7 @@ export type JobMarketInsightMetrics = {
   newOffersCount: number
   medianSalary: number
   p90Salary: number
+  p90OffersCount: number
   offersWithSalaryRangePercent: number
   remoteWorkPercent: number
   permanentEmploymentPercent: number
@@ -387,6 +388,7 @@ export type JobMarketInsightFeed = {
   newOffersCount: JobMarketChangeMetric
   medianSalary: JobMarketChangeMetric
   p90Salary: JobMarketChangeMetric
+  p90OffersCount: JobMarketChangeMetric
   offersWithSalaryRangePercent: JobMarketChangeMetric
   remoteWorkPercent: JobMarketChangeMetric
   permanentEmploymentPercent: JobMarketChangeMetric

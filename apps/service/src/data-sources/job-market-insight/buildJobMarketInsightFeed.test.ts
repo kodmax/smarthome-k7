@@ -21,7 +21,7 @@ describe('buildJobMarketInsightFeed', () => {
   it('builds all aggregation values from ads', () => {
     const feed = buildJobMarketInsightFeed([
       makeAd(),
-      makeAd({ id: '2', requiredSkills: ['TypeScript'], workplaceType: 'office' }),
+      makeAd({ id: '2', requiredSkills: ['React'], workplaceType: 'office' }),
     ])
 
     expect(feed.adsCount).toBe(2)

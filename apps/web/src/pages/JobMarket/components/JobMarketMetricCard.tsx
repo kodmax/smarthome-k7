@@ -1,6 +1,6 @@
 import { type StyledLucideIcon } from '@repo/assets'
 import { SingleValueCard } from '@repo/apollo-card'
-import { type FC } from 'react'
+import { type FC, type ReactNode } from 'react'
 import { useTranslations } from '@/i18n'
 import {
   type JobMarketMetricVariant,
@@ -17,6 +17,7 @@ export type JobMarketMetricCardProps = {
   value?: number
   previous?: number | null
   variant: JobMarketMetricVariant
+  headingInfo?: ReactNode
 }
 
 const changeToneColor = (tone: ReturnType<typeof getChangeTone>): string => {
@@ -37,6 +38,7 @@ export const JobMarketMetricCard: FC<JobMarketMetricCardProps> = ({
   value,
   previous,
   variant,
+  headingInfo,
 }) => {
   const { t } = useTranslations()
   const hasChange = value !== undefined && previous != null
@@ -51,6 +53,7 @@ export const JobMarketMetricCard: FC<JobMarketMetricCardProps> = ({
       secondary={hasChange ? formatMetricChange(value, previous, variant) : '--'}
       secondaryColor={changeToneColor(getChangeTone(changeAbsolute))}
       tertiary={t.jobMarket.summary.vsPreviousPeriod}
+      headingInfo={headingInfo}
     />
   )
 }
