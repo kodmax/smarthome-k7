@@ -268,7 +268,7 @@ export type Translations = {
       company: string
       currentApplicationStatus: string
       applicationDate: string
-      lastStatusChange: string
+      rejectionDate: string
       requiredSkills: string
       changeApplicationStatus: string
       newApplicationStatus: string

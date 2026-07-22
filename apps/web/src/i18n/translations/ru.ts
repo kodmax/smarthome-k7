@@ -302,7 +302,7 @@ export const ru: Translations = {
       company: 'Компания',
       currentApplicationStatus: 'Текущий статус',
       applicationDate: 'Дата отклика',
-      lastStatusChange: 'Последнее изменение статуса',
+      rejectionDate: 'Дата отказа',
       requiredSkills: 'Требуемые навыки',
       changeApplicationStatus: 'Изменить статус',
       newApplicationStatus: 'Новый статус',

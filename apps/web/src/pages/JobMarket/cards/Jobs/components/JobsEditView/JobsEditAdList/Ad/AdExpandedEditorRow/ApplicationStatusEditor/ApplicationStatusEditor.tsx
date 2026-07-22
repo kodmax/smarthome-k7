@@ -37,8 +37,10 @@ export const ApplicationStatusEditor: FC<{
   const { locale } = useLocale()
   const labels = t.dashboard.jobs
   const currentStatus = ad.meta.application.status
+  const rejectedAt = ad.meta.application.rejectedAt
+  const showRejectionDate = rejectedAt !== null
   const appliedDaysAgo = formatAppliedDaysAgo(ad.meta.application.appliedAt, locale)
-  const statusChangedDaysAgo = formatAppliedDaysAgo(ad.meta.application.statusChangedAt ?? null, locale)
+  const rejectedDaysAgo = formatAppliedDaysAgo(rejectedAt, locale)
   const notApplicable = formatNotApplicable(locale)
   const [isChangingStatus, setIsChangingStatus] = useState(false)
   const [nextStatus, setNextStatus] = useState<JobApplyStatus | typeof emptyNextStatus>(emptyNextStatus)
@@ -150,12 +152,14 @@ export const ApplicationStatusEditor: FC<{
               </Typography>
               <Typography>{appliedDaysAgo}</Typography>
             </Box>
-            <Box>
-              <Typography variant='caption' color='text.secondary' display='block'>
-                {labels.lastStatusChange}
-              </Typography>
-              <Typography>{statusChangedDaysAgo}</Typography>
-            </Box>
+            {showRejectionDate ? (
+              <Box>
+                <Typography variant='caption' color='text.secondary' display='block'>
+                  {labels.rejectionDate}
+                </Typography>
+                <Typography>{rejectedDaysAgo}</Typography>
+              </Box>
+            ) : null}
           </Box>
           <Box sx={{ mt: `${designTokens.space[2]}px` }}>
             <Typography variant='caption' color='text.secondary' display='block'>

@@ -15,6 +15,7 @@ describe('applicationMeta', () => {
       applyStatus: 'applied',
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
+      rejectedAt: null,
     })
 
     expect(
@@ -23,6 +24,7 @@ describe('applicationMeta', () => {
           applyStatus: 'applied',
           comment: null,
           appliedAt: '2026-07-19T12:00:00.000Z',
+          rejectedAt: null,
         },
         { applyStatus: 'interview' },
         now,
@@ -31,6 +33,47 @@ describe('applicationMeta', () => {
       applyStatus: 'interview',
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
+      rejectedAt: null,
+    })
+  })
+
+  it('sets rejectedAt on transition to rejected and preserves it on comment-only updates', () => {
+    const now = new Date('2026-07-19T12:00:00.000Z')
+
+    expect(
+      applyStatusChange(
+        {
+          applyStatus: 'applied',
+          comment: null,
+          appliedAt: '2026-07-18T12:00:00.000Z',
+          rejectedAt: null,
+        },
+        { applyStatus: 'rejected' },
+        now,
+      ),
+    ).toEqual({
+      applyStatus: 'rejected',
+      comment: null,
+      appliedAt: '2026-07-18T12:00:00.000Z',
+      rejectedAt: '2026-07-19T12:00:00.000Z',
+    })
+
+    expect(
+      applyStatusChange(
+        {
+          applyStatus: 'rejected',
+          comment: null,
+          appliedAt: '2026-07-18T12:00:00.000Z',
+          rejectedAt: '2026-07-19T12:00:00.000Z',
+        },
+        { applyStatus: 'rejected', comment: 'No fit' },
+        new Date('2026-07-20T12:00:00.000Z'),
+      ),
+    ).toEqual({
+      applyStatus: 'rejected',
+      comment: 'No fit',
+      appliedAt: '2026-07-18T12:00:00.000Z',
+      rejectedAt: '2026-07-19T12:00:00.000Z',
     })
   })
 
@@ -41,6 +84,7 @@ describe('applicationMeta', () => {
           applyStatus: 'applied',
           comment: null,
           appliedAt: '2026-07-19T12:00:00.000Z',
+          rejectedAt: null,
         },
         { applyStatus: 'applied', comment: 'Follow-up sent' },
       ),
@@ -48,6 +92,7 @@ describe('applicationMeta', () => {
       applyStatus: 'applied',
       comment: 'Follow-up sent',
       appliedAt: '2026-07-19T12:00:00.000Z',
+      rejectedAt: null,
     })
   })
 
@@ -65,6 +110,7 @@ describe('applicationMeta', () => {
       applyStatus: 'unmet-requirements',
       comment: 'React',
       appliedAt: null,
+      rejectedAt: null,
     })
   })
 
@@ -75,6 +121,7 @@ describe('applicationMeta', () => {
           applyStatus: 'applied',
           comment: 'Old note',
           appliedAt: '2026-07-19T12:00:00.000Z',
+          rejectedAt: null,
         },
         { applyStatus: 'interview' },
       ),
@@ -82,6 +129,7 @@ describe('applicationMeta', () => {
       applyStatus: 'interview',
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
+      rejectedAt: null,
     })
   })
 
@@ -92,6 +140,7 @@ describe('applicationMeta', () => {
           applyStatus: 'applied',
           comment: 'Old note',
           appliedAt: '2026-07-19T12:00:00.000Z',
+          rejectedAt: null,
         },
         { applyStatus: 'applied', comment: '' },
       ),
@@ -99,6 +148,7 @@ describe('applicationMeta', () => {
       applyStatus: 'applied',
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
+      rejectedAt: null,
     })
   })
 
@@ -114,6 +164,23 @@ describe('applicationMeta', () => {
       applyStatus: 'not-interested',
       comment: 'Not for me',
       appliedAt: null,
+      rejectedAt: null,
+    })
+  })
+
+  it('parses rejectedAt from stored application meta', () => {
+    expect(
+      parseApplicationMeta({
+        applyStatus: 'rejected',
+        comment: null,
+        appliedAt: '2026-07-18T12:00:00.000Z',
+        rejectedAt: '2026-07-19T12:00:00.000Z',
+      }),
+    ).toEqual({
+      applyStatus: 'rejected',
+      comment: null,
+      appliedAt: '2026-07-18T12:00:00.000Z',
+      rejectedAt: '2026-07-19T12:00:00.000Z',
     })
   })
 

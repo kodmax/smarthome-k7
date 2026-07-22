@@ -302,7 +302,7 @@ export const en: Translations = {
       company: 'Company',
       currentApplicationStatus: 'Current status',
       applicationDate: 'Application date',
-      lastStatusChange: 'Last status change',
+      rejectionDate: 'Rejection date',
       requiredSkills: 'Required skills',
       changeApplicationStatus: 'Change status',
       newApplicationStatus: 'New status',

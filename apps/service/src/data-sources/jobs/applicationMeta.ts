@@ -20,6 +20,7 @@ export function emptyApplicationMeta(): JobAdApplicationMeta {
     applyStatus: DEFAULT_JOB_APPLY_STATUS,
     comment: null,
     appliedAt: null,
+    rejectedAt: null,
   }
 }
 
@@ -57,6 +58,7 @@ export function parseApplicationMeta(value: unknown): JobAdApplicationMeta | nul
     applyStatus: record.applyStatus,
     comment: parseOptionalComment(record.comment),
     appliedAt: parseOptionalTimestamp(record.appliedAt),
+    rejectedAt: parseOptionalTimestamp(record.rejectedAt),
   }
 }
 
@@ -110,6 +112,7 @@ export function applyStatusChange(
     applyStatus: to,
     comment: comment !== undefined ? comment || null : null,
     appliedAt: current.appliedAt,
+    rejectedAt: to === 'rejected' ? (current.rejectedAt ?? now.toISOString()) : null,
   }
 
   if (to === 'applied' && next.appliedAt === null) {

@@ -34,6 +34,56 @@ describe('ApplicationStatusEditor', () => {
     expect(onUnfav).not.toHaveBeenCalled()
   })
 
+  it('shows rejection date when rejectedAt is set, even after archiving', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '9',
+          title: 'Role',
+          meta: {
+            application: {
+              status: 'archived',
+              appliedAt: '2026-07-07T20:59:24.000Z',
+              rejectedAt: '2026-07-20T06:27:50.000Z',
+              statusChangedAt: '2026-07-22T20:55:49.000Z',
+            },
+          },
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Data zaaplikowania')).toBeInTheDocument()
+    expect(screen.getByText('Data odrzucenia')).toBeInTheDocument()
+    expect(screen.queryByText('Ostatnia zmiana')).not.toBeInTheDocument()
+  })
+
+  it('does not show rejection date when rejectedAt is missing', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '10',
+          title: 'Role',
+          meta: {
+            application: {
+              status: 'applied',
+              appliedAt: '2026-07-16T08:00:00.000Z',
+              rejectedAt: null,
+              statusChangedAt: '2026-07-18T08:00:00.000Z',
+            },
+          },
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByText('Data odrzucenia')).not.toBeInTheDocument()
+  })
+
   it('shows read-only application details until change status is clicked', () => {
     renderWithTheme(
       <ApplicationStatusEditor
@@ -59,7 +109,6 @@ describe('ApplicationStatusEditor', () => {
     expect(screen.getByText('Acme Corp')).toBeInTheDocument()
     expect(screen.getByText('Obecny status')).toBeInTheDocument()
     expect(screen.getByText('Data zaaplikowania')).toBeInTheDocument()
-    expect(screen.getByText('Ostatnia zmiana statusu')).toBeInTheDocument()
     expect(screen.getByText('Wymagane umiejętności')).toBeInTheDocument()
     expect(screen.getAllByText('Zaaplikowane').length).toBeGreaterThan(0)
     expect(screen.getByText('Komentarz')).toBeInTheDocument()
@@ -140,8 +189,7 @@ describe('ApplicationStatusEditor', () => {
       />,
     )
 
-    expect(screen.getByText('Ostatnia zmiana statusu')).toBeInTheDocument()
-    expect(screen.getAllByText('n/d').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getAllByText('n/d').length).toBeGreaterThanOrEqual(1)
   })
 
   it('reveals edit controls after clicking change status', () => {

@@ -301,12 +301,14 @@ export type JobAdApplicationMeta = {
   applyStatus: JobApplyStatus
   comment: string | null
   appliedAt: string | null
+  rejectedAt: string | null
 }
 
 export type JobAdApplication = {
   status: JobApplyStatus
   comment: string | null
   appliedAt: string | null
+  rejectedAt: string | null
   statusChangedAt: string | null
 }
 
@@ -412,6 +414,7 @@ export function emptyJobAdApplication(): JobAdApplication {
     status: DEFAULT_JOB_APPLY_STATUS,
     comment: null,
     appliedAt: null,
+    rejectedAt: null,
     statusChangedAt: null,
   }
 }
@@ -431,6 +434,7 @@ export function jobAdApplicationFromMeta(
     status: meta.applyStatus,
     comment: meta.comment,
     appliedAt: meta.appliedAt,
+    rejectedAt: meta.rejectedAt,
     statusChangedAt,
   }
 }
@@ -440,6 +444,7 @@ export function jobAdApplicationMetaFromApplication(application: JobAdApplicatio
     applyStatus: application.status,
     comment: application.comment,
     appliedAt: application.appliedAt,
+    rejectedAt: application.rejectedAt,
   }
 }
 
