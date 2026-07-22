@@ -130,12 +130,12 @@ class DataSource<T, TCache = T> {
     this.vent.emit('data-update', this.definition.getId())
   }
 
-  public isCacheFresh(): boolean {
+  public async isCacheFresh(): Promise<boolean> {
     if (this.definition.getCacheTTL() <= 0) {
       return false
     }
 
-    const snapshot = this.cacheEntry.getSnapshot()
+    const snapshot = await this.cacheEntry.getSnapshot()
     if (snapshot === null) {
       return false
     }
@@ -148,7 +148,7 @@ class DataSource<T, TCache = T> {
   }
 
   public async getRecentContent(): Promise<T> {
-    const snapshot = this.cacheEntry.getSnapshot()
+    const snapshot = await this.cacheEntry.getSnapshot()
     if (snapshot === null) {
       throw new NoRecentContent()
     }
@@ -159,10 +159,10 @@ class DataSource<T, TCache = T> {
   public async getData(forceRefresh = false): Promise<T> {
     if (this.updating) {
       return this.updating
-    } else if (!forceRefresh && this.isCacheFresh()) {
+    } else if (!forceRefresh && this.definition.getCacheTTL() > 0 && (await this.isCacheFresh())) {
       this.vent.emit('sys-log', 7, `Cache hit on data source <${this.definition.getId()}>`)
 
-      const snapshot = this.cacheEntry.getSnapshot()
+      const snapshot = await this.cacheEntry.getSnapshot()
       return this.definition.composeContent(snapshot!.getContent())
     } else {
       this.updating = new Promise((resolve, reject) => {

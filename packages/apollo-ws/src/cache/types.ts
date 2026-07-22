@@ -21,7 +21,7 @@ export type CacheOptions = {
 
 export interface CacheEntry<T> {
   write(data: T): Promise<T>
-  getSnapshot(): Snapshot<T> | null
+  getSnapshot(): Promise<Snapshot<T> | null>
 }
 
 export interface Cache {

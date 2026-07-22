@@ -1,5 +1,6 @@
 import { CorruptCacheError } from '../Errors'
 import { RedisCacheEntry } from './RedisCacheEntry'
+import { VolatileCacheEntry } from './VolatileCacheEntry'
 import { isExpired } from './ttl'
 import type { Cache, CacheEntry, CacheOptions } from './types'
 import type { RedisClient } from './RedisClient'
@@ -19,7 +20,7 @@ class RedisCache implements Cache {
     const ttlMs = options?.ttlMs
 
     if (id === undefined) {
-      return new RedisCacheEntry<T>(this.redis, undefined, { timestamp: new Date().getTime() }, ttlMs)
+      return new VolatileCacheEntry<T>({ timestamp: new Date().getTime() }, ttlMs)
     }
 
     const key = this.key(id)
@@ -27,7 +28,7 @@ class RedisCache implements Cache {
     try {
       const raw = await this.redis.get(key)
       if (raw === null) {
-        return new RedisCacheEntry<T>(this.redis, key, { timestamp: new Date().getTime() }, ttlMs)
+        return new RedisCacheEntry<T>(this.redis, key, id, ttlMs)
       }
 
       const payload = JSON.parse(raw) as RedisCachePayload<T>
@@ -35,18 +36,10 @@ class RedisCache implements Cache {
       if (isExpired(payload.timestamp, ttlMs)) {
         await this.redis.del(key)
 
-        return new RedisCacheEntry<T>(this.redis, key, { timestamp: new Date().getTime() }, ttlMs)
+        return new RedisCacheEntry<T>(this.redis, key, id, ttlMs)
       }
 
-      return new RedisCacheEntry<T>(
-        this.redis,
-        key,
-        {
-          timestamp: payload.timestamp,
-          content: payload.content,
-        },
-        ttlMs,
-      )
+      return new RedisCacheEntry<T>(this.redis, key, id, ttlMs)
     } catch (e) {
       if (e instanceof SyntaxError) {
         throw new CorruptCacheError(id, e)

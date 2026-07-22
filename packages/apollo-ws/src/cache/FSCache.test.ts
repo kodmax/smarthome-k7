@@ -26,7 +26,7 @@ describe('FSCache', () => {
 
     const entry = await cache.getEntry<{ value: number }>('missing')
 
-    expect(entry.getSnapshot()).toBeNull()
+    expect(await entry.getSnapshot()).toBeNull()
   })
 
   it('persists and reloads content from disk', async () => {
@@ -37,21 +37,21 @@ describe('FSCache', () => {
 
     const reloaded = await cache.getEntry<{ value: number }>('persisted', { ttlMs: Number.MAX_SAFE_INTEGER })
 
-    expect(reloaded.getSnapshot()?.getContent()).toEqual({ value: 42 })
+    expect((await reloaded.getSnapshot())?.getContent()).toEqual({ value: 42 })
   })
 
-  it('does not write files for volatile entries', async () => {
+  it('returns VolatileCacheEntry when source id is missing', async () => {
     const cache = createCache()
     const dir = cacheDirs[cacheDirs.length - 1]
 
     const entry = await cache.getEntry<{ value: number }>(undefined)
     await entry.write({ value: 1 })
 
-    expect(existsSync(join(dir, 'undefined.json'))).toBe(false)
+    expect((await entry.getSnapshot())?.getContent()).toEqual({ value: 1 })
     expect(readdirSync(dir)).toHaveLength(0)
   })
 
-  it('serves volatile snapshot from memory and expires without touching disk', async () => {
+  it('expires volatile entry without touching disk', async () => {
     vi.useFakeTimers()
     const cache = createCache()
     const dir = cacheDirs[cacheDirs.length - 1]
@@ -59,13 +59,12 @@ describe('FSCache', () => {
     const entry = await cache.getEntry<{ value: number }>(undefined, { ttlMs: 1000 })
     await entry.write({ value: 1 })
 
-    expect(entry.getSnapshot()?.getContent()).toEqual({ value: 1 })
-    expect(readdirSync(dir)).toHaveLength(0)
-
     vi.advanceTimersByTime(1001)
 
-    expect(entry.getSnapshot()).toBeNull()
+    expect(await entry.getSnapshot()).toBeNull()
     expect(readdirSync(dir)).toHaveLength(0)
+
+    vi.useRealTimers()
   })
 
   it('throws CorruptCacheError for invalid JSON on disk', async () => {
@@ -89,7 +88,7 @@ describe('FSCache', () => {
 
     vi.advanceTimersByTime(1001)
 
-    expect(entry.getSnapshot()).toBeNull()
+    expect(await entry.getSnapshot()).toBeNull()
     expect(existsSync(join(dir, 'expiring.json'))).toBe(false)
   })
 
@@ -104,7 +103,7 @@ describe('FSCache', () => {
 
     const entry = await cache.getEntry<{ value: number }>('stale', { ttlMs: 60_000 })
 
-    expect(entry.getSnapshot()).toBeNull()
+    expect(await entry.getSnapshot()).toBeNull()
     expect(existsSync(filePath)).toBe(false)
   })
 })

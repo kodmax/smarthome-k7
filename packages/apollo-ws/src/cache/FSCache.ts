@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import { isFileSystemError } from '../fs-error'
 import { CorruptCacheError } from '../Errors'
 import { FSCacheEntry } from './FSCacheEntry'
+import { VolatileCacheEntry } from './VolatileCacheEntry'
 import { isExpired } from './ttl'
 import type { Cache, CacheEntry, CacheOptions } from './types'
 
@@ -19,7 +20,7 @@ class FSCache implements Cache {
     const ttlMs = options?.ttlMs
 
     if (id === undefined) {
-      return new FSCacheEntry<T>(this.path, { timestamp: new Date().getTime() }, id, ttlMs)
+      return new VolatileCacheEntry<T>({ timestamp: new Date().getTime() }, ttlMs)
     }
 
     const filePath = path.resolve(this.path, `${id}.json`)
@@ -32,21 +33,15 @@ class FSCache implements Cache {
       if (isExpired(timestamp, ttlMs)) {
         await this.deleteFile(filePath)
 
-        return new FSCacheEntry<T>(this.path, { timestamp: new Date().getTime() }, id, ttlMs)
+        return new FSCacheEntry<T>(this.path, id, ttlMs)
       }
 
-      return new FSCacheEntry<T>(
-        this.path,
-        {
-          content: JSON.parse(content),
-          timestamp,
-        },
-        id,
-        ttlMs,
-      )
+      JSON.parse(content)
+
+      return new FSCacheEntry<T>(this.path, id, ttlMs)
     } catch (e) {
       if (isFileSystemError(e) && e.code === 'ENOENT') {
-        return new FSCacheEntry<T>(this.path, { timestamp: new Date().getTime() }, id, ttlMs)
+        return new FSCacheEntry<T>(this.path, id, ttlMs)
       }
 
       if (e instanceof SyntaxError) {

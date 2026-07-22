@@ -1,54 +1,63 @@
+import { CorruptCacheError } from '../Errors'
 import { Snapshot } from './Snapshot'
 import type { RedisClient } from './RedisClient'
 import { isExpired } from './ttl'
-import type { CacheEntry, SnapshotContent } from './types'
+import type { CacheEntry } from './types'
+
+type RedisCachePayload<T> = {
+  timestamp: number
+  content: T
+}
 
 class RedisCacheEntry<T> implements CacheEntry<T> {
   public constructor(
     private readonly redis: RedisClient,
-    private readonly key: string | undefined,
-    private readonly snapshot: SnapshotContent<T>,
+    private readonly key: string,
+    private readonly sourceId: string,
     private readonly ttlMs?: number,
   ) {}
 
   public async write(data: T): Promise<T> {
-    this.snapshot.timestamp = new Date().getTime()
-    this.snapshot.content = data
+    const timestamp = new Date().getTime()
+    const payload = JSON.stringify({ timestamp, content: data })
 
-    if (this.key !== undefined) {
-      const payload = JSON.stringify({ timestamp: this.snapshot.timestamp, content: data })
-
-      if (this.ttlMs !== undefined && this.ttlMs > 0) {
-        await this.redis.set(this.key, payload, { EX: Math.ceil(this.ttlMs / 1000) })
-      } else {
-        await this.redis.set(this.key, payload)
-      }
+    if (this.ttlMs !== undefined && this.ttlMs > 0) {
+      await this.redis.set(this.key, payload, { EX: Math.ceil(this.ttlMs / 1000) })
+    } else {
+      await this.redis.set(this.key, payload)
     }
 
     return data
   }
 
-  public getSnapshot(): Snapshot<T> | null {
-    if (this.snapshot.content === undefined) {
-      return null
-    }
+  public async getSnapshot(): Promise<Snapshot<T> | null> {
+    try {
+      const raw = await this.redis.get(this.key)
+      if (raw === null) {
+        return null
+      }
 
-    if (isExpired(this.snapshot.timestamp, this.ttlMs)) {
-      return this.expire()
-    }
+      const payload = JSON.parse(raw) as RedisCachePayload<T>
 
-    return new Snapshot({
-      timestamp: this.snapshot.timestamp,
-      content: this.snapshot.content,
-    })
+      if (isExpired(payload.timestamp, this.ttlMs)) {
+        return this.expire()
+      }
+
+      return new Snapshot({
+        timestamp: payload.timestamp,
+        content: payload.content,
+      })
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        throw new CorruptCacheError(this.sourceId, e)
+      }
+
+      throw e
+    }
   }
 
-  private expire(): null {
-    this.snapshot.content = undefined
-
-    if (this.key !== undefined) {
-      void this.redis.del(this.key)
-    }
+  private async expire(): Promise<null> {
+    await this.redis.del(this.key)
 
     return null
   }

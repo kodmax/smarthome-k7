@@ -40,7 +40,7 @@ describe('RedisCache', () => {
 
     const entry = await cache.getEntry<{ value: number }>('missing')
 
-    expect(entry.getSnapshot()).toBeNull()
+    expect(await entry.getSnapshot()).toBeNull()
   })
 
   it('persists and reloads content from redis', async () => {
@@ -52,7 +52,7 @@ describe('RedisCache', () => {
 
     const reloaded = await cache.getEntry<{ value: number }>('persisted', { ttlMs: Number.MAX_SAFE_INTEGER })
 
-    expect(reloaded.getSnapshot()?.getContent()).toEqual({ value: 42 })
+    expect((await reloaded.getSnapshot())?.getContent()).toEqual({ value: 42 })
     expect(JSON.parse(stores[0].get('apollo-ws:cache:persisted')!)).toMatchObject({ content: { value: 42 } })
   })
 
@@ -80,7 +80,7 @@ describe('RedisCache', () => {
     expect(setCalls[0][0].options).toBeUndefined()
   })
 
-  it('does not write keys for volatile entries', async () => {
+  it('returns VolatileCacheEntry when source id is missing', async () => {
     const redis = createMockRedis()
     const cache = createCache(redis)
     const store = stores[0]
@@ -88,25 +88,25 @@ describe('RedisCache', () => {
     const entry = await cache.getEntry<{ value: number }>(undefined)
     await entry.write({ value: 1 })
 
+    expect((await entry.getSnapshot())?.getContent()).toEqual({ value: 1 })
     expect(store.size).toBe(0)
+    expect(setCalls[0]).toHaveLength(0)
   })
 
-  it('serves volatile snapshot from memory and expires without touching redis', async () => {
+  it('expires volatile entry without touching redis', async () => {
     vi.useFakeTimers()
     const cache = createCache()
 
     const entry = await cache.getEntry<{ value: number }>(undefined, { ttlMs: 1000 })
     await entry.write({ value: 1 })
 
-    expect(entry.getSnapshot()?.getContent()).toEqual({ value: 1 })
-    expect(stores[0].size).toBe(0)
-    expect(setCalls[0]).toHaveLength(0)
-
     vi.advanceTimersByTime(1001)
 
-    expect(entry.getSnapshot()).toBeNull()
+    expect(await entry.getSnapshot()).toBeNull()
     expect(stores[0].size).toBe(0)
     expect(setCalls[0]).toHaveLength(0)
+
+    vi.useRealTimers()
   })
 
   it('throws CorruptCacheError for invalid JSON in redis', async () => {
@@ -126,7 +126,7 @@ describe('RedisCache', () => {
 
     vi.advanceTimersByTime(1001)
 
-    expect(entry.getSnapshot()).toBeNull()
+    expect(await entry.getSnapshot()).toBeNull()
     expect(stores[0].has('apollo-ws:cache:expiring')).toBe(false)
   })
 
@@ -140,7 +140,7 @@ describe('RedisCache', () => {
 
     const entry = await cache.getEntry<{ value: number }>('stale', { ttlMs: 60_000 })
 
-    expect(entry.getSnapshot()).toBeNull()
+    expect(await entry.getSnapshot()).toBeNull()
     expect(stores[0].has('apollo-ws:cache:stale')).toBe(false)
   })
 })

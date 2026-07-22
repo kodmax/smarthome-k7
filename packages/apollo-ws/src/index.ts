@@ -1,5 +1,5 @@
 export { DataSourceDefinition, DataSourceDefinitionClass, AnyDataSourceDefinitionClass, DataSource } from './DataSource'
-export { FSCache, FSCacheEntry, RedisCache, RedisCacheEntry, CacheAgeUnit } from './cache'
+export { FSCache, FSCacheEntry, RedisCache, RedisCacheEntry, VolatileCacheEntry, CacheAgeUnit } from './cache'
 export type { Cache, CacheEntry, RedisClient } from './cache'
 export { ApolloEvents } from './ApolloEvents'
 export type { ApolloEventMap } from './ApolloEvents'
