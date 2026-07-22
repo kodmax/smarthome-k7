@@ -1,0 +1,1 @@
+export { AdSalaryCells } from './AdSalaryCells'

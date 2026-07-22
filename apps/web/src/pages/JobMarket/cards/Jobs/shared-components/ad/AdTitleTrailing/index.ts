@@ -1,0 +1,1 @@
+export { AdTitleTrailing } from './AdTitleTrailing'
