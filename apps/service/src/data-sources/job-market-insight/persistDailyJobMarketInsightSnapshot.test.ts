@@ -8,6 +8,7 @@ const metrics: JobMarketInsightMetrics = {
   adsCount: 1,
   newOffersCount: 2,
   medianSalary: 3,
+  p90Salary: 3.5,
   offersWithSalaryRangePercent: 4,
   remoteWorkPercent: 5,
   permanentEmploymentPercent: 6,

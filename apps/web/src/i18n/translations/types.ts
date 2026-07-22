@@ -60,6 +60,7 @@ export type Translations = {
       activeOffers: string
       newOffers: string
       medianSalary: string
+      p90Salary: string
       offersWithSalaryRange: string
       workModeSplit: string
       permanentEmployment: string

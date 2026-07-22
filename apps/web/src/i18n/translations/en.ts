@@ -62,6 +62,7 @@ export const en: Translations = {
       activeOffers: 'Active listings',
       newOffers: 'New listings',
       medianSalary: 'Median',
+      p90Salary: 'P90',
       offersWithSalaryRange: 'Ranges',
       workModeSplit: 'Remote work',
       permanentEmployment: 'Permanent',

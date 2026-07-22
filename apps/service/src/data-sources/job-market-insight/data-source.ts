@@ -52,6 +52,7 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
       adsCount: { value: cached.adsCount, previous: previous?.adsCount ?? null },
       newOffersCount: { value: cached.newOffersCount, previous: previous?.newOffersCount ?? null },
       medianSalary: { value: cached.medianSalary, previous: previous?.medianSalary ?? null },
+      p90Salary: { value: cached.p90Salary, previous: previous?.p90Salary ?? null },
       offersWithSalaryRangePercent: {
         value: cached.offersWithSalaryRangePercent,
         previous: previous?.offersWithSalaryRangePercent ?? null,

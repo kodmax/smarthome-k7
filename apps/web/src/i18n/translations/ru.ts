@@ -62,6 +62,7 @@ export const ru: Translations = {
       activeOffers: 'Активные вакансии',
       newOffers: 'Новые вакансии',
       medianSalary: 'Медиана',
+      p90Salary: 'P90',
       offersWithSalaryRange: 'Вилки',
       workModeSplit: 'Удалённая работа',
       permanentEmployment: 'ТК',

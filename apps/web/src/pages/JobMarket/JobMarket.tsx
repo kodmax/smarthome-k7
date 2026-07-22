@@ -7,8 +7,8 @@ import { PageWrapper } from '@/app/components/PageWrapper'
 import { useTranslations } from '@/i18n'
 import { ActiveOffers } from './cards/ActiveOffers/ActiveOffers'
 import { MedianSalary } from './cards/MedianSalary/MedianSalary'
+import { P90Salary } from './cards/P90Salary/P90Salary'
 import { NewOffers } from './cards/NewOffers/NewOffers'
-import { OffersWithSalaryRange } from './cards/OffersWithSalaryRange/OffersWithSalaryRange'
 import { PermanentEmployment } from './cards/PermanentEmployment/PermanentEmployment'
 import { WorkModeSplit } from './cards/WorkModeSplit/WorkModeSplit'
 import { PopularTechnologies } from './cards/PopularTechnologies/PopularTechnologies'
@@ -86,7 +86,7 @@ export const JobMarket: FC<Record<string, never>> = () => {
             <MedianSalary />
           </Box>
           <Box sx={{ gridArea: 'offersWithSalaryRange', minWidth: 0 }}>
-            <OffersWithSalaryRange />
+            <P90Salary />
           </Box>
           <Box sx={{ gridArea: 'workModeSplit', minWidth: 0 }}>
             <WorkModeSplit />
