@@ -1,6 +1,13 @@
 import { JobAdWithMeta, JobApplyStatus, isTerminalApplyStatus } from '@repo/types'
 
-export const JOB_ADS_FILTER_ORDER = ['latest', 'in-progress', 'not-interested', 'stretch', 'finished'] as const
+export const JOB_ADS_FILTER_ORDER = [
+  'latest',
+  'in-progress',
+  'rejected-no-response',
+  'not-interested',
+  'stretch',
+  'finished',
+] as const
 
 export type JobAdsFilter = (typeof JOB_ADS_FILTER_ORDER)[number]
 
@@ -19,7 +26,11 @@ export function getJobAdFilterCategory(status: JobApplyStatus): JobAdsFilter {
     return 'stretch'
   }
 
-  if (isTerminalApplyStatus(status) || status === 'no-response') {
+  if (status === 'rejected' || status === 'no-response') {
+    return 'rejected-no-response'
+  }
+
+  if (isTerminalApplyStatus(status)) {
     return 'finished'
   }
 

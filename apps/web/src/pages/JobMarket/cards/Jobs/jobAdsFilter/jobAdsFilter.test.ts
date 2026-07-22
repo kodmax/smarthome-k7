@@ -9,10 +9,10 @@ describe('jobAdsFilter', () => {
     expect(getJobAdFilterCategory('not-interested')).toBe('not-interested')
     expect(getJobAdFilterCategory('unmet-requirements')).toBe('stretch')
     expect(getJobAdFilterCategory('stack-mismatch')).toBe('finished')
-    expect(getJobAdFilterCategory('no-response')).toBe('finished')
+    expect(getJobAdFilterCategory('no-response')).toBe('rejected-no-response')
     expect(getJobAdFilterCategory('interview')).toBe('in-progress')
     expect(getJobAdFilterCategory('offer')).toBe('in-progress')
-    expect(getJobAdFilterCategory('rejected')).toBe('finished')
+    expect(getJobAdFilterCategory('rejected')).toBe('rejected-no-response')
     expect(getJobAdFilterCategory('offer-accepted')).toBe('finished')
     expect(getJobAdFilterCategory('withdrawn')).toBe('finished')
   })
@@ -24,12 +24,15 @@ describe('jobAdsFilter', () => {
       jobAd({ id: '3', title: 'Skipped', meta: { application: { status: 'not-interested' } } }),
       jobAd({ id: '4', title: 'Skill gap', meta: { application: { status: 'unmet-requirements' } } }),
       jobAd({ id: '5', title: 'Rejected', meta: { application: { status: 'rejected' } } }),
+      jobAd({ id: '6', title: 'No response', meta: { application: { status: 'no-response' } } }),
+      jobAd({ id: '7', title: 'Accepted', meta: { application: { status: 'offer-accepted' } } }),
     ]
 
     expect(filterJobAdsByCategory(ads, 'latest').map(ad => ad.id)).toEqual(['1'])
     expect(filterJobAdsByCategory(ads, 'in-progress').map(ad => ad.id)).toEqual(['2'])
     expect(filterJobAdsByCategory(ads, 'not-interested').map(ad => ad.id)).toEqual(['3'])
     expect(filterJobAdsByCategory(ads, 'stretch').map(ad => ad.id)).toEqual(['4'])
-    expect(filterJobAdsByCategory(ads, 'finished').map(ad => ad.id)).toEqual(['5'])
+    expect(filterJobAdsByCategory(ads, 'rejected-no-response').map(ad => ad.id)).toEqual(['5', '6'])
+    expect(filterJobAdsByCategory(ads, 'finished').map(ad => ad.id)).toEqual(['7'])
   })
 })

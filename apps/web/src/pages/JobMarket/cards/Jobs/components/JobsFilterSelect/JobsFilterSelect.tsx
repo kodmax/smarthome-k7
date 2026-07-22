@@ -21,6 +21,7 @@ export const JobsFilterSelect: FC<Props> = ({ value, onChange }) => {
     'in-progress': labels.inProgress,
     'not-interested': labels.notInterested,
     stretch: labels.stretch,
+    'rejected-no-response': labels.rejectedNoResponse,
     finished: labels.finished,
   }
 

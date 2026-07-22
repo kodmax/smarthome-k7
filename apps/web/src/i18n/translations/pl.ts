@@ -315,6 +315,7 @@ export const pl: Translations = {
         inProgress: 'W trakcie',
         notInterested: 'Nie interesują mnie',
         stretch: 'Do nadrobienia',
+        rejectedNoResponse: 'Odrzucone i brak odpowiedzi',
         finished: 'Zakończone',
       },
       workplaceType: {

@@ -281,6 +281,7 @@ export type Translations = {
         inProgress: string
         notInterested: string
         stretch: string
+        rejectedNoResponse: string
         finished: string
       }
       workplaceType: {
