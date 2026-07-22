@@ -21,11 +21,12 @@ describe('jobApplyStatusFlow', () => {
     expect(canTransition('not-applied', 'withdrawn')).toBe(false)
   })
 
-  it('allows not-interested to not-applied, applied, unmet-requirements, and stack-mismatch', () => {
+  it('allows not-interested to not-applied, applied, unmet-requirements, stack-mismatch, and archived', () => {
     expect(canTransition('not-interested', 'not-applied')).toBe(true)
     expect(canTransition('not-interested', 'applied')).toBe(true)
     expect(canTransition('not-interested', 'unmet-requirements')).toBe(true)
     expect(canTransition('not-interested', 'stack-mismatch')).toBe(true)
+    expect(canTransition('not-interested', 'archived')).toBe(true)
   })
 
   it('allows applied follow-up statuses', () => {

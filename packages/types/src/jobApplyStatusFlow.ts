@@ -42,7 +42,7 @@ const APPLIED_FOLLOW_UP_STATUSES = [
 const TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
   'not-applied': ['applied', 'not-interested', 'unmet-requirements', 'stack-mismatch'],
   applied: APPLIED_FOLLOW_UP_STATUSES,
-  'not-interested': ['not-applied', 'applied', 'unmet-requirements', 'stack-mismatch'],
+  'not-interested': ['not-applied', 'applied', 'unmet-requirements', 'stack-mismatch', 'archived'],
   'unmet-requirements': ['not-applied', 'applied', 'stack-mismatch'],
   'stack-mismatch': [],
   rejected: [],

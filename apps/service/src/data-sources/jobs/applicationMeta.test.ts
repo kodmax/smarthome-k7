@@ -152,6 +152,26 @@ describe('applicationMeta', () => {
     })
   })
 
+  it('allows transition from not-interested to archived', () => {
+    expect(
+      applyStatusChange(
+        {
+          applyStatus: 'not-interested',
+          comment: 'Not for me',
+          appliedAt: null,
+          rejectedAt: null,
+        },
+        { applyStatus: 'archived' },
+        new Date('2026-07-22T20:55:49.000Z'),
+      ),
+    ).toEqual({
+      applyStatus: 'archived',
+      comment: null,
+      appliedAt: null,
+      rejectedAt: null,
+    })
+  })
+
   it('ignores legacy statusChangedAt field in stored application meta', () => {
     expect(
       parseApplicationMeta({

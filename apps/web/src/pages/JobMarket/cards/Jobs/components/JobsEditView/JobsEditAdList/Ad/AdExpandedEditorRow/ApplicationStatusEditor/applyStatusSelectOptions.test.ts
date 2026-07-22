@@ -14,6 +14,7 @@ describe('applyStatusTargetOptions', () => {
       'applied',
       'unmet-requirements',
       'stack-mismatch',
+      'archived',
     ])
   })
 
