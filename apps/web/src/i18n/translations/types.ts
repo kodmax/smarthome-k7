@@ -81,12 +81,25 @@ export type Translations = {
     }
     popularTechnologies: {
       title: string
+      editExperience: string
+      experienceLevelLabel: string
+      experienceLevelPlaceholder: string
+      experienceComment: string
+      experienceLevel: {
+        master: string
+        regular: string
+        adept: string
+        'knew-before': string
+        'to-learn': string
+        'not-interested': string
+      }
       columns: {
         rank: string
         technology: string
         offers: string
         share: string
         median: string
+        experience: string
       }
     }
   }

@@ -62,6 +62,7 @@ export { createStyledIcon } from './createStyledIcon'
 export type { StyledIconOptions, StyledIconProps, StyledLucideIcon } from './createStyledIcon'
 export type { IconGlow } from './iconGlow'
 export { iconStyles } from './iconStyles'
+export { iconGlowFilter } from './iconGlow'
 
 export const HomeIcon = createStyledIcon(House, iconStyles.neutral)
 export const DashboardIcon = createStyledIcon(LayoutDashboard, iconStyles.neutral)

@@ -24,6 +24,7 @@ type BaseCardProps = {
   allowZoom?: boolean
   onZoom?: () => void
   actions?: ReactNode
+  zoomActions?: ReactNode
   headingInfo?: ReactNode
 }
 
@@ -37,40 +38,50 @@ export const BaseCard: FC<BaseCardProps> = ({
   allowZoom = true,
   headingInfo,
   actions,
+  zoomActions,
 }) => {
   return (
     <ZoomCurtain cardId={cardId} allowZoom={allowZoom} onZoom={onZoom}>
-      {({ zoomClose, zoom }) => (
-        <ApolloCardRoot zoom={zoom}>
-          <ApolloCardHeader>
-            {zoom ? (
-              <IconButton aria-label='Back' size='small' sx={{ marginLeft: '-12px' }} onClick={zoomClose}>
-                <BackIcon size={designTokens.icon.sizeSm} strokeWidth={designTokens.icon.strokeWidth} />
-              </IconButton>
-            ) : null}
-            <Icon
-              size={designTokens.icon.sizeSm}
-              strokeWidth={designTokens.icon.strokeWidth}
-              glow='default'
-              aria-hidden
-            />
-            <ApolloCardTitle variant='h3'>{title}</ApolloCardTitle>
-            <ApolloCardHeadingInfo>{headingInfo}</ApolloCardHeadingInfo>
-            {zoom && actions !== undefined ? <Actions>{actions}</Actions> : null}
-          </ApolloCardHeader>
+      {({ zoomClose, zoom }) => {
+        const showActions = actions !== undefined || (zoom && zoomActions !== undefined)
 
-          <ApolloCardContentArea zoom={zoom}>
-            <ApolloCardContent
-              rows={zoom ? undefined : height}
-              sx={zoom ? { flex: '1 1 auto', minHeight: 0, overflowY: 'auto' } : undefined}
-            >
-              {children}
-            </ApolloCardContent>
-            <ApolloCardTopFade aria-hidden />
-            <ApolloCardBottomFade aria-hidden />
-          </ApolloCardContentArea>
-        </ApolloCardRoot>
-      )}
+        return (
+          <ApolloCardRoot zoom={zoom}>
+            <ApolloCardHeader>
+              {zoom ? (
+                <IconButton aria-label='Back' size='small' sx={{ marginLeft: '-12px' }} onClick={zoomClose}>
+                  <BackIcon size={designTokens.icon.sizeSm} strokeWidth={designTokens.icon.strokeWidth} />
+                </IconButton>
+              ) : null}
+              <Icon
+                size={designTokens.icon.sizeSm}
+                strokeWidth={designTokens.icon.strokeWidth}
+                glow='default'
+                aria-hidden
+              />
+              <ApolloCardTitle variant='h3'>{title}</ApolloCardTitle>
+              <ApolloCardHeadingInfo>{headingInfo}</ApolloCardHeadingInfo>
+              {showActions ? (
+                <Actions>
+                  {actions}
+                  {zoom ? zoomActions : null}
+                </Actions>
+              ) : null}
+            </ApolloCardHeader>
+
+            <ApolloCardContentArea zoom={zoom}>
+              <ApolloCardContent
+                rows={zoom ? undefined : height}
+                sx={zoom ? { flex: '1 1 auto', minHeight: 0, overflowY: 'auto' } : undefined}
+              >
+                {children}
+              </ApolloCardContent>
+              <ApolloCardTopFade aria-hidden />
+              <ApolloCardBottomFade aria-hidden />
+            </ApolloCardContentArea>
+          </ApolloCardRoot>
+        )
+      }}
     </ZoomCurtain>
   )
 }

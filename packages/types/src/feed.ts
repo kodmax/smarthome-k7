@@ -1,4 +1,5 @@
 import { type KnxReading } from 'js-knx'
+import { type SkillExperienceLevel } from './skillExperienceLevel'
 
 export { KnxReading as KnxReadingType }
 
@@ -390,6 +391,19 @@ export type JobMarketInsightFeed = {
 }
 
 export type JobMarketInsightCachedFeed = JobMarketInsightMetrics
+
+export type { SkillExperienceLevel } from './skillExperienceLevel'
+
+export type MySkill = {
+  id: string
+  name: string
+  level: SkillExperienceLevel
+  comment: string | null
+}
+
+export type MySkillsFeed = {
+  skills: MySkill[]
+}
 
 export function emptyJobAdApplication(): JobAdApplication {
   return {

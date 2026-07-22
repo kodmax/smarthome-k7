@@ -54,7 +54,7 @@ export const Jobs: FC<Record<string, never>> = () => {
       icon={JobsIcon}
       height={6}
       headingInfo={headingInfo}
-      actions={
+      zoomActions={
         <>
           {editMode ? <JobsFilterSelect value={adsFilter} onChange={onAdsFilterChange} /> : null}
           <ApolloCardAction

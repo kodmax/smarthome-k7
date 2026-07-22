@@ -74,7 +74,7 @@ export const News: FC<Record<string, never>> = () => {
       icon={NewsIcon}
       height={6}
       onZoom={onZoom}
-      actions={
+      zoomActions={
         <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />
       }
     >
