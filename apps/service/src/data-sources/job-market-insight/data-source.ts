@@ -9,7 +9,7 @@ import { theprotocol } from '../jobs/theprotocol'
 import { addAllAds } from './addAllAds'
 import { buildJobMarketInsightFeed } from './buildJobMarketInsightFeed'
 import { loadJobMarketInsightSnapshotAtOrBefore } from './loadJobMarketInsightSnapshotAtOrBefore'
-import { persistJobMarketInsightSnapshot } from './persistJobMarketInsightSnapshot'
+import { persistDailyJobMarketInsightSnapshot } from './persistDailyJobMarketInsightSnapshot'
 
 const COMPARISON_WINDOW_DAYS = 1 // TODO: revert to 7 after verifying change metrics
 
@@ -22,11 +22,11 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
   }
 
   getCron() {
-    return '0 8 * * *'
+    return '0 * * * *'
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTE * 15
+    return CacheAgeUnit.HOUR * 4
   }
 
   async getData() {
@@ -38,9 +38,8 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
 
     const ads = [...allAds.values()]
     const metrics = buildJobMarketInsightFeed(ads)
-    const snapshotAt = DateTime.now().getDateTime()
 
-    await persistJobMarketInsightSnapshot(this.db, snapshotAt, metrics)
+    await persistDailyJobMarketInsightSnapshot(this.db, metrics)
 
     return metrics
   }

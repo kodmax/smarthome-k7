@@ -92,11 +92,11 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
   }
 
   getCron() {
-    return '0 8 * * *'
+    return '0 * * * *'
   }
 
   getCacheTTL() {
-    return CacheAgeUnit.MINUTE * 15
+    return CacheAgeUnit.HOUR * 4
   }
 
   async getData() {
