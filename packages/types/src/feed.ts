@@ -358,16 +358,7 @@ export type JobsCachedFeed = {
 }
 
 export type JobMarketSalaryDistributionBracket = {
-  id:
-    | 'below5k'
-    | 'from5to10k'
-    | 'from10to15k'
-    | 'from15to20k'
-    | 'from20to25k'
-    | 'from25to30k'
-    | 'from30to35k'
-    | 'from35to40k'
-    | 'above40k'
+  id: 'below10k' | 'from10to15k' | 'from15to20k' | 'from20to25k' | 'from25to30k' | 'from30to35k' | 'above35k'
   percentage: number
 }
 

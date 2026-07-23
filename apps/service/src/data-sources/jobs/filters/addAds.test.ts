@@ -44,10 +44,14 @@ describe('addAds', () => {
     expect(allAds.size).toBe(0)
   })
 
-  it('rejects office-only ads', () => {
+  it('accepts office-only ads when other filters pass', () => {
     const allAds = new Map<string, JobAd>()
-    addAds(allAds, [makeAd({ workplaceType: 'office' })])
-    expect(allAds.size).toBe(0)
+    const ad = makeAd({ workplaceType: 'office' })
+
+    addAds(allAds, [ad])
+
+    expect(allAds.size).toBe(1)
+    expect(allAds.get('acme -- SENIOR REACT DEVELOPER')).toBe(ad)
   })
 
   it('rejects manager titles', () => {

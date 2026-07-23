@@ -18,24 +18,24 @@ const makeAd = (salary?: { from: number; to: number }): JobAd => ({
 
 describe('classifySalaryUpperBound', () => {
   it('uses upper salary bounds with half-open bucket ranges', () => {
-    expect(classifySalaryUpperBound(4_999)).toBe('below5k')
-    expect(classifySalaryUpperBound(5_000)).toBe('from5to10k')
-    expect(classifySalaryUpperBound(9_999)).toBe('from5to10k')
+    expect(classifySalaryUpperBound(4_999)).toBe('below10k')
+    expect(classifySalaryUpperBound(5_000)).toBe('below10k')
+    expect(classifySalaryUpperBound(9_999)).toBe('below10k')
     expect(classifySalaryUpperBound(10_000)).toBe('from10to15k')
     expect(classifySalaryUpperBound(29_999)).toBe('from25to30k')
     expect(classifySalaryUpperBound(30_000)).toBe('from30to35k')
-    expect(classifySalaryUpperBound(35_000)).toBe('from35to40k')
-    expect(classifySalaryUpperBound(40_000)).toBe('above40k')
-    expect(classifySalaryUpperBound(40_001)).toBe('above40k')
+    expect(classifySalaryUpperBound(35_000)).toBe('above35k')
+    expect(classifySalaryUpperBound(40_000)).toBe('above35k')
+    expect(classifySalaryUpperBound(40_001)).toBe('above35k')
   })
 
   it('classifies offers by the top of their salary range', () => {
-    expect(computeSalaryDistribution([makeAd({ from: 25_000, to: 30_000 })])[2]).toEqual({
+    expect(computeSalaryDistribution([makeAd({ from: 25_000, to: 30_000 })])[1]).toEqual({
       id: 'from30to35k',
       percentage: 100,
     })
-    expect(computeSalaryDistribution([makeAd({ from: 30_000, to: 35_000 })])[1]).toEqual({
-      id: 'from35to40k',
+    expect(computeSalaryDistribution([makeAd({ from: 30_000, to: 35_000 })])[0]).toEqual({
+      id: 'above35k',
       percentage: 100,
     })
   })
@@ -44,15 +44,13 @@ describe('classifySalaryUpperBound', () => {
 describe('computeSalaryDistribution', () => {
   it('returns zeroed brackets for an empty list', () => {
     expect(computeSalaryDistribution([])).toEqual([
-      { id: 'above40k', percentage: 0 },
-      { id: 'from35to40k', percentage: 0 },
+      { id: 'above35k', percentage: 0 },
       { id: 'from30to35k', percentage: 0 },
       { id: 'from25to30k', percentage: 0 },
       { id: 'from20to25k', percentage: 0 },
       { id: 'from15to20k', percentage: 0 },
       { id: 'from10to15k', percentage: 0 },
-      { id: 'from5to10k', percentage: 0 },
-      { id: 'below5k', percentage: 0 },
+      { id: 'below10k', percentage: 0 },
     ])
   })
 
@@ -71,15 +69,13 @@ describe('computeSalaryDistribution', () => {
         makeAd(),
       ]),
     ).toEqual([
-      { id: 'above40k', percentage: 11 },
-      { id: 'from35to40k', percentage: 22 },
+      { id: 'above35k', percentage: 33 },
       { id: 'from30to35k', percentage: 11 },
       { id: 'from25to30k', percentage: 11 },
       { id: 'from20to25k', percentage: 0 },
       { id: 'from15to20k', percentage: 11 },
       { id: 'from10to15k', percentage: 11 },
-      { id: 'from5to10k', percentage: 11 },
-      { id: 'below5k', percentage: 11 },
+      { id: 'below10k', percentage: 22 },
     ])
   })
 })

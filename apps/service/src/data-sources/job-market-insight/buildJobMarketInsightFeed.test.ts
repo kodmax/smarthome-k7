@@ -26,7 +26,7 @@ describe('buildJobMarketInsightFeed', () => {
 
     expect(feed.adsCount).toBe(2)
     expect(feed.popularTechnologies.length).toBeGreaterThan(0)
-    expect(feed.salaryDistribution).toHaveLength(9)
+    expect(feed.salaryDistribution).toHaveLength(7)
     expect(feed.remoteWorkPercent).toBe(50)
   })
 })

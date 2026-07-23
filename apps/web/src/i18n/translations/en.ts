@@ -79,15 +79,13 @@ export const en: Translations = {
     salaryDistribution: {
       title: 'Salary distribution',
       brackets: {
-        below5k: 'Below 5k',
-        from5to10k: '5k – 10k',
+        below10k: 'Below 10k',
         from10to15k: '10k – 15k',
         from15to20k: '15k – 20k',
         from20to25k: '20k – 25k',
         from25to30k: '25k – 30k',
         from30to35k: '30k – 35k',
-        from35to40k: '35k – 40k',
-        above40k: 'Above 40k',
+        above35k: 'Above 35k',
       },
     },
     popularTechnologies: {
