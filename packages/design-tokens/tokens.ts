@@ -31,4 +31,10 @@ export function buildDesignTokens(scheme: ColorScheme = 'dark') {
 
 export const designTokens = buildDesignTokens('dark')
 
+/** Pixel gap between cards on dashboard-style grid layouts. */
+export const cardGridGap = shared.layout.cardGridGap
+
+/** MUI Grid `spacing` value matching {@link cardGridGap} (gap = spacing × theme spacing unit). */
+export const cardGridSpacing = shared.layout.cardGridGap / shared.space[1]
+
 export type DesignTokens = ReturnType<typeof buildDesignTokens>

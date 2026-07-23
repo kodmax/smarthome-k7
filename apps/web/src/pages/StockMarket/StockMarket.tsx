@@ -1,4 +1,5 @@
 import { Grid } from '@mui/material'
+import { cardGridSpacing } from '@repo/design-tokens'
 import { StockMarketIcon, iconStyles } from '@repo/assets'
 import { type FC } from 'react'
 import { PageHeader } from '@/app/components/PageHeader'
@@ -18,7 +19,7 @@ export const StockMarket: FC<Record<string, never>> = () => {
         description={t.stockMarket.description}
       />
 
-      <Grid container spacing={3} sx={{ width: '100%' }}>
+      <Grid container spacing={cardGridSpacing} sx={{ width: '100%' }}>
         <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
           <MarketStatusTile />
         </Grid>

@@ -1,8 +1,11 @@
-import { designTokens } from '@repo/design-tokens'
-import { apolloCardHeaderMinHeight } from './cardHeaderLayout'
-import { apolloCardContentHeightPx } from './styled'
-
-const cardBorderWidthPx = designTokens.borderWidth.hairline
+import { cardGridGap } from '@repo/design-tokens'
+import { apolloCardHeaderHeight } from './cardHeaderLayout'
+import {
+  CARD_BORDER_WIDTH,
+  CARD_CONTENT_HEIGHT_BUFFER,
+  CARD_CONTENT_PADDING_BOTTOM,
+  CARD_CONTENT_PADDING_TOP,
+} from './styled'
 
 export type ApolloCardStackedColumnExtraHeightParams = {
   /** Content row count of the card spanning the stacked column. */
@@ -18,16 +21,14 @@ export type ApolloCardStackedColumnExtraHeightParams = {
  * stacked column. Each additional stacked card adds one grid gap, one header,
  * and the card's top + bottom border.
  */
-export const apolloCardStackedColumnExtraHeight = ({
-  spanningRows,
-  stackedRows,
-  gridRowGap,
-}: ApolloCardStackedColumnExtraHeightParams): number => {
-  const stackedCardCount = stackedRows.length
-  const gapTotal = (stackedCardCount - 1) * gridRowGap
-  const headerTotal = (stackedCardCount - 1) * apolloCardHeaderMinHeight
-  const borderTotal = (stackedCardCount - 1) * 2 * cardBorderWidthPx
-  const stackedContentTotal = stackedRows.reduce((sum, rows) => sum + apolloCardContentHeightPx(rows), 0)
-
-  return gapTotal + headerTotal + borderTotal + stackedContentTotal - apolloCardContentHeightPx(spanningRows)
+export const apolloCardStackedColumnExtraHeight = (stackedCardCount: number): number => {
+  return stackedCardCount > 1
+    ? (stackedCardCount - 1) *
+        (cardGridGap +
+          apolloCardHeaderHeight +
+          2 * CARD_BORDER_WIDTH +
+          CARD_CONTENT_PADDING_TOP +
+          CARD_CONTENT_PADDING_BOTTOM +
+          CARD_CONTENT_HEIGHT_BUFFER)
+    : 0
 }

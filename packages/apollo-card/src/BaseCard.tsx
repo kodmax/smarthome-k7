@@ -21,6 +21,9 @@ type BaseCardProps = {
   children: ReactNode
   cardId: string
   height?: number
+  /**
+   * Add extra height to extend the card to match stacked cards in another column.
+   */
   extraHeight?: number
   allowZoom?: boolean
   onZoom?: () => void

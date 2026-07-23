@@ -6,7 +6,6 @@ import { JobMarketInsightFeed, MySkillsFeed, type SkillExperienceLevel } from '@
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { ApolloDataTable, ApolloTableCell, ApolloValueCell, TablePlaceholder } from '@/card-components'
 import { useTranslations } from '@/i18n'
-import { jobMarketPopularHeight } from '../../jobMarketCardLayout'
 import { Skill } from './Skill'
 
 export const PopularTechnologies: FC<Record<string, never>> = () => {
@@ -57,7 +56,7 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
       cardId='job-market-popular-technologies'
       title={labels.title}
       icon={ListIcon}
-      height={jobMarketPopularHeight}
+      height={11}
       allowZoom={false}
       actions={
         <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />

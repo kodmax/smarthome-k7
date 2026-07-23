@@ -13,5 +13,5 @@ export const apolloCardHintIconStrokeWidth = icon.strokeWidth
 
 const scaledHeaderContentHeight = Math.round(font.h3.size * CARD_HINT_ICON_SCALE * font.h3.lineHeight)
 
-export const apolloCardHeaderMinHeight =
+export const apolloCardHeaderHeight =
   HEADER_PADDING_TOP + Math.max(scaledHeaderContentHeight, apolloCardHintIconSize) + HEADER_PADDING_BOTTOM

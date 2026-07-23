@@ -1,4 +1,5 @@
 import { Grid } from '@mui/material'
+import { cardGridSpacing } from '@repo/design-tokens'
 import { ZoomStateProvider } from '@repo/apollo-card'
 import { DashboardIcon, iconStyles } from '@repo/assets'
 import { type FC } from 'react'
@@ -29,7 +30,7 @@ export const Dashboard: FC<Record<string, never>> = () => {
       />
 
       <ZoomStateProvider>
-        <Grid container spacing={3} sx={{ width: '100%' }}>
+        <Grid container spacing={cardGridSpacing} sx={{ width: '100%' }}>
           <Grid size={{ xs: 12, md: 6, xl: 3 }} sx={dashboardMdOrder(1)}>
             <Energy />
           </Grid>

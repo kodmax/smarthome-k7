@@ -1,16 +1,18 @@
 import { Box, Card, CardContent, Typography, styled } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
-import { apolloCardHeaderMinHeight } from './cardHeaderLayout'
+import { apolloCardHeaderHeight } from './cardHeaderLayout'
 import { ZOOM_SCALE } from './ZoomCurtain/zoomConstants'
+import { apolloCardStackedColumnExtraHeight } from './apolloCardStackedColumnExtraHeight'
 
 const { font, space } = designTokens
 
-const CARD_CONTENT_PADDING_TOP = space[3]
-const CARD_CONTENT_PADDING_BOTTOM = space[3]
+export const CARD_CONTENT_PADDING_TOP = space[3]
+export const CARD_CONTENT_PADDING_BOTTOM = space[3]
+export const CARD_BORDER_WIDTH = designTokens.borderWidth.hairline
 const CARD_CONTENT_PADDING_X = space[4]
 
 const CARD_CONTENT_ROW_SLACK = 1
-const CARD_CONTENT_HEIGHT_BUFFER = 2
+export const CARD_CONTENT_HEIGHT_BUFFER = 2
 
 export const apolloCardRowHeight = Math.ceil(font.body.size * font.body.lineHeight)
 export const apolloCardContentRowHeight = apolloCardRowHeight + CARD_CONTENT_ROW_SLACK
@@ -20,7 +22,7 @@ export const apolloCardContentHeightPx = (rows: number, extraHeight = 0) =>
   CARD_CONTENT_PADDING_TOP +
   CARD_CONTENT_PADDING_BOTTOM +
   CARD_CONTENT_HEIGHT_BUFFER +
-  extraHeight
+  apolloCardStackedColumnExtraHeight(extraHeight)
 
 export const apolloCardContentHeight = (rows: number, extraHeight = 0) =>
   `${apolloCardContentHeightPx(rows, extraHeight)}px`
@@ -30,8 +32,7 @@ export const ApolloCardHeader = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: designTokens.space[2],
   boxSizing: 'border-box',
-  height: apolloCardHeaderMinHeight,
-  minHeight: apolloCardHeaderMinHeight,
+  height: apolloCardHeaderHeight,
   overflow: 'hidden',
   padding: '12px 12px 12px 16px',
   paddingBottom: designTokens.space[2],

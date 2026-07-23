@@ -1,7 +1,7 @@
 export { ApolloCardAction } from './ApolloCardAction'
 export { BaseCard } from './BaseCard'
 export {
-  apolloCardHeaderMinHeight,
+  apolloCardHeaderHeight,
   apolloCardHintIconSize,
   apolloCardHintIconStrokeWidth,
   CARD_HINT_ICON_SCALE,

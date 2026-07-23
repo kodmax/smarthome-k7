@@ -1,4 +1,5 @@
 import { Box, Grid } from '@mui/material'
+import { cardGridSpacing } from '@repo/design-tokens'
 import { ZoomStateProvider } from '@repo/apollo-card'
 import { JobsIcon, iconStyles } from '@repo/assets'
 import { type FC } from 'react'
@@ -30,7 +31,7 @@ export const JobMarket: FC<Record<string, never>> = () => {
       <ZoomStateProvider>
         <Grid
           container
-          spacing={3}
+          spacing={cardGridSpacing}
           sx={{
             display: 'grid',
             alignItems: 'start',
