@@ -21,9 +21,9 @@ export const getAds = async () => {
         'x-xsrf-token':
           'CfDJ8CHz4u6jVN9JqX72tBhZssrum24HOxX6QZD-YeOF_yJnVF8R_dR4AdwR4DA7pON-dHd3t7PBinifwPQ3LhxiyDW4lGRxfvZCFz7lVnKqkQYjYRcXnGZWJppOxth7iF4POU-NRX36eF5gYUgdd_Z-fiA',
         cookie: config.jobs.theprotocolCookie,
-        Referer: 'https://theprotocol.it/filtry/react.js,javascript;t/1;s/warszawa;wp/zdalna,hybrydowa;rw',
+        Referer: 'https://theprotocol.it/filtry/react.js,javascript;t/1;s/warszawa;wp/zdalna,hybrydowa,stacjonarna;rw',
       },
-      body: '{"typesOfContractIds":[],"positionLevelIds":[],"salaryFrom":"1","cities":["Warszawa"],"workModeCodes":["home-office","hybrid"],"onlyWithProjectDescription":false,"expectedTechnologies":["React.js","JavaScript"],"niceToHaveTechnologies":[],"excludedTechnologies":[],"regionsOfWorld":[],"keywords":[],"specializationsCodes":[],"isSupportingUkraine":false,"fromExternalLocations":true}',
+      body: '{"typesOfContractIds":[],"positionLevelIds":[],"salaryFrom":"1","cities":["Warszawa"],"workModeCodes":["home-office","hybrid","full-office"],"onlyWithProjectDescription":false,"expectedTechnologies":["React.js","JavaScript"],"niceToHaveTechnologies":[],"excludedTechnologies":[],"regionsOfWorld":[],"keywords":[],"specializationsCodes":[],"isSupportingUkraine":false,"fromExternalLocations":true}',
       method: 'POST',
     },
   )

@@ -40,7 +40,6 @@ const theprotocol: () => Promise<JobAd[]> = async () => {
         : ad.workModes.includes('hybrydowa') || ad.workModes.includes('hybrid')
           ? 'hybrid'
           : 'office'
-
     ads.push({
       id: createHash('sha256').update(ad.offerUrlName).digest('hex'),
       title: ad.title,

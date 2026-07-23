@@ -54,7 +54,7 @@ export interface Ad {
       longForm: 'monthly'
     }
   }
-  workModes: ['hybrid', 'remote', 'zdalna', 'hybrydowa']
+  workModes: ['hybrid', 'remote', 'zdalna', 'hybrydowa', 'full office', 'stacjonarna']
   immediateEmployment: true
   isSupportingUkraine: true
   addons: {
