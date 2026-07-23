@@ -78,8 +78,22 @@ export type MarketInfo = {
   afterHoursMarketClosingTime: number
 }
 
+export type MarketIndexQuote = {
+  symbol: string
+  title: string
+  price: number
+  netChange: number
+  percentageChange: number
+}
+
+export type MarketIndices = {
+  sp500: MarketIndexQuote
+  sp500Futures: MarketIndexQuote
+}
+
 export type StockMarketFeed = {
   marketInfo: MarketInfo
+  marketIndices: MarketIndices
   tickers: TickerData[]
 }
 

@@ -28,6 +28,14 @@ export type Translations = {
     marketStatus: {
       title: string
     }
+    marketIndices: {
+      sp500: {
+        title: string
+      }
+      sp500Futures: {
+        title: string
+      }
+    }
     earningsTomorrow: {
       title: string
     }

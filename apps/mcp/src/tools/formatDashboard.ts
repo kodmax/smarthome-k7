@@ -119,6 +119,13 @@ export function formatWeather(feed: WeatherFeed): string {
 
 export function formatStockMarketOverview(feed: StockMarketFeed): string {
   const header = `Rynek: ${feed.marketInfo.status} (${feed.marketInfo.country})`
+  const indices = [feed.marketIndices.sp500, feed.marketIndices.sp500Futures]
+    .map(quote => {
+      const netSign = quote.netChange > 0 ? '+' : ''
+      const percentageSign = quote.percentageChange > 0 ? '+' : ''
+      return `${quote.title}: ${quote.price.toFixed(2)} (${netSign}${quote.netChange.toFixed(2)}, ${percentageSign}${quote.percentageChange.toFixed(2)}%)`
+    })
+    .join('\n')
   const tickers = feed.tickers
     .map(
       ticker =>
@@ -126,7 +133,7 @@ export function formatStockMarketOverview(feed: StockMarketFeed): string {
     )
     .join('\n')
 
-  return `${header}\n${tickers}`
+  return `${header}\n${indices}\n${tickers}`
 }
 
 export function formatNews(feed: NewsFeed): string {

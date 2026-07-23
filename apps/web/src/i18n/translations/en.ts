@@ -30,6 +30,14 @@ export const en: Translations = {
     marketStatus: {
       title: 'Market session',
     },
+    marketIndices: {
+      sp500: {
+        title: 'S&P 500',
+      },
+      sp500Futures: {
+        title: 'S&P 500 Futures',
+      },
+    },
     earningsTomorrow: {
       title: 'Earnings tomorrow',
     },

@@ -1,4 +1,4 @@
-import { type MarketInfo, type StockMarketFeed, type TickerData } from '@repo/types'
+import { type MarketIndices, type MarketInfo, type StockMarketFeed, type TickerData } from '@repo/types'
 
 const emptyQuoteSummary: TickerData['quoteSummary'] = {
   ratingsCount: { last90days: 0, last30days: 0, last7days: 0 },
@@ -22,6 +22,23 @@ const defaultMarketInfo: MarketInfo = {
   marketClosingTime: 1783454400000,
   afterHoursMarketOpeningTime: 1783454400000,
   afterHoursMarketClosingTime: 1783468800000,
+}
+
+const defaultMarketIndices: MarketIndices = {
+  sp500: {
+    symbol: '.SPX',
+    title: 'S&P 500',
+    price: 7498.96,
+    netChange: -10.24,
+    percentageChange: -0.14,
+  },
+  sp500Futures: {
+    symbol: '@SP.1',
+    title: 'S&P 500 Futures',
+    price: 7512.25,
+    netChange: -28,
+    percentageChange: -0.37,
+  },
 }
 
 type QuoteSummaryOverrides = {
@@ -78,5 +95,5 @@ export function ticker(overrides: TickerOverrides): TickerData {
 }
 
 export function stockMarketFeed(...tickers: TickerData[]): StockMarketFeed {
-  return { marketInfo: defaultMarketInfo, tickers }
+  return { marketInfo: defaultMarketInfo, marketIndices: defaultMarketIndices, tickers }
 }

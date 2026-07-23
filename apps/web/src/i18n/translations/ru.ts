@@ -30,6 +30,14 @@ export const ru: Translations = {
     marketStatus: {
       title: 'Сессия биржи',
     },
+    marketIndices: {
+      sp500: {
+        title: 'S&P 500',
+      },
+      sp500Futures: {
+        title: 'S&P 500 Futures',
+      },
+    },
     earningsTomorrow: {
       title: 'Квартальный отчёт завтра',
     },
