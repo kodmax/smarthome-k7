@@ -23,7 +23,8 @@ export const SalaryDistribution: FC<Record<string, never>> = () => {
       cardId='job-market-salary-distribution'
       title={labels.title}
       icon={PowerIcon}
-      height={10}
+      extraHeight={2}
+      height={7}
       allowZoom={false}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: rowGap }}>

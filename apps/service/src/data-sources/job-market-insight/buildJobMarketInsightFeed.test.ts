@@ -27,6 +27,35 @@ describe('buildJobMarketInsightFeed', () => {
     expect(feed.adsCount).toBe(2)
     expect(feed.popularTechnologies.length).toBeGreaterThan(0)
     expect(feed.salaryDistribution).toHaveLength(7)
-    expect(feed.remoteWorkPercent).toBe(50)
+  })
+
+  it('calculate remote work mode correctly, not including hybrid', () => {
+    const feed = buildJobMarketInsightFeed([
+      makeAd(),
+      makeAd({ id: '2', requiredSkills: ['React'], workplaceType: 'office' }),
+      makeAd({ id: '3', requiredSkills: ['React'], workplaceType: 'hybrid' }),
+    ])
+
+    expect(feed.remoteWorkPercent).toBe(33)
+  })
+
+  it('calculate hybrid work mode correctly, not including remote or office', () => {
+    const feed = buildJobMarketInsightFeed([
+      makeAd(),
+      makeAd({ id: '2', requiredSkills: ['React'], workplaceType: 'office' }),
+      makeAd({ id: '3', requiredSkills: ['React'], workplaceType: 'hybrid' }),
+    ])
+
+    expect(feed.hybridWorkPercent).toBe(33)
+  })
+
+  it('calculate office work mode correctly, not including hybrid', () => {
+    const feed = buildJobMarketInsightFeed([
+      makeAd(),
+      makeAd({ id: '2', requiredSkills: ['React'], workplaceType: 'office' }),
+      makeAd({ id: '3', requiredSkills: ['React'], workplaceType: 'hybrid' }),
+    ])
+
+    expect(feed.officeWorkPercent).toBe(33)
   })
 })

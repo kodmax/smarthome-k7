@@ -11,10 +11,11 @@ import { MedianSalary } from './cards/MedianSalary/MedianSalary'
 import { P90Salary } from './cards/P90Salary/P90Salary'
 import { NewOffers } from './cards/NewOffers/NewOffers'
 import { PermanentEmployment } from './cards/PermanentEmployment/PermanentEmployment'
-import { WorkModeSplit } from './cards/WorkModeSplit/WorkModeSplit'
+import { RemoteWorkModeSplit, OfficeWorkModeSplit, HybridWorkModeSplit } from './cards/WorkMode'
 import { PopularTechnologies } from './cards/PopularTechnologies/PopularTechnologies'
 import { SalaryDistribution } from './cards/SalaryDistribution/SalaryDistribution'
 import { Jobs } from './cards/Jobs'
+import { OffersWithSalaryRange } from './cards/OffersWithSalaryRange/OffersWithSalaryRange'
 
 export const JobMarket: FC<Record<string, never>> = () => {
   const { t } = useTranslations()
@@ -40,6 +41,7 @@ export const JobMarket: FC<Record<string, never>> = () => {
             gridTemplateColumns: {
               xs: '1fr',
               sm: 'repeat(2, 1fr)',
+              lg: 'repeat(6, 1fr)',
               xl: 'repeat(6, 1fr)',
             },
             gridTemplateAreas: {
@@ -47,62 +49,81 @@ export const JobMarket: FC<Record<string, never>> = () => {
                 "activeOffers"
                 "newOffers"
                 "medianSalary"
-                "offersWithSalaryRange"
-                "workModeSplit"
+                "p90salary"
+                "ads-with-range"
                 "permanentEmployment"
+                "remote-work-mode-split"
+                "hybrid-work-mode-split"
+                "office-work-mode-split"
                 "required-skills"
                 "salary-distribution"
                 "job-ads"
               `,
               sm: `
                 "activeOffers newOffers"
-                "medianSalary offersWithSalaryRange"
-                "workModeSplit permanentEmployment"
+                "medianSalary p90salary"
+                "ads-with-range permanentEmployment"
+                "remote-work-mode-split hybrid-work-mode-split"
+                "office-work-mode-split office-work-mode-split"
                 "required-skills required-skills"
                 "salary-distribution salary-distribution"
                 "job-ads job-ads"
               `,
               lg: `
-                "activeOffers newOffers"
-                "medianSalary offersWithSalaryRange"
-                "workModeSplit permanentEmployment"
-                "required-skills job-ads"
-                "salary-distribution job-ads"
+                "activeOffers activeOffers newOffers newOffers medianSalary medianSalary"
+                "p90salary p90salary ads-with-range ads-with-range permanentEmployment permanentEmployment"
+                "remote-work-mode-split remote-work-mode-split hybrid-work-mode-split hybrid-work-mode-split office-work-mode-split office-work-mode-split"
+                "required-skills required-skills required-skills job-ads job-ads job-ads"
+                "salary-distribution salary-distribution salary-distribution job-ads job-ads job-ads"
               `,
               xl: `
-                "activeOffers newOffers medianSalary offersWithSalaryRange workModeSplit permanentEmployment"
-                "required-skills required-skills job-ads job-ads job-ads ."
+                "activeOffers newOffers medianSalary p90salary ads-with-range permanentEmployment"
+                "required-skills required-skills job-ads job-ads job-ads remote-work-mode-split"
+                "required-skills required-skills job-ads job-ads job-ads hybrid-work-mode-split"
+                "salary-distribution salary-distribution job-ads job-ads job-ads office-work-mode-split"
                 "salary-distribution salary-distribution job-ads job-ads job-ads ."
               `,
             },
           }}
         >
-          <Box sx={{ gridArea: 'activeOffers', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'activeOffers' }}>
             <ActiveOffers />
           </Box>
-          <Box sx={{ gridArea: 'newOffers', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'newOffers' }}>
             <NewOffers />
           </Box>
-          <Box sx={{ gridArea: 'medianSalary', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'medianSalary' }}>
             <MedianSalary />
           </Box>
-          <Box sx={{ gridArea: 'offersWithSalaryRange', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'p90salary' }}>
             <P90Salary />
           </Box>
-          <Box sx={{ gridArea: 'workModeSplit', minWidth: 0 }}>
-            <WorkModeSplit />
+          <Box sx={{ gridArea: 'remote-work-mode-split' }}>
+            <RemoteWorkModeSplit />
           </Box>
-          <Box sx={{ gridArea: 'permanentEmployment', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'hybrid-work-mode-split' }}>
+            <HybridWorkModeSplit />
+          </Box>
+          <Box sx={{ gridArea: 'office-work-mode-split' }}>
+            <OfficeWorkModeSplit />
+          </Box>
+          <Box sx={{ gridArea: 'permanentEmployment' }}>
             <PermanentEmployment />
           </Box>
-          <Box sx={{ gridArea: 'required-skills', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'required-skills' }}>
             <PopularTechnologies />
           </Box>
-          <Box sx={{ gridArea: 'salary-distribution', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'salary-distribution' }}>
             <SalaryDistribution />
           </Box>
-          <Box sx={{ gridArea: 'job-ads', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'job-ads' }}>
             <Jobs />
+          </Box>
+          <Box sx={{ gridArea: 'job-ads' }}>
+            <Jobs />
+          </Box>
+          <Box sx={{ gridArea: 'ads-with-range' }}>
+            <OffersWithSalaryRange />
           </Box>
         </Grid>
       </ZoomStateProvider>

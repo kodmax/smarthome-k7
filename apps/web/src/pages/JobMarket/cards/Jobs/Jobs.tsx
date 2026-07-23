@@ -33,8 +33,8 @@ export const Jobs: FC<Record<string, never>> = () => {
       cardId='jobs'
       title={labels.title}
       icon={JobsIcon}
-      height={21}
-      extraHeight={2}
+      height={14}
+      extraHeight={4}
       allowZoom={false}
       headingInfo={headingInfo}
       actions={<JobsFilterSelect value={adsFilter} onChange={onAdsFilterChange} />}

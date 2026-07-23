@@ -13,6 +13,8 @@ const metrics: JobMarketInsightMetrics = {
   offersWithSalaryRangePercent: 4,
   remoteWorkPercent: 5,
   permanentEmploymentPercent: 6,
+  hybridWorkPercent: 7,
+  officeWorkPercent: 8,
   popularTechnologies: [],
   salaryDistribution: [],
 }

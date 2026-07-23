@@ -56,7 +56,8 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
       cardId='job-market-popular-technologies'
       title={labels.title}
       icon={ListIcon}
-      height={11}
+      extraHeight={2}
+      height={7}
       allowZoom={false}
       actions={
         <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />

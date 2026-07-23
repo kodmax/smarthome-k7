@@ -59,6 +59,8 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
         previous: previous?.offersWithSalaryRangePercent ?? null,
       },
       remoteWorkPercent: { value: cached.remoteWorkPercent, previous: previous?.remoteWorkPercent ?? null },
+      hybridWorkPercent: { value: cached.hybridWorkPercent, previous: previous?.hybridWorkPercent ?? null },
+      officeWorkPercent: { value: cached.officeWorkPercent, previous: previous?.officeWorkPercent ?? null },
       permanentEmploymentPercent: {
         value: cached.permanentEmploymentPercent,
         previous: previous?.permanentEmploymentPercent ?? null,

@@ -70,7 +70,9 @@ export type Translations = {
       medianSalary: string
       p90Salary: string
       offersWithSalaryRange: string
-      workModeSplit: string
+      remoteWorkModeSplit: string
+      hybridWorkModeSplit: string
+      officeWorkModeSplit: string
       permanentEmployment: string
       vsPreviousPeriod: string
     }

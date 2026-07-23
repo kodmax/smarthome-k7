@@ -378,6 +378,8 @@ export type JobMarketInsightMetrics = {
   p90OffersCount: number
   offersWithSalaryRangePercent: number
   remoteWorkPercent: number
+  hybridWorkPercent: number
+  officeWorkPercent: number
   permanentEmploymentPercent: number
   popularTechnologies: JobMarketPopularTechnology[]
   salaryDistribution: JobMarketSalaryDistributionBracket[]
@@ -396,6 +398,8 @@ export type JobMarketInsightFeed = {
   p90OffersCount: JobMarketChangeMetric
   offersWithSalaryRangePercent: JobMarketChangeMetric
   remoteWorkPercent: JobMarketChangeMetric
+  hybridWorkPercent: JobMarketChangeMetric
+  officeWorkPercent: JobMarketChangeMetric
   permanentEmploymentPercent: JobMarketChangeMetric
   popularTechnologies: JobMarketPopularTechnology[]
   salaryDistribution: JobMarketSalaryDistributionBracket[]

@@ -24,7 +24,7 @@ export const SingleValueCard: FC<SingleValueCardProps> = ({
   secondary,
   secondaryColor = 'text.secondary',
   tertiary,
-  height = 4,
+  height = 3.5,
   headingInfo,
 }) => {
   return (
@@ -34,7 +34,7 @@ export const SingleValueCard: FC<SingleValueCardProps> = ({
           fontSize: designTokens.font.h1.size,
           fontWeight: designTokens.font.h1.weight,
           lineHeight: designTokens.font.h1.lineHeight,
-          mb: 3,
+          mb: 2,
           display: 'inline-flex',
           alignItems: 'center',
           gap: 1,
@@ -44,10 +44,7 @@ export const SingleValueCard: FC<SingleValueCardProps> = ({
       </Typography>
 
       {secondary !== undefined ? (
-        <Typography
-          variant='body2'
-          sx={{ color: secondaryColor, fontWeight: 600, mb: tertiary !== undefined ? 0.5 : 0 }}
-        >
+        <Typography variant='body2' sx={{ color: secondaryColor, fontWeight: 600, mb: 0 }}>
           {secondary}
         </Typography>
       ) : null}

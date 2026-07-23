@@ -1,8 +1,10 @@
 import {
   Activity,
   AirVent,
+  ArrowLeftRight,
   Banknote,
   BriefcaseBusiness,
+  Building2,
   Camera,
   ChartCandlestick,
   ChartNoAxesColumnIncreasing,
@@ -101,6 +103,8 @@ export const JobsIcon = createStyledIcon(BriefcaseBusiness, iconStyles.neutral)
 export const JobMarketActiveOffersIcon = createStyledIcon(BriefcaseBusiness, iconStyles.jobs)
 export const JobMarketNewOffersIcon = createStyledIcon(TrendingUp, iconStyles.energy)
 export const JobMarketSalaryRangeIcon = createStyledIcon(SlidersHorizontal, iconStyles.jobs)
+export const JobMarketHybridWorkIcon = createStyledIcon(ArrowLeftRight, iconStyles.jobs)
+export const JobMarketOfficeWorkIcon = createStyledIcon(Building2, iconStyles.jobs)
 export const FileTextIcon = createStyledIcon(FileText, iconStyles.jobs)
 export const BanknoteIcon = createStyledIcon(Banknote, iconStyles.media)
 export const PieChartIcon = createStyledIcon(PieChart, iconStyles.temperature)
