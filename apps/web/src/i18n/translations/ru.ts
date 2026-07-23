@@ -38,6 +38,11 @@ export const ru: Translations = {
         title: 'S&P 500 Futures',
       },
     },
+    forex: {
+      usdPln: {
+        title: 'Курс USD/PLN',
+      },
+    },
     earningsTomorrow: {
       title: 'Квартальный отчёт завтра',
     },

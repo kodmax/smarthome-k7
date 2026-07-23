@@ -6,6 +6,7 @@ import type {
   JobsFeed,
   NewsFeed,
   StockMarketFeed,
+  FxRatesFeed,
   TemperatureData,
   Torrent,
   TransmissionFeed,
@@ -134,6 +135,15 @@ export function formatStockMarketOverview(feed: StockMarketFeed): string {
     .join('\n')
 
   return `${header}\n${indices}\n${tickers}`
+}
+
+export function formatFxRates(feed: FxRatesFeed): string {
+  return [feed.usdPln, feed.eurPln]
+    .map(
+      quote =>
+        `${quote.title}: ${quote.price.toFixed(4)} (${quote.netChange >= 0 ? '+' : ''}${quote.netChange.toFixed(4)}, ${quote.percentageChange >= 0 ? '+' : ''}${quote.percentageChange.toFixed(2)}%)`,
+    )
+    .join('\n')
 }
 
 export function formatNews(feed: NewsFeed): string {
@@ -280,6 +290,9 @@ export function formatDashboardSummary(feedStore: FeedStore): string {
 
   const stockMarket = feedStore.get<StockMarketFeed>('stock-market')
   sections.push(section('Giełda', stockMarket ? formatStockMarketOverview(stockMarket) : 'brak danych'))
+
+  const fxRates = feedStore.get<FxRatesFeed>('fx-rates')
+  sections.push(section('Kursy walut', fxRates ? formatFxRates(fxRates) : 'brak danych'))
 
   const news = feedStore.get<NewsFeed>('news')
   sections.push(section('Wiadomości', news ? formatNews(news) : 'brak danych'))

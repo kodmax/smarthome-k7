@@ -86,10 +86,19 @@ export type MarketIndexQuote = {
   percentageChange: number
 }
 
+export type ForexQuote = MarketIndexQuote
+
 export type MarketIndices = {
   sp500: MarketIndexQuote
   sp500Futures: MarketIndexQuote
 }
+
+export type ForexRates = {
+  usdPln: ForexQuote
+  eurPln: ForexQuote
+}
+
+export type FxRatesFeed = ForexRates
 
 export type StockMarketFeed = {
   marketInfo: MarketInfo

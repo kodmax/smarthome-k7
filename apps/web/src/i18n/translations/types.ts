@@ -36,6 +36,11 @@ export type Translations = {
         title: string
       }
     }
+    forex: {
+      usdPln: {
+        title: string
+      }
+    }
     earningsTomorrow: {
       title: string
     }

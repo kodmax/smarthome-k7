@@ -1,4 +1,5 @@
 import { Feeds } from '@repo/apollo-ws'
+import { addFxRatesFeed } from './fx-rates'
 import { addJobMarketInsightFeed } from './job-market-insight'
 import { addJobsFeed } from './jobs'
 import { addMySkillsFeed } from './my-skills'
@@ -12,6 +13,7 @@ export const initWebFeeds = async (feeds: Feeds): Promise<void> => {
   await Promise.all([
     addWeatherFeed(feeds),
     addStockMarketFeed(feeds),
+    addFxRatesFeed(feeds),
     addNewsFeed(feeds),
     addJobsFeed(feeds),
     addJobMarketInsightFeed(feeds),

@@ -1,6 +1,7 @@
 export const DASHBOARD_FEEDS = [
   { id: 'weather', label: 'Pogoda' },
   { id: 'stock-market', label: 'Giełda' },
+  { id: 'fx-rates', label: 'Kursy walut' },
   { id: 'energy', label: 'Energia' },
   { id: 'heating', label: 'Ogrzewanie' },
   { id: 'home.temp.bathroom-floor', label: 'Temperatura — podłoga łazienki' },
