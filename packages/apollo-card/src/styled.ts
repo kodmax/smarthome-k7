@@ -27,12 +27,13 @@ export const apolloCardContentHeightPx = (rows: number, extraHeight = 0) =>
 export const apolloCardContentHeight = (rows: number, extraHeight = 0) =>
   `${apolloCardContentHeightPx(rows, extraHeight)}px`
 
-export const ApolloCardHeader = styled(Box)(({ theme }) => ({
+export const ApolloCardHeader = styled(Box)<{ zoom: boolean }>(({ theme, zoom }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: designTokens.space[2],
   boxSizing: 'border-box',
-  height: apolloCardHeaderHeight,
+  height: zoom ? undefined : apolloCardHeaderHeight,
+  minHeight: apolloCardHeaderHeight,
   overflow: 'hidden',
   padding: '12px 12px 12px 16px',
   paddingBottom: designTokens.space[2],

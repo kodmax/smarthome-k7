@@ -52,7 +52,7 @@ export const BaseCard: FC<BaseCardProps> = ({
 
         return (
           <ApolloCardRoot zoom={zoom}>
-            <ApolloCardHeader>
+            <ApolloCardHeader zoom={zoom}>
               {zoom ? (
                 <IconButton aria-label='Back' size='small' sx={{ marginLeft: '-12px' }} onClick={zoomClose}>
                   <BackIcon size={designTokens.icon.sizeSm} strokeWidth={designTokens.icon.strokeWidth} />
