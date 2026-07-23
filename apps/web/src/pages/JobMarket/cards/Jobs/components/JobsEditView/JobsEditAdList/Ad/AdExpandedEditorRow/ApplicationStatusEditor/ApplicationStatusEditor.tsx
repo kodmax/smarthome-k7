@@ -175,14 +175,16 @@ export const ApplicationStatusEditor: FC<{
               <Typography variant='body2'>{notApplicable}</Typography>
             )}
           </Box>
-          <Box sx={{ mt: `${designTokens.space[2]}px` }}>
-            <Typography variant='caption' color='text.secondary' display='block'>
-              {labels.applicationComment}
-            </Typography>
-            <Typography variant='body2' color='text.secondary'>
-              {ad.meta.application.comment || notApplicable}
-            </Typography>
-          </Box>
+          {ad.meta.application.comment !== null ? (
+            <Box sx={{ mt: `${designTokens.space[2]}px` }}>
+              <Typography variant='caption' color='text.secondary' display='block'>
+                {labels.applicationComment}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {ad.meta.application.comment}
+              </Typography>
+            </Box>
+          ) : null}
         </Box>
 
         {isChangingStatus ? (

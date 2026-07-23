@@ -10,5 +10,5 @@ export const WORKPLACE_TYPE_ICONS: Record<WorkplaceType, LucideIcon> = {
 export const WORKPLACE_TYPE_COLORS: Record<WorkplaceType, string> = {
   remote: 'var(--mui-palette-success-main)',
   office: 'var(--mui-palette-text-secondary)',
-  hybrid: 'var(--mui-palette-warning-main)',
+  hybrid: 'var(--mui-palette-text-secondary)',
 }
