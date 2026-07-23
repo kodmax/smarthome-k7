@@ -39,7 +39,7 @@ export const JobMarket: FC<Record<string, never>> = () => {
             gridTemplateColumns: {
               xs: '1fr',
               sm: 'repeat(2, 1fr)',
-              xl: 'repeat(12, 1fr)',
+              xl: 'repeat(6, 1fr)',
             },
             gridTemplateAreas: {
               xs: `
@@ -49,29 +49,29 @@ export const JobMarket: FC<Record<string, never>> = () => {
                 "offersWithSalaryRange"
                 "workModeSplit"
                 "permanentEmployment"
-                "popular"
-                "salary"
-                "jobs"
+                "required-skills"
+                "salary-distribution"
+                "job-ads"
               `,
               sm: `
                 "activeOffers newOffers"
                 "medianSalary offersWithSalaryRange"
                 "workModeSplit permanentEmployment"
-                "popular popular"
-                "salary salary"
-                "jobs jobs"
+                "required-skills required-skills"
+                "salary-distribution salary-distribution"
+                "job-ads job-ads"
               `,
               lg: `
                 "activeOffers newOffers"
                 "medianSalary offersWithSalaryRange"
                 "workModeSplit permanentEmployment"
-                "popular salary"
-                "popular jobs"
+                "required-skills job-ads"
+                "salary-distribution job-ads"
               `,
               xl: `
-                "activeOffers activeOffers newOffers newOffers medianSalary medianSalary offersWithSalaryRange offersWithSalaryRange workModeSplit workModeSplit permanentEmployment permanentEmployment"
-                "popular popular popular popular salary salary salary salary salary salary salary salary"
-                "popular popular popular popular jobs jobs jobs jobs jobs jobs jobs jobs"
+                "activeOffers newOffers medianSalary offersWithSalaryRange workModeSplit permanentEmployment"
+                "required-skills required-skills job-ads job-ads job-ads ."
+                "salary-distribution salary-distribution job-ads job-ads job-ads ."
               `,
             },
           }}
@@ -94,13 +94,13 @@ export const JobMarket: FC<Record<string, never>> = () => {
           <Box sx={{ gridArea: 'permanentEmployment', minWidth: 0 }}>
             <PermanentEmployment />
           </Box>
-          <Box sx={{ gridArea: 'popular', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'required-skills', minWidth: 0 }}>
             <PopularTechnologies />
           </Box>
-          <Box sx={{ gridArea: 'salary', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'salary-distribution', minWidth: 0 }}>
             <SalaryDistribution />
           </Box>
-          <Box sx={{ gridArea: 'jobs', minWidth: 0 }}>
+          <Box sx={{ gridArea: 'job-ads', minWidth: 0 }}>
             <Jobs />
           </Box>
         </Grid>

@@ -5,7 +5,7 @@ import { useFeed } from '@repo/feed-client'
 import { TablePlaceholder } from '@/card-components'
 import { JobsFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
-import { jobMarketJobsHeight } from '../../jobMarketCardLayout'
+import { adsExtraHeight, jobMarketJobsHeight } from '../../jobMarketCardLayout'
 import { DEFAULT_JOB_ADS_FILTER, type JobAdsFilter } from './jobAdsFilter'
 import { countJobsEditViewAds, JobsEditView } from './components/JobsEditView'
 import { JobsFilterSelect } from './components/JobsFilterSelect'
@@ -35,6 +35,7 @@ export const Jobs: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={JobsIcon}
       height={jobMarketJobsHeight}
+      extraHeight={adsExtraHeight}
       allowZoom={false}
       headingInfo={headingInfo}
       actions={<JobsFilterSelect value={adsFilter} onChange={onAdsFilterChange} />}

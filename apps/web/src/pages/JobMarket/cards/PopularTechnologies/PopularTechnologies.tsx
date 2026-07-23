@@ -2,16 +2,12 @@ import { Box, TableBody, TableHead, TableRow } from '@mui/material'
 import { ListIcon, SettingsIcon } from '@repo/assets'
 import { ApolloCardAction, BaseCard } from '@repo/apollo-card'
 import { useCommand, useFeed } from '@repo/feed-client'
-import { designTokens } from '@repo/design-tokens'
 import { JobMarketInsightFeed, MySkillsFeed, type SkillExperienceLevel } from '@repo/types'
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { ApolloDataTable, ApolloTableCell, ApolloValueCell, TablePlaceholder } from '@/card-components'
 import { useTranslations } from '@/i18n'
-import { jobMarketPopularExtraHeight, jobMarketPopularHeight } from '../../jobMarketCardLayout'
+import { jobMarketPopularHeight } from '../../jobMarketCardLayout'
 import { Skill } from './Skill'
-
-const tableHeaderGap = designTokens.space[3]
-const headerRowSx = { '& .MuiTableCell-root': { pb: `${tableHeaderGap}px`, color: 'text.secondary' } }
 
 export const PopularTechnologies: FC<Record<string, never>> = () => {
   const [editMode, setEditMode] = useState(false)
@@ -62,7 +58,6 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={ListIcon}
       height={jobMarketPopularHeight}
-      extraHeight={jobMarketPopularExtraHeight}
       allowZoom={false}
       actions={
         <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />
@@ -74,7 +69,7 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
         <Box sx={{ overflow: 'auto', height: '100%' }}>
           <ApolloDataTable sx={{ tableLayout: 'fixed' }}>
             <TableHead>
-              <TableRow sx={headerRowSx}>
+              <TableRow>
                 <ApolloTableCell sx={{ width: 24 }}>{labels.columns.rank}</ApolloTableCell>
                 <ApolloTableCell>{labels.columns.technology}</ApolloTableCell>
                 <ApolloTableCell sx={{ width: 56, px: 0.5, textAlign: 'center' }}>
