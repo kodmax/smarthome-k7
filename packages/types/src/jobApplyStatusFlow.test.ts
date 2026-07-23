@@ -30,11 +30,24 @@ describe('jobApplyStatusFlow', () => {
   })
 
   it('allows applied follow-up statuses', () => {
-    expect(availableTargetApplyStatuses('applied')).toEqual(['rejected', 'no-response', 'interview', 'withdrawn'])
+    expect(availableTargetApplyStatuses('applied')).toEqual([
+      'rejected',
+      'no-response',
+      'interview',
+      'withdrawn',
+      'unmet-requirements',
+    ])
+    expect(canTransition('applied', 'unmet-requirements')).toBe(true)
   })
 
   it('allows the same follow-up statuses from no-response as from applied', () => {
-    expect(availableTargetApplyStatuses('no-response')).toEqual(['rejected', 'no-response', 'interview', 'withdrawn'])
+    expect(availableTargetApplyStatuses('no-response')).toEqual([
+      'rejected',
+      'no-response',
+      'interview',
+      'withdrawn',
+      'unmet-requirements',
+    ])
     expect(canTransition('no-response', 'interview')).toBe(true)
     expect(canTransition('no-response', 'rejected')).toBe(true)
   })

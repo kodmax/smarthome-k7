@@ -31,11 +31,23 @@ describe('applyStatusTargetOptions', () => {
     ])
   })
 
-  it('returns the same follow-up transitions from no-response as from applied', () => {
-    expect(applyStatusTargetOptions('no-response')).toEqual(['rejected', 'no-response', 'interview', 'withdrawn'])
+  it('returns only allowed transitions', () => {
+    expect(applyStatusTargetOptions('applied')).toEqual([
+      'rejected',
+      'no-response',
+      'interview',
+      'withdrawn',
+      'unmet-requirements',
+    ])
   })
 
-  it('returns only allowed transitions', () => {
-    expect(applyStatusTargetOptions('applied')).toEqual(['rejected', 'no-response', 'interview', 'withdrawn'])
+  it('returns the same follow-up transitions from no-response as from applied', () => {
+    expect(applyStatusTargetOptions('no-response')).toEqual([
+      'rejected',
+      'no-response',
+      'interview',
+      'withdrawn',
+      'unmet-requirements',
+    ])
   })
 })

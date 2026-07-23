@@ -114,6 +114,25 @@ describe('applicationMeta', () => {
     })
   })
 
+  it('allows transition from applied to unmet-requirements', () => {
+    expect(
+      applyStatusChange(
+        {
+          applyStatus: 'applied',
+          comment: 'Sent CV',
+          appliedAt: '2026-07-19T12:00:00.000Z',
+          rejectedAt: null,
+        },
+        { applyStatus: 'unmet-requirements', comment: 'Missing Kubernetes' },
+      ),
+    ).toEqual({
+      applyStatus: 'unmet-requirements',
+      comment: 'Missing Kubernetes',
+      appliedAt: '2026-07-19T12:00:00.000Z',
+      rejectedAt: null,
+    })
+  })
+
   it('clears comment when changing status without a new comment', () => {
     expect(
       applyStatusChange(

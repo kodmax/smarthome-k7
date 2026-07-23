@@ -37,6 +37,7 @@ const APPLIED_FOLLOW_UP_STATUSES = [
   'no-response',
   'interview',
   'withdrawn',
+  'unmet-requirements',
 ] as const satisfies readonly JobApplyStatus[]
 
 const TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
