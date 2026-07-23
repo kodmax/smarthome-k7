@@ -28,5 +28,5 @@ const run = async (sony: IpControl) => {
 }
 
 await run(new IpControl(requireEnv('SONY_TV_IP'), requireEnv('SONY_TV_SECRET'))).catch(e => {
-  console.error(e + '')
+  // ignore
 })
