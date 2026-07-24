@@ -119,9 +119,6 @@ export const JobMarket: FC<Record<string, never>> = () => {
           <Box sx={{ gridArea: 'job-ads' }}>
             <JobAds />
           </Box>
-          <Box sx={{ gridArea: 'job-ads' }}>
-            <JobAds />
-          </Box>
           <Box sx={{ gridArea: 'ads-with-range' }}>
             <OffersWithSalaryRange />
           </Box>
