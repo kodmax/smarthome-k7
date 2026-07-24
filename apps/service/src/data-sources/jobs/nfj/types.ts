@@ -1,3 +1,5 @@
+import { EmploymentType } from '@repo/types'
+
 export type NoFluffJobsAd = {
   id: string
   title: string
@@ -10,7 +12,7 @@ export type NoFluffJobsAd = {
   salary: {
     from?: number
     to?: number
-    type: 'b2b' | 'permanent'
+    type: EmploymentType
   }
   tiles: {
     values: Array<{

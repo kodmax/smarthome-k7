@@ -1,3 +1,5 @@
+import { EmploymentType, SalaryUnit } from '@repo/types'
+
 export type Skill = {
   name: string
   level: number
@@ -16,8 +18,8 @@ export type JJEmploymentType = {
   toPerUnit: number | null
   currency: SalaryCurrency
   currencySource: 'original' | 'conversion'
-  type: 'permanent' | 'b2b' | 'any' | 'mandate_contract'
-  unit: 'Month' | 'Year' | 'Day' | 'Hour'
+  type: EmploymentType
+  unit: SalaryUnit
   gross: boolean
 }
 

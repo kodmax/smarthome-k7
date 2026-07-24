@@ -1,6 +1,7 @@
 import { JobAd } from '@repo/types'
 import { JustJoinAd } from './types'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
+import { sanitizeMonthlySalaryRange } from '../sanitizeMonthlySalary'
 import { createHash } from 'node:crypto'
 
 export const toJobAd = (jjAd: JustJoinAd): JobAd => {
@@ -15,14 +16,16 @@ export const toJobAd = (jjAd: JustJoinAd): JobAd => {
     companyName: jjAd.companyName,
     requiredSkills: jjAd.requiredSkills.filter(item => item.level >= 3).map(item => item.name),
     workplaceType: jjAd.workplaceType,
-    employmentType: jjEmploymentType?.type === 'permanent' ? 'permanent' : 'b2b',
+    employmentType: jjEmploymentType?.type ?? 'b2b',
     monthlySalaryRangeAfterTaxes:
       jjEmploymentType !== undefined && jjEmploymentType.fromPerUnit !== null && jjEmploymentType.toPerUnit !== null
-        ? getMonthlySalaryAfterTax(
-            jjEmploymentType.type === 'permanent' ? 'permanent' : 'b2b',
-            jjEmploymentType.unit,
-            jjEmploymentType.fromPerUnit,
-            jjEmploymentType.toPerUnit,
+        ? sanitizeMonthlySalaryRange(
+            getMonthlySalaryAfterTax(
+              jjEmploymentType.type,
+              jjEmploymentType.unit,
+              jjEmploymentType.fromPerUnit,
+              jjEmploymentType.toPerUnit,
+            ),
           )
         : undefined,
     publishedAt: jjAd.lastPublishedAt,

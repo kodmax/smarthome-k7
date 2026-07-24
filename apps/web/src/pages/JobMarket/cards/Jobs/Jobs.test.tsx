@@ -17,10 +17,11 @@ describe('Jobs', () => {
     mockedUseFeed.mockReturnValue(undefined)
   })
 
-  it('renders a loading placeholder when feed is unavailable', () => {
-    const { container } = render(<Jobs />)
+  it('renders an empty card when feed is unavailable', () => {
+    render(<Jobs />)
 
-    expect(container.querySelectorAll('tbody tr')).toHaveLength(12)
+    expect(screen.getByRole('heading', { name: 'Oferty pracy' })).toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
   it('renders job ads from the feed', () => {

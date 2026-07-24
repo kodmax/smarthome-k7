@@ -301,6 +301,11 @@ export type Translations = {
         rejectedNoResponse: string
         finished: string
       }
+      acceptableSalary: {
+        label: string
+        ariaLabel: string
+        valueAtLeast: string
+      }
       workplaceType: {
         office: string
         remote: string

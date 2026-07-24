@@ -127,4 +127,81 @@ describe('toJobAd', () => {
       publishedAt: '2026-05-13T16:16:35.807366Z',
     })
   })
+
+  it('drops salary when converted monthly net from is below 5k', () => {
+    const base = {
+      ...jjAd,
+      requiredSkills: [{ name: 'React', level: 3 }],
+      niceToHaveSkills: [] as JustJoinAd['niceToHaveSkills'],
+    }
+
+    expect(
+      toJobAd({
+        ...base,
+        slug: 'ness-solution-frontend-developer-eclipse--warszawa-javascript',
+        title: 'Frontend Developer (Eclipse)',
+        companyName: 'Ness Solution',
+        employmentTypes: [
+          {
+            from: 2415,
+            fromPerUnit: 115,
+            to: 2625,
+            toPerUnit: 125,
+            currency: 'PLN',
+            currencySource: 'original',
+            type: 'b2b',
+            unit: 'Day',
+            gross: false,
+          },
+        ],
+      }).monthlySalaryRangeAfterTaxes,
+    ).toBeUndefined()
+
+    expect(
+      toJobAd({
+        ...base,
+        slug: 'netguru-frontend-developer-with-react---freelance-poznan-javascript',
+        title: 'Frontend Developer with React - Freelance',
+        companyName: 'Netguru',
+        employmentTypes: [
+          {
+            from: 5040,
+            fromPerUnit: 30,
+            to: 5040,
+            toPerUnit: 30,
+            currency: 'PLN',
+            currencySource: 'original',
+            type: 'permanent',
+            unit: 'Hour',
+            gross: true,
+          },
+        ],
+      }).monthlySalaryRangeAfterTaxes,
+    ).toBeUndefined()
+  })
+
+  it('passes through jj employment type without mapping to b2b', () => {
+    const ad = toJobAd({
+      ...jjAd,
+      slug: 'experis-servicenow-developer-warszawa-javascript',
+      title: 'ServiceNow Developer',
+      companyName: 'Experis',
+      requiredSkills: [{ name: 'JavaScript', level: 3 }],
+      employmentTypes: [
+        {
+          from: 140,
+          fromPerUnit: 140,
+          to: 175,
+          toPerUnit: 175,
+          currency: 'PLN',
+          currencySource: 'original',
+          type: 'any',
+          unit: 'Hour',
+          gross: false,
+        },
+      ],
+    })
+
+    expect(ad.employmentType).toBe('any')
+  })
 })

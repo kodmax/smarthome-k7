@@ -75,6 +75,7 @@ export const Actions = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   flex: '0 0 auto',
+  gap: designTokens.space[4],
 })
 
 export const ApolloCardRoot = styled(Card, {

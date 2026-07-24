@@ -335,6 +335,11 @@ export const en: Translations = {
         rejectedNoResponse: 'Rejected and no response',
         finished: 'Finished',
       },
+      acceptableSalary: {
+        label: 'Minimum salary',
+        ariaLabel: 'Minimum acceptable salary',
+        valueAtLeast: 'Salary >= {amount} k PLN',
+      },
       workplaceType: {
         office: 'Office',
         remote: 'Remote',

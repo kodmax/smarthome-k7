@@ -1,11 +1,31 @@
-import { JobAd } from '@repo/types'
+import { JobAd, JobAdWithMeta, JobApplyStatus } from '@repo/types'
 
 export const isHybridOrRemote: (offer: JobAd) => boolean = offer =>
   offer.workplaceType === 'hybrid' || offer.workplaceType === 'remote'
 
-const MIN_SALARY = 24_000
-export const isSalaryAcceptable = (ad: JobAd): boolean =>
-  ad.monthlySalaryRangeAfterTaxes !== undefined && ad.monthlySalaryRangeAfterTaxes.to > MIN_SALARY
+const SALARY_FILTER_EXEMPT_STATUSES = new Set<JobApplyStatus>(['interview', 'offer'])
+
+export const shouldFilterJobAdBySalary = (status: JobApplyStatus): boolean => !SALARY_FILTER_EXEMPT_STATUSES.has(status)
+
+export const isSalaryAboveThreshold = (ad: JobAd, threshold: number): boolean =>
+  ad.monthlySalaryRangeAfterTaxes !== undefined && ad.monthlySalaryRangeAfterTaxes.to > threshold
+
+export const filterJobAdsByAcceptableSalary = (
+  ads: JobAdWithMeta[],
+  acceptableSalary: number | null,
+): JobAdWithMeta[] => {
+  if (acceptableSalary === null) {
+    return ads
+  }
+
+  return ads.filter(ad => {
+    if (!shouldFilterJobAdBySalary(ad.meta.application.status)) {
+      return true
+    }
+
+    return isSalaryAboveThreshold(ad, acceptableSalary)
+  })
+}
 
 const unwantedSkills = [
   /^python/i,

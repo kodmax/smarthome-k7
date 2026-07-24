@@ -11,5 +11,7 @@ export const addJobsFeed = (feeds: Feeds): Promise<void> =>
 
     return {
       ads: jobs.ads.filter(ad => !ad.requiredSkills.some(skill => notInterested.has(toSkillId(skill)))),
+      salaryRange: jobs.salaryRange,
+      acceptableSalary: jobs.acceptableSalary,
     }
   })

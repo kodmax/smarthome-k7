@@ -2,6 +2,7 @@ import { JobAd, SalaryUnit, WorkplaceType } from '@repo/types'
 import { getAds } from './getAds'
 import { Contract } from './types'
 import { getMonthlySalaryAfterTax } from '../getMonthlySalaryAfterTax'
+import { sanitizeMonthlySalaryRange } from '../sanitizeMonthlySalary'
 import { toIsoDate } from '../toIsoDate'
 import { createHash } from 'node:crypto'
 
@@ -49,7 +50,7 @@ const theprotocol: () => Promise<JobAd[]> = async () => {
       requiredSkills: ad.technologies,
       workplaceType,
       employmentType: bestContractType.type,
-      monthlySalaryRangeAfterTaxes: bestContractType.salaryRange,
+      monthlySalaryRangeAfterTaxes: sanitizeMonthlySalaryRange(bestContractType.salaryRange),
       origin: 'theprotocol',
       publishedAt: toIsoDate(ad.publicationDateUtc),
     })

@@ -1,3 +1,4 @@
+import { ContractType } from '@repo/types'
 import { describe, expect, it } from 'vitest'
 import { getMonthlySalaryAfterTax } from './getMonthlySalaryAfterTax'
 
@@ -46,5 +47,46 @@ describe('getMonthlySalaryAfterTax', () => {
         to: Math.round((((120 * 2008) / 2008) * 1800 * 0.88 - 12_000) / 12),
       })
     })
+  })
+
+  describe('uod-like contract types', () => {
+    it('converts uod without zus deduction', () => {
+      expect(getMonthlySalaryAfterTax('uod', 'Month', 20_000, 25_000)).toEqual({
+        from: Math.round((((20_000 * 12) / 2008) * 1800 * 0.88) / 12),
+        to: Math.round((((25_000 * 12) / 2008) * 1800 * 0.88) / 12),
+      })
+    })
+
+    it('converts mandate_contract like uod', () => {
+      expect(getMonthlySalaryAfterTax('mandate_contract', 'Month', 20_000, 25_000)).toEqual(
+        getMonthlySalaryAfterTax('uod', 'Month', 20_000, 25_000),
+      )
+    })
+
+    it('converts contract like uod', () => {
+      expect(getMonthlySalaryAfterTax('contract', 'Month', 8_000, 13_000)).toEqual(
+        getMonthlySalaryAfterTax('uod', 'Month', 8_000, 13_000),
+      )
+    })
+  })
+
+  describe('other jj contract types', () => {
+    it('converts any like b2b', () => {
+      expect(getMonthlySalaryAfterTax('any', 'Hour', 100, 120)).toEqual(
+        getMonthlySalaryAfterTax('b2b', 'Hour', 100, 120),
+      )
+    })
+
+    it('converts internship like permanent', () => {
+      expect(getMonthlySalaryAfterTax('internship', 'Month', 50_000, 67_000)).toEqual(
+        getMonthlySalaryAfterTax('permanent', 'Month', 50_000, 67_000),
+      )
+    })
+  })
+
+  it('throws for unknown contract type', () => {
+    expect(() => getMonthlySalaryAfterTax('invalid' as ContractType, 'Month', 10_000, 12_000)).toThrow(
+      'Unknown contract type: invalid',
+    )
   })
 })

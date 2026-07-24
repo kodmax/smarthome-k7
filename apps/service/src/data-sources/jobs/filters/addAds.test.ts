@@ -18,7 +18,7 @@ const makeAd = (overrides: Partial<JobAd> = {}): JobAd => ({
 })
 
 describe('addAds', () => {
-  it('adds ads passing all filters', () => {
+  it('adds ads to the map', () => {
     const allAds = new Map<string, JobAd>()
     const ad = makeAd()
 
@@ -28,7 +28,7 @@ describe('addAds', () => {
     expect(allAds.get('acme -- SENIOR REACT DEVELOPER')).toBe(ad)
   })
 
-  it('accepts ads with unwanted skills when other filters pass', () => {
+  it('adds ads regardless of skills', () => {
     const allAds = new Map<string, JobAd>()
     const ad = makeAd({ requiredSkills: ['Python', 'React'] })
 
@@ -38,13 +38,17 @@ describe('addAds', () => {
     expect(allAds.get('acme -- SENIOR REACT DEVELOPER')).toBe(ad)
   })
 
-  it('rejects ads with salary below threshold', () => {
+  it('adds ads regardless of salary', () => {
     const allAds = new Map<string, JobAd>()
-    addAds(allAds, [makeAd({ monthlySalaryRangeAfterTaxes: { from: 20_000, to: 24_000 } })])
-    expect(allAds.size).toBe(0)
+    const ad = makeAd({ monthlySalaryRangeAfterTaxes: { from: 20_000, to: 24_000 } })
+
+    addAds(allAds, [ad])
+
+    expect(allAds.size).toBe(1)
+    expect(allAds.get('acme -- SENIOR REACT DEVELOPER')).toBe(ad)
   })
 
-  it('accepts office-only ads when other filters pass', () => {
+  it('adds office-only ads', () => {
     const allAds = new Map<string, JobAd>()
     const ad = makeAd({ workplaceType: 'office' })
 
@@ -54,10 +58,14 @@ describe('addAds', () => {
     expect(allAds.get('acme -- SENIOR REACT DEVELOPER')).toBe(ad)
   })
 
-  it('rejects manager titles', () => {
+  it('adds manager titles', () => {
     const allAds = new Map<string, JobAd>()
-    addAds(allAds, [makeAd({ title: 'Engineering Manager' })])
-    expect(allAds.size).toBe(0)
+    const ad = makeAd({ title: 'Engineering Manager' })
+
+    addAds(allAds, [ad])
+
+    expect(allAds.size).toBe(1)
+    expect(allAds.get('acme -- ENGINEERING MANAGER')).toBe(ad)
   })
 
   it('deduplicates by company name and title (case-insensitive)', () => {

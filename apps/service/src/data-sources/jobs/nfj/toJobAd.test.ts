@@ -52,6 +52,22 @@ describe('toJobAd', () => {
     )
   })
 
+  it('calculates UoD salary without zus deduction', () => {
+    const ad = toJobAd(
+      {
+        ...baseNfjAd,
+        salary: { from: 25_536, to: 25_536, type: 'uod' },
+      },
+      new Set(),
+    )
+
+    expect(ad.employmentType).toBe('uod')
+    expect(ad.monthlySalaryRangeAfterTaxes).toEqual({
+      from: Math.round((((25_536 * 12) / 2008) * 1800 * 0.88) / 12),
+      to: Math.round((((25_536 * 12) / 2008) * 1800 * 0.88) / 12),
+    })
+  })
+
   it('calculates B2B salary', () => {
     const ad = toJobAd(
       {

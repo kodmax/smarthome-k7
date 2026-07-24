@@ -12,8 +12,10 @@ import {
   jobAdApplicationFromMeta,
 } from '@repo/types'
 import { nfj } from './nfj/nfj'
-import { addAds } from './filters'
+import { addAds, filterJobAdsByAcceptableSalary } from './filters'
 import { theprotocol } from './theprotocol'
+import { computeJobsSalaryRange } from './computeJobsSalaryRange'
+import { loadAcceptableSalary, parseSetAcceptableSalaryCommandArgs, saveAcceptableSalary } from './jobsPreferences'
 import {
   applyStatusChange,
   emptyApplicationMeta,
@@ -50,7 +52,20 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
       case 'unfav':
         await this.commandUnfav(args)
         break
+      case 'set-acceptable-salary':
+        await this.commandSetAcceptableSalary(args)
+        break
     }
+  }
+
+  private async commandSetAcceptableSalary(args: string): Promise<void> {
+    const parsed = parseSetAcceptableSalaryCommandArgs(args)
+    if (parsed === null) {
+      return
+    }
+
+    await saveAcceptableSalary(this.db, parsed.value)
+    this.push()
   }
 
   private async commandChangeState(args: string): Promise<void> {
@@ -116,8 +131,14 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
   }
 
   async composeContent(cached: JobsCachedFeed): Promise<JobsFeed> {
+    const salaryRange = computeJobsSalaryRange(cached.ads)
+    const acceptableSalary = await loadAcceptableSalary(this.db)
+    const adsWithMeta = await this.attachMeta(cached.ads)
+
     return {
-      ads: await this.attachMeta(cached.ads),
+      ads: filterJobAdsByAcceptableSalary(adsWithMeta, acceptableSalary),
+      salaryRange,
+      acceptableSalary,
     }
   }
 
@@ -299,7 +320,7 @@ export class JobsSource extends DataSourceDefinition<JobsFeed, JobsCachedFeed> {
       `insert into meta (item_uid, attribute_name, group_id, value)
        values (?, 'application', ?, ?)
        on duplicate key update value = values(value), group_id = values(group_id)`,
-      [itemId, this.getId(), JSON.stringify(meta)],
+      [itemId, this.getId(), meta],
     )
   }
 

@@ -305,10 +305,10 @@ export type TemperatureData = {
 }
 
 export type SalaryUnit = 'Year' | 'Month' | 'Day' | 'Hour'
-export type ContractType = 'permanent' | 'b2b'
+export type ContractType = 'permanent' | 'b2b' | 'uod' | 'mandate_contract' | 'any' | 'contract' | 'internship'
 
 export type WorkplaceType = 'office' | 'remote' | 'hybrid'
-export type EmploymentType = 'permanent' | 'b2b'
+export type EmploymentType = 'permanent' | 'b2b' | 'uod' | 'mandate_contract' | 'any' | 'contract' | 'internship'
 
 export type SalaryRange = {
   from: number
@@ -358,8 +358,15 @@ export type JobAdWithMeta = JobAd & {
   meta: JobAdMeta
 }
 
+export type JobsSalaryRange = {
+  min: number
+  max: number
+}
+
 export type JobsFeed = {
   ads: JobAdWithMeta[]
+  salaryRange: JobsSalaryRange | null
+  acceptableSalary: number | null
 }
 
 export type JobsCachedFeed = {

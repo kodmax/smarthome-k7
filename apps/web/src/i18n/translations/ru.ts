@@ -335,6 +335,11 @@ export const ru: Translations = {
         rejectedNoResponse: 'Отклонённые и без ответа',
         finished: 'Завершённые',
       },
+      acceptableSalary: {
+        label: 'Минимальная зарплата',
+        ariaLabel: 'Минимально приемлемая зарплата',
+        valueAtLeast: 'Зарплата >= {amount} k PLN',
+      },
       workplaceType: {
         office: 'Офис',
         remote: 'Удалённо',
