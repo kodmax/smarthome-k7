@@ -4,6 +4,14 @@ import { JobAdsFeed } from '@repo/types'
 import { FC, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from '@/i18n'
 
+// MUI Slider still listens to mouse+touch; iOS Safari synthesizes mousedown/mouseup after a short
+// drag and those ghost events reset the controlled value to the drag start (mui#31869).
+const isIOS =
+  typeof navigator !== 'undefined' &&
+  (/iPad|iPhone|iPod/.test(navigator.platform) || (navigator.userAgent.includes('Mac') && 'ontouchend' in document))
+
+const toSliderValue = (newValue: number | number[]): number => (Array.isArray(newValue) ? newValue[0] : newValue)
+
 type Props = {
   salaryRange: JobAdsFeed['salaryRange']
   acceptableSalary: JobAdsFeed['acceptableSalary']
@@ -53,9 +61,22 @@ const AcceptableSalarySliderInner: FC<InnerProps> = ({
     [labels.valueAtLeast, value],
   )
 
+  const onChange = useCallback((_event: Event, newValue: number | number[]) => {
+    if (isIOS && _event.type === 'mousedown') {
+      return
+    }
+
+    setValue(toSliderValue(newValue))
+  }, [])
+
   const onChangeCommitted = useCallback(
-    (_event: SyntheticEvent | Event, newValue: number | number[]) => {
-      const next = Array.isArray(newValue) ? newValue[0] : newValue
+    (event: SyntheticEvent | Event, newValue: number | number[]) => {
+      if (isIOS && event.type === 'mouseup') {
+        return
+      }
+
+      const next = toSliderValue(newValue)
+      setValue(next)
       setAcceptableSalary(JSON.stringify({ value: next }))
     },
     [setAcceptableSalary],
@@ -73,7 +94,7 @@ const AcceptableSalarySliderInner: FC<InnerProps> = ({
           min={salaryRange.min}
           max={salaryRange.max}
           step={1000}
-          onChange={(_event, newValue) => setValue(Array.isArray(newValue) ? newValue[0] : newValue)}
+          onChange={onChange}
           onChangeCommitted={onChangeCommitted}
           aria-label={labels.ariaLabel}
           aria-valuetext={valueLabel}

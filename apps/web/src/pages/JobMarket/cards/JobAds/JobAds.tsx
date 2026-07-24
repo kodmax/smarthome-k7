@@ -1,4 +1,5 @@
 import { type FC, useCallback, useState } from 'react'
+import { useMediaQuery, useTheme } from '@mui/material'
 import { JobAdsIcon } from '@repo/assets'
 import { BaseCard } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
@@ -11,6 +12,8 @@ import { AcceptableSalarySlider } from './components/AcceptableSalarySlider'
 
 export const JobAds: FC<Record<string, never>> = () => {
   const [adsFilter, setAdsFilter] = useState<JobAdsFilter>(DEFAULT_JOB_ADS_FILTER)
+  const theme = useTheme()
+  const isSmUp = useMediaQuery(theme.breakpoints.up('sm'))
 
   const feed = useFeed<JobAdsFeed>('job-ads')
   const { t } = useTranslations()
@@ -39,7 +42,9 @@ export const JobAds: FC<Record<string, never>> = () => {
       headingInfo={countJobAdsEditViewAds(feed.ads, adsFilter)}
       actions={
         <>
-          <AcceptableSalarySlider salaryRange={feed.salaryRange} acceptableSalary={feed.acceptableSalary} />
+          {isSmUp ? (
+            <AcceptableSalarySlider salaryRange={feed.salaryRange} acceptableSalary={feed.acceptableSalary} />
+          ) : null}
           <JobAdsFilterSelect value={adsFilter} onChange={onAdsFilterChange} />
         </>
       }
