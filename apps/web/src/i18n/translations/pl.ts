@@ -96,7 +96,10 @@ export const pl: Translations = {
       },
     },
     popularTechnologies: {
-      title: 'Technologie w P90',
+      title: 'Umiejętności',
+      searchLabel: 'Szukaj technologii',
+      searchPlaceholder: 'Szukaj…',
+      clearSearch: 'Wyczyść wyszukiwanie',
       editExperience: 'Edytuj doświadczenie',
       experienceLevelLabel: 'Moje doświadczenie',
       experienceLevelPlaceholder: 'Wybierz poziom',

@@ -1,16 +1,6 @@
-import {
-  isIgnoredSkillKey,
-  normalizeSkillKey,
-  filterByPercentileOf,
-  toTechnologyId,
-  unifySkillName,
-} from '@repo/common'
+import { isIgnoredSkillKey, normalizeSkillKey, toTechnologyId, unifySkillName } from '@repo/common'
 import { JobAd, JobMarketPopularTechnology } from '@repo/types'
-import { SALARY_INSIGHT_PERCENTILE } from './computeP90Salary'
 import { median } from './median'
-
-export const POPULAR_TECHNOLOGIES_LIMIT = 50
-export const POPULAR_TECHNOLOGIES_MIN_OFFERS_COUNT = 2
 
 const computeTechnologyMedian = (ads: JobAd[]): number | null => {
   const result = median(
@@ -21,14 +11,13 @@ const computeTechnologyMedian = (ads: JobAd[]): number | null => {
 }
 
 export const computePopularTechnologies = (ads: JobAd[]): JobMarketPopularTechnology[] => {
-  const topPaidAds = filterByPercentileOf(ads, SALARY_INSIGHT_PERCENTILE, ad => ad.monthlySalaryRangeAfterTaxes?.to)
-  if (topPaidAds.length === 0) {
+  if (ads.length === 0) {
     return []
   }
 
   const adsBySkillKey = new Map<string, { name: string; ads: JobAd[] }>()
 
-  for (const ad of topPaidAds) {
+  for (const ad of ads) {
     const unifiedSkills = new Map<string, string>()
 
     for (const skill of ad.requiredSkills) {
@@ -52,15 +41,30 @@ export const computePopularTechnologies = (ads: JobAd[]): JobMarketPopularTechno
     }
   }
 
-  return [...adsBySkillKey.values()]
+  const technologies = [...adsBySkillKey.values()]
     .map(({ name, ads: matching }) => ({
       id: toTechnologyId(name),
       name,
       offersCount: matching.length,
-      sharePercent: Math.round((matching.length / topPaidAds.length) * 100),
+      sharePercent: Math.round((matching.length / ads.length) * 100),
       medianSalary: computeTechnologyMedian(matching),
     }))
-    .filter(technology => technology.offersCount >= POPULAR_TECHNOLOGIES_MIN_OFFERS_COUNT)
     .sort((a, b) => b.offersCount - a.offersCount || a.name.localeCompare(b.name))
-    .slice(0, POPULAR_TECHNOLOGIES_LIMIT)
+
+  const seenIds = new Set<string>()
+  const duplicateIds = new Set<string>()
+
+  for (const { id } of technologies) {
+    if (seenIds.has(id)) {
+      duplicateIds.add(id)
+      continue
+    }
+    seenIds.add(id)
+  }
+
+  if (duplicateIds.size > 0) {
+    throw new Error(`Duplicate popular technology ids: ${[...duplicateIds].join(', ')}`)
+  }
+
+  return technologies
 }

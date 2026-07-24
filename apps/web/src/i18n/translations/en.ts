@@ -96,7 +96,10 @@ export const en: Translations = {
       },
     },
     popularTechnologies: {
-      title: 'Technologies in P90',
+      title: 'Skills',
+      searchLabel: 'Search technologies',
+      searchPlaceholder: 'Search…',
+      clearSearch: 'Clear search',
       editExperience: 'Edit experience',
       experienceLevelLabel: 'My experience',
       experienceLevelPlaceholder: 'Select level',

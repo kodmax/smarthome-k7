@@ -95,6 +95,9 @@ export type Translations = {
     }
     popularTechnologies: {
       title: string
+      searchLabel: string
+      searchPlaceholder: string
+      clearSearch: string
       editExperience: string
       experienceLevelLabel: string
       experienceLevelPlaceholder: string

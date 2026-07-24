@@ -27,7 +27,9 @@ export const apolloCardContentHeightPx = (rows: number, extraHeight = 0) =>
 export const apolloCardContentHeight = (rows: number, extraHeight = 0) =>
   `${apolloCardContentHeightPx(rows, extraHeight)}px`
 
-export const ApolloCardHeader = styled(Box)<{ zoom: boolean }>(({ theme, zoom }) => ({
+export const ApolloCardHeader = styled(Box, {
+  shouldForwardProp: prop => prop !== 'zoom',
+})<{ zoom: boolean }>(({ theme, zoom }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: designTokens.space[2],

@@ -6,11 +6,14 @@ import { JobMarketInsightFeed, MySkillsFeed, type SkillExperienceLevel } from '@
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { ApolloDataTable, ApolloTableCell, ApolloValueCell, TablePlaceholder } from '@/card-components'
 import { useTranslations } from '@/i18n'
-import { Skill } from './Skill'
+import { rankCellSx, Skill } from './Skill'
+import { TechnologySearchInput } from './TechnologySearchInput'
+import { useFilteredPopularTechnologies } from './useFilteredPopularTechnologies'
 
 export const PopularTechnologies: FC<Record<string, never>> = () => {
   const [editMode, setEditMode] = useState(false)
   const [expandedSkillId, setExpandedSkillId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const { t } = useTranslations()
   const labels = t.jobMarket.popularTechnologies
   const feed = useFeed<JobMarketInsightFeed>('job-market-insight')
@@ -23,6 +26,8 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
     return map
   }, [mySkillsFeed])
 
+  const filteredTechnologies = useFilteredPopularTechnologies(feed?.popularTechnologies, searchQuery)
+
   const onEditPreferences = useCallback(() => {
     setEditMode(current => !current)
   }, [])
@@ -32,6 +37,11 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
       setExpandedSkillId(null)
     }
   }, [editMode])
+
+  const onSearchChange = useCallback((query: string) => {
+    setSearchQuery(query)
+    setExpandedSkillId(null)
+  }, [])
 
   const onToggleSkillExpand = useCallback((skillId: string) => {
     setExpandedSkillId(current => (current === skillId ? null : skillId))
@@ -59,6 +69,7 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
       extraHeight={2}
       height={7}
       allowZoom={false}
+      headingInfo={<TechnologySearchInput value={searchQuery} onChange={onSearchChange} />}
       actions={
         <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />
       }
@@ -70,7 +81,7 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
           <ApolloDataTable sx={{ tableLayout: 'fixed' }}>
             <TableHead>
               <TableRow>
-                <ApolloTableCell sx={{ width: 24 }}>{labels.columns.rank}</ApolloTableCell>
+                <ApolloTableCell sx={rankCellSx}>{labels.columns.rank}</ApolloTableCell>
                 <ApolloTableCell>{labels.columns.technology}</ApolloTableCell>
                 <ApolloTableCell sx={{ width: 56, px: 0.5, textAlign: 'center' }}>
                   {labels.columns.experience}
@@ -82,10 +93,10 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
             </TableHead>
 
             <TableBody>
-              {feed.popularTechnologies.map((technology, index) => (
+              {filteredTechnologies.map(({ technology, rank }) => (
                 <Skill
                   key={technology.id}
-                  rank={index + 1}
+                  rank={rank}
                   technology={technology}
                   editMode={editMode}
                   expanded={expandedSkillId === technology.id}

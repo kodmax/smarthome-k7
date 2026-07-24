@@ -96,7 +96,10 @@ export const ru: Translations = {
       },
     },
     popularTechnologies: {
-      title: 'Технологии в P90',
+      title: 'Навыки',
+      searchLabel: 'Поиск технологий',
+      searchPlaceholder: 'Поиск…',
+      clearSearch: 'Очистить поиск',
       editExperience: 'Редактировать опыт',
       experienceLevelLabel: 'Мой опыт',
       experienceLevelPlaceholder: 'Выберите уровень',

@@ -62,6 +62,26 @@ describe('normalizeSkillKey', () => {
     expect(normalizeSkillKey('CSS3')).toBe('css')
   })
 
+  it('groups HTML/CSS combo label variants under one key', () => {
+    expect(normalizeSkillKey('HTML / CSS')).toBe('htmlcss')
+    expect(normalizeSkillKey('HTML-CSS')).toBe('htmlcss')
+    expect(normalizeSkillKey('HTML + CSS')).toBe('htmlcss')
+    expect(normalizeSkillKey('HTML5 / CSS3')).toBe('htmlcss')
+    expect(normalizeSkillKey('HTML5/CSS3')).toBe('htmlcss')
+    expect(normalizeSkillKey('HTML5-CSS3')).toBe('htmlcss')
+    expect(normalizeSkillKey('HTML5, CSS3')).toBe('htmlcss')
+  })
+
+  it('groups CI/CD under cicd', () => {
+    expect(normalizeSkillKey('CI/CD')).toBe('cicd')
+  })
+
+  it('groups C# and C++ under distinct keys', () => {
+    expect(normalizeSkillKey('C')).toBe('c')
+    expect(normalizeSkillKey('C#')).toBe('csharp')
+    expect(normalizeSkillKey('C++')).toBe('cplusplus')
+  })
+
   it('groups spring under spring boot', () => {
     expect(normalizeSkillKey('Spring Boot')).toBe('springboot')
     expect(normalizeSkillKey('Spring')).toBe('springboot')
@@ -94,6 +114,13 @@ describe('unifySkillName', () => {
     expect(unifySkillName('Test automation')).toBe('Automated Testing')
     expect(unifySkillName('HTML5')).toBe('HTML')
     expect(unifySkillName('CSS3')).toBe('CSS')
+    expect(unifySkillName('HTML / CSS')).toBe('HTML + CSS')
+    expect(unifySkillName('HTML-CSS')).toBe('HTML + CSS')
+    expect(unifySkillName('HTML5 / CSS3')).toBe('HTML + CSS')
+    expect(unifySkillName('HTML5-CSS3')).toBe('HTML + CSS')
+    expect(unifySkillName('CI/CD')).toBe('CI/CD')
+    expect(unifySkillName('C#')).toBe('C#')
+    expect(unifySkillName('C++')).toBe('C++')
     expect(unifySkillName('JS')).toBe('JavaScript')
     expect(unifySkillName('Spring')).toBe('Spring Boot')
     expect(unifySkillName('Tailwind')).toBe('Tailwind CSS')

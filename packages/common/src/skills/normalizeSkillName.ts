@@ -10,6 +10,7 @@ const CANONICAL_SKILL_NAMES: Record<string, string> = {
   backend: 'Backend',
   cicd: 'CI/CD',
   csharp: 'C#',
+  cplusplus: 'C++',
   css: 'CSS',
   cypress: 'Cypress',
   docker: 'Docker',
@@ -22,6 +23,7 @@ const CANONICAL_SKILL_NAMES: Record<string, string> = {
   github: 'GitHub',
   graphql: 'GraphQL',
   html: 'HTML',
+  htmlcss: 'HTML + CSS',
   java: 'Java',
   javascript: 'JavaScript',
   jest: 'Jest',
@@ -54,6 +56,16 @@ const CANONICAL_SKILL_NAMES: Record<string, string> = {
 
 const SCRIPT_SKILL_KEYS = new Set(['javascript', 'typescript'])
 
+const HTML_CSS_COMBO_KEYS = new Set([
+  'htmlcss',
+  'html+css',
+  'html5css',
+  'htmlcss3',
+  'html5css3',
+  'htmlandcss',
+  'html5andcss3',
+])
+
 const IGNORED_SKILL_KEYS = new Set([
   'agile',
   'backend',
@@ -71,12 +83,13 @@ const IGNORED_SKILL_KEYS = new Set([
 
 export const isIgnoredSkillKey = (key: string): boolean => IGNORED_SKILL_KEYS.has(key)
 
+/** Maps different labels of the same skill into one bucket key (dedupe / aggregate). */
 export const normalizeSkillKey = (skill: string): string => {
   let normalized = skill
     .trim()
     .toLowerCase()
     .replace(/\.(js|jsx)$/u, '')
-  normalized = normalized.replace(/[^a-z0-9+#/]+/gu, '')
+  normalized = normalized.replace(/[^a-z0-9+#]+/gu, '')
 
   if (normalized === 'net' || normalized === 'netcore') {
     return normalized === 'netcore' ? 'dotnetcore' : 'dotnet'
@@ -108,6 +121,18 @@ export const normalizeSkillKey = (skill: string): string => {
 
   if (normalized === 'css3') {
     return 'css'
+  }
+
+  if (HTML_CSS_COMBO_KEYS.has(normalized)) {
+    return 'htmlcss'
+  }
+
+  if (normalized === 'c#') {
+    return 'csharp'
+  }
+
+  if (normalized === 'c++') {
+    return 'cplusplus'
   }
 
   if (normalized === 'js') {

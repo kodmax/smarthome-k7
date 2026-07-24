@@ -11,6 +11,11 @@ import { TechnologyLogo } from './TechnologyLogo'
 
 const columnCount = 6
 
+export const rankCellSx = {
+  width: 32,
+  textAlign: 'right',
+} as const
+
 const experienceCellSx = {
   width: 56,
   px: 0.5,
@@ -38,46 +43,41 @@ export const Skill: FC<Props> = ({
   onToggleExpand,
   onLevelChange,
   onCommentBlur,
-}) => {
-  return (
-    <Fragment>
-      <TableRow sx={{ height: 40 }}>
-        <ApolloTableCell>{rank}</ApolloTableCell>
-        <ApolloTableCell>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-            <TechnologyLogo id={technology.id} name={technology.name} />
-            <Typography variant='body2' noWrap sx={{ minWidth: 0 }}>
-              {technology.name}
-            </Typography>
-          </Box>
+}) => (
+  <Fragment>
+    <TableRow sx={{ height: 40 }}>
+      <ApolloTableCell sx={rankCellSx}>{rank}</ApolloTableCell>
+      <ApolloTableCell>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+          <TechnologyLogo id={technology.id} name={technology.name} />
+          <Typography variant='body2' noWrap sx={{ minWidth: 0 }}>
+            {technology.name}
+          </Typography>
+        </Box>
+      </ApolloTableCell>
+      <ApolloTableCell sx={experienceCellSx}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.5 }}>
+          {mySkill?.level ? <SkillLevelIndicator level={mySkill.level} comment={mySkill.comment} /> : null}
+          {editMode ? <SkillEditButton expanded={expanded} onClick={onToggleExpand} /> : null}
+        </Box>
+      </ApolloTableCell>
+      <ApolloValueCell>{formatNumber(technology.offersCount, { fractionDigits: 0 })}</ApolloValueCell>
+      <ApolloValueCell>{`${technology.sharePercent}%`}</ApolloValueCell>
+      <ApolloValueCell>
+        {technology.medianSalary !== null ? `${formatNumber(technology.medianSalary, { fractionDigits: 0 })} zł` : '--'}
+      </ApolloValueCell>
+    </TableRow>
+    {editMode && expanded ? (
+      <TableRow>
+        <ApolloTableCell colSpan={columnCount} sx={{ py: `${designTokens.space[2]}px` }}>
+          <SkillExperienceEditor
+            level={mySkill?.level ?? null}
+            initialComment={mySkill?.comment ?? ''}
+            onLevelChange={onLevelChange}
+            onCommentBlur={onCommentBlur}
+          />
         </ApolloTableCell>
-        <ApolloTableCell sx={experienceCellSx}>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.5 }}>
-            {mySkill?.level ? <SkillLevelIndicator level={mySkill.level} comment={mySkill.comment} /> : null}
-            {editMode ? <SkillEditButton expanded={expanded} onClick={onToggleExpand} /> : null}
-          </Box>
-        </ApolloTableCell>
-        <ApolloValueCell>{formatNumber(technology.offersCount, { fractionDigits: 0 })}</ApolloValueCell>
-        <ApolloValueCell>{`${technology.sharePercent}%`}</ApolloValueCell>
-        <ApolloValueCell>
-          {technology.medianSalary !== null
-            ? `${formatNumber(technology.medianSalary, { fractionDigits: 0 })} zł`
-            : '--'}
-        </ApolloValueCell>
       </TableRow>
-      {editMode && expanded ? (
-        <TableRow>
-          <ApolloTableCell colSpan={columnCount} sx={{ py: `${designTokens.space[2]}px` }}>
-            <SkillExperienceEditor
-              key={technology.id}
-              level={mySkill?.level ?? null}
-              initialComment={mySkill?.comment ?? ''}
-              onLevelChange={onLevelChange}
-              onCommentBlur={onCommentBlur}
-            />
-          </ApolloTableCell>
-        </TableRow>
-      ) : null}
-    </Fragment>
-  )
-}
+    ) : null}
+  </Fragment>
+)

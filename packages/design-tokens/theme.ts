@@ -551,6 +551,19 @@ export const theme = createTheme({
         }),
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        input: {
+          // Keep text/placeholder clear of rounded outline corners.
+          paddingLeft: `${space[3]}px`,
+          paddingRight: `${space[3]}px`,
+        },
+        inputSizeSmall: {
+          paddingLeft: `${space[3]}px`,
+          paddingRight: `${space[3]}px`,
+        },
+      },
+    },
     MuiTableCell: {
       styleOverrides: {
         root: ({ theme }: { theme: Theme }) => ({

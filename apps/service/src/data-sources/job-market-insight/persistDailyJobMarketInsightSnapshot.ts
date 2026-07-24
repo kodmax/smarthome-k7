@@ -6,15 +6,18 @@ const DAILY_SNAPSHOT_TIME = '18:00:00'
 
 type JobMarketInsightSnapshotMetrics = Omit<JobMarketInsightMetrics, 'popularTechnologies' | 'salaryDistribution'>
 
-export const toSnapshotMetrics = (metrics: JobMarketInsightMetrics): JobMarketInsightSnapshotMetrics => {
-  const {
-    popularTechnologies: _popularTechnologies,
-    salaryDistribution: _salaryDistribution,
-    ...snapshotMetrics
-  } = metrics
-
-  return snapshotMetrics
-}
+export const toSnapshotMetrics = (metrics: JobMarketInsightMetrics): JobMarketInsightSnapshotMetrics => ({
+  adsCount: metrics.adsCount,
+  newOffersCount: metrics.newOffersCount,
+  medianSalary: metrics.medianSalary,
+  p90Salary: metrics.p90Salary,
+  p90OffersCount: metrics.p90OffersCount,
+  offersWithSalaryRangePercent: metrics.offersWithSalaryRangePercent,
+  remoteWorkPercent: metrics.remoteWorkPercent,
+  hybridWorkPercent: metrics.hybridWorkPercent,
+  officeWorkPercent: metrics.officeWorkPercent,
+  permanentEmploymentPercent: metrics.permanentEmploymentPercent,
+})
 
 export const persistDailyJobMarketInsightSnapshot = async (
   db: Pool,
