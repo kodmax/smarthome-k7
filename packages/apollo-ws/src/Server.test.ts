@@ -56,10 +56,10 @@ describe('Server', () => {
     const refreshed: string[][] = []
     server.vent.on('feeds-refresh', feedIds => refreshed.push([...feedIds]))
 
-    ws.send('refresh weather jobs')
+    ws.send('refresh weather job-ads')
 
     await vi.waitFor(() => expect(refreshed).toHaveLength(1))
-    expect(refreshed[0]).toEqual(['weather', 'jobs'])
+    expect(refreshed[0]).toEqual(['weather', 'job-ads'])
   })
 
   it('parses command and emits command with joined args', async () => {

@@ -3,7 +3,7 @@ import type {
   EnergyFeed,
   HomeTempFeedData,
   HumidityData,
-  JobsFeed,
+  JobAdsFeed,
   NewsFeed,
   StockMarketFeed,
   FxRatesFeed,
@@ -154,7 +154,7 @@ export function formatNews(feed: NewsFeed): string {
   return articles.map(article => `- ${article.title}`).join('\n')
 }
 
-export function formatJobs(feed: JobsFeed, visibleOnly = true): string {
+export function formatJobAds(feed: JobAdsFeed, visibleOnly = true): string {
   const ads = visibleOnly ? feed.ads.filter(ad => !isHiddenApplyStatus(ad.meta.application.status)) : feed.ads
 
   if (ads.length === 0) {
@@ -297,8 +297,8 @@ export function formatDashboardSummary(feedStore: FeedStore): string {
   const news = feedStore.get<NewsFeed>('news')
   sections.push(section('Wiadomości', news ? formatNews(news) : 'brak danych'))
 
-  const jobs = feedStore.get<JobsFeed>('jobs')
-  sections.push(section('Oferty pracy', jobs ? formatJobs(jobs, true) : 'brak danych'))
+  const jobAds = feedStore.get<JobAdsFeed>('job-ads')
+  sections.push(section('Oferty pracy', jobAds ? formatJobAds(jobAds, true) : 'brak danych'))
 
   const torrents = feedStore.get<Torrent[]>('top-torrents')
   sections.push(section('Top torrenty', torrents ? formatTorrents(torrents) : 'brak danych'))

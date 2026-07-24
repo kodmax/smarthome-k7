@@ -3,7 +3,7 @@ import {
   DashboardIcon,
   EnergyIcon,
   InfoIcon,
-  JobsIcon,
+  JobAdsIcon,
   StockMarketIcon,
   SunMoonIcon,
   type StyledLucideIcon,
@@ -39,7 +39,7 @@ export const SideMenuContent: FC<SideMenuContentProps> = ({ onNavigate }) => {
         items: [
           { id: 'dashboard', label: t.nav.dashboard, path: '/dashboard', icon: DashboardIcon },
           { id: 'stock-market', label: t.nav.stockMarket, path: '/stock-market', icon: StockMarketIcon },
-          { id: 'job-market', label: t.nav.jobMarket, path: '/job-market', icon: JobsIcon },
+          { id: 'job-market', label: t.nav.jobMarket, path: '/job-market', icon: JobAdsIcon },
           { id: 'energy-meter', label: t.nav.energyMeter, path: '/energy-meter', icon: EnergyIcon },
         ],
       },

@@ -8,7 +8,7 @@ Types in `src/feed.ts` (re-exported from `src/index.ts`):
 
 - weather, energy, heating, air quality
 - stock market, currencies, commodities, interest rates
-- news, jobs, torrents, transmission
+- news, job-ads, torrents, transmission
 - KNX readings (temperatures, lights)
 - allergens, fuel prices
 

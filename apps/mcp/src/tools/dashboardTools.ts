@@ -4,7 +4,7 @@ import type {
   Co2Data,
   EnergyFeed,
   HumidityData,
-  JobsFeed,
+  JobAdsFeed,
   LightsFeed,
   NewsFeed,
   StockMarketFeed,
@@ -20,7 +20,7 @@ import {
   formatDashboardSummary,
   formatEnergy,
   formatHeating,
-  formatJobs,
+  formatJobAds,
   formatNews,
   formatStockMarketOverview,
   formatStockQuote,
@@ -147,12 +147,12 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
     {
       title: 'Oferty pracy',
       description:
-        'Widoczne oferty pracy z dashboardu (JustJoin/NoFluff/TheProtocol) — tylko te, które nie są ukryte, tak jak na karcie Jobs.',
+        'Widoczne oferty pracy z dashboardu (JustJoin/NoFluff/TheProtocol) — tylko te, które nie są ukryte, tak jak na karcie ofert.',
     },
     async () => {
-      const feed = feedStore.get<JobsFeed>('jobs')
+      const feed = feedStore.get<JobAdsFeed>('job-ads')
       if (!feed) return feedUnavailable(feedStore, 'oferty pracy')
-      return textResult(formatJobs(feed, true))
+      return textResult(formatJobAds(feed, true))
     },
   )
 

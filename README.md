@@ -76,7 +76,7 @@ apps/service  ──►  @repo/apollo-ws  ──►  WebSocket :3678
        └── scrapers
 ```
 
-The backend registers feeds (weather, stock market, news, jobs, torrents, energy, heating, CO₂, humidity, room
+The backend registers feeds (weather, stock market, news, job-ads, torrents, energy, heating, CO₂, humidity, room
 temperatures, lights) and pushes updates to clients. The frontend subscribes to topics via `@repo/feed-client`.
 [`apps/mcp`](apps/mcp) exposes the same data (and light control) to Cursor via MCP tools.
 

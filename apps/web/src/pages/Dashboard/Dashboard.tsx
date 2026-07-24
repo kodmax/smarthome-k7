@@ -11,7 +11,7 @@ import { Energy } from './cards/Energy'
 import { Temperature } from './cards/Temperature'
 import { TopTorrents } from './cards/TopTorrents'
 import { Weather, WeatherForecast, HourlyWeatherForecast } from './cards/Weather'
-import { Jobs } from './cards/Jobs'
+import { JobAds } from './cards/JobAds'
 import { StockMarket } from './cards/stock-market'
 import { News } from './cards/News'
 
@@ -53,7 +53,7 @@ export const Dashboard: FC<Record<string, never>> = () => {
             <WeatherForecast />
           </Grid>
           <Grid size={{ xs: 12, md: 6, xl: 4 }} sx={dashboardMdOrder(8)}>
-            <Jobs />
+            <JobAds />
           </Grid>
           <Grid size={{ xs: 12, md: 6, xl: 4 }} sx={dashboardMdOrder(9)}>
             <News />

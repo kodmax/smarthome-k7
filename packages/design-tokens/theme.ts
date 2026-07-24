@@ -131,7 +131,7 @@ const buildPalette = (scheme: SchemeTokens) => {
     weather: domainColor(color.weather),
     media: domainColor(color.media),
     news: domainColor(color.news),
-    jobs: domainColor(color.jobs),
+    jobAds: domainColor(color.jobAds),
     surfaceElevated: domainColor(color.surfaceElevated),
     borderStrong: domainColor(color.borderStrong),
     cardHeaderBorder: domainColor(card.headerBorderColor),

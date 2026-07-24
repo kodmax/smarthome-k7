@@ -307,7 +307,7 @@ export const ru: Translations = {
       iceChance: 'Вероятность ледяного дождя в ближайшие часы',
       mixedChance: 'Вероятность смешанных осадков в ближайшие часы',
     },
-    jobs: {
+    jobAds: {
       title: 'Вакансии',
       applied: 'Отклик отправлен',
       favourite: 'Избранное',

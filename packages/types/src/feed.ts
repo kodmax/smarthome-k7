@@ -358,18 +358,18 @@ export type JobAdWithMeta = JobAd & {
   meta: JobAdMeta
 }
 
-export type JobsSalaryRange = {
+export type JobAdsSalaryRange = {
   min: number
   max: number
 }
 
-export type JobsFeed = {
+export type JobAdsFeed = {
   ads: JobAdWithMeta[]
-  salaryRange: JobsSalaryRange | null
+  salaryRange: JobAdsSalaryRange | null
   acceptableSalary: number | null
 }
 
-export type JobsCachedFeed = {
+export type JobAdsCachedFeed = {
   ads: JobAd[]
 }
 

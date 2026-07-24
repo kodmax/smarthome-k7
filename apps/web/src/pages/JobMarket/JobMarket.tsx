@@ -1,7 +1,7 @@
 import { Box, Grid } from '@mui/material'
 import { cardGridSpacing } from '@repo/design-tokens'
 import { ZoomStateProvider } from '@repo/apollo-card'
-import { JobsIcon, iconStyles } from '@repo/assets'
+import { JobAdsIcon, iconStyles } from '@repo/assets'
 import { type FC } from 'react'
 import { PageHeader } from '@/app/components/PageHeader'
 import { PageWrapper } from '@/app/components/PageWrapper'
@@ -14,7 +14,7 @@ import { PermanentEmployment } from './cards/PermanentEmployment/PermanentEmploy
 import { RemoteWorkModeSplit, OfficeWorkModeSplit, HybridWorkModeSplit } from './cards/WorkMode'
 import { PopularTechnologies } from './cards/PopularTechnologies/PopularTechnologies'
 import { SalaryDistribution } from './cards/SalaryDistribution/SalaryDistribution'
-import { Jobs } from './cards/Jobs'
+import { JobAds } from './cards/JobAds'
 import { OffersWithSalaryRange } from './cards/OffersWithSalaryRange/OffersWithSalaryRange'
 
 export const JobMarket: FC<Record<string, never>> = () => {
@@ -23,8 +23,8 @@ export const JobMarket: FC<Record<string, never>> = () => {
   return (
     <PageWrapper>
       <PageHeader
-        icon={JobsIcon}
-        iconColor={iconStyles.jobs.color}
+        icon={JobAdsIcon}
+        iconColor={iconStyles.jobAds.color}
         title={t.jobMarket.title}
         description={t.jobMarket.description}
       />
@@ -117,10 +117,10 @@ export const JobMarket: FC<Record<string, never>> = () => {
             <SalaryDistribution />
           </Box>
           <Box sx={{ gridArea: 'job-ads' }}>
-            <Jobs />
+            <JobAds />
           </Box>
           <Box sx={{ gridArea: 'job-ads' }}>
-            <Jobs />
+            <JobAds />
           </Box>
           <Box sx={{ gridArea: 'ads-with-range' }}>
             <OffersWithSalaryRange />

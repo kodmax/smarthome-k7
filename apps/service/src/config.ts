@@ -38,7 +38,7 @@ export const config = {
   google: {
     socs_cookie: getString('GOOGLE_SOCS_COOKIE'),
   },
-  jobs: {
+  jobAds: {
     nfjCookie: getString('NFJ_COOKIE'),
     theprotocolCookie: getString('THEPROTOCOL_COOKIE'),
   },

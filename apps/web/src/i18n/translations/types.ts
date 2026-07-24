@@ -273,7 +273,7 @@ export type Translations = {
       iceChance: string
       mixedChance: string
     }
-    jobs: {
+    jobAds: {
       title: string
       applied: string
       favourite: string

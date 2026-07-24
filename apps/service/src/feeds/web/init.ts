@@ -1,7 +1,7 @@
 import { Feeds } from '@repo/apollo-ws'
 import { addFxRatesFeed } from './fx-rates'
 import { addJobMarketInsightFeed } from './job-market-insight'
-import { addJobsFeed } from './jobs'
+import { addJobAdsFeed } from './job-ads'
 import { addMySkillsFeed } from './my-skills'
 import { addNewsFeed } from './news'
 import { addStockMarketFeed } from './stock-market'
@@ -15,7 +15,7 @@ export const initWebFeeds = async (feeds: Feeds): Promise<void> => {
     addStockMarketFeed(feeds),
     addFxRatesFeed(feeds),
     addNewsFeed(feeds),
-    addJobsFeed(feeds),
+    addJobAdsFeed(feeds),
     addJobMarketInsightFeed(feeds),
     addMySkillsFeed(feeds),
     addTopTorrentsFeed(feeds),

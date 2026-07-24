@@ -307,7 +307,7 @@ export const en: Translations = {
       iceChance: 'Freezing rain chance in the next hours',
       mixedChance: 'Mixed precipitation chance in the next hours',
     },
-    jobs: {
+    jobAds: {
       title: 'Job offers',
       applied: 'Applied',
       favourite: 'Favourite',

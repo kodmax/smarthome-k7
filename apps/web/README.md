@@ -1,7 +1,7 @@
 # web
 
 Smart home dashboard frontend — a grid of live data cards (weather, energy, heating, air quality, stock market, news,
-jobs, torrents).
+job-ads, torrents).
 
 ## Stack
 

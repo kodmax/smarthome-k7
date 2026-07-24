@@ -11,7 +11,7 @@ export const DASHBOARD_FEEDS = [
   { id: 'home.air-quality.co2', label: 'CO₂' },
   { id: 'home.air-quality.humidity', label: 'Wilgotność' },
   { id: 'news', label: 'Wiadomości' },
-  { id: 'jobs', label: 'Oferty pracy' },
+  { id: 'job-ads', label: 'Oferty pracy' },
   { id: 'top-torrents', label: 'Top torrenty' },
   { id: 'transmission', label: 'Transmission' },
   { id: 'home.lights', label: 'Światła KNX' },

@@ -20,7 +20,7 @@ declare module '@mui/material/styles' {
     weather: PaletteColor
     media: PaletteColor
     news: PaletteColor
-    jobs: PaletteColor
+    jobAds: PaletteColor
     accentRed: PaletteColor
     surfaceElevated: PaletteColor
     borderStrong: PaletteColor
@@ -35,7 +35,7 @@ declare module '@mui/material/styles' {
     weather?: PaletteColor
     media?: PaletteColor
     news?: PaletteColor
-    jobs?: PaletteColor
+    jobAds?: PaletteColor
     accentRed?: PaletteColor
     surfaceElevated?: PaletteColor
     borderStrong?: PaletteColor
@@ -121,7 +121,7 @@ declare module '@mui/material/Button' {
     weather: true
     media: true
     news: true
-    jobs: true
+    jobAds: true
   }
 }
 

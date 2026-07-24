@@ -307,7 +307,7 @@ export const pl: Translations = {
       iceChance: 'Szansa na marznący deszcz w najbliższych godzinach',
       mixedChance: 'Szansa na mieszane opady w najbliższych godzinach',
     },
-    jobs: {
+    jobAds: {
       title: 'Oferty pracy',
       applied: 'Złożone',
       favourite: 'Ulubione',
