@@ -4,6 +4,18 @@ import DateTime from '@/DateTime'
 
 const DAILY_SNAPSHOT_TIME = '18:00:00'
 
+type JobMarketInsightSnapshotMetrics = Omit<JobMarketInsightMetrics, 'popularTechnologies' | 'salaryDistribution'>
+
+export const toSnapshotMetrics = (metrics: JobMarketInsightMetrics): JobMarketInsightSnapshotMetrics => {
+  const {
+    popularTechnologies: _popularTechnologies,
+    salaryDistribution: _salaryDistribution,
+    ...snapshotMetrics
+  } = metrics
+
+  return snapshotMetrics
+}
+
 export const persistDailyJobMarketInsightSnapshot = async (
   db: Pool,
   metrics: JobMarketInsightMetrics,
@@ -27,7 +39,7 @@ export const persistDailyJobMarketInsightSnapshot = async (
 
     await conn.query('insert into job_market_insight_snapshots (snapshot_at, metrics) values (?, ?)', [
       now.getDateTime(),
-      JSON.stringify(metrics),
+      JSON.stringify(toSnapshotMetrics(metrics)),
     ])
   } finally {
     conn.release()

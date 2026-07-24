@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { JobMarketInsightMetrics } from '@repo/types'
 import type { Pool } from 'mariadb'
 import DateTime from '@/DateTime'
-import { persistDailyJobMarketInsightSnapshot } from './persistDailyJobMarketInsightSnapshot'
+import { persistDailyJobMarketInsightSnapshot, toSnapshotMetrics } from './persistDailyJobMarketInsightSnapshot'
 
 const metrics: JobMarketInsightMetrics = {
   adsCount: 1,
@@ -15,9 +15,11 @@ const metrics: JobMarketInsightMetrics = {
   permanentEmploymentPercent: 6,
   hybridWorkPercent: 7,
   officeWorkPercent: 8,
-  popularTechnologies: [],
-  salaryDistribution: [],
+  popularTechnologies: [{ id: 'react', name: 'React', offersCount: 1, sharePercent: 10, medianSalary: 20 }],
+  salaryDistribution: [{ id: 'below10k', percentage: 100 }],
 }
+
+const snapshotMetrics = toSnapshotMetrics(metrics)
 
 const mockNow = (date: string, time: string): DateTime =>
   ({
@@ -63,9 +65,22 @@ describe('persistDailyJobMarketInsightSnapshot', () => {
     expect(query).toHaveBeenNthCalledWith(
       2,
       'insert into job_market_insight_snapshots (snapshot_at, metrics) values (?, ?)',
-      ['2026-06-28T19:00:00', JSON.stringify(metrics)],
+      ['2026-06-28T19:00:00', JSON.stringify(snapshotMetrics)],
     )
     expect(release).toHaveBeenCalledOnce()
+  })
+
+  it('does not persist popularTechnologies or salaryDistribution', async () => {
+    query.mockResolvedValueOnce([]).mockResolvedValueOnce(undefined)
+
+    await persistDailyJobMarketInsightSnapshot(db, metrics, mockNow('2026-06-28', '19:00:00'))
+
+    const insertedJson = query.mock.calls[1]?.[1]?.[1] as string
+    const inserted = JSON.parse(insertedJson) as Record<string, unknown>
+
+    expect(inserted).not.toHaveProperty('popularTechnologies')
+    expect(inserted).not.toHaveProperty('salaryDistribution')
+    expect(inserted).toMatchObject(snapshotMetrics)
   })
 
   it('does not insert when today snapshot already exists', async () => {
@@ -85,6 +100,6 @@ describe('persistDailyJobMarketInsightSnapshot', () => {
     const now = DateTime.now()
 
     expect(query).toHaveBeenNthCalledWith(1, expect.any(String), [now.getDateTime(), now.getDateTime()])
-    expect(query).toHaveBeenNthCalledWith(2, expect.any(String), [now.getDateTime(), JSON.stringify(metrics)])
+    expect(query).toHaveBeenNthCalledWith(2, expect.any(String), [now.getDateTime(), JSON.stringify(snapshotMetrics)])
   })
 })
