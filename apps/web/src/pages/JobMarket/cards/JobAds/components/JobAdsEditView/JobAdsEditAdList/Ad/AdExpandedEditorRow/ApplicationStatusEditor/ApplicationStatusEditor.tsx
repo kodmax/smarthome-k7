@@ -10,7 +10,7 @@ import {
   Typography,
   type SelectChangeEvent,
 } from '@mui/material'
-import { FavStarIcon } from '@repo/assets'
+import { AiSparklesIcon, FavStarIcon, LoaderIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
 import { toSkillId } from '@repo/common'
 import { JobAdWithMeta, JobApplyStatus, MySkillsFeed } from '@repo/types'
@@ -18,13 +18,16 @@ import { designTokens } from '@repo/design-tokens'
 import { Star } from 'lucide-react'
 import { FC, useEffect, useMemo, useState, type CSSProperties, type SyntheticEvent } from 'react'
 import { TagGroup } from '@/card-components'
+import { CvPreviewDialog } from '@/pages/JobMarket/cards/Cv/CvPreviewDialog'
 import { useLocale, useTranslations } from '@/i18n'
 import { ApplyStatusIcon } from '../../../../../../shared-components'
 import { applyStatusTargetOptions } from './applyStatusSelectOptions'
 import { formatAppliedDaysAgo, formatNotApplicable, formatPublicationDate } from './formatAppliedDaysAgo'
 import { RequiredSkillTag } from './RequiredSkillTag'
+import { useCvMatchAnalysis } from './useCvMatchAnalysis'
 
 const favIconSize = designTokens.icon.sizeMd
+const actionButtonIconSize = 16
 const emptyNextStatus = ''
 
 export const ApplicationStatusEditor: FC<{
@@ -32,7 +35,8 @@ export const ApplicationStatusEditor: FC<{
   onSave: (applyStatus: JobApplyStatus, comment: string) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
-}> = ({ ad, onSave, onFav, onUnfav }) => {
+  onAnalyzeCvMatch: (id: string) => void
+}> = ({ ad, onSave, onFav, onUnfav, onAnalyzeCvMatch }) => {
   const { t } = useTranslations()
   const { locale } = useLocale()
   const labels = t.dashboard.jobAds
@@ -50,6 +54,19 @@ export const ApplicationStatusEditor: FC<{
   const targetStatusOptions = useMemo(() => applyStatusTargetOptions(currentStatus), [currentStatus])
   const canSubmit = nextStatus !== emptyNextStatus
   const canChangeStatus = targetStatusOptions.length > 0
+  const canAnalyzeCvMatch = ad.origin !== 'theprotocol'
+  const {
+    analyzing: analyzingCvMatch,
+    dialogOpen: matchAnalysisDialogOpen,
+    dialogSummary: matchAnalysisSummary,
+    closeDialog: closeMatchAnalysisDialog,
+    requestAnalysis: handleAnalyzeCvMatch,
+  } = useCvMatchAnalysis({
+    ad,
+    canAnalyze: canAnalyzeCvMatch,
+    onAnalyze: onAnalyzeCvMatch,
+    resetWhen: currentStatus,
+  })
   const mySkillsFeed = useFeed<MySkillsFeed>('my-skills')
 
   const mySkillsById = useMemo(() => {
@@ -258,14 +275,50 @@ export const ApplicationStatusEditor: FC<{
               </Button>
             </Box>
           </Box>
-        ) : canChangeStatus ? (
-          <Box>
-            <Button size='small' variant='outlined' onClick={() => setIsChangingStatus(true)}>
-              {labels.changeApplicationStatus}
+        ) : (
+          <Box sx={{ display: 'flex', gap: `${designTokens.space[1]}px`, flexWrap: 'wrap' }}>
+            <Button
+              size='small'
+              variant='outlined'
+              startIcon={
+                analyzingCvMatch ? (
+                  <LoaderIcon
+                    spinning
+                    size={actionButtonIconSize}
+                    strokeWidth={designTokens.icon.strokeWidth}
+                    aria-hidden
+                  />
+                ) : (
+                  <AiSparklesIcon
+                    size={actionButtonIconSize}
+                    strokeWidth={designTokens.icon.strokeWidth}
+                    glow='soft'
+                    aria-hidden
+                  />
+                )
+              }
+              disabled={!canAnalyzeCvMatch || analyzingCvMatch}
+              aria-busy={analyzingCvMatch}
+              onClick={handleAnalyzeCvMatch}
+            >
+              {labels.checkCvMatch}
             </Button>
+            {canChangeStatus ? (
+              <Button size='small' variant='outlined' onClick={() => setIsChangingStatus(true)}>
+                {labels.changeApplicationStatus}
+              </Button>
+            ) : null}
           </Box>
-        ) : null}
+        )}
       </Box>
+      {matchAnalysisSummary !== null ? (
+        <CvPreviewDialog
+          open={matchAnalysisDialogOpen}
+          onClose={closeMatchAnalysisDialog}
+          title={labels.matchAnalysisTitle}
+          text={matchAnalysisSummary}
+        />
+      ) : null}
     </Box>
   )
 }

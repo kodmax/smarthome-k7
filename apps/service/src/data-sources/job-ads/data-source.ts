@@ -24,11 +24,16 @@ import {
   resolveStatusChangedAt,
 } from './applicationMeta'
 import { isMetaFlagTrue } from './metaFlag'
+import type OpenAI from 'openai'
+import { runAnalyzeCvMatchCommand } from './analyzeCvMatchCommand'
+import { loadCvMatchesByAdIds } from './cvMatchDocument'
 
 const META_RETENTION_DAYS = 365
 const APPLICATION_ATTRIBUTE_NAME = 'application'
 const FAV_ATTRIBUTE_NAME = 'fav'
+const AD_URL_ATTRIBUTE_NAME = 'ad-url'
 const FIRST_PUBLISHED_AT_ATTRIBUTE_NAME = 'first-published-at'
+const PERSISTENT_META_ATTRIBUTE_NAMES = [AD_URL_ATTRIBUTE_NAME, FIRST_PUBLISHED_AT_ATTRIBUTE_NAME] as const
 const STALE_APPLIED_NO_RESPONSE_AFTER_DAYS = 7
 const STALE_NO_RESPONSE_ARCHIVE_AFTER_DAYS = 30
 const STALE_REJECTED_ARCHIVE_AFTER_DAYS = 7
@@ -44,6 +49,9 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
   @Inject('db')
   declare private db: Pool
 
+  @Inject('openai')
+  declare private openai: OpenAI
+
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'change-state':
@@ -58,7 +66,14 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       case 'set-acceptable-salary':
         await this.commandSetAcceptableSalary(args)
         break
+      case 'analyze-cv-match':
+        await this.commandAnalyzeCvMatch(args)
+        break
+      default:
+        return
     }
+
+    await this.push()
   }
 
   private async commandSetAcceptableSalary(args: string): Promise<void> {
@@ -68,7 +83,6 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     }
 
     await saveAcceptableSalary(this.db, parsed.value)
-    this.push()
   }
 
   private async commandChangeState(args: string): Promise<void> {
@@ -94,17 +108,25 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     }
 
     await this.writeApplicationMeta(itemId, next)
-    this.push()
   }
 
   private async commandFav(itemId: string): Promise<void> {
     await this.markMeta(itemId, FAV_ATTRIBUTE_NAME, true)
-    this.push()
   }
 
   private async commandUnfav(itemId: string): Promise<void> {
     await this.unmarkMeta(itemId, FAV_ATTRIBUTE_NAME)
-    this.push()
+  }
+
+  private async commandAnalyzeCvMatch(args: string): Promise<void> {
+    const adId = args.trim()
+
+    await runAnalyzeCvMatchCommand({
+      db: this.db,
+      openai: this.openai,
+      adId,
+      loadAdUrl: itemId => this.loadMetaStringValue(itemId, AD_URL_ATTRIBUTE_NAME),
+    })
   }
 
   getId() {
@@ -151,9 +173,9 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       await conn.query(
         `delete from meta
          where group_id = ?
-           and attribute_name != ?
+           and attribute_name not in (?)
            and last_update_timestamp < current_timestamp() - interval ? day`,
-        [this.getId(), FIRST_PUBLISHED_AT_ATTRIBUTE_NAME, META_RETENTION_DAYS],
+        [this.getId(), PERSISTENT_META_ATTRIBUTE_NAMES, META_RETENTION_DAYS],
       )
 
       const appliedChanged = await this.markStaleAppliedAsNoResponse(conn)
@@ -233,14 +255,22 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
         `select item_uid, attribute_name, value, last_update_timestamp
          from meta
          where group_id = ?
-           and attribute_name in (?, ?, ?)
+           and attribute_name in (?, ?, ?, ?)
            and item_uid in (?)`,
-        [this.getId(), APPLICATION_ATTRIBUTE_NAME, FAV_ATTRIBUTE_NAME, FIRST_PUBLISHED_AT_ATTRIBUTE_NAME, ids],
+        [
+          this.getId(),
+          APPLICATION_ATTRIBUTE_NAME,
+          FAV_ATTRIBUTE_NAME,
+          AD_URL_ATTRIBUTE_NAME,
+          FIRST_PUBLISHED_AT_ATTRIBUTE_NAME,
+          ids,
+        ],
       )) as MetaRow[]
 
       const applicationById = new Map<string, JobAdApplicationMeta>()
       const applicationUpdatedAtById = new Map<string, Date | string>()
       const favIds = new Set<string>()
+      const existingAdUrlIds = new Set<string>()
       const firstPublishedAtById = new Map<string, string>()
 
       for (const row of rows) {
@@ -260,6 +290,9 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
               favIds.add(row.item_uid)
             }
             break
+          case AD_URL_ATTRIBUTE_NAME:
+            existingAdUrlIds.add(row.item_uid)
+            break
           case FIRST_PUBLISHED_AT_ATTRIBUTE_NAME:
             if (typeof row.value === 'string') {
               firstPublishedAtById.set(row.item_uid, row.value)
@@ -268,8 +301,14 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
         }
       }
 
+      const adUrlToInsert: Array<[string, string]> = []
+      const matchAnalysisById = await loadCvMatchesByAdIds(this.db, ids)
       const firstPublishedAtToInsert: Array<[string, string]> = []
       const adsWithMeta = ads.map(ad => {
+        if (!existingAdUrlIds.has(ad.id)) {
+          adUrlToInsert.push([ad.id, ad.advertUrl])
+        }
+
         const storedFirstPublishedAt = firstPublishedAtById.get(ad.id)
         const publishedAt = storedFirstPublishedAt ?? ad.publishedAt
 
@@ -283,6 +322,7 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
         return {
           ...ad,
           publishedAt,
+          matchAnalysis: matchAnalysisById.get(ad.id) ?? null,
           meta: {
             ...emptyJobAdMeta(),
             application: jobAdApplicationFromMeta(
@@ -293,6 +333,15 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
           },
         }
       })
+
+      if (adUrlToInsert.length > 0) {
+        await conn.batch(
+          `insert into meta (item_uid, attribute_name, group_id, value)
+           values (?, ?, ?, JSON_QUOTE(?))
+           on duplicate key update value = value`,
+          adUrlToInsert.map(([itemId, advertUrl]) => [itemId, AD_URL_ATTRIBUTE_NAME, this.getId(), advertUrl]),
+        )
+      }
 
       if (firstPublishedAtToInsert.length > 0) {
         await conn.batch(
@@ -309,6 +358,29 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       }
 
       return adsWithMeta
+    } finally {
+      conn.release()
+    }
+  }
+
+  private async loadMetaStringValue(itemId: string, attributeName: string): Promise<string | null> {
+    const conn = await this.db.getConnection()
+    try {
+      const rows = (await conn.query(
+        `select value
+         from meta
+         where group_id = ?
+           and item_uid = ?
+           and attribute_name = ?`,
+        [this.getId(), itemId, attributeName],
+      )) as MetaRow[]
+
+      const row = rows[0]
+      if (row === undefined || typeof row.value !== 'string') {
+        return null
+      }
+
+      return row.value
     } finally {
       conn.release()
     }

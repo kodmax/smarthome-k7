@@ -328,6 +328,9 @@ export const ru: Translations = {
       rejectionDate: 'Дата отказа',
       requiredSkills: 'Требуемые навыки',
       changeApplicationStatus: 'Изменить статус',
+      checkCvMatch: 'Проверить соответствие',
+      viewMatchAnalysis: 'Показать анализ соответствия CV',
+      matchAnalysisTitle: 'Анализ соответствия CV',
       newApplicationStatus: 'Новый статус',
       applicationComment: 'Комментарий',
       save: 'Сохранить',
@@ -336,6 +339,7 @@ export const ru: Translations = {
       filters: {
         label: 'Фильтр',
         latest: 'Новейшие',
+        withMatchAnalysis: 'С анализом соответствия',
         inProgress: 'В процессе',
         notInterested: 'Не интересует',
         stretch: 'Пробел в навыках',

@@ -4,7 +4,7 @@ import { ApolloEvents } from './ApolloEvents'
 
 export abstract class DataSourceDefinition<T, TCache = T> {
   public constructor(
-    protected readonly push: (content?: T) => void,
+    protected readonly push: (content?: T) => void | Promise<void>,
     protected readonly reportError: (e: Error) => void,
   ) {}
 
@@ -44,7 +44,7 @@ export abstract class DataSourceDefinition<T, TCache = T> {
 }
 
 export type DataSourceDefinitionClass<T = unknown, TCache = T> = new (
-  push: (content?: T) => void,
+  push: (content?: T) => void | Promise<void>,
   reportError: (e: Error) => void,
 ) => DataSourceDefinition<T, TCache>
 
@@ -87,7 +87,7 @@ class DataSource<T, TCache = T> {
     let dataSource!: DataSource<T, TCache>
 
     const definition = new sourceClass(
-      content => void dataSource.push(content),
+      content => dataSource.push(content),
       e => vent.emit('sys-log', 4, `Push data source <${definition.getId()}> update error: ${e}`, e),
     )
 

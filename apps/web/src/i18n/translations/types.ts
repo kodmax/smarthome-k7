@@ -294,6 +294,9 @@ export type Translations = {
       rejectionDate: string
       requiredSkills: string
       changeApplicationStatus: string
+      checkCvMatch: string
+      viewMatchAnalysis: string
+      matchAnalysisTitle: string
       newApplicationStatus: string
       applicationComment: string
       save: string
@@ -302,6 +305,7 @@ export type Translations = {
       filters: {
         label: string
         latest: string
+        withMatchAnalysis: string
         inProgress: string
         notInterested: string
         stretch: string

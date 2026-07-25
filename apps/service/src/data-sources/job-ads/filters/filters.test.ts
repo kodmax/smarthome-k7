@@ -31,6 +31,7 @@ const adWithStatus = (
   ...baseAd,
   id: `${status}-${salary?.to ?? 'none'}`,
   monthlySalaryRangeAfterTaxes: salary,
+  matchAnalysis: null,
   meta: {
     ...emptyJobAdMeta(),
     application: jobAdApplicationFromMeta({ applyStatus: status, comment: null, appliedAt: null, rejectedAt: null }),

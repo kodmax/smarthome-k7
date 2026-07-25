@@ -335,6 +335,11 @@ export type JobAdApplication = {
   statusChangedAt: string | null
 }
 
+export type JobAdMatchAnalysis = {
+  analyzedAt: string
+  summary: string
+}
+
 export type JobAdMeta = {
   application: JobAdApplication
   fav: boolean
@@ -356,6 +361,7 @@ export type JobAd = {
 
 export type JobAdWithMeta = JobAd & {
   meta: JobAdMeta
+  matchAnalysis: JobAdMatchAnalysis | null
 }
 
 export type JobAdsSalaryRange = {

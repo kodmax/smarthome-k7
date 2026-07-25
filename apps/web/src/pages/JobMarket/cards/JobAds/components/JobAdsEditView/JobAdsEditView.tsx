@@ -19,6 +19,7 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter }) => {
   const changeState = useCommand('job-ads', 'change-state')
   const fav = useCommand('job-ads', 'fav')
   const unfav = useCommand('job-ads', 'unfav')
+  const analyzeCvMatch = useCommand('job-ads', 'analyze-cv-match')
 
   const filteredAds = useMemo(() => filterJobAdsByCategory(ads ?? [], filter), [ads, filter])
 
@@ -47,6 +48,7 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter }) => {
       onChangeApplicationState={onChangeApplicationState}
       onFav={fav}
       onUnfav={unfav}
+      onAnalyzeCvMatch={analyzeCvMatch}
     />
   )
 }

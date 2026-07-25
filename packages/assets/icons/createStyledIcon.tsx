@@ -5,6 +5,7 @@ import './iconSpin.css'
 
 export type StyledIconOptions = {
   color: string
+  glowColor?: string
 }
 
 export type StyledIconProps = LucideProps & {
@@ -14,7 +15,10 @@ export type StyledIconProps = LucideProps & {
 
 export type StyledLucideIcon = ForwardRefExoticComponent<StyledIconProps & RefAttributes<SVGSVGElement>>
 
-export function createStyledIcon(source: LucideIcon, { color }: StyledIconOptions): StyledLucideIcon {
+export function createStyledIcon(
+  source: LucideIcon,
+  { color, glowColor = color }: StyledIconOptions,
+): StyledLucideIcon {
   const SourceIcon = source
 
   const StyledIcon = forwardRef<SVGSVGElement, StyledIconProps>(function StyledLucideIcon(
@@ -22,7 +26,7 @@ export function createStyledIcon(source: LucideIcon, { color }: StyledIconOption
     ref,
   ) {
     const iconColor = colorOverride ?? color
-    const glowFilter = glow === 'off' ? undefined : iconGlowFilter(iconColor, glow)
+    const glowFilter = glow === 'off' ? undefined : iconGlowFilter(glowColor, glow)
     const spinStyle = spinning ? { animation: 'repo-icon-spin 1s linear infinite' } : undefined
 
     return (

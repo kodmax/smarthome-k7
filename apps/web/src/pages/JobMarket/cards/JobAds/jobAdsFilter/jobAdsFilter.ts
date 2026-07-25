@@ -2,6 +2,7 @@ import { JobAdWithMeta, JobApplyStatus, isTerminalApplyStatus } from '@repo/type
 
 export const JOB_ADS_FILTER_ORDER = [
   'latest',
+  'with-match-analysis',
   'in-progress',
   'rejected-no-response',
   'not-interested',
@@ -38,5 +39,9 @@ export function getJobAdFilterCategory(status: JobApplyStatus): JobAdsFilter {
 }
 
 export function filterJobAdsByCategory(ads: JobAdWithMeta[], filter: JobAdsFilter): JobAdWithMeta[] {
+  if (filter === 'with-match-analysis') {
+    return ads.filter(ad => ad.matchAnalysis !== null)
+  }
+
   return ads.filter(ad => getJobAdFilterCategory(ad.meta.application.status) === filter)
 }

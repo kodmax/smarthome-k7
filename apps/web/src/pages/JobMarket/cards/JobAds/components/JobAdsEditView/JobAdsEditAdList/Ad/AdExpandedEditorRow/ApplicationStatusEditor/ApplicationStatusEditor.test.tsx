@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useFeed } from '@repo/feed-client'
 import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
@@ -25,6 +25,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={onFav}
         onUnfav={onUnfav}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -52,6 +53,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -78,6 +80,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -102,6 +105,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -131,6 +135,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -155,6 +160,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -169,6 +175,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -188,6 +195,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -201,6 +209,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -220,6 +229,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={onSave}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 
@@ -232,6 +242,68 @@ describe('ApplicationStatusEditor', () => {
     expect(onSave).toHaveBeenCalledWith('applied', 'CV sent')
   })
 
+  it('disables check cv match for theprotocol ads', () => {
+    const onAnalyzeCvMatch = vi.fn()
+
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({ id: 'tp-1', title: 'Role', origin: 'theprotocol' })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={onAnalyzeCvMatch}
+      />,
+    )
+
+    const button = screen.getByRole('button', { name: 'Sprawdź dopasowanie' })
+    expect(button).toBeDisabled()
+    fireEvent.click(button)
+    expect(onAnalyzeCvMatch).not.toHaveBeenCalled()
+  })
+
+  it('shows loader and opens match analysis dialog after ad update', async () => {
+    const feedAd = jobAd({ id: '11', title: 'Role' })
+    const onAnalyzeCvMatch = vi.fn()
+
+    const { rerender } = renderWithTheme(
+      <ApplicationStatusEditor
+        ad={feedAd}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={onAnalyzeCvMatch}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Sprawdź dopasowanie' }))
+
+    expect(onAnalyzeCvMatch).toHaveBeenCalledWith('11')
+    expect(screen.getByRole('button', { name: 'Sprawdź dopasowanie' })).toBeDisabled()
+
+    rerender(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '11',
+          title: 'Role',
+          matchAnalysis: {
+            analyzedAt: '2026-01-02T00:00:00.000Z',
+            summary: 'Dobre dopasowanie do roli.',
+          },
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={onAnalyzeCvMatch}
+      />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+    expect(screen.getByText('Analiza dopasowania CV')).toBeInTheDocument()
+    expect(screen.getByText('Dobre dopasowanie do roli.')).toBeInTheDocument()
+  })
+
   it('returns to read-only view when change is cancelled', () => {
     renderWithTheme(
       <ApplicationStatusEditor
@@ -239,6 +311,7 @@ describe('ApplicationStatusEditor', () => {
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
       />,
     )
 

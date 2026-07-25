@@ -15,6 +15,7 @@ type Props = {
   onChangeApplicationState?: (id: string, applyStatus: JobApplyStatus, comment: string) => void
   onFav?: (id: string) => void
   onUnfav?: (id: string) => void
+  onAnalyzeCvMatch?: (id: string) => void
 }
 
 export const JobAdsEditAdList: FC<Props> = ({
@@ -25,6 +26,7 @@ export const JobAdsEditAdList: FC<Props> = ({
   onChangeApplicationState,
   onFav,
   onUnfav,
+  onAnalyzeCvMatch,
 }) => {
   return (
     <ApolloDataTable style={{ fontSize: cardTableFontSize, tableLayout: 'fixed', width: '100%' }}>
@@ -40,6 +42,7 @@ export const JobAdsEditAdList: FC<Props> = ({
             onChangeApplicationState={onChangeApplicationState ?? (() => undefined)}
             onFav={onFav ?? (() => undefined)}
             onUnfav={onUnfav ?? (() => undefined)}
+            onAnalyzeCvMatch={onAnalyzeCvMatch ?? (() => undefined)}
           />
         ))}
       </TableBody>

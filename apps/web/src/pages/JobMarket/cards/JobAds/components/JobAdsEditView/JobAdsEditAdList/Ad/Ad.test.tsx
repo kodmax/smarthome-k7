@@ -25,6 +25,7 @@ function renderAd(
       onChangeApplicationState={onChangeApplicationState}
       onFav={noop}
       onUnfav={noop}
+      onAnalyzeCvMatch={noop}
     />,
   )
 }
@@ -130,6 +131,26 @@ describe('Ad', () => {
     renderAd(jobAd({ id: '3d', title: 'Favourite Role', meta: { fav: true } }), true, true)
 
     expect(screen.getByLabelText('Ulubione')).toBeInTheDocument()
+  })
+
+  it('shows match analysis icon and opens summary dialog', () => {
+    renderAd(
+      jobAd({
+        id: '8',
+        title: 'Analyzed Role',
+        matchAnalysis: {
+          analyzedAt: '2026-01-01T00:00:00.000Z',
+          summary: 'Silne dopasowanie do roli TypeScript.',
+        },
+      }),
+      true,
+    )
+
+    fireEvent.click(screen.getByLabelText('Pokaż analizę dopasowania CV'))
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText('Analiza dopasowania CV')).toBeInTheDocument()
+    expect(screen.getByText('Silne dopasowanie do roli TypeScript.')).toBeInTheDocument()
   })
 
   it('shows abbreviated applied days after the title in edit mode', () => {

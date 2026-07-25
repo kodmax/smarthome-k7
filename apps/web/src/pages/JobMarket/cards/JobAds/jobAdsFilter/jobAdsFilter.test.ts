@@ -35,4 +35,23 @@ describe('jobAdsFilter', () => {
     expect(filterJobAdsByCategory(ads, 'rejected-no-response').map(ad => ad.id)).toEqual(['5', '6'])
     expect(filterJobAdsByCategory(ads, 'finished').map(ad => ad.id)).toEqual(['7'])
   })
+
+  it('filters ads with match analysis', () => {
+    const ads = [
+      jobAd({ id: '1', title: 'No analysis' }),
+      jobAd({
+        id: '2',
+        title: 'Analyzed',
+        matchAnalysis: { analyzedAt: '2026-01-01T00:00:00.000Z', summary: 'OK' },
+      }),
+      jobAd({
+        id: '3',
+        title: 'Also analyzed',
+        meta: { application: { status: 'applied' } },
+        matchAnalysis: { analyzedAt: '2026-01-02T00:00:00.000Z', summary: 'Strong fit' },
+      }),
+    ]
+
+    expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.id)).toEqual(['2', '3'])
+  })
 })

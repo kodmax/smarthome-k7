@@ -10,7 +10,8 @@ export const AdExpandedEditorRow: FC<{
   onSave: (applyStatus: JobApplyStatus, comment: string) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
-}> = ({ ad, columnCount, onSave, onFav, onUnfav }) => (
+  onAnalyzeCvMatch: (id: string) => void
+}> = ({ ad, columnCount, onSave, onFav, onUnfav, onAnalyzeCvMatch }) => (
   <ApolloTableRow sx={{ height: 'auto' }}>
     <ApolloTableCell
       colSpan={columnCount}
@@ -21,7 +22,13 @@ export const AdExpandedEditorRow: FC<{
         py: `${designTokens.space[1]}px`,
       }}
     >
-      <ApplicationStatusEditor ad={ad} onSave={onSave} onFav={onFav} onUnfav={onUnfav} />
+      <ApplicationStatusEditor
+        ad={ad}
+        onSave={onSave}
+        onFav={onFav}
+        onUnfav={onUnfav}
+        onAnalyzeCvMatch={onAnalyzeCvMatch}
+      />
     </ApolloTableCell>
   </ApolloTableRow>
 )

@@ -18,6 +18,7 @@ export const JobAdsFilterSelect: FC<Props> = ({ value, onChange }) => {
 
   const filterLabels: Record<JobAdsFilter, string> = {
     latest: labels.latest,
+    'with-match-analysis': labels.withMatchAnalysis,
     'in-progress': labels.inProgress,
     'not-interested': labels.notInterested,
     stretch: labels.stretch,

@@ -328,6 +328,9 @@ export const pl: Translations = {
       rejectionDate: 'Data odrzucenia',
       requiredSkills: 'Wymagane umiejętności',
       changeApplicationStatus: 'Zmień stan',
+      checkCvMatch: 'Sprawdź dopasowanie',
+      viewMatchAnalysis: 'Pokaż analizę dopasowania CV',
+      matchAnalysisTitle: 'Analiza dopasowania CV',
       newApplicationStatus: 'Nowy status',
       applicationComment: 'Komentarz',
       save: 'Zapisz',
@@ -336,6 +339,7 @@ export const pl: Translations = {
       filters: {
         label: 'Filtr',
         latest: 'Najnowsze',
+        withMatchAnalysis: 'Z analizą dopasowania',
         inProgress: 'W trakcie',
         notInterested: 'Nie interesują mnie',
         stretch: 'Do nadrobienia',

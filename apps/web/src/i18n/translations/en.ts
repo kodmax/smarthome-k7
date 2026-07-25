@@ -328,6 +328,9 @@ export const en: Translations = {
       rejectionDate: 'Rejection date',
       requiredSkills: 'Required skills',
       changeApplicationStatus: 'Change status',
+      checkCvMatch: 'Check match',
+      viewMatchAnalysis: 'Show CV match analysis',
+      matchAnalysisTitle: 'CV match analysis',
       newApplicationStatus: 'New status',
       applicationComment: 'Comment',
       save: 'Save',
@@ -336,6 +339,7 @@ export const en: Translations = {
       filters: {
         label: 'Filter',
         latest: 'Latest',
+        withMatchAnalysis: 'With match analysis',
         inProgress: 'In progress',
         notInterested: 'Not interested',
         stretch: 'Skill gap',

@@ -8,7 +8,7 @@ type JobAdOverrides = Partial<Omit<JobAdWithMeta, 'meta'>> &
   }
 
 export function jobAd(overrides: JobAdOverrides): JobAdWithMeta {
-  const { meta, ...rest } = overrides
+  const { meta, matchAnalysis = null, ...rest } = overrides
 
   return {
     advertUrl: 'https://example.com/job/1',
@@ -19,6 +19,7 @@ export function jobAd(overrides: JobAdOverrides): JobAdWithMeta {
     employmentType: 'permanent',
     origin: 'jj',
     publishedAt: '2026-01-01T00:00:00.000Z',
+    matchAnalysis,
     ...rest,
     meta: {
       ...emptyJobAdMeta(),

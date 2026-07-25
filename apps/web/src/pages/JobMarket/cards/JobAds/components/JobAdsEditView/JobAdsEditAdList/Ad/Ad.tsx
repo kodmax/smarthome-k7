@@ -21,7 +21,8 @@ export const Ad: FC<{
   onChangeApplicationState: (id: string, applyStatus: JobApplyStatus, comment: string) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
-}> = ({ ad, zoom, editMode, expanded, onToggleExpand, onChangeApplicationState, onFav, onUnfav }) => {
+  onAnalyzeCvMatch: (id: string) => void
+}> = ({ ad, zoom, editMode, expanded, onToggleExpand, onChangeApplicationState, onFav, onUnfav, onAnalyzeCvMatch }) => {
   const columnCount = zoom ? 4 : 2
 
   return (
@@ -51,6 +52,7 @@ export const Ad: FC<{
           onSave={(applyStatus, comment) => onChangeApplicationState(ad.id, applyStatus, comment)}
           onFav={onFav}
           onUnfav={onUnfav}
+          onAnalyzeCvMatch={onAnalyzeCvMatch}
         />
       ) : null}
     </Fragment>

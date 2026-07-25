@@ -3,15 +3,16 @@ import { FC, type ReactNode } from 'react'
 import { AppliedDaysPrefix } from './AppliedDaysPrefix'
 import { ApplyStatusIndicator } from './ApplyStatusIndicator'
 import { JobFavIndicator } from './JobFavIndicator'
+import { MatchAnalysisIndicator } from './MatchAnalysisIndicator'
 import { trailingGroupStyle } from './trailingGroupStyle'
 import { WorkplaceTypeIndicator } from './WorkplaceTypeIndicator'
 
-function hasAdTitleTrailingContent(ad: Pick<JobAdWithMeta, 'meta'>, zoom: boolean): boolean {
+function hasAdTitleTrailingContent(ad: Pick<JobAdWithMeta, 'meta' | 'matchAnalysis'>, zoom: boolean): boolean {
   if (zoom) {
     return true
   }
 
-  return ad.meta.fav || ad.meta.application.status !== 'not-applied'
+  return ad.meta.fav || ad.meta.application.status !== 'not-applied' || ad.matchAnalysis !== null
 }
 
 export const AdTitleTrailing: FC<{
@@ -28,6 +29,7 @@ export const AdTitleTrailing: FC<{
       {zoom ? <WorkplaceTypeIndicator workplaceType={ad.workplaceType} /> : null}
       <JobFavIndicator fav={ad.meta.fav} />
       <ApplyStatusIndicator ad={ad} />
+      <MatchAnalysisIndicator matchAnalysis={ad.matchAnalysis} />
       <AppliedDaysPrefix application={ad.meta.application} />
       {children}
     </span>

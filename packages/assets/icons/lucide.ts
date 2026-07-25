@@ -41,6 +41,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   Snowflake,
+  Sparkles,
   Star,
   Sun,
   SunMedium,
@@ -60,6 +61,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react'
+import { designTokens } from '@repo/design-tokens'
 import { createStyledIcon } from './createStyledIcon'
 import { iconStyles } from './iconStyles'
 
@@ -126,6 +128,10 @@ export const InfoIcon = createStyledIcon(Info, iconStyles.weather)
 export const IconLink = createStyledIcon(Link, iconStyles.link)
 export const IconCopy = createStyledIcon(Copy, iconStyles.link)
 export const FavStarIcon = createStyledIcon(Star, iconStyles.fav)
+export const AiSparklesIcon = createStyledIcon(Sparkles, {
+  color: designTokens.skillLevel.master.color,
+  glowColor: designTokens.skillLevel.master.glow,
+})
 export const BackIcon = createStyledIcon(ChevronLeft, iconStyles.neutral)
 export const ChevronRightIcon = createStyledIcon(ChevronRight, iconStyles.neutral)
 export const CollapseMenuIcon = createStyledIcon(ChevronsLeft, iconStyles.muted)
