@@ -13,6 +13,7 @@ export const setupEnv = {
   TRANSMISSION_URL: 'http://localhost:9091/transmission/rpc',
   TRANSMISSION_USERNAME: 'test',
   TRANSMISSION_PASSWORD: 'test',
+  OPENAI_API_KEY: 'test',
   NO_KNX: '1',
   NO_CRON: '1',
   NO_REDIS: '1',

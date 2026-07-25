@@ -26,6 +26,8 @@ declare module 'process' {
         readonly TRANSMISSION_URL: string
         readonly TRANSMISSION_USERNAME: string
         readonly TRANSMISSION_PASSWORD: string
+
+        readonly OPENAI_API_KEY: string
       }
     }
   }

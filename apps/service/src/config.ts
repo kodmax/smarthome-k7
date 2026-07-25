@@ -58,4 +58,7 @@ export const config = {
     username: getString('TRANSMISSION_USERNAME'),
     password: getString('TRANSMISSION_PASSWORD'),
   },
+  openai: {
+    apiKey: getString('OPENAI_API_KEY'),
+  },
 }

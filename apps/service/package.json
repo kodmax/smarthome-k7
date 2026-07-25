@@ -6,15 +6,16 @@
   "dependencies": {
     "@repo/apollo-ws": "*",
     "@repo/common": "*",
-    "@repo/di": "*",
     "@repo/cron-scripts": "*",
     "@repo/db": "*",
+    "@repo/di": "*",
     "@repo/knx-schema": "*",
     "@repo/transmission": "*",
     "@types/suncalc": "^1.8.1",
     "dotenv": "^17.4.2",
     "js-knx": "^3.1.0",
     "linkedom": "^0.18.12",
+    "openai": "^6.49.0",
     "redis": "^6.1.0",
     "suncalc": "^1.9.0"
   },

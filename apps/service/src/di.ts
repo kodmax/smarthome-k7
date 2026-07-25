@@ -1,6 +1,7 @@
 import { createContainer } from '@repo/di'
 import type { KnxLink } from 'js-knx'
 import type { Pool } from 'mariadb'
+import type OpenAI from 'openai'
 import type { RedisClientType } from 'redis'
 import type { config as appConfig } from './config'
 
@@ -13,6 +14,7 @@ export type Dependencies = {
   redis: RedisClientType
   config: typeof appConfig
   knx: KnxLink
+  openai: OpenAI
 }
 
 export type DependencyKey = keyof Dependencies
