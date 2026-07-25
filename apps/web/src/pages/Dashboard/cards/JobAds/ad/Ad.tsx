@@ -24,7 +24,7 @@ export const Ad: FC<{
           <AdTitleTrailing ad={ad} zoom={zoom} />
         </JobTitleContent>
       </JobTitleCell>
-      <AdSalaryCells ad={ad} zoom={zoom} />
+      <AdSalaryCells ad={ad} zoom={zoom} showHourlySalaryOnXs />
     </ApolloTableRow>
   )
 }

@@ -28,11 +28,23 @@ export const JobTitleText = styled('span')({
 })
 
 export const Salary = styled(ApolloTableCell)({
-  width: '128px',
+  width: '96px',
   padding: 0,
   borderBottom: 'none',
   textAlign: 'right',
 })
+
+export const MonthlySalaryRangeCell = styled(Salary)(({ theme }) => ({
+  [theme.breakpoints.down('sm')]: {
+    display: 'none',
+  },
+}))
+
+export const HourlySalaryCellXsOnly = styled(Salary)(({ theme }) => ({
+  [theme.breakpoints.up('sm')]: {
+    display: 'none',
+  },
+}))
 
 export const SkillsList = styled('ul')({
   display: 'inline-block',
