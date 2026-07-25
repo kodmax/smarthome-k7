@@ -19,6 +19,7 @@ import {
   Cog,
   Copy,
   Droplets,
+  Eye,
   Fan,
   FileText,
   Flame,
@@ -30,6 +31,7 @@ import {
   Leaf,
   Link,
   List,
+  Loader2,
   Funnel,
   FunnelX,
   Menu,
@@ -50,6 +52,7 @@ import {
   TrendingDown,
   TrendingUp,
   TriangleAlert,
+  Upload,
   Wind,
   Zap,
   ChevronLeft,
@@ -106,6 +109,9 @@ export const JobMarketSalaryRangeIcon = createStyledIcon(SlidersHorizontal, icon
 export const JobMarketHybridWorkIcon = createStyledIcon(ArrowLeftRight, iconStyles.jobAds)
 export const JobMarketOfficeWorkIcon = createStyledIcon(Building2, iconStyles.jobAds)
 export const FileTextIcon = createStyledIcon(FileText, iconStyles.jobAds)
+export const UploadIcon = createStyledIcon(Upload, iconStyles.jobAds)
+export const EyeIcon = createStyledIcon(Eye, iconStyles.jobAds)
+export const LoaderIcon = createStyledIcon(Loader2, iconStyles.jobAds)
 export const BanknoteIcon = createStyledIcon(Banknote, iconStyles.media)
 export const PieChartIcon = createStyledIcon(PieChart, iconStyles.temperature)
 export const ListIcon = createStyledIcon(List, iconStyles.muted)

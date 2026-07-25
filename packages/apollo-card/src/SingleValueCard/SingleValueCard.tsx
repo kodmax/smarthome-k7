@@ -14,6 +14,7 @@ export type SingleValueCardProps = {
   tertiary?: ReactNode
   height?: number
   headingInfo?: ReactNode
+  actions?: ReactNode
 }
 
 export const SingleValueCard: FC<SingleValueCardProps> = ({
@@ -26,9 +27,18 @@ export const SingleValueCard: FC<SingleValueCardProps> = ({
   tertiary,
   height = 3.5,
   headingInfo,
+  actions,
 }) => {
   return (
-    <BaseCard cardId={cardId} title={title} icon={icon} height={height} allowZoom={false} headingInfo={headingInfo}>
+    <BaseCard
+      cardId={cardId}
+      title={title}
+      icon={icon}
+      height={height}
+      allowZoom={false}
+      headingInfo={headingInfo}
+      actions={actions}
+    >
       <Typography
         sx={{
           fontSize: designTokens.font.h1.size,

@@ -81,6 +81,12 @@ export type Translations = {
       permanentEmployment: string
       vsPreviousPeriod: string
     }
+    cv: {
+      title: string
+      load: string
+      processing: string
+      preview: string
+    }
     salaryDistribution: {
       title: string
       brackets: {

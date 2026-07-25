@@ -16,6 +16,7 @@ import { PopularTechnologies } from './cards/PopularTechnologies/PopularTechnolo
 import { SalaryDistribution } from './cards/SalaryDistribution/SalaryDistribution'
 import { JobAds } from './cards/JobAds'
 import { OffersWithSalaryRange } from './cards/OffersWithSalaryRange/OffersWithSalaryRange'
+import { Cv } from './cards/Cv'
 
 export const JobMarket: FC<Record<string, never>> = () => {
   const { t } = useTranslations()
@@ -41,7 +42,7 @@ export const JobMarket: FC<Record<string, never>> = () => {
             gridTemplateColumns: {
               xs: '1fr',
               sm: 'repeat(2, 1fr)',
-              lg: 'repeat(6, 1fr)',
+              lg: 'repeat(4, 1fr)',
               xl: 'repeat(6, 1fr)',
             },
             gridTemplateAreas: {
@@ -52,6 +53,7 @@ export const JobMarket: FC<Record<string, never>> = () => {
                 "p90salary"
                 "ads-with-range"
                 "permanentEmployment"
+                "cv"
                 "remote-work-mode-split"
                 "hybrid-work-mode-split"
                 "office-work-mode-split"
@@ -63,6 +65,7 @@ export const JobMarket: FC<Record<string, never>> = () => {
                 "activeOffers newOffers"
                 "medianSalary p90salary"
                 "ads-with-range permanentEmployment"
+                "cv cv"
                 "remote-work-mode-split hybrid-work-mode-split"
                 "office-work-mode-split office-work-mode-split"
                 "required-skills required-skills"
@@ -70,18 +73,18 @@ export const JobMarket: FC<Record<string, never>> = () => {
                 "job-ads job-ads"
               `,
               lg: `
-                "activeOffers activeOffers newOffers newOffers medianSalary medianSalary"
-                "p90salary p90salary ads-with-range ads-with-range permanentEmployment permanentEmployment"
-                "remote-work-mode-split remote-work-mode-split hybrid-work-mode-split hybrid-work-mode-split office-work-mode-split office-work-mode-split"
-                "required-skills required-skills required-skills job-ads job-ads job-ads"
-                "salary-distribution salary-distribution salary-distribution job-ads job-ads job-ads"
+                "activeOffers newOffers medianSalary p90salary"
+                "ads-with-range permanentEmployment cv ."
+                "remote-work-mode-split hybrid-work-mode-split office-work-mode-split ."
+                "required-skills required-skills job-ads job-ads"
+                "salary-distribution salary-distribution job-ads job-ads"
               `,
               xl: `
                 "activeOffers newOffers medianSalary p90salary ads-with-range permanentEmployment"
                 "required-skills required-skills job-ads job-ads job-ads remote-work-mode-split"
                 "required-skills required-skills job-ads job-ads job-ads hybrid-work-mode-split"
                 "salary-distribution salary-distribution job-ads job-ads job-ads office-work-mode-split"
-                "salary-distribution salary-distribution job-ads job-ads job-ads ."
+                "salary-distribution salary-distribution job-ads job-ads job-ads cv"
               `,
             },
           }}
@@ -121,6 +124,9 @@ export const JobMarket: FC<Record<string, never>> = () => {
           </Box>
           <Box sx={{ gridArea: 'ads-with-range' }}>
             <OffersWithSalaryRange />
+          </Box>
+          <Box sx={{ gridArea: 'cv' }}>
+            <Cv />
           </Box>
         </Grid>
       </ZoomStateProvider>

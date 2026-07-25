@@ -83,6 +83,12 @@ export const en: Translations = {
       permanentEmployment: 'Permanent',
       vsPreviousPeriod: 'vs. previous 7 days',
     },
+    cv: {
+      title: 'CV',
+      load: 'Load',
+      processing: 'Processing…',
+      preview: 'Preview',
+    },
     salaryDistribution: {
       title: 'Salary distribution',
       brackets: {

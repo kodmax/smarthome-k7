@@ -83,6 +83,12 @@ export const ru: Translations = {
       permanentEmployment: 'ТК',
       vsPreviousPeriod: 'vs. предыдущие 7 дней',
     },
+    cv: {
+      title: 'CV',
+      load: 'Загрузить',
+      processing: 'Обработка…',
+      preview: 'Просмотр',
+    },
     salaryDistribution: {
       title: 'Распределение зарплат',
       brackets: {

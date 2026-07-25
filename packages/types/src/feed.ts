@@ -436,6 +436,17 @@ export type MySkillsFeed = {
   skills: MySkill[]
 }
 
+export type CvData = {
+  modifiedAt: string
+  text: string
+}
+
+export type CvFeed = {
+  cv: CvData | null
+}
+
+export type CvCachedFeed = Record<string, never>
+
 export function emptyJobAdApplication(): JobAdApplication {
   return {
     status: DEFAULT_JOB_APPLY_STATUS,

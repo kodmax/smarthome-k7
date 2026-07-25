@@ -9,7 +9,7 @@ import { getDependency, registerDependency } from './di'
 import { initKnxFeeds, initWebFeeds } from './feeds'
 import { knxInit } from './knx-init'
 import { registerApollo, registerKnxCron, setupGracefulShutdown } from './graceful-shutdown'
-import { initOpenAIClient, getModelList } from './openai'
+import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
 
 registerDependency('config', config)
@@ -19,9 +19,6 @@ registerDependency('openai', initOpenAIClient())
 setupGracefulShutdown()
 
 Server.listen({}, async apollo => {
-  const openaiModels = await getModelList()
-  console.log(`OpenAI connected, ${openaiModels.length} models available`)
-
   if (!config.redis.disabled) {
     registerDependency('redis', await initRedisClient())
     console.log('Redis connected')
