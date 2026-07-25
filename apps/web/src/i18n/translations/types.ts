@@ -282,6 +282,7 @@ export type Translations = {
       markAsApplied: string
       editApplication: string
       company: string
+      publicationDate: string
       currentApplicationStatus: string
       applicationDate: string
       rejectionDate: string

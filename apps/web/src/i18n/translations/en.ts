@@ -316,6 +316,7 @@ export const en: Translations = {
       markAsApplied: 'Mark as applied',
       editApplication: 'Edit application',
       company: 'Company',
+      publicationDate: 'Publication date',
       currentApplicationStatus: 'Current status',
       applicationDate: 'Application date',
       rejectionDate: 'Rejection date',
@@ -338,7 +339,7 @@ export const en: Translations = {
       acceptableSalary: {
         label: 'Minimum salary',
         ariaLabel: 'Minimum acceptable salary',
-        valueAtLeast: 'Salary >= {amount} k PLN',
+        valueAtLeast: '>= {amount} k PLN',
       },
       workplaceType: {
         office: 'Office',

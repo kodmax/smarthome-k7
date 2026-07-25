@@ -107,6 +107,8 @@ describe('ApplicationStatusEditor', () => {
 
     expect(screen.getByText('Firma')).toBeInTheDocument()
     expect(screen.getByText('Acme Corp')).toBeInTheDocument()
+    expect(screen.getByText('Data publikacji')).toBeInTheDocument()
+    expect(screen.getByText('1 stycznia 2026')).toBeInTheDocument()
     expect(screen.getByText('Obecny status')).toBeInTheDocument()
     expect(screen.getByText('Data zaaplikowania')).toBeInTheDocument()
     expect(screen.getByText('Wymagane umiejętności')).toBeInTheDocument()

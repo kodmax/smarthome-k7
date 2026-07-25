@@ -316,6 +316,7 @@ export const ru: Translations = {
       markAsApplied: 'Отметить как откликнутую',
       editApplication: 'Редактировать отклик',
       company: 'Компания',
+      publicationDate: 'Дата публикации',
       currentApplicationStatus: 'Текущий статус',
       applicationDate: 'Дата отклика',
       rejectionDate: 'Дата отказа',
@@ -338,7 +339,7 @@ export const ru: Translations = {
       acceptableSalary: {
         label: 'Минимальная зарплата',
         ariaLabel: 'Минимально приемлемая зарплата',
-        valueAtLeast: 'Зарплата >= {amount} k PLN',
+        valueAtLeast: '>= {amount} k PLN',
       },
       workplaceType: {
         office: 'Офис',

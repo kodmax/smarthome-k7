@@ -316,6 +316,7 @@ export const pl: Translations = {
       markAsApplied: 'Oznacz jako złożone',
       editApplication: 'Edytuj aplikację',
       company: 'Firma',
+      publicationDate: 'Data publikacji',
       currentApplicationStatus: 'Obecny status',
       applicationDate: 'Data zaaplikowania',
       rejectionDate: 'Data odrzucenia',
@@ -338,7 +339,7 @@ export const pl: Translations = {
       acceptableSalary: {
         label: 'Minimalne wynagrodzenie',
         ariaLabel: 'Minimalne akceptowalne wynagrodzenie',
-        valueAtLeast: 'Wynagrodzenie >= {amount} k PLN',
+        valueAtLeast: '>= {amount} k PLN',
       },
       workplaceType: {
         office: 'Biuro',

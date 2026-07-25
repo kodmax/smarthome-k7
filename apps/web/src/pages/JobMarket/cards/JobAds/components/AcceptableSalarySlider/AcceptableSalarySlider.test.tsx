@@ -17,12 +17,12 @@ describe('AcceptableSalarySlider', () => {
     render(<AcceptableSalarySlider salaryRange={{ min: 15_000, max: 35_000 }} acceptableSalary={24_000} />)
 
     expect(screen.getByLabelText('Minimalne akceptowalne wynagrodzenie')).toBeInTheDocument()
-    expect(screen.getByText('Wynagrodzenie >= 24 k PLN')).toBeInTheDocument()
+    expect(screen.getByText('>= 24 k PLN')).toBeInTheDocument()
   })
 
   it('defaults to salary range min when acceptable salary is unset', () => {
     render(<AcceptableSalarySlider salaryRange={{ min: 15_000, max: 35_000 }} acceptableSalary={null} />)
 
-    expect(screen.getByText('Wynagrodzenie >= 15 k PLN')).toBeInTheDocument()
+    expect(screen.getByText('>= 15 k PLN')).toBeInTheDocument()
   })
 })

@@ -25,8 +25,11 @@ import {
 } from './applicationMeta'
 import { isMetaFlagTrue } from './metaFlag'
 
-const META_RETENTION_DAYS = 90
-const STALE_APPLIED_NO_RESPONSE_AFTER_DAYS = 14
+const META_RETENTION_DAYS = 365
+const APPLICATION_ATTRIBUTE_NAME = 'application'
+const FAV_ATTRIBUTE_NAME = 'fav'
+const FIRST_PUBLISHED_AT_ATTRIBUTE_NAME = 'first-published-at'
+const STALE_APPLIED_NO_RESPONSE_AFTER_DAYS = 7
 const STALE_NO_RESPONSE_ARCHIVE_AFTER_DAYS = 30
 const STALE_REJECTED_ARCHIVE_AFTER_DAYS = 7
 
@@ -95,12 +98,12 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
   }
 
   private async commandFav(itemId: string): Promise<void> {
-    await this.markMeta(itemId, 'fav', true)
+    await this.markMeta(itemId, FAV_ATTRIBUTE_NAME, true)
     this.push()
   }
 
   private async commandUnfav(itemId: string): Promise<void> {
-    await this.unmarkMeta(itemId, 'fav')
+    await this.unmarkMeta(itemId, FAV_ATTRIBUTE_NAME)
     this.push()
   }
 
@@ -148,8 +151,9 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       await conn.query(
         `delete from meta
          where group_id = ?
+           and attribute_name != ?
            and last_update_timestamp < current_timestamp() - interval ? day`,
-        [this.getId(), META_RETENTION_DAYS],
+        [this.getId(), FIRST_PUBLISHED_AT_ATTRIBUTE_NAME, META_RETENTION_DAYS],
       )
 
       const appliedChanged = await this.markStaleAppliedAsNoResponse(conn)
@@ -171,11 +175,11 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       `update meta
        set value = json_set(value, '$.applyStatus', 'no-response', '$.comment', cast(null as json))
        where group_id = ?
-         and attribute_name = 'application'
+         and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'applied'
          and json_extract(value, '$.appliedAt') is not null
          and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
-      [this.getId(), cutoff.toISOString()],
+      [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
     )
 
     return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
@@ -189,11 +193,11 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       `update meta
        set value = json_set(value, '$.applyStatus', 'archived', '$.comment', cast(null as json))
        where group_id = ?
-         and attribute_name = 'application'
+         and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'no-response'
          and json_extract(value, '$.appliedAt') is not null
          and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
-      [this.getId(), cutoff.toISOString()],
+      [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
     )
 
     return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
@@ -207,11 +211,11 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       `update meta
        set value = json_set(value, '$.applyStatus', 'archived', '$.comment', cast(null as json))
        where group_id = ?
-         and attribute_name = 'application'
+         and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'rejected'
          and json_extract(value, '$.rejectedAt') is not null
          and json_unquote(json_extract(value, '$.rejectedAt')) <= ?`,
-      [this.getId(), cutoff.toISOString()],
+      [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
     )
 
     return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
@@ -229,18 +233,19 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
         `select item_uid, attribute_name, value, last_update_timestamp
          from meta
          where group_id = ?
-           and attribute_name in ('application', 'fav')
+           and attribute_name in (?, ?, ?)
            and item_uid in (?)`,
-        [this.getId(), ids],
+        [this.getId(), APPLICATION_ATTRIBUTE_NAME, FAV_ATTRIBUTE_NAME, FIRST_PUBLISHED_AT_ATTRIBUTE_NAME, ids],
       )) as MetaRow[]
 
       const applicationById = new Map<string, JobAdApplicationMeta>()
       const applicationUpdatedAtById = new Map<string, Date | string>()
       const favIds = new Set<string>()
+      const firstPublishedAtById = new Map<string, string>()
 
       for (const row of rows) {
         switch (row.attribute_name) {
-          case 'application': {
+          case APPLICATION_ATTRIBUTE_NAME: {
             const parsed = parseApplicationMeta(row.value)
             if (parsed !== null) {
               applicationById.set(row.item_uid, parsed)
@@ -250,20 +255,34 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
             }
             break
           }
-          case 'fav':
+          case FAV_ATTRIBUTE_NAME:
             if (isMetaFlagTrue(row.value)) {
               favIds.add(row.item_uid)
+            }
+            break
+          case FIRST_PUBLISHED_AT_ATTRIBUTE_NAME:
+            if (typeof row.value === 'string') {
+              firstPublishedAtById.set(row.item_uid, row.value)
             }
             break
         }
       }
 
-      return ads.map(ad => {
+      const firstPublishedAtToInsert: Array<[string, string]> = []
+      const adsWithMeta = ads.map(ad => {
+        const storedFirstPublishedAt = firstPublishedAtById.get(ad.id)
+        const publishedAt = storedFirstPublishedAt ?? ad.publishedAt
+
+        if (storedFirstPublishedAt === undefined) {
+          firstPublishedAtToInsert.push([ad.id, ad.publishedAt])
+        }
+
         const application = applicationById.get(ad.id) ?? emptyApplicationMeta()
         const lastStatusChangeAt = applicationUpdatedAtById.get(ad.id)
 
         return {
           ...ad,
+          publishedAt,
           meta: {
             ...emptyJobAdMeta(),
             application: jobAdApplicationFromMeta(
@@ -274,6 +293,22 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
           },
         }
       })
+
+      if (firstPublishedAtToInsert.length > 0) {
+        await conn.batch(
+          `insert into meta (item_uid, attribute_name, group_id, value)
+           values (?, ?, ?, JSON_QUOTE(?))
+           on duplicate key update value = value`,
+          firstPublishedAtToInsert.map(([itemId, publishedAt]) => [
+            itemId,
+            FIRST_PUBLISHED_AT_ATTRIBUTE_NAME,
+            this.getId(),
+            publishedAt,
+          ]),
+        )
+      }
+
+      return adsWithMeta
     } finally {
       conn.release()
     }
@@ -287,8 +322,8 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
          from meta
          where group_id = ?
            and item_uid = ?
-           and attribute_name = 'application'`,
-        [this.getId(), itemId],
+           and attribute_name = ?`,
+        [this.getId(), itemId, APPLICATION_ATTRIBUTE_NAME],
       )) as MetaRow[]
 
       const row = rows[0]
@@ -318,9 +353,9 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
   ): Promise<void> {
     await conn.query(
       `insert into meta (item_uid, attribute_name, group_id, value)
-       values (?, 'application', ?, ?)
+       values (?, ?, ?, ?)
        on duplicate key update value = values(value), group_id = values(group_id)`,
-      [itemId, this.getId(), meta],
+      [itemId, APPLICATION_ATTRIBUTE_NAME, this.getId(), meta],
     )
   }
 

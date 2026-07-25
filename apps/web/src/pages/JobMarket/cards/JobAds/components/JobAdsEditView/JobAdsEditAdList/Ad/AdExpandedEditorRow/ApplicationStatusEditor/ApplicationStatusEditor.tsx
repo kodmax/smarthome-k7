@@ -21,7 +21,7 @@ import { TagGroup } from '@/card-components'
 import { useLocale, useTranslations } from '@/i18n'
 import { ApplyStatusIcon } from '../../../../../../shared-components'
 import { applyStatusTargetOptions } from './applyStatusSelectOptions'
-import { formatAppliedDaysAgo, formatNotApplicable } from './formatAppliedDaysAgo'
+import { formatAppliedDaysAgo, formatNotApplicable, formatPublicationDate } from './formatAppliedDaysAgo'
 import { RequiredSkillTag } from './RequiredSkillTag'
 
 const favIconSize = designTokens.icon.sizeMd
@@ -41,6 +41,7 @@ export const ApplicationStatusEditor: FC<{
   const showRejectionDate = rejectedAt !== null
   const appliedDaysAgo = formatAppliedDaysAgo(ad.meta.application.appliedAt, locale)
   const rejectedDaysAgo = formatAppliedDaysAgo(rejectedAt, locale)
+  const publicationDate = formatPublicationDate(ad.publishedAt, locale)
   const notApplicable = formatNotApplicable(locale)
   const [isChangingStatus, setIsChangingStatus] = useState(false)
   const [nextStatus, setNextStatus] = useState<JobApplyStatus | typeof emptyNextStatus>(emptyNextStatus)
@@ -136,6 +137,12 @@ export const ApplicationStatusEditor: FC<{
                 {labels.company}
               </Typography>
               <Typography>{ad.companyName}</Typography>
+            </Box>
+            <Box>
+              <Typography variant='caption' color='text.secondary' display='block'>
+                {labels.publicationDate}
+              </Typography>
+              <Typography>{publicationDate}</Typography>
             </Box>
             <Box>
               <Typography variant='caption' color='text.secondary' display='block'>

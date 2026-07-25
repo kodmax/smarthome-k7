@@ -51,8 +51,22 @@ const APPLIED_YESTERDAY: Record<AppLocale, string> = {
   ru: 'вчера',
 }
 
+const LOCALE_TAGS: Record<AppLocale, string> = {
+  en: 'en-GB',
+  pl: 'pl-PL',
+  ru: 'ru-RU',
+}
+
 export function formatNotApplicable(locale: AppLocale): string {
   return NOT_APPLICABLE_LABEL[locale]
+}
+
+export function formatPublicationDate(publishedAt: string, locale: AppLocale): string {
+  return new Intl.DateTimeFormat(LOCALE_TAGS[locale], {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(publishedAt))
 }
 
 export function formatAppliedDaysAgo(appliedAt: string | null, locale: AppLocale, now = new Date()): string {
