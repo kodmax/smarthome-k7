@@ -302,4 +302,68 @@ describe('DataSource', () => {
 
     await expect(dataSource.maintenance()).resolves.toBeUndefined()
   })
+
+  it('ensureContent returns cached content without calling script', async () => {
+    const getData = vi.fn(async () => ({ value: 11 }))
+    const { dataSource } = await createDataSource(
+      createTestSourceClass({
+        id: 'ensure-hit',
+        getCacheTTL: () => Number.MAX_SAFE_INTEGER,
+        getData,
+      }),
+    )
+
+    await dataSource.getData()
+    getData.mockClear()
+
+    await expect(dataSource.ensureContent()).resolves.toEqual({ value: 11 })
+    expect(getData).not.toHaveBeenCalled()
+  })
+
+  it('ensureContent fetches and writes cache when snapshot is missing', async () => {
+    const getData = vi.fn(async () => ({ value: 22 }))
+    const { dataSource } = await createDataSource(
+      createTestSourceClass({
+        id: 'ensure-miss',
+        getData,
+      }),
+    )
+
+    await expect(dataSource.ensureContent()).resolves.toEqual({ value: 22 })
+    expect(getData).toHaveBeenCalledTimes(1)
+    await expect(dataSource.getRecentContent()).resolves.toEqual({ value: 22 })
+  })
+
+  it('ensureContent does not emit data-update on fetch', async () => {
+    const updates: string[] = []
+    const getData = vi.fn(async () => ({ value: 33 }))
+    const { dataSource, vent } = await createDataSource(
+      createTestSourceClass({
+        id: 'ensure-silent',
+        getData,
+      }),
+    )
+
+    vent.on('data-update', sourceId => updates.push(sourceId))
+
+    await expect(dataSource.ensureContent()).resolves.toEqual({ value: 33 })
+    expect(getData).toHaveBeenCalledTimes(1)
+    expect(updates).toEqual([])
+  })
+
+  it('getData still emits data-update after fetch', async () => {
+    const updates: string[] = []
+    const { dataSource, vent } = await createDataSource(
+      createTestSourceClass({
+        id: 'getdata-emit',
+        getData: async () => ({ value: 44 }),
+      }),
+    )
+
+    vent.on('data-update', sourceId => updates.push(sourceId))
+
+    await dataSource.getData()
+
+    expect(updates).toEqual(['getdata-emit'])
+  })
 })

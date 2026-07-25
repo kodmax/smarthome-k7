@@ -62,13 +62,14 @@ export class Feeds {
     this.vent.on('command', async ev => {
       const registration = this.sourcesById.get(ev.sourceId)
       if (registration === undefined) {
+        this.vent.emit('sys-log', 6, `Command ignored: unknown data source <${ev.sourceId}>`)
         return
       }
 
       try {
         await registration.dataSource.handleCommand(ev.name, ev.args)
       } catch (e) {
-        this.vent.emit('sys-log', 4, `Data source <${ev.sourceId}> command <${ev.name} execution error: ${e}`, e)
+        this.vent.emit('sys-log', 4, `Data source <${ev.sourceId}> command <${ev.name}> execution error: ${e}`, e)
       }
     })
   }
@@ -120,12 +121,24 @@ export class Feeds {
     return dataSource
   }
 
+  private async getSourceContent(src: DS, triggeredBy?: string): Promise<unknown> {
+    if (triggeredBy === src.getId()) {
+      return src.getRecentContent()
+    }
+
+    if (triggeredBy === undefined) {
+      return src.getData()
+    }
+
+    return src.ensureContent()
+  }
+
   private async getData(feed: Feed, triggeredBy?: string): Promise<Record<string, unknown>> {
     const contents: Record<string, unknown> = {}
 
     await Promise.all(
       Array.from([...feed.sources.entries()]).map(async ([srcName, src]) => {
-        contents[srcName] = triggeredBy !== undefined ? await src.getRecentContent() : await src.getData()
+        contents[srcName] = await this.getSourceContent(src, triggeredBy)
       }),
     )
 
@@ -157,6 +170,7 @@ export class Feeds {
       this.vent.emit('feed', feedId, content)
     } catch (e) {
       if (e instanceof NonErrorException) {
+        this.vent.emit('sys-log', 6, `Feed <${feedId}> update skipped: ${e.message}`)
         return
       }
 
@@ -177,6 +191,7 @@ export class Feeds {
       this.vent.emit('feed', feedId, content)
     } catch (e) {
       if (e instanceof NonErrorException) {
+        this.vent.emit('sys-log', 6, `Feed <${feedId}> update skipped: ${e.message}`)
         return
       }
 

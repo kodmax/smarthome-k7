@@ -156,6 +156,15 @@ class DataSource<T, TCache = T> {
     return this.definition.composeContent(snapshot.getContent())
   }
 
+  public async ensureContent(): Promise<T> {
+    const snapshot = await this.cacheEntry.getSnapshot()
+    if (snapshot !== null) {
+      return this.definition.composeContent(snapshot.getContent())
+    }
+
+    return this.fetchAndCompose().promise
+  }
+
   public async getData(forceRefresh = false): Promise<T> {
     if (this.updating) {
       return this.updating
@@ -165,27 +174,43 @@ class DataSource<T, TCache = T> {
       const snapshot = await this.cacheEntry.getSnapshot()
       return this.definition.composeContent(snapshot!.getContent())
     } else {
-      this.updating = new Promise((resolve, reject) => {
-        this.definition
-          .getData()
-          .then(async cached => {
-            await this.cacheEntry.write(cached)
-            const content = await this.definition.composeContent(cached)
-            resolve(content)
+      const fetch = this.fetchAndCompose()
+      const content = await fetch.promise
 
-            this.vent.emit('sys-log', 4, `Data source <${this.definition.getId()}> content refreshed`)
-            this.vent.emit('data-update', this.definition.getId())
-            this.updating = void 0
-          })
-          .catch(e => {
-            this.vent.emit('sys-log', 4, `Data source <${this.definition.getId()}> update error: ` + e)
-            this.updating = void 0
-            reject(e)
-          })
-      })
+      if (fetch.initiated) {
+        this.vent.emit('data-update', this.definition.getId())
+      }
 
-      return this.updating
+      return content
     }
+  }
+
+  private fetchAndCompose(): { promise: Promise<T>; initiated: boolean } {
+    if (this.updating) {
+      return { promise: this.updating, initiated: false }
+    }
+
+    const promise = new Promise<T>((resolve, reject) => {
+      this.definition
+        .getData()
+        .then(async cached => {
+          await this.cacheEntry.write(cached)
+          const content = await this.definition.composeContent(cached)
+          resolve(content)
+
+          this.vent.emit('sys-log', 4, `Data source <${this.definition.getId()}> content refreshed`)
+          this.updating = void 0
+        })
+        .catch(e => {
+          this.vent.emit('sys-log', 4, `Data source <${this.definition.getId()}> update error: ` + e)
+          this.updating = void 0
+          reject(e)
+        })
+    })
+
+    this.updating = promise
+
+    return { promise, initiated: true }
   }
 }
 

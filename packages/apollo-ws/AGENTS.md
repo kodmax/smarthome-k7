@@ -39,13 +39,14 @@ Typed wrapper over Node `EventEmitter`. Create one instance on `Server.vent` and
 `getData(true)` on refresh). Sources finish at different times; each success emits `data-update` and may trigger another
 composition pass.
 
-**Push / cron** (`data-update` handler): `feed(feedId, sourceId)` runs with `triggeredBy` set. **All** sources in that
-feed use `getRecentContent()` — not `getData()`. Push already wrote to cache before emitting `data-update`; KNX volatile
-cache stays warm in RAM so clients rarely need a burst of `dp.read()` on subscribe.
+**Push / cron** (`data-update` handler): `feed(feedId, sourceId)` runs with `triggeredBy` set. The **trigger** source
+uses `getRecentContent()` (push already wrote to cache before emitting `data-update`; KNX volatile cache stays warm in
+RAM). Other sources in the same feed use `ensureContent()` — read from cache when available, otherwise fetch without
+emitting another `data-update`. Do **not** use `getRecentContent()` for all sources (regression from 28fb434): siblings
+without cache would throw `NoRecentContent` and skip the feed event entirely.
 
-If any source has no cached content, `getRecentContent()` throws `NoRecentContent`; `Feeds` swallows it
-(`NonErrorException`) and skips the `feed` event for that attempt. A later source update or client subscribe usually
-succeeds once every source has cache.
+**Subscribe** (`feeds-request`, no `triggeredBy`): every source uses `getData()`, which may emit `data-update` after
+refresh — intentional; the server debounce merges rapid multi-source updates.
 
 ## Intentional behavior — do not "fix"
 
