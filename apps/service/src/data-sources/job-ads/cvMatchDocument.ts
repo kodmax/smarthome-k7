@@ -6,13 +6,22 @@ export const CV_MATCH_SCOPE = 'cv-match'
 
 export type CvMatchContent = {
   analyzedAt: string
-  analysis: string
+  score: number
+  summary: string
+  strengths: string
+  gaps: string
+  observations: string
+  conclusion: string
 }
 
 type DocumentRow = {
   id: string
   content: CvMatchContent | string
   modified_at: Date | string
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0
 }
 
 export function digestCvMatchContentHash(content: CvMatchContent): string {
@@ -24,22 +33,46 @@ export function parseCvMatchContent(content: DocumentRow['content']): CvMatchCon
   if (
     typeof parsed !== 'object' ||
     parsed === null ||
-    typeof (parsed as CvMatchContent).analyzedAt !== 'string' ||
-    typeof (parsed as CvMatchContent).analysis !== 'string'
+    typeof (parsed as { analyzedAt?: unknown }).analyzedAt !== 'string'
+  ) {
+    return null
+  }
+
+  const record = parsed as Record<string, unknown>
+  if (
+    typeof record.score !== 'number' ||
+    !Number.isInteger(record.score) ||
+    record.score < 1 ||
+    record.score > 5 ||
+    !isNonEmptyString(record.summary) ||
+    !isNonEmptyString(record.strengths) ||
+    !isNonEmptyString(record.gaps) ||
+    !isNonEmptyString(record.observations) ||
+    !isNonEmptyString(record.conclusion)
   ) {
     return null
   }
 
   return {
-    analyzedAt: (parsed as CvMatchContent).analyzedAt,
-    analysis: (parsed as CvMatchContent).analysis,
+    analyzedAt: record.analyzedAt as string,
+    score: record.score,
+    summary: record.summary.trim(),
+    strengths: record.strengths.trim(),
+    gaps: record.gaps.trim(),
+    observations: record.observations.trim(),
+    conclusion: record.conclusion.trim(),
   }
 }
 
 export function cvMatchContentToMatchAnalysis(content: CvMatchContent): JobAdMatchAnalysis {
   return {
     analyzedAt: content.analyzedAt,
-    summary: content.analysis,
+    score: content.score,
+    summary: content.summary,
+    strengths: content.strengths,
+    gaps: content.gaps,
+    observations: content.observations,
+    conclusion: content.conclusion,
   }
 }
 

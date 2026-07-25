@@ -297,6 +297,12 @@ export type Translations = {
       checkCvMatch: string
       viewMatchAnalysis: string
       matchAnalysisTitle: string
+      matchAnalysisScore: string
+      matchAnalysisSummarySection: string
+      matchAnalysisStrengthsSection: string
+      matchAnalysisGapsSection: string
+      matchAnalysisObservationsSection: string
+      matchAnalysisConclusionSection: string
       newApplicationStatus: string
       applicationComment: string
       save: string

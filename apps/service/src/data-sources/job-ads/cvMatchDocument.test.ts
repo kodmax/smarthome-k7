@@ -1,35 +1,44 @@
 import { describe, expect, it } from 'vitest'
 import { cvMatchContentToMatchAnalysis, digestCvMatchContentHash, parseCvMatchContent } from './cvMatchDocument'
 
+const content = {
+  analyzedAt: '2026-01-01T00:00:00.000Z',
+  score: 4,
+  summary: 'Dobre dopasowanie.',
+  strengths: 'React, TypeScript.',
+  gaps: 'Brak doświadczenia w GraphQL.',
+  observations: 'CV jest przejrzyste.',
+  conclusion: 'Warto rozważyć rozmowę.',
+}
+
 describe('cvMatchDocument', () => {
   it('parses cv match content', () => {
+    expect(parseCvMatchContent(content)).toEqual(content)
+  })
+
+  it('returns null for legacy content', () => {
     expect(
       parseCvMatchContent({
         analyzedAt: '2026-01-01T00:00:00.000Z',
-        analysis: 'Dobre dopasowanie.',
+        analysis: 'Ocena dopasowania: dobre, około 75%\n\nSzczegóły.',
       }),
-    ).toEqual({
-      analyzedAt: '2026-01-01T00:00:00.000Z',
-      analysis: 'Dobre dopasowanie.',
-    })
+    ).toBeNull()
+
+    expect(
+      parseCvMatchContent({
+        analyzedAt: '2026-01-01T00:00:00.000Z',
+        score: 4,
+        summary: 'Dobre dopasowanie.',
+        analysis: 'Szczegółowa analiza.',
+      }),
+    ).toBeNull()
   })
 
   it('hashes content deterministically', () => {
-    const content = {
-      analyzedAt: '2026-01-01T00:00:00.000Z',
-      analysis: 'Dobre dopasowanie.',
-    }
     expect(digestCvMatchContentHash(content)).toBe(digestCvMatchContentHash(content))
   })
 
   it('maps content to feed matchAnalysis shape', () => {
-    const content = {
-      analyzedAt: '2026-01-01T00:00:00.000Z',
-      analysis: 'Dobre dopasowanie.',
-    }
-    expect(cvMatchContentToMatchAnalysis(content)).toEqual({
-      analyzedAt: '2026-01-01T00:00:00.000Z',
-      summary: 'Dobre dopasowanie.',
-    })
+    expect(cvMatchContentToMatchAnalysis(content)).toEqual(content)
   })
 })

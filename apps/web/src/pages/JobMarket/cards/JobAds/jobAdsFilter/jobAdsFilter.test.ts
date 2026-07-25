@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
+import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { filterJobAdsByCategory, getJobAdFilterCategory } from './jobAdsFilter'
 
 describe('jobAdsFilter', () => {
@@ -42,13 +42,13 @@ describe('jobAdsFilter', () => {
       jobAd({
         id: '2',
         title: 'Analyzed',
-        matchAnalysis: { analyzedAt: '2026-01-01T00:00:00.000Z', summary: 'OK' },
+        matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z', summary: 'OK' }),
       }),
       jobAd({
         id: '3',
         title: 'Also analyzed',
         meta: { application: { status: 'applied' } },
-        matchAnalysis: { analyzedAt: '2026-01-02T00:00:00.000Z', summary: 'Strong fit' },
+        matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-02T00:00:00.000Z', summary: 'Strong fit' }),
       }),
     ]
 

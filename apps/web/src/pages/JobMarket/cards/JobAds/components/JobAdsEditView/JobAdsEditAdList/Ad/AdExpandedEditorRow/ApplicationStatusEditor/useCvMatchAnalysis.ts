@@ -1,5 +1,10 @@
 import { type JobAdWithMeta } from '@repo/types'
 import { useCallback, useEffect, useState } from 'react'
+import {
+  formatMatchAnalysisText,
+  formatMatchAnalysisTitle,
+} from '@/pages/JobMarket/cards/JobAds/shared-components/formatMatchAnalysisText'
+import { useTranslations } from '@/i18n'
 
 const MATCH_ANALYSIS_TIMEOUT_MS = 120_000
 
@@ -11,16 +16,20 @@ type UseCvMatchAnalysisOptions = {
 }
 
 export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: UseCvMatchAnalysisOptions) {
+  const { t } = useTranslations()
+  const labels = t.dashboard.jobAds
   const [analyzing, setAnalyzing] = useState(false)
   const [pendingAnalysisAt, setPendingAnalysisAt] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogSummary, setDialogSummary] = useState<string | null>(null)
+  const [dialogTitle, setDialogTitle] = useState<string | null>(null)
+  const [dialogText, setDialogText] = useState<string | null>(null)
 
   useEffect(() => {
     setAnalyzing(false)
     setPendingAnalysisAt(null)
     setDialogOpen(false)
-    setDialogSummary(null)
+    setDialogTitle(null)
+    setDialogText(null)
   }, [ad.id, resetWhen])
 
   useEffect(() => {
@@ -39,11 +48,12 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
       return
     }
 
-    setDialogSummary(matchAnalysis.summary)
+    setDialogTitle(formatMatchAnalysisTitle(matchAnalysis, labels))
+    setDialogText(formatMatchAnalysisText(matchAnalysis, labels))
     setDialogOpen(true)
     setAnalyzing(false)
     setPendingAnalysisAt(null)
-  }, [ad, analyzing, pendingAnalysisAt])
+  }, [ad, analyzing, labels, pendingAnalysisAt])
 
   useEffect(() => {
     if (!analyzing) {
@@ -75,7 +85,8 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
   return {
     analyzing,
     dialogOpen,
-    dialogSummary,
+    dialogTitle,
+    dialogText,
     closeDialog,
     requestAnalysis,
   }

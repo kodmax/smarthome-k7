@@ -1,7 +1,7 @@
 import { type JobAdWithMeta, type JobApplyStatus } from '@repo/types'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
+import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { renderInTableBody } from '@/pages/JobMarket/test/renderInTable'
 import { Ad } from './Ad'
 
@@ -134,23 +134,28 @@ describe('Ad', () => {
   })
 
   it('shows match analysis icon and opens summary dialog', () => {
+    const analysis = matchAnalysis({
+      analyzedAt: '2026-01-01T00:00:00.000Z',
+      summary: 'Silne dopasowanie do roli TypeScript.',
+    })
+
     renderAd(
       jobAd({
         id: '8',
         title: 'Analyzed Role',
-        matchAnalysis: {
-          analyzedAt: '2026-01-01T00:00:00.000Z',
-          summary: 'Silne dopasowanie do roli TypeScript.',
-        },
+        matchAnalysis: analysis,
       }),
       true,
     )
 
     fireEvent.click(screen.getByLabelText('Pokaż analizę dopasowania CV'))
 
+    expect(screen.getByText('4/5')).toBeInTheDocument()
     expect(screen.getByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByText('Analiza dopasowania CV')).toBeInTheDocument()
-    expect(screen.getByText('Silne dopasowanie do roli TypeScript.')).toBeInTheDocument()
+    expect(screen.getByText('Analiza dopasowania CV — 4/5')).toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
+    expect(screen.getByRole('dialog')).toHaveTextContent('Silne dopasowanie do roli TypeScript.')
+    expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
   })
 
   it('shows abbreviated applied days after the title in edit mode', () => {

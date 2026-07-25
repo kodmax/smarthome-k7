@@ -1,6 +1,5 @@
 import { JobAdWithMeta } from '@repo/types'
 import { FC, type ReactNode } from 'react'
-import { AppliedDaysPrefix } from './AppliedDaysPrefix'
 import { ApplyStatusIndicator } from './ApplyStatusIndicator'
 import { JobFavIndicator } from './JobFavIndicator'
 import { MatchAnalysisIndicator } from './MatchAnalysisIndicator'
@@ -30,7 +29,6 @@ export const AdTitleTrailing: FC<{
       <JobFavIndicator fav={ad.meta.fav} />
       <ApplyStatusIndicator ad={ad} />
       <MatchAnalysisIndicator matchAnalysis={ad.matchAnalysis} />
-      <AppliedDaysPrefix application={ad.meta.application} />
       {children}
     </span>
   )

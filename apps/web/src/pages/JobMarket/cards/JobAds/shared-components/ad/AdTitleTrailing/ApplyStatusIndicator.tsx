@@ -1,7 +1,9 @@
 import { Tooltip } from '@mui/material'
+import { designTokens } from '@repo/design-tokens'
 import { JobAdWithMeta } from '@repo/types'
 import { FC, useMemo } from 'react'
 import { useTranslations } from '@/i18n'
+import { formatAppliedDaysShort } from './AppliedDaysPrefix/formatAppliedDaysShort'
 import { ApplyStatusIcon } from './ApplyStatusIcon'
 
 export const ApplyStatusIndicator: FC<{ ad: Pick<JobAdWithMeta, 'meta'> }> = ({ ad }) => {
@@ -23,6 +25,8 @@ export const ApplyStatusIndicator: FC<{ ad: Pick<JobAdWithMeta, 'meta'> }> = ({ 
     return null
   }
 
+  const appliedDaysShort = application.status === 'applied' ? formatAppliedDaysShort(application.appliedAt) : null
+
   return (
     <Tooltip title={tooltip}>
       <span
@@ -30,9 +34,16 @@ export const ApplyStatusIndicator: FC<{ ad: Pick<JobAdWithMeta, 'meta'> }> = ({ 
         style={{
           verticalAlign: 'middle',
           display: 'inline-flex',
+          alignItems: 'center',
+          gap: `${designTokens.space[1]}px`,
+          fontSize: 'inherit',
+          lineHeight: 1,
         }}
       >
         <ApplyStatusIcon status={application.status} />
+        {appliedDaysShort !== null ? (
+          <span style={{ color: 'var(--mui-palette-text-secondary)', fontSize: 'inherit' }}>{appliedDaysShort}</span>
+        ) : null}
       </span>
     </Tooltip>
   )

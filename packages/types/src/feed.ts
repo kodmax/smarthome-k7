@@ -337,7 +337,12 @@ export type JobAdApplication = {
 
 export type JobAdMatchAnalysis = {
   analyzedAt: string
+  score: number
   summary: string
+  strengths: string
+  gaps: string
+  observations: string
+  conclusion: string
 }
 
 export type JobAdMeta = {

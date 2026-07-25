@@ -58,7 +58,8 @@ export const ApplicationStatusEditor: FC<{
   const {
     analyzing: analyzingCvMatch,
     dialogOpen: matchAnalysisDialogOpen,
-    dialogSummary: matchAnalysisSummary,
+    dialogTitle: matchAnalysisTitle,
+    dialogText: matchAnalysisText,
     closeDialog: closeMatchAnalysisDialog,
     requestAnalysis: handleAnalyzeCvMatch,
   } = useCvMatchAnalysis({
@@ -311,12 +312,12 @@ export const ApplicationStatusEditor: FC<{
           </Box>
         )}
       </Box>
-      {matchAnalysisSummary !== null ? (
+      {matchAnalysisText !== null && matchAnalysisTitle !== null ? (
         <CvPreviewDialog
           open={matchAnalysisDialogOpen}
           onClose={closeMatchAnalysisDialog}
-          title={labels.matchAnalysisTitle}
-          text={matchAnalysisSummary}
+          title={matchAnalysisTitle}
+          text={matchAnalysisText}
         />
       ) : null}
     </Box>

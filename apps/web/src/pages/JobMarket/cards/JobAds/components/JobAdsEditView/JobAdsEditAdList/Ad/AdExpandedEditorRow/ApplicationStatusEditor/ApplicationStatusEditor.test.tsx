@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useFeed } from '@repo/feed-client'
-import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
+import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { renderWithTheme } from '@/test/test-utils'
 import { ApplicationStatusEditor } from './ApplicationStatusEditor'
 
@@ -280,15 +280,17 @@ describe('ApplicationStatusEditor', () => {
     expect(onAnalyzeCvMatch).toHaveBeenCalledWith('11')
     expect(screen.getByRole('button', { name: 'Sprawdź dopasowanie' })).toBeDisabled()
 
+    const updatedAnalysis = matchAnalysis({
+      analyzedAt: '2026-01-02T00:00:00.000Z',
+      summary: 'Dobre dopasowanie do roli.',
+    })
+
     rerender(
       <ApplicationStatusEditor
         ad={jobAd({
           id: '11',
           title: 'Role',
-          matchAnalysis: {
-            analyzedAt: '2026-01-02T00:00:00.000Z',
-            summary: 'Dobre dopasowanie do roli.',
-          },
+          matchAnalysis: updatedAnalysis,
         })}
         onSave={vi.fn()}
         onFav={vi.fn()}
@@ -300,8 +302,10 @@ describe('ApplicationStatusEditor', () => {
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
-    expect(screen.getByText('Analiza dopasowania CV')).toBeInTheDocument()
-    expect(screen.getByText('Dobre dopasowanie do roli.')).toBeInTheDocument()
+    expect(screen.getByText('Analiza dopasowania CV — 4/5')).toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
+    expect(screen.getByRole('dialog')).toHaveTextContent('Dobre dopasowanie do roli.')
+    expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
   })
 
   it('returns to read-only view when change is cancelled', () => {

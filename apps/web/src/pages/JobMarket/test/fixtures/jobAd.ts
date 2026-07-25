@@ -1,4 +1,10 @@
-import { type JobAdApplication, type JobAdMeta, type JobAdWithMeta, emptyJobAdMeta } from '@repo/types'
+import {
+  type JobAdApplication,
+  type JobAdMatchAnalysis,
+  type JobAdMeta,
+  type JobAdWithMeta,
+  emptyJobAdMeta,
+} from '@repo/types'
 
 type JobAdOverrides = Partial<Omit<JobAdWithMeta, 'meta'>> &
   Pick<JobAdWithMeta, 'id' | 'title'> & {
@@ -6,6 +12,20 @@ type JobAdOverrides = Partial<Omit<JobAdWithMeta, 'meta'>> &
       application?: Partial<JobAdApplication>
     }
   }
+
+export function matchAnalysis(
+  overrides: Partial<JobAdMatchAnalysis> & Pick<JobAdMatchAnalysis, 'analyzedAt'>,
+): JobAdMatchAnalysis {
+  return {
+    score: 4,
+    summary: 'Dobre dopasowanie.',
+    strengths: 'React, TypeScript.',
+    gaps: 'Brak doświadczenia w GraphQL.',
+    observations: 'CV jest przejrzyste.',
+    conclusion: 'Warto rozważyć rozmowę.',
+    ...overrides,
+  }
+}
 
 export function jobAd(overrides: JobAdOverrides): JobAdWithMeta {
   const { meta, matchAnalysis = null, ...rest } = overrides

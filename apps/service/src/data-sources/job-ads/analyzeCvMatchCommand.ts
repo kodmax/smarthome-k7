@@ -37,10 +37,10 @@ export async function runAnalyzeCvMatchCommand(input: AnalyzeCvMatchInput): Prom
     throw new Error(`analyze-cv-match: failed to parse job posting from ${adUrl}`)
   }
 
-  const analysis = await analyzeCvMatch(input.openai, cvText, posting)
+  const result = await analyzeCvMatch(input.openai, cvText, posting)
   const content: CvMatchContent = {
     analyzedAt: new Date().toISOString(),
-    analysis,
+    ...result,
   }
 
   await saveCvMatch(input.db, adId, content)
