@@ -6,6 +6,7 @@ import { PersistentPages } from './PersistentPages'
 import { Appearance } from '@/pages/Appearance/Appearance'
 import { EnergyMeter } from '@/pages/EnergyMeter/EnergyMeter'
 import { JobMarket } from '@/pages/JobMarket/JobMarket'
+import { NotFound } from '@/pages/NotFound/NotFound'
 import { Offline } from '@/pages/Offline/Offline'
 import { StockMarket } from '@/pages/StockMarket/StockMarket'
 
@@ -47,6 +48,10 @@ export const router = createRouter([
           {
             path: 'offline',
             element: <Offline />,
+          },
+          {
+            path: '*',
+            element: <NotFound />,
           },
         ],
       },

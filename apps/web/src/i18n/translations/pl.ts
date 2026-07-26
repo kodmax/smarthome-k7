@@ -420,6 +420,11 @@ export const pl: Translations = {
     description: 'Wygląda na to, że jesteś offline. Sprawdź sieć i spróbuj ponownie.',
     retry: 'Odśwież',
   },
+  notFound: {
+    title: 'Strona nie istnieje',
+    description: 'Adres, którego szukasz, nie prowadzi do żadnej strony w aplikacji.',
+    backHome: 'Wróć na pulpit',
+  },
   error: {
     title: 'Coś poszło nie tak',
     description: 'W aplikacji wystąpił nieoczekiwany błąd. Możesz spróbować ponownie.',

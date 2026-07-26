@@ -392,6 +392,11 @@ export type Translations = {
     description: string
     retry: string
   }
+  notFound: {
+    title: string
+    description: string
+    backHome: string
+  }
   error: {
     title: string
     description: string

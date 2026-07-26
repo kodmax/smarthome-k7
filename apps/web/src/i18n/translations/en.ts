@@ -420,6 +420,11 @@ export const en: Translations = {
     description: 'It looks like you lost your connection. Check your network and try again.',
     retry: 'Refresh',
   },
+  notFound: {
+    title: 'Page not found',
+    description: 'The address you are looking for does not match any page in the app.',
+    backHome: 'Back to dashboard',
+  },
   error: {
     title: 'Something went wrong',
     description: 'An unexpected error occurred in the app. You can try again.',
