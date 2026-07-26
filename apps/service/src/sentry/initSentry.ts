@@ -18,8 +18,6 @@ export function initSentry(): void {
     release: process.env.SENTRY_RELEASE,
     tracesSampleRate: 0.2,
   })
-
-  console.info(`[sentry] enabled (${appMode})`)
 }
 
 export async function closeSentry(timeoutMs = 2000): Promise<void> {

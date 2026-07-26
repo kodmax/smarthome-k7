@@ -30,6 +30,4 @@ export function initSentry(): void {
     ],
     tracesSampleRate: 0.2,
   })
-
-  console.info(`[sentry] enabled (${mode})`)
 }
