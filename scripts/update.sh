@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 # Production deploy for Raspberry Pi (build, Sentry source maps, frontend, systemd).
 #
-# Prerequisites on the host (not in repo):
-#   - ~/smart-home/deploy.secrets.env  (SENTRY_AUTH_TOKEN, org/project slugs)
-#   - /etc/apollo/apollo.env           (runtime env for apollo-daemon, incl. SENTRY_DSN)
+# Host layout (override with env vars if needed):
+#   /home/pi/smart-home/update.sh
+#   /home/pi/smart-home/deploy.secrets.env
+#   /home/pi/smart-home/smarthome-k7/   ← git repo
 #
-# Usage:
-#   ./scripts/update.sh
-#   # or from ~/smart-home:  ./smarthome-k7/scripts/update.sh
+# Usage:  /home/pi/smart-home/update.sh
 
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SMART_HOME_DIR="${SMART_HOME_DIR:-$(dirname "$REPO_DIR")}"
+SMART_HOME_DIR="${SMART_HOME_DIR:-/home/pi/smart-home}"
+REPO_DIR="${REPO_DIR:-$SMART_HOME_DIR/smarthome-k7}"
 SERVICE_ENV="${SERVICE_ENV:-/etc/apollo/apollo.env}"
 SECRETS_FILE="${SECRETS_FILE:-$SMART_HOME_DIR/deploy.secrets.env}"
 WEB_DIST_DIR="${WEB_DIST_DIR:-$REPO_DIR/apps/web/dist}"
