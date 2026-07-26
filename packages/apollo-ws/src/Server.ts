@@ -3,12 +3,14 @@ import { Socket } from 'net'
 import { ApolloEvents } from './ApolloEvents'
 import { DataSourceCommand } from './DataSource'
 import { formatCommandArgsForLog } from './formatCommandArgsForLog'
+import { notifyError, type ErrorHandler } from './notifyError'
 
 export type ApolloWebSocketOptions = {
   /**
    * Defaults to 3678
    */
   port?: number
+  onError: ErrorHandler
 }
 
 type Client = {
@@ -39,17 +41,19 @@ export class Server {
   }
 
   public static async listen<T>(
-    { port = 3678 }: ApolloWebSocketOptions,
+    { port = 3678, onError }: ApolloWebSocketOptions,
     init: (instance: Server) => Promise<T>,
   ): Promise<T> {
-    const serv = new Server({ port })
+    const serv = new Server({ port, onError })
     const ret = await init(serv)
     await serv.connect()
 
     return ret
   }
 
-  private constructor(private readonly options: Required<ApolloWebSocketOptions>) {}
+  private constructor(
+    private readonly options: Required<Pick<ApolloWebSocketOptions, 'port'>> & Pick<ApolloWebSocketOptions, 'onError'>,
+  ) {}
 
   public async close(): Promise<void> {
     for (const timeoutId of this.feedDebounceTimeout.values()) {
@@ -98,7 +102,7 @@ export class Server {
         // this.vent.emit('sys-log', 6, `Feed <${id}> broadcast successful. [ ${clients.map(client => `<${client.socket.remoteAddress}>`)} ]`)
       })
       .catch(e => {
-        this.vent.emit('sys-log', 4, `Feed <${id}> broadcast error: ${e}`)
+        notifyError(this.vent, this.options.onError, 4, `Feed <${id}> broadcast error`, e)
       })
   }
 
@@ -158,7 +162,7 @@ export class Server {
 
       this.clients.add(client)
       ws.on('error', e => {
-        this.vent.emit('sys-log', 5, `Client <${client.socket.remoteAddress}> socket error: ` + e.toString(), e)
+        notifyError(this.vent, this.options.onError, 5, `Client <${client.socket.remoteAddress}> socket error`, e)
       })
 
       ws.on('close', () => {
@@ -180,7 +184,7 @@ export class Server {
       })
 
       server.on('error', e => {
-        this.vent.emit('sys-log', 2, `Apollo WebSocket Server network port bind error: ${e}`, e)
+        notifyError(this.vent, this.options.onError, 2, 'Apollo WebSocket Server network port bind error', e)
         reject(e)
       })
     })

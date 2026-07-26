@@ -1,5 +1,6 @@
 import { createClient, type RedisClientType } from 'redis'
 import { config } from '../config'
+import { captureProductionError } from '../sentry'
 
 let client: RedisClientType | undefined
 
@@ -11,6 +12,7 @@ export const initRedisClient = async (): Promise<RedisClientType> => {
   client = createClient({ url: config.redis.url })
   client.on('error', err => {
     console.error('Redis error:', err)
+    captureProductionError(err)
   })
   await client.connect()
 

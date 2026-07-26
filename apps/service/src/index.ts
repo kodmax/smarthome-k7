@@ -12,9 +12,16 @@ import { knxInit } from './knx-init'
 import { registerApollo, registerKnxCron, setupGracefulShutdown } from './graceful-shutdown'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
+import { initSentry, captureProductionError } from './sentry'
 
 if (isDevelopment) {
   console.info(`[app] ${appMode} mode`)
+}
+
+initSentry()
+
+const reportProductionError = (error: unknown, context: string) => {
+  captureProductionError(error instanceof Error ? error : new Error(context, { cause: error }))
 }
 
 registerDependency('config', config)
@@ -23,7 +30,7 @@ registerDependency('openai', initOpenAIClient())
 
 setupGracefulShutdown()
 
-Server.listen({}, async apollo => {
+Server.listen({ onError: reportProductionError }, async apollo => {
   if (!config.redis.disabled) {
     registerDependency('redis', await initRedisClient())
     console.log('Redis connected')
@@ -31,7 +38,7 @@ Server.listen({}, async apollo => {
 
   console.log('Feed cache directory:', path.resolve(config.cache.dir))
   const cache = config.redis.disabled ? new FSCache(config.cache.dir) : new RedisCache(getDependency('redis'))
-  const feeds = new Feeds(cache, apollo.vent)
+  const feeds = new Feeds(cache, apollo.vent, { onError: reportProductionError })
 
   registerApollo(apollo, feeds)
   sysLog(apollo.vent, 6)

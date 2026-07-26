@@ -1,10 +1,12 @@
 import type { JobPostingOrigin } from './types'
+import { captureInvalidInput } from '@/sentry'
 
 export function detectOrigin(adUrl: string): JobPostingOrigin | null {
   let url: URL
   try {
     url = new URL(adUrl)
-  } catch {
+  } catch (cause) {
+    captureInvalidInput('job-ads: invalid job posting URL', cause)
     return null
   }
 
@@ -22,5 +24,6 @@ export function detectOrigin(adUrl: string): JobPostingOrigin | null {
     return 'theprotocol'
   }
 
+  captureInvalidInput('job-ads: unsupported job posting URL', adUrl)
   return null
 }

@@ -2,6 +2,7 @@ import { createServer } from 'net'
 import WebSocket from 'ws'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Server } from './Server'
+import { noopErrorHandler } from './notifyError'
 
 function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -29,7 +30,7 @@ describe('Server', () => {
 
   beforeEach(async () => {
     port = await getFreePort()
-    await Server.listen({ port }, async instance => {
+    await Server.listen({ port, onError: noopErrorHandler }, async instance => {
       server = instance
     })
 

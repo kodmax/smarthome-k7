@@ -1,4 +1,5 @@
 import { isSkillExperienceLevel, type MySkill, type SkillExperienceLevel } from '@repo/types'
+import { captureInvalidInput } from '@/sentry'
 
 export type SkillRecordRow = {
   skill_id: string
@@ -20,6 +21,7 @@ export type SetSkillCommentCommandArgs = {
 
 export function skillRowToMySkill(row: SkillRecordRow): MySkill | null {
   if (!isSkillExperienceLevel(row.experience_level)) {
+    captureInvalidInput('my-skills: invalid skill experience level in row', row)
     return null
   }
 
@@ -39,6 +41,7 @@ export function parseSetSkillCommandArgs(args: string): SetSkillCommandArgs | nu
   try {
     const parsed = JSON.parse(args) as Record<string, unknown>
     if (typeof parsed.id !== 'string' || typeof parsed.name !== 'string' || !isSkillExperienceLevel(parsed.level)) {
+      captureInvalidInput('my-skills: invalid set-skill command args', args)
       return null
     }
 
@@ -47,7 +50,8 @@ export function parseSetSkillCommandArgs(args: string): SetSkillCommandArgs | nu
       name: parsed.name,
       level: parsed.level,
     }
-  } catch {
+  } catch (cause) {
+    captureInvalidInput('my-skills: failed to parse set-skill command args', cause)
     return null
   }
 }
@@ -56,6 +60,7 @@ export function parseSetSkillCommentCommandArgs(args: string): SetSkillCommentCo
   try {
     const parsed = JSON.parse(args) as Record<string, unknown>
     if (typeof parsed.id !== 'string' || typeof parsed.comment !== 'string') {
+      captureInvalidInput('my-skills: invalid set-skill-comment command args', args)
       return null
     }
 
@@ -63,7 +68,8 @@ export function parseSetSkillCommentCommandArgs(args: string): SetSkillCommentCo
       id: parsed.id,
       comment: parsed.comment,
     }
-  } catch {
+  } catch (cause) {
+    captureInvalidInput('my-skills: failed to parse set-skill-comment command args', cause)
     return null
   }
 }

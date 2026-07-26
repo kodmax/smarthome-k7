@@ -1,4 +1,5 @@
 import { DEFAULT_JOB_APPLY_STATUS, JobAdApplicationMeta, JobApplyStatus, canTransition } from '@repo/types'
+import { captureInvalidInput } from '@/sentry'
 
 const APPLY_STATUSES = new Set<JobApplyStatus>([
   'not-applied',
@@ -46,11 +47,13 @@ function parseOptionalComment(value: unknown): string | null {
 
 export function parseApplicationMeta(value: unknown): JobAdApplicationMeta | null {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    captureInvalidInput('job-ads: invalid application meta shape', value)
     return null
   }
 
   const record = value as Record<string, unknown>
   if (!isJobApplyStatus(record.applyStatus)) {
+    captureInvalidInput('job-ads: invalid application meta applyStatus', value)
     return null
   }
 
@@ -132,10 +135,12 @@ export function parseChangeStateCommandArgs(args: string): ChangeStateCommandArg
   try {
     const parsed = JSON.parse(args) as Record<string, unknown>
     if (typeof parsed.id !== 'string' || !isJobApplyStatus(parsed.applyStatus)) {
+      captureInvalidInput('job-ads: invalid change-state command args', args)
       return null
     }
 
     if (parsed.comment !== undefined && typeof parsed.comment !== 'string') {
+      captureInvalidInput('job-ads: invalid change-state command comment', args)
       return null
     }
 
@@ -144,7 +149,8 @@ export function parseChangeStateCommandArgs(args: string): ChangeStateCommandArg
       applyStatus: parsed.applyStatus,
       comment: parsed.comment,
     }
-  } catch {
+  } catch (cause) {
+    captureInvalidInput('job-ads: failed to parse change-state command args', cause)
     return null
   }
 }

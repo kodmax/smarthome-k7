@@ -1,5 +1,6 @@
 import type { Feeds, Server } from '@repo/apollo-ws'
 import { closeDbPool } from '@repo/db'
+import { captureProductionError, closeSentry } from './sentry'
 import { closeRedisClient } from './redis'
 import type { KnxLink } from 'js-knx'
 
@@ -39,6 +40,7 @@ const closeConnections = async (): Promise<void> => {
       await knx.disconnect()
     } catch (err) {
       console.error('KNX disconnect failed:', err)
+      captureProductionError(err)
     }
   }
 
@@ -48,6 +50,7 @@ const closeConnections = async (): Promise<void> => {
 
   await closeRedisClient()
   await closeDbPool()
+  await closeSentry()
 }
 
 export const setupGracefulShutdown = (): void => {
@@ -64,7 +67,8 @@ export const setupGracefulShutdown = (): void => {
       .then(() => process.exit(0))
       .catch(err => {
         console.error('Failed during shutdown:', err)
-        process.exit(1)
+        captureProductionError(err)
+        void closeSentry().finally(() => process.exit(1))
       })
   }
 

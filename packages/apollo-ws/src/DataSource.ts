@@ -1,6 +1,7 @@
 import type { Cache, CacheEntry } from './cache'
 import { NoRecentContent } from './Errors'
 import { ApolloEvents } from './ApolloEvents'
+import { notifyError, type ErrorHandler } from './notifyError'
 
 export abstract class DataSourceDefinition<T, TCache = T> {
   public constructor(
@@ -76,25 +77,32 @@ class DataSource<T, TCache = T> {
     private definition: DataSourceDefinition<T, TCache>,
     private cacheEntry: CacheEntry<TCache>,
     private vent: ApolloEvents,
+    private onError: ErrorHandler,
   ) {}
 
   public static async fromClass<T, TCache = T>(
     sourceClass: DataSourceDefinitionClass<T, TCache>,
     cache: Cache,
     vent: ApolloEvents,
+    onError: ErrorHandler,
   ): Promise<DataSource<T, TCache>> {
     // eslint-disable-next-line prefer-const -- forward ref: push callback needs dataSource before assignment
     let dataSource!: DataSource<T, TCache>
+    let sourceId = ''
 
     const definition = new sourceClass(
       content => dataSource.push(content),
-      e => vent.emit('sys-log', 4, `Push data source <${definition.getId()}> update error: ${e}`, e),
+      e => {
+        const context = `Push data source <${sourceId}> update error`
+        notifyError(vent, onError, 4, context, e)
+      },
     )
+    sourceId = definition.getId()
 
     const cacheEntry = await cache.getEntry<TCache>(definition.isVolatile() ? undefined : definition.getId(), {
       ttlMs: definition.getCacheTTL(),
     })
-    dataSource = new DataSource(definition, cacheEntry, vent)
+    dataSource = new DataSource(definition, cacheEntry, vent, onError)
 
     return dataSource
   }
@@ -202,7 +210,8 @@ class DataSource<T, TCache = T> {
           this.updating = void 0
         })
         .catch(e => {
-          this.vent.emit('sys-log', 4, `Data source <${this.definition.getId()}> update error: ` + e)
+          const context = `Data source <${this.definition.getId()}> update error`
+          notifyError(this.vent, this.onError, 4, context, e)
           this.updating = void 0
           reject(e)
         })

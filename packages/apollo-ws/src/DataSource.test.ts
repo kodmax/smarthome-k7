@@ -6,6 +6,7 @@ import { ApolloEvents } from './ApolloEvents'
 import { FSCache } from './cache'
 import { DataSource, DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
 import { NoRecentContent } from './Errors'
+import { noopErrorHandler } from './notifyError'
 
 function createTestSourceClass<T, TCache = T>(options: {
   id: string
@@ -64,13 +65,16 @@ describe('DataSource', () => {
     }
   })
 
-  async function createDataSource<T, TCache = T>(SourceClass: DataSourceDefinitionClass<T, TCache>) {
+  async function createDataSource<T, TCache = T>(
+    SourceClass: DataSourceDefinitionClass<T, TCache>,
+    onError = noopErrorHandler,
+  ) {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-ds-'))
     cacheDirs.push(cacheDir)
 
     const vent = new ApolloEvents()
     const cache = new FSCache(cacheDir)
-    const dataSource = await DataSource.fromClass(SourceClass, cache, vent)
+    const dataSource = await DataSource.fromClass(SourceClass, cache, vent, onError)
 
     return {
       dataSource,
@@ -239,7 +243,7 @@ describe('DataSource', () => {
     cacheDirs.push(cacheDir)
     const vent = new ApolloEvents()
     const cache = new FSCache(cacheDir)
-    const dataSource = await DataSource.fromClass(NotifySource, cache, vent)
+    const dataSource = await DataSource.fromClass(NotifySource, cache, vent, noopErrorHandler)
 
     vent.on('data-update', sourceId => updates.push(sourceId))
     await dataSource.getData()
@@ -365,5 +369,51 @@ describe('DataSource', () => {
     await dataSource.getData()
 
     expect(updates).toEqual(['getdata-emit'])
+  })
+
+  it('calls onError when getData fails', async () => {
+    const onError = vi.fn()
+    const failure = new Error('fetch failed')
+    const { dataSource } = await createDataSource(
+      createTestSourceClass({
+        id: 'getdata-fail',
+        getData: async () => {
+          throw failure
+        },
+      }),
+      onError,
+    )
+
+    await expect(dataSource.getData()).rejects.toThrow('fetch failed')
+    expect(onError).toHaveBeenCalledWith(failure, 'Data source <getdata-fail> update error')
+  })
+
+  it('calls onError from reportError callback', async () => {
+    const onError = vi.fn()
+    const failure = new Error('push failed')
+
+    class PushFailSource extends DataSourceDefinition<{ value: number }> {
+      public constructor(push: (content?: { value: number }) => void, reportError: (e: Error) => void) {
+        super(push, reportError)
+        queueMicrotask(() => reportError(failure))
+      }
+
+      public getId(): string {
+        return 'push-fail'
+      }
+
+      public getCacheTTL(): number {
+        return 0
+      }
+
+      public async getData(): Promise<{ value: number }> {
+        return { value: 1 }
+      }
+    }
+
+    await createDataSource(PushFailSource, onError)
+    await new Promise<void>(resolve => queueMicrotask(() => resolve()))
+
+    expect(onError).toHaveBeenCalledWith(failure, 'Push data source <push-fail> update error')
   })
 })

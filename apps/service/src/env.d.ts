@@ -28,6 +28,8 @@ declare module 'process' {
         readonly TRANSMISSION_PASSWORD: string
 
         readonly OPENAI_API_KEY: string
+
+        readonly SENTRY_DSN?: string
       }
     }
   }

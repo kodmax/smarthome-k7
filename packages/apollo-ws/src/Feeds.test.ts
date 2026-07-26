@@ -8,6 +8,7 @@ import { FSCache } from './cache'
 import { DuplicateDataSourceIdError } from './Errors'
 import { Feeds } from './Feeds'
 import { DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
+import { noopErrorHandler } from './notifyError'
 
 function waitForDataUpdate(vent: ApolloEventsType, sourceId: string): Promise<void> {
   return new Promise(resolve => {
@@ -98,11 +99,11 @@ describe('Feeds data source registration', () => {
     }
   })
 
-  function createFeeds() {
+  function createFeeds(onError = noopErrorHandler) {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
 
-    return new Feeds(new FSCache(cacheDir), new ApolloEvents())
+    return new Feeds(new FSCache(cacheDir), new ApolloEvents(), { onError })
   }
 
   it('reuses the same DataSource when the same definition class is registered in multiple feeds', async () => {
@@ -137,7 +138,7 @@ describe('Feeds data source registration', () => {
     const vent = new ApolloEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new Feeds(new FSCache(cacheDir), vent)
+    const feeds = new Feeds(new FSCache(cacheDir), vent, { onError: noopErrorHandler })
 
     const SourceClass = createTestSourceClass({
       id: 'routed-src',
@@ -156,6 +157,29 @@ describe('Feeds data source registration', () => {
 
     await vi.waitFor(() => expect(commandHandler).toHaveBeenCalledTimes(1))
     expect(commandHandler).toHaveBeenCalledWith('50')
+  })
+
+  it('calls onError when command execution fails', async () => {
+    const onError = vi.fn()
+    const failure = new Error('command failed')
+    const vent = new ApolloEvents()
+    const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
+    cacheDirs.push(cacheDir)
+    const feeds = new Feeds(new FSCache(cacheDir), vent, { onError })
+
+    await feeds.addFeed('cmd-feed', {
+      src: createTestSourceClass({
+        id: 'cmd-src',
+        handleCommand: async () => {
+          throw failure
+        },
+      }),
+    })
+
+    vent.emit('command', { sourceId: 'cmd-src', name: 'fail', args: '' })
+
+    await vi.waitFor(() => expect(onError).toHaveBeenCalledTimes(1))
+    expect(onError).toHaveBeenCalledWith(failure, 'Data source <cmd-src> command <fail> execution error')
   })
 
   it('runs maintenance sequentially for all registered data sources at 3 AM', async () => {
@@ -217,7 +241,7 @@ describe('Feeds composition', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
 
-    const feeds = new Feeds(new FSCache(cacheDir), vent)
+    const feeds = new Feeds(new FSCache(cacheDir), vent, { onError: noopErrorHandler })
     activeFeeds.push(feeds)
 
     return { vent, feeds }
@@ -462,7 +486,7 @@ describe('Feeds composition', () => {
     const vent = new ApolloEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new Feeds(new FSCache(cacheDir), vent)
+    const feeds = new Feeds(new FSCache(cacheDir), vent, { onError: noopErrorHandler })
     activeFeeds.push(feeds)
 
     const getDataA = vi.fn(async () => ({ value: 1 }))

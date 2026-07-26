@@ -1,12 +1,13 @@
 import { Chronos } from '@repo/chronos'
 import { DataSource, DSCT, AnyDataSourceDefinitionClass } from './DataSource'
 import type { Cache } from './cache'
-import type { DS, Feed, FeedCb, FeedSources, SourceDataTypes, SourceRegistration } from './Feeds.types'
+import type { DS, Feed, FeedCb, FeedSources, FeedsOptions, SourceDataTypes, SourceRegistration } from './Feeds.types'
 import { ApolloEvents } from './ApolloEvents'
+import { notifyError } from './notifyError'
 
 import { DuplicateDataSourceIdError, NonErrorException } from './Errors'
 
-export type { SourceDataTypes } from './Feeds.types'
+export type { FeedsOptions, SourceDataTypes } from './Feeds.types'
 
 const DATA_SOURCES_MAINTENANCE_CRON = '0 3 * * *'
 
@@ -19,6 +20,7 @@ export class Feeds {
   public constructor(
     private cache: Cache,
     private vent: ApolloEvents,
+    private options: FeedsOptions,
   ) {
     this.chronos = new Chronos((priority, msg) => this.vent.emit('sys-log', priority, msg))
 
@@ -30,7 +32,7 @@ export class Feeds {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.feed(id).catch(e => {
-            this.vent.emit('sys-log', 4, `Feed request error <${id}> update error: ${e}`, e)
+            notifyError(this.vent, this.options.onError, 4, `Feed request error <${id}> update error`, e)
           })
         }
       }
@@ -40,7 +42,7 @@ export class Feeds {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.refresh(id).catch(e => {
-            this.vent.emit('sys-log', 4, `Feed request error <${id}> update error: ${e}`, e)
+            notifyError(this.vent, this.options.onError, 4, `Feed request error <${id}> update error`, e)
           })
         }
       }
@@ -53,7 +55,7 @@ export class Feeds {
             this.vent.emit('sys-log', 7, `Refreshing feed <${feed.feedId}> due to source <${sourceId}> update`)
             await this.feed(feed.feedId, sourceId)
           } catch (e) {
-            this.vent.emit('sys-log', 4, `Feed <${feed.feedId}> update error: ${e}`, e)
+            notifyError(this.vent, this.options.onError, 4, `Feed <${feed.feedId}> update error`, e)
           }
         }
       }
@@ -69,7 +71,13 @@ export class Feeds {
       try {
         await registration.dataSource.handleCommand(ev.name, ev.args)
       } catch (e) {
-        this.vent.emit('sys-log', 4, `Data source <${ev.sourceId}> command <${ev.name}> execution error: ${e}`, e)
+        notifyError(
+          this.vent,
+          this.options.onError,
+          4,
+          `Data source <${ev.sourceId}> command <${ev.name}> execution error`,
+          e,
+        )
       }
     })
   }
@@ -83,7 +91,7 @@ export class Feeds {
         await dataSource.maintenance()
         this.vent.emit('sys-log', 7, `Data source <${sourceId}> maintenance completed`)
       } catch (e) {
-        this.vent.emit('sys-log', 4, `Data source <${sourceId}> maintenance error: ${e}`, e)
+        notifyError(this.vent, this.options.onError, 4, `Data source <${sourceId}> maintenance error`, e)
       }
     }
   }
@@ -97,7 +105,7 @@ export class Feeds {
       }
     }
 
-    const dataSource = await DataSource.fromClass(sourceClass, this.cache, this.vent)
+    const dataSource = await DataSource.fromClass(sourceClass, this.cache, this.vent, this.options.onError)
     const sourceId = dataSource.getId()
 
     const existingById = this.sourcesById.get(sourceId)
@@ -111,7 +119,7 @@ export class Feeds {
         try {
           await dataSource.getData(true)
         } catch (e) {
-          this.vent.emit('sys-log', 4, `Crontab data source <${sourceId}> update error: ${e}`, e)
+          notifyError(this.vent, this.options.onError, 4, `Crontab data source <${sourceId}> update error`, e)
           throw e
         }
       })
@@ -174,7 +182,7 @@ export class Feeds {
         return
       }
 
-      this.vent.emit('sys-log', 4, `Feed <${feedId}> callback error.`, e)
+      notifyError(this.vent, this.options.onError, 4, `Feed <${feedId}> callback error`, e)
     }
   }
 
@@ -195,7 +203,7 @@ export class Feeds {
         return
       }
 
-      this.vent.emit('sys-log', 4, `Feed <${feedId}> callback error.`, e)
+      notifyError(this.vent, this.options.onError, 4, `Feed <${feedId}> callback error`, e)
     }
   }
 

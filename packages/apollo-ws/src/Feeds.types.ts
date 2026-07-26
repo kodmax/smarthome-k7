@@ -1,4 +1,5 @@
 import { DataSource, DataSourceDefinition, AnyDataSourceDefinitionClass } from './DataSource'
+import type { ErrorHandler } from './notifyError'
 
 export type DS = DataSource<unknown>
 
@@ -23,4 +24,8 @@ export type Feed = {
   sources: FeedSources
   cb: FeedCb
   feedId: string
+}
+
+export type FeedsOptions = {
+  onError: ErrorHandler
 }
