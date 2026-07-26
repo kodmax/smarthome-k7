@@ -45,6 +45,6 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "vitest run",
-    "sentry:upload-sourcemaps": "sh scripts/upload-sourcemaps.sh"
+    "sentry:upload-sourcemaps": "bash scripts/upload-sourcemaps.sh"
   }
 }

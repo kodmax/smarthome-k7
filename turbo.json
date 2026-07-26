@@ -1,5 +1,14 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "globalPassThroughEnv": [
+    "SENTRY_AUTH_TOKEN",
+    "SENTRY_ORG",
+    "SENTRY_WEB_PROJECT",
+    "SENTRY_SERVICE_PROJECT",
+    "SENTRY_RELEASE",
+    "VITE_SENTRY_DSN",
+    "VITE_SENTRY_RELEASE"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
