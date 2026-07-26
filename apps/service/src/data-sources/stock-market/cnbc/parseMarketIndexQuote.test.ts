@@ -23,6 +23,20 @@ describe('parseMarketIndexQuoteFromDocument', () => {
     })
   })
 
+  it('parses positive S&P 500 index quote from CNBC HTML', () => {
+    const document = parseHTML(
+      '<div class="QuoteStrip-lastPrice">7502.64</div><div class="QuoteStrip-changeUp">+3.68 (+0.05%)</div>',
+    ).window.document
+
+    expect(parseMarketIndexQuoteFromDocument(document, '.SPX', 'S&P 500')).toEqual({
+      symbol: '.SPX',
+      title: 'S&P 500',
+      price: 7502.64,
+      netChange: 3.68,
+      percentageChange: 0.05,
+    })
+  })
+
   it('parses S&P 500 futures quote from CNBC HTML', () => {
     expect(parseMarketIndexQuoteFromDocument(loadDocument('sp-futures.html'), '@SP.1', 'S&P 500 Futures')).toEqual({
       symbol: '@SP.1',

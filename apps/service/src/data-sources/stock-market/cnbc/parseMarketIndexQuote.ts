@@ -3,7 +3,7 @@ import { getNumberContent } from '@/utils/get-number-content'
 import { requireText, withScraperSource } from '@/utils/scraper'
 
 const parseChangeText = (changeText: string): Pick<MarketIndexQuote, 'netChange' | 'percentageChange'> => {
-  const match = changeText.trim().match(/^(-?[0-9,.]+)\s*\((-?[0-9,.]+)%\)$/)
+  const match = changeText.trim().match(/^(\+?-?[0-9,.]+)\s*\((\+?-?[0-9,.]+)%\)$/)
   if (match === null) {
     throw new Error(`change text "${changeText}" is not in expected format`)
   }
