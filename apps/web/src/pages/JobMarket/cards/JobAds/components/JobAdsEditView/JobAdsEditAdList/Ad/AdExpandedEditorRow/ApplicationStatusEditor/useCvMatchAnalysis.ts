@@ -1,6 +1,7 @@
-import { type JobAdWithMeta } from '@repo/types'
+import { type JobAdsFeedItem } from '@repo/types'
 import { useCallback, useEffect, useState } from 'react'
 import {
+  formatMatchAnalysisStaleNotice,
   formatMatchAnalysisText,
   formatMatchAnalysisTitle,
 } from '@/pages/JobMarket/cards/JobAds/shared-components/formatMatchAnalysisText'
@@ -9,7 +10,7 @@ import { useTranslations } from '@/i18n'
 const MATCH_ANALYSIS_TIMEOUT_MS = 120_000
 
 type UseCvMatchAnalysisOptions = {
-  ad: Pick<JobAdWithMeta, 'id' | 'matchAnalysis'>
+  ad: Pick<JobAdsFeedItem, 'content' | 'matchAnalysis' | 'meta'>
   canAnalyze: boolean
   onAnalyze: (adId: string) => void
   resetWhen?: unknown
@@ -23,6 +24,7 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogTitle, setDialogTitle] = useState<string | null>(null)
   const [dialogText, setDialogText] = useState<string | null>(null)
+  const [dialogNotice, setDialogNotice] = useState<string | null>(null)
 
   useEffect(() => {
     setAnalyzing(false)
@@ -30,7 +32,8 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
     setDialogOpen(false)
     setDialogTitle(null)
     setDialogText(null)
-  }, [ad.id, resetWhen])
+    setDialogNotice(null)
+  }, [ad.content.id, resetWhen])
 
   useEffect(() => {
     if (!analyzing) {
@@ -49,6 +52,7 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
     }
 
     setDialogTitle(formatMatchAnalysisTitle(matchAnalysis, labels))
+    setDialogNotice(formatMatchAnalysisStaleNotice(ad.meta.isCurrentCVUsed, labels))
     setDialogText(formatMatchAnalysisText(matchAnalysis, labels))
     setDialogOpen(true)
     setAnalyzing(false)
@@ -75,8 +79,8 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
 
     setPendingAnalysisAt(ad.matchAnalysis?.analyzedAt ?? null)
     setAnalyzing(true)
-    onAnalyze(ad.id)
-  }, [ad.id, ad.matchAnalysis?.analyzedAt, analyzing, canAnalyze, onAnalyze])
+    onAnalyze(ad.content.id)
+  }, [ad.content.id, ad.matchAnalysis?.analyzedAt, analyzing, canAnalyze, onAnalyze])
 
   const closeDialog = useCallback(() => {
     setDialogOpen(false)
@@ -87,6 +91,7 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
     dialogOpen,
     dialogTitle,
     dialogText,
+    dialogNotice,
     closeDialog,
     requestAnalysis,
   }

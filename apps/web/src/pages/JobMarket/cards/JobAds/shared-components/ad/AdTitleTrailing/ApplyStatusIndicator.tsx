@@ -1,12 +1,12 @@
 import { Tooltip } from '@mui/material'
 import { designTokens } from '@repo/design-tokens'
-import { JobAdWithMeta } from '@repo/types'
+import { JobAdsFeedItem } from '@repo/types'
 import { FC, useMemo } from 'react'
 import { useTranslations } from '@/i18n'
 import { formatAppliedDaysShort } from './AppliedDaysPrefix/formatAppliedDaysShort'
 import { ApplyStatusIcon } from './ApplyStatusIcon'
 
-export const ApplyStatusIndicator: FC<{ ad: Pick<JobAdWithMeta, 'meta'> }> = ({ ad }) => {
+export const ApplyStatusIndicator: FC<{ ad: Pick<JobAdsFeedItem, 'meta'> }> = ({ ad }) => {
   const { t } = useTranslations()
   const labels = t.dashboard.jobAds
   const application = ad.meta.application

@@ -1,4 +1,4 @@
-import { type JobAdWithMeta, type JobApplyStatus } from '@repo/types'
+import { type JobAdsFeedItem, type JobApplyStatus } from '@repo/types'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
@@ -8,7 +8,7 @@ import { Ad } from './Ad'
 const noop = () => undefined
 
 function renderAd(
-  ad: JobAdWithMeta,
+  ad: JobAdsFeedItem,
   zoom: boolean,
   editMode = false,
   expanded = false,

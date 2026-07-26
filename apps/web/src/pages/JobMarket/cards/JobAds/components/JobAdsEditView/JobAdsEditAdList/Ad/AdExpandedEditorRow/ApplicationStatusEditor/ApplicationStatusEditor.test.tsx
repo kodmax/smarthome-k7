@@ -261,6 +261,48 @@ describe('ApplicationStatusEditor', () => {
     expect(onAnalyzeCvMatch).not.toHaveBeenCalled()
   })
 
+  it('disables check cv match when analysis is current', () => {
+    const onAnalyzeCvMatch = vi.fn()
+
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '12',
+          title: 'Role',
+          matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z' }),
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={onAnalyzeCvMatch}
+      />,
+    )
+
+    const button = screen.getByRole('button', { name: 'Sprawdź dopasowanie' })
+    expect(button).toBeDisabled()
+    fireEvent.click(button)
+    expect(onAnalyzeCvMatch).not.toHaveBeenCalled()
+  })
+
+  it('enables check cv match when analysis is stale', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '13',
+          title: 'Role',
+          matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z' }),
+          meta: { isCurrentCVUsed: false },
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Sprawdź dopasowanie' })).toBeEnabled()
+  })
+
   it('shows loader and opens match analysis dialog after ad update', async () => {
     const feedAd = jobAd({ id: '11', title: 'Role' })
     const onAnalyzeCvMatch = vi.fn()
@@ -306,6 +348,7 @@ describe('ApplicationStatusEditor', () => {
     expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
     expect(screen.getByRole('dialog')).toHaveTextContent('Dobre dopasowanie do roli.')
     expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
+    expect(screen.getByRole('button', { name: 'Sprawdź dopasowanie', hidden: true })).toBeDisabled()
   })
 
   it('returns to read-only view when change is cancelled', () => {

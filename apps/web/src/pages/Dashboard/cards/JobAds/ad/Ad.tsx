@@ -1,4 +1,4 @@
-import { JobAdWithMeta } from '@repo/types'
+import { JobAdsFeedItem } from '@repo/types'
 import { FC } from 'react'
 import { ApolloTableRow, LinkOpen } from '@/card-components'
 import {
@@ -11,15 +11,15 @@ import {
 } from '@/pages/JobMarket/cards/JobAds/shared-components'
 
 export const Ad: FC<{
-  ad: JobAdWithMeta
+  ad: JobAdsFeedItem
   zoom: boolean
 }> = ({ ad, zoom }) => {
   return (
     <ApolloTableRow>
-      {zoom ? <LinkOpen href={ad.advertUrl} /> : null}
+      {zoom ? <LinkOpen href={ad.content.advertUrl} /> : null}
       <JobTitleCell>
         <JobTitleContent>
-          <PublishedTodayTag publishedAt={ad.publishedAt} />
+          <PublishedTodayTag publishedAt={ad.content.publishedAt} />
           <AdTitleText ad={ad} />
           <AdTitleTrailing ad={ad} zoom={zoom} />
         </JobTitleContent>

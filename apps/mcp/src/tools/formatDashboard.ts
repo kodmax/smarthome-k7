@@ -167,15 +167,15 @@ export function formatJobAds(feed: JobAdsFeed, visibleOnly = true): string {
       const flags = [
         isJobAdApplied(ad) ? 'applied' : null,
         ad.meta.fav ? '★' : null,
-        ad.workplaceType,
-        ad.employmentType,
+        ad.content.workplaceType,
+        ad.content.employmentType,
       ]
         .filter(Boolean)
         .join(', ')
-      const salary = ad.monthlySalaryRangeAfterTaxes
-        ? `${ad.monthlySalaryRangeAfterTaxes.from}–${ad.monthlySalaryRangeAfterTaxes.to} PLN netto`
+      const salary = ad.content.monthlySalaryRangeAfterTaxes
+        ? `${ad.content.monthlySalaryRangeAfterTaxes.from}–${ad.content.monthlySalaryRangeAfterTaxes.to} PLN netto`
         : 'brak widełek'
-      return `- ${ad.title} @ ${ad.companyName} (${flags}) — ${salary}`
+      return `- ${ad.content.title} @ ${ad.content.companyName} (${flags}) — ${salary}`
     })
     .join('\n')
 

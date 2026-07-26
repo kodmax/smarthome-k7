@@ -1,4 +1,4 @@
-import { JobAd, JobAdWithMeta, emptyJobAdMeta, jobAdApplicationFromMeta } from '@repo/types'
+import { JobAd, JobAdsFeedItem, emptyJobAdMeta, jobAdApplicationFromMeta } from '@repo/types'
 import { describe, expect, it } from 'vitest'
 import {
   filterJobAdsByAcceptableSalary,
@@ -25,12 +25,14 @@ const baseAd: JobAd = {
 }
 
 const adWithStatus = (
-  status: JobAdWithMeta['meta']['application']['status'],
+  status: JobAdsFeedItem['meta']['application']['status'],
   salary?: JobAd['monthlySalaryRangeAfterTaxes'],
-): JobAdWithMeta => ({
-  ...baseAd,
-  id: `${status}-${salary?.to ?? 'none'}`,
-  monthlySalaryRangeAfterTaxes: salary,
+): JobAdsFeedItem => ({
+  content: {
+    ...baseAd,
+    id: `${status}-${salary?.to ?? 'none'}`,
+    monthlySalaryRangeAfterTaxes: salary,
+  },
   matchAnalysis: null,
   meta: {
     ...emptyJobAdMeta(),

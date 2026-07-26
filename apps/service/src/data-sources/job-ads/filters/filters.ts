@@ -1,4 +1,4 @@
-import { JobAd, JobAdWithMeta, JobApplyStatus } from '@repo/types'
+import { JobAd, JobAdsFeedItem, JobApplyStatus } from '@repo/types'
 
 export const isHybridOrRemote: (offer: JobAd) => boolean = offer =>
   offer.workplaceType === 'hybrid' || offer.workplaceType === 'remote'
@@ -11,19 +11,19 @@ export const isSalaryAboveThreshold = (ad: JobAd, threshold: number): boolean =>
   ad.monthlySalaryRangeAfterTaxes !== undefined && ad.monthlySalaryRangeAfterTaxes.to > threshold
 
 export const filterJobAdsByAcceptableSalary = (
-  ads: JobAdWithMeta[],
+  ads: JobAdsFeedItem[],
   acceptableSalary: number | null,
-): JobAdWithMeta[] => {
+): JobAdsFeedItem[] => {
   if (acceptableSalary === null) {
     return ads
   }
 
-  return ads.filter(ad => {
-    if (!shouldFilterJobAdBySalary(ad.meta.application.status)) {
+  return ads.filter(item => {
+    if (!shouldFilterJobAdBySalary(item.meta.application.status)) {
       return true
     }
 
-    return isSalaryAboveThreshold(ad, acceptableSalary)
+    return isSalaryAboveThreshold(item.content, acceptableSalary)
   })
 }
 

@@ -348,6 +348,7 @@ export type JobAdMatchAnalysis = {
 export type JobAdMeta = {
   application: JobAdApplication
   fav: boolean
+  isCurrentCVUsed: boolean
 }
 
 export type JobAd = {
@@ -364,7 +365,8 @@ export type JobAd = {
   publishedAt: string
 }
 
-export type JobAdWithMeta = JobAd & {
+export type JobAdsFeedItem = {
+  content: JobAd
   meta: JobAdMeta
   matchAnalysis: JobAdMatchAnalysis | null
 }
@@ -375,7 +377,7 @@ export type JobAdsSalaryRange = {
 }
 
 export type JobAdsFeed = {
-  ads: JobAdWithMeta[]
+  ads: JobAdsFeedItem[]
   salaryRange: JobAdsSalaryRange | null
   acceptableSalary: number | null
 }
@@ -473,6 +475,7 @@ export function emptyJobAdMeta(): JobAdMeta {
   return {
     application: emptyJobAdApplication(),
     fav: false,
+    isCurrentCVUsed: false,
   }
 }
 
@@ -498,8 +501,8 @@ export function jobAdApplicationMetaFromApplication(application: JobAdApplicatio
   }
 }
 
-export function isJobAdApplied(ad: Pick<JobAdWithMeta, 'meta'>): boolean {
-  return ad.meta.application.appliedAt !== null
+export function isJobAdApplied(item: Pick<JobAdsFeedItem, 'meta'>): boolean {
+  return item.meta.application.appliedAt !== null
 }
 
 export type Article = {

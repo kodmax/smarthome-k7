@@ -6,13 +6,18 @@ import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { formatMatchAnalysisText } from '@/pages/JobMarket/cards/JobAds/shared-components/formatMatchAnalysisText'
 import { useCvMatchAnalysis } from './useCvMatchAnalysis'
 
-const expectedDialogText = formatMatchAnalysisText(matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z' }), {
+const sectionLabels = {
   matchAnalysisSummarySection: 'Podsumowanie',
   matchAnalysisStrengthsSection: 'Mocne strony',
   matchAnalysisGapsSection: 'Luki',
   matchAnalysisObservationsSection: 'Obserwacje',
   matchAnalysisConclusionSection: 'Wnioski',
-})
+}
+
+const expectedDialogText = formatMatchAnalysisText(
+  matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z' }),
+  sectionLabels,
+)
 
 function TestWrapper({ children }: { children: ReactNode }) {
   return <I18nProvider initialLocale='pl'>{children}</I18nProvider>
@@ -58,6 +63,7 @@ describe('useCvMatchAnalysis', () => {
       expect(result.current.dialogOpen).toBe(true)
     })
     expect(result.current.dialogText).toBe(expectedDialogText)
+    expect(result.current.dialogNotice).toBeNull()
     expect(result.current.dialogTitle).toBe('Analiza dopasowania CV — 80%')
     expect(result.current.analyzing).toBe(false)
   })
@@ -112,15 +118,10 @@ describe('useCvMatchAnalysis', () => {
           analyzedAt: '2026-01-02T00:00:00.000Z',
           summary: 'Nowa analiza.',
         }),
-        {
-          matchAnalysisSummarySection: 'Podsumowanie',
-          matchAnalysisStrengthsSection: 'Mocne strony',
-          matchAnalysisGapsSection: 'Luki',
-          matchAnalysisObservationsSection: 'Obserwacje',
-          matchAnalysisConclusionSection: 'Wnioski',
-        },
+        sectionLabels,
       ),
     )
+    expect(result.current.dialogNotice).toBeNull()
     expect(result.current.dialogTitle).toBe('Analiza dopasowania CV — 80%')
   })
 

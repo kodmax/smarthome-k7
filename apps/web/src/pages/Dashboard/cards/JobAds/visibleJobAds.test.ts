@@ -31,7 +31,7 @@ describe('visibleJobAds', () => {
         jobAd({ id: '3', title: 'Applied', meta: { application: { status: 'applied' } } }),
         jobAd({ id: '4', title: 'Interview', meta: { application: { status: 'interview' } } }),
         jobAd({ id: '5', title: 'Offer', meta: { application: { status: 'offer' } } }),
-      ]).map(ad => ad.id),
+      ]).map(ad => ad.content.id),
     ).toEqual(['1', '3', '4', '5'])
   })
 })

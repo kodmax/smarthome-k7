@@ -298,6 +298,8 @@ export type Translations = {
       viewMatchAnalysis: string
       matchAnalysisTitle: string
       matchAnalysisScore: string
+      matchAnalysisStaleTooltip: string
+      matchAnalysisStaleNotice: string
       matchAnalysisSummarySection: string
       matchAnalysisStrengthsSection: string
       matchAnalysisGapsSection: string

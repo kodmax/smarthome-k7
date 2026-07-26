@@ -1,11 +1,11 @@
-import { JobAdWithMeta, JobApplyStatus } from '@repo/types'
+import { JobAdsFeedItem, JobApplyStatus } from '@repo/types'
 import { FC } from 'react'
 import { designTokens } from '@repo/design-tokens'
 import { ApolloTableCell, ApolloTableRow } from '@/card-components'
 import { ApplicationStatusEditor } from './ApplicationStatusEditor'
 
 export const AdExpandedEditorRow: FC<{
-  ad: JobAdWithMeta
+  ad: JobAdsFeedItem
   columnCount: number
   onSave: (applyStatus: JobApplyStatus, comment: string) => void
   onFav: (id: string) => void

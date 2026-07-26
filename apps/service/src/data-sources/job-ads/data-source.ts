@@ -5,7 +5,7 @@ import { jjit } from './jjit/jjit'
 import {
   JobAd,
   JobAdApplicationMeta,
-  JobAdWithMeta,
+  JobAdsFeedItem,
   JobAdsCachedFeed,
   JobAdsFeed,
   emptyJobAdMeta,
@@ -26,7 +26,7 @@ import {
 import { isMetaFlagTrue } from './metaFlag'
 import type OpenAI from 'openai'
 import { runAnalyzeCvMatchCommand } from './analyzeCvMatchCommand'
-import { loadCvMatchesByAdIds } from './cvMatchDocument'
+import { loadCvMatchesByAdIds, loadCV } from './cvMatchDocument'
 
 const META_RETENTION_DAYS = 365
 const APPLICATION_ATTRIBUTE_NAME = 'application'
@@ -243,7 +243,7 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
   }
 
-  private async attachMeta(ads: JobAd[]): Promise<JobAdWithMeta[]> {
+  private async attachMeta(ads: JobAd[]): Promise<JobAdsFeedItem[]> {
     if (ads.length === 0) {
       return []
     }
@@ -302,6 +302,8 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       }
 
       const adUrlToInsert: Array<[string, string]> = []
+      const currentCV = await loadCV(this.db)
+      const currentCvTextHash = currentCV?.hash ?? null
       const matchAnalysisById = await loadCvMatchesByAdIds(this.db, ids)
       const firstPublishedAtToInsert: Array<[string, string]> = []
       const adsWithMeta = ads.map(ad => {
@@ -318,11 +320,20 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
 
         const application = applicationById.get(ad.id) ?? emptyApplicationMeta()
         const lastStatusChangeAt = applicationUpdatedAtById.get(ad.id)
+        const loadedMatchAnalysis = matchAnalysisById.get(ad.id)
+
+        const isCurrentCVUsed =
+          loadedMatchAnalysis !== undefined &&
+          loadedMatchAnalysis.analyzedCvTextHash !== null &&
+          currentCvTextHash !== null &&
+          loadedMatchAnalysis.analyzedCvTextHash === currentCvTextHash
 
         return {
-          ...ad,
-          publishedAt,
-          matchAnalysis: matchAnalysisById.get(ad.id) ?? null,
+          content: {
+            ...ad,
+            publishedAt,
+          },
+          matchAnalysis: loadedMatchAnalysis?.analysis ?? null,
           meta: {
             ...emptyJobAdMeta(),
             application: jobAdApplicationFromMeta(
@@ -330,6 +341,7 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
               resolveStatusChangedAt(application.applyStatus, lastStatusChangeAt),
             ),
             fav: favIds.has(ad.id),
+            isCurrentCVUsed,
           },
         }
       })

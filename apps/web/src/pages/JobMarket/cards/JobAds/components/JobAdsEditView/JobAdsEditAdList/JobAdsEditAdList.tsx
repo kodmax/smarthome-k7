@@ -2,13 +2,13 @@ import { TableBody } from '@mui/material'
 import { FC } from 'react'
 import { ApolloDataTable } from '@/card-components'
 import { designTokens } from '@repo/design-tokens'
-import { JobAdWithMeta, JobApplyStatus } from '@repo/types'
+import { JobAdsFeedItem, JobApplyStatus } from '@repo/types'
 import { Ad } from './Ad'
 
 const cardTableFontSize = designTokens.font.body.size
 
 type Props = {
-  ads: JobAdWithMeta[]
+  ads: JobAdsFeedItem[]
   zoom: boolean
   expandedAdId?: string | null
   onToggleExpand?: (id: string) => void
@@ -33,11 +33,11 @@ export const JobAdsEditAdList: FC<Props> = ({
       <TableBody>
         {ads.map(ad => (
           <Ad
-            key={ad.id}
+            key={ad.content.id}
             ad={ad}
             zoom={zoom}
             editMode={true}
-            expanded={expandedAdId === ad.id}
+            expanded={expandedAdId === ad.content.id}
             onToggleExpand={onToggleExpand ?? (() => undefined)}
             onChangeApplicationState={onChangeApplicationState ?? (() => undefined)}
             onFav={onFav ?? (() => undefined)}

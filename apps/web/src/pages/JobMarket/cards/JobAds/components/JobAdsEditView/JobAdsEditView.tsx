@@ -1,13 +1,13 @@
 import { FC, useCallback, useMemo, useState } from 'react'
 import { TableEmptyMessage } from '@/card-components'
 import { useCommand } from '@repo/feed-client'
-import { JobAdWithMeta, JobApplyStatus } from '@repo/types'
+import { JobAdsFeedItem, JobApplyStatus } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { type JobAdsFilter, filterJobAdsByCategory } from '../../jobAdsFilter'
 import { JobAdsEditAdList } from './JobAdsEditAdList'
 
 type Props = {
-  ads: JobAdWithMeta[] | undefined
+  ads: JobAdsFeedItem[] | undefined
   zoom: boolean
   filter: JobAdsFilter
 }
@@ -53,6 +53,6 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter }) => {
   )
 }
 
-export function countJobAdsEditViewAds(ads: JobAdWithMeta[] | undefined, filter: JobAdsFilter): number {
+export function countJobAdsEditViewAds(ads: JobAdsFeedItem[] | undefined, filter: JobAdsFilter): number {
   return filterJobAdsByCategory(ads ?? [], filter).length
 }

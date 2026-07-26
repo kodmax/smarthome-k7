@@ -1,13 +1,27 @@
 import { describe, expect, it } from 'vitest'
-import { formatMatchAnalysisScore, formatMatchAnalysisText, formatMatchAnalysisTitle } from './formatMatchAnalysisText'
+import {
+  formatMatchAnalysisScore,
+  formatMatchAnalysisStaleNotice,
+  formatMatchAnalysisText,
+  formatMatchAnalysisTitle,
+} from './formatMatchAnalysisText'
 
 const sectionLabels = {
+  matchAnalysisStaleNotice: 'Analiza dotyczy wcześniejszej wersji CV — przeanalizuj ponownie.',
   matchAnalysisSummarySection: 'Podsumowanie',
   matchAnalysisStrengthsSection: 'Mocne strony',
   matchAnalysisGapsSection: 'Luki',
   matchAnalysisObservationsSection: 'Obserwacje',
   matchAnalysisConclusionSection: 'Wnioski',
 }
+
+const matchAnalysisBody = [
+  'Podsumowanie\nDobre dopasowanie.',
+  'Mocne strony\nReact, TypeScript.',
+  'Luki\nBrak doświadczenia w GraphQL.',
+  'Obserwacje\nCV jest przejrzyste.',
+  'Wnioski\nWarto rozważyć rozmowę.',
+].join('\n\n')
 
 const matchAnalysis = {
   analyzedAt: '2026-01-01T00:00:00.000Z',
@@ -36,16 +50,18 @@ describe('formatMatchAnalysisTitle', () => {
   })
 })
 
+describe('formatMatchAnalysisStaleNotice', () => {
+  it('returns null when analysis uses current CV', () => {
+    expect(formatMatchAnalysisStaleNotice(true, sectionLabels)).toBeNull()
+  })
+
+  it('returns stale notice when analysis is outdated', () => {
+    expect(formatMatchAnalysisStaleNotice(false, sectionLabels)).toBe(sectionLabels.matchAnalysisStaleNotice)
+  })
+})
+
 describe('formatMatchAnalysisText', () => {
   it('returns all sections in order with labels', () => {
-    expect(formatMatchAnalysisText(matchAnalysis, sectionLabels)).toBe(
-      [
-        'Podsumowanie\nDobre dopasowanie.',
-        'Mocne strony\nReact, TypeScript.',
-        'Luki\nBrak doświadczenia w GraphQL.',
-        'Obserwacje\nCV jest przejrzyste.',
-        'Wnioski\nWarto rozważyć rozmowę.',
-      ].join('\n\n'),
-    )
+    expect(formatMatchAnalysisText(matchAnalysis, sectionLabels)).toBe(matchAnalysisBody)
   })
 })

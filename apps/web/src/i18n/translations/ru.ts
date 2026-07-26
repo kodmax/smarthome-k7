@@ -332,6 +332,8 @@ export const ru: Translations = {
       viewMatchAnalysis: 'Показать анализ соответствия CV',
       matchAnalysisTitle: 'Анализ соответствия CV',
       matchAnalysisScore: '{score}%',
+      matchAnalysisStaleTooltip: 'Анализ относится к более ранней версии CV',
+      matchAnalysisStaleNotice: 'Анализ относится к более ранней версии CV — выполните анализ заново.',
       matchAnalysisSummarySection: 'Резюме',
       matchAnalysisStrengthsSection: 'Сильные стороны',
       matchAnalysisGapsSection: 'Пробелы',

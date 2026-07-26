@@ -332,6 +332,8 @@ export const en: Translations = {
       viewMatchAnalysis: 'Show CV match analysis',
       matchAnalysisTitle: 'CV match analysis',
       matchAnalysisScore: '{score}%',
+      matchAnalysisStaleTooltip: 'Analysis is based on an older CV version',
+      matchAnalysisStaleNotice: 'This analysis is based on an older CV version — re-analyze to refresh it.',
       matchAnalysisSummarySection: 'Summary',
       matchAnalysisStrengthsSection: 'Strengths',
       matchAnalysisGapsSection: 'Gaps',

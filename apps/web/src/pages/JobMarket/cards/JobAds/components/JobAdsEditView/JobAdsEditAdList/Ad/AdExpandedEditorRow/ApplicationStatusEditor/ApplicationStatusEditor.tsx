@@ -13,7 +13,7 @@ import {
 import { AiSparklesIcon, FavStarIcon, LoaderIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
 import { toSkillId } from '@repo/common'
-import { JobAdWithMeta, JobApplyStatus, MySkillsFeed } from '@repo/types'
+import { JobAdsFeedItem, JobApplyStatus, MySkillsFeed } from '@repo/types'
 import { designTokens } from '@repo/design-tokens'
 import { Star } from 'lucide-react'
 import { FC, useEffect, useMemo, useState, type CSSProperties, type SyntheticEvent } from 'react'
@@ -31,7 +31,7 @@ const actionButtonIconSize = 16
 const emptyNextStatus = ''
 
 export const ApplicationStatusEditor: FC<{
-  ad: JobAdWithMeta
+  ad: JobAdsFeedItem
   onSave: (applyStatus: JobApplyStatus, comment: string) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
@@ -45,7 +45,7 @@ export const ApplicationStatusEditor: FC<{
   const showRejectionDate = rejectedAt !== null
   const appliedDaysAgo = formatAppliedDaysAgo(ad.meta.application.appliedAt, locale)
   const rejectedDaysAgo = formatAppliedDaysAgo(rejectedAt, locale)
-  const publicationDate = formatPublicationDate(ad.publishedAt, locale)
+  const publicationDate = formatPublicationDate(ad.content.publishedAt, locale)
   const notApplicable = formatNotApplicable(locale)
   const [isChangingStatus, setIsChangingStatus] = useState(false)
   const [nextStatus, setNextStatus] = useState<JobApplyStatus | typeof emptyNextStatus>(emptyNextStatus)
@@ -54,12 +54,13 @@ export const ApplicationStatusEditor: FC<{
   const targetStatusOptions = useMemo(() => applyStatusTargetOptions(currentStatus), [currentStatus])
   const canSubmit = nextStatus !== emptyNextStatus
   const canChangeStatus = targetStatusOptions.length > 0
-  const canAnalyzeCvMatch = ad.origin !== 'theprotocol'
+  const canAnalyzeCvMatch = ad.content.origin !== 'theprotocol' && !ad.meta.isCurrentCVUsed
   const {
     analyzing: analyzingCvMatch,
     dialogOpen: matchAnalysisDialogOpen,
     dialogTitle: matchAnalysisTitle,
     dialogText: matchAnalysisText,
+    dialogNotice: matchAnalysisNotice,
     closeDialog: closeMatchAnalysisDialog,
     requestAnalysis: handleAnalyzeCvMatch,
   } = useCvMatchAnalysis({
@@ -89,7 +90,7 @@ export const ApplicationStatusEditor: FC<{
     setIsChangingStatus(false)
     setNextStatus(emptyNextStatus)
     setComment('')
-  }, [ad.id, currentStatus])
+  }, [ad.content.id, currentStatus])
 
   const handleNextStatusChange = (event: SelectChangeEvent<JobApplyStatus | typeof emptyNextStatus>) => {
     setNextStatus(event.target.value as JobApplyStatus)
@@ -117,11 +118,11 @@ export const ApplicationStatusEditor: FC<{
 
   const handleFavToggle = () => {
     if (ad.meta.fav) {
-      onUnfav(ad.id)
+      onUnfav(ad.content.id)
       return
     }
 
-    onFav(ad.id)
+    onFav(ad.content.id)
   }
 
   return (
@@ -154,7 +155,7 @@ export const ApplicationStatusEditor: FC<{
               <Typography variant='caption' color='text.secondary' display='block'>
                 {labels.company}
               </Typography>
-              <Typography>{ad.companyName}</Typography>
+              <Typography>{ad.content.companyName}</Typography>
             </Box>
             <Box>
               <Typography variant='caption' color='text.secondary' display='block'>
@@ -190,9 +191,9 @@ export const ApplicationStatusEditor: FC<{
             <Typography variant='caption' color='text.secondary' display='block'>
               {labels.requiredSkills}
             </Typography>
-            {ad.requiredSkills.length > 0 ? (
+            {ad.content.requiredSkills.length > 0 ? (
               <TagGroup>
-                {ad.requiredSkills.map(skill => (
+                {ad.content.requiredSkills.map(skill => (
                   <RequiredSkillTag key={skill} skill={skill} mySkill={mySkillsById.get(toSkillId(skill))} />
                 ))}
               </TagGroup>
@@ -230,11 +231,11 @@ export const ApplicationStatusEditor: FC<{
                 },
               }}
             >
-              <InputLabel id={`job-next-status-${ad.id}`} shrink>
+              <InputLabel id={`job-next-status-${ad.content.id}`} shrink>
                 {labels.newApplicationStatus}
               </InputLabel>
               <Select<JobApplyStatus | typeof emptyNextStatus>
-                labelId={`job-next-status-${ad.id}`}
+                labelId={`job-next-status-${ad.content.id}`}
                 value={nextStatus}
                 label={labels.newApplicationStatus}
                 displayEmpty
@@ -317,6 +318,7 @@ export const ApplicationStatusEditor: FC<{
           open={matchAnalysisDialogOpen}
           onClose={closeMatchAnalysisDialog}
           title={matchAnalysisTitle}
+          notice={matchAnalysisNotice}
           text={matchAnalysisText}
         />
       ) : null}

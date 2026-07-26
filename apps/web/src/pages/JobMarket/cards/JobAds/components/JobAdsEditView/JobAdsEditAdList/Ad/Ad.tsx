@@ -1,4 +1,4 @@
-import { JobAdWithMeta, JobApplyStatus } from '@repo/types'
+import { JobAdsFeedItem, JobApplyStatus } from '@repo/types'
 import { FC, Fragment } from 'react'
 import { ApolloTableRow, LinkOpen } from '@/card-components'
 import {
@@ -13,7 +13,7 @@ import { AdExpandedEditorRow } from './AdExpandedEditorRow'
 import { EditApplicationButton } from './EditApplicationButton'
 
 export const Ad: FC<{
-  ad: JobAdWithMeta
+  ad: JobAdsFeedItem
   zoom: boolean
   editMode: boolean
   expanded: boolean
@@ -28,16 +28,16 @@ export const Ad: FC<{
   return (
     <Fragment>
       <ApolloTableRow>
-        {zoom ? <LinkOpen href={ad.advertUrl} /> : null}
+        {zoom ? <LinkOpen href={ad.content.advertUrl} /> : null}
         <JobTitleCell>
           <JobTitleContent>
-            <PublishedTodayTag publishedAt={ad.publishedAt} />
+            <PublishedTodayTag publishedAt={ad.content.publishedAt} />
             <AdTitleText ad={ad} />
             <AdTitleTrailing ad={ad} zoom={zoom}>
               <EditApplicationButton
                 visible={zoom && editMode}
                 expanded={expanded}
-                adId={ad.id}
+                adId={ad.content.id}
                 onToggleExpand={onToggleExpand}
               />
             </AdTitleTrailing>
@@ -49,7 +49,7 @@ export const Ad: FC<{
         <AdExpandedEditorRow
           ad={ad}
           columnCount={columnCount}
-          onSave={(applyStatus, comment) => onChangeApplicationState(ad.id, applyStatus, comment)}
+          onSave={(applyStatus, comment) => onChangeApplicationState(ad.content.id, applyStatus, comment)}
           onFav={onFav}
           onUnfav={onUnfav}
           onAnalyzeCvMatch={onAnalyzeCvMatch}

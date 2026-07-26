@@ -1,7 +1,7 @@
 import type OpenAI from 'openai'
 import type { Pool } from 'mariadb'
 import { analyzeCvMatch } from './analyzeCvMatch'
-import { type CvMatchContent, loadCvText, saveCvMatch } from './cvMatchDocument'
+import { type CvMatchContent, loadCV, saveCvMatch } from './cvMatchDocument'
 import { detectOrigin } from './jobPosting/detectOrigin'
 import { fetchJobPostingDetails } from './jobPosting/fetchJobPostingDetails'
 
@@ -18,8 +18,8 @@ export async function runAnalyzeCvMatchCommand(input: AnalyzeCvMatchInput): Prom
     throw new Error('analyze-cv-match: missing ad id')
   }
 
-  const cvText = await loadCvText(input.db)
-  if (cvText === null || cvText.length === 0) {
+  const cv = await loadCV(input.db)
+  if (cv === null || cv.text === null || cv.text.length === 0 || cv.hash === null) {
     throw new Error('analyze-cv-match: CV not found')
   }
 
@@ -37,12 +37,12 @@ export async function runAnalyzeCvMatchCommand(input: AnalyzeCvMatchInput): Prom
     throw new Error(`analyze-cv-match: failed to parse job posting from ${adUrl}`)
   }
 
-  const result = await analyzeCvMatch(input.openai, cvText, posting)
+  const result = await analyzeCvMatch(input.openai, cv.text, posting)
   const content: CvMatchContent = {
     analyzedAt: new Date().toISOString(),
     ...result,
   }
 
-  await saveCvMatch(input.db, adId, content)
+  await saveCvMatch(input.db, adId, content, cv.hash)
   return content
 }

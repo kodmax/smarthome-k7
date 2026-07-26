@@ -1,4 +1,4 @@
-import { JobAdWithMeta, JobApplyStatus, isTerminalApplyStatus } from '@repo/types'
+import { JobAdsFeedItem, JobApplyStatus, isTerminalApplyStatus } from '@repo/types'
 
 export const JOB_ADS_FILTER_ORDER = [
   'latest',
@@ -38,7 +38,7 @@ export function getJobAdFilterCategory(status: JobApplyStatus): JobAdsFilter {
   return 'in-progress'
 }
 
-export function filterJobAdsByCategory(ads: JobAdWithMeta[], filter: JobAdsFilter): JobAdWithMeta[] {
+export function filterJobAdsByCategory(ads: JobAdsFeedItem[], filter: JobAdsFilter): JobAdsFeedItem[] {
   if (filter === 'with-match-analysis') {
     return ads
       .filter(ad => ad.matchAnalysis !== null && getJobAdFilterCategory(ad.meta.application.status) !== 'finished')

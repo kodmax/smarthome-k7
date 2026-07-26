@@ -28,12 +28,12 @@ describe('jobAdsFilter', () => {
       jobAd({ id: '7', title: 'Accepted', meta: { application: { status: 'offer-accepted' } } }),
     ]
 
-    expect(filterJobAdsByCategory(ads, 'latest').map(ad => ad.id)).toEqual(['1'])
-    expect(filterJobAdsByCategory(ads, 'in-progress').map(ad => ad.id)).toEqual(['2'])
-    expect(filterJobAdsByCategory(ads, 'not-interested').map(ad => ad.id)).toEqual(['3'])
-    expect(filterJobAdsByCategory(ads, 'stretch').map(ad => ad.id)).toEqual(['4'])
-    expect(filterJobAdsByCategory(ads, 'rejected-no-response').map(ad => ad.id)).toEqual(['5', '6'])
-    expect(filterJobAdsByCategory(ads, 'finished').map(ad => ad.id)).toEqual(['7'])
+    expect(filterJobAdsByCategory(ads, 'latest').map(ad => ad.content.id)).toEqual(['1'])
+    expect(filterJobAdsByCategory(ads, 'in-progress').map(ad => ad.content.id)).toEqual(['2'])
+    expect(filterJobAdsByCategory(ads, 'not-interested').map(ad => ad.content.id)).toEqual(['3'])
+    expect(filterJobAdsByCategory(ads, 'stretch').map(ad => ad.content.id)).toEqual(['4'])
+    expect(filterJobAdsByCategory(ads, 'rejected-no-response').map(ad => ad.content.id)).toEqual(['5', '6'])
+    expect(filterJobAdsByCategory(ads, 'finished').map(ad => ad.content.id)).toEqual(['7'])
   })
 
   it('filters ads with match analysis', () => {
@@ -58,7 +58,7 @@ describe('jobAdsFilter', () => {
       }),
     ]
 
-    expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.id)).toEqual(['2', '3'])
+    expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.content.id)).toEqual(['2', '3'])
   })
 
   it('excludes finished ads from with-match-analysis filter', () => {
@@ -83,7 +83,7 @@ describe('jobAdsFilter', () => {
       }),
     ]
 
-    expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.id)).toEqual(['2', '3'])
+    expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.content.id)).toEqual(['2', '3'])
   })
 
   it('sorts with-match-analysis ads by score descending', () => {
@@ -105,6 +105,6 @@ describe('jobAdsFilter', () => {
       }),
     ]
 
-    expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.id)).toEqual(['2', '3', '1'])
+    expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.content.id)).toEqual(['2', '3', '1'])
   })
 })
