@@ -16,8 +16,10 @@ if [[ -z "${SENTRY_SERVICE_PROJECT:-}" ]]; then
   exit 1
 fi
 
-sentry-cli releases new "$SENTRY_RELEASE" --project "$SENTRY_SERVICE_PROJECT"
-sentry-cli releases files "$SENTRY_RELEASE" upload-sourcemaps ./dist --project "$SENTRY_SERVICE_PROJECT"
-sentry-cli releases finalize "$SENTRY_RELEASE"
+sentry-cli releases new "$SENTRY_RELEASE" --project "$SENTRY_SERVICE_PROJECT" || true
+sentry-cli sourcemaps upload ./dist \
+  --release "$SENTRY_RELEASE" \
+  --project "$SENTRY_SERVICE_PROJECT"
+sentry-cli releases finalize "$SENTRY_RELEASE" --project "$SENTRY_SERVICE_PROJECT"
 
 echo "[sentry] source maps uploaded (release=$SENTRY_RELEASE)"
