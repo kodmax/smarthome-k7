@@ -302,7 +302,7 @@ describe('ApplicationStatusEditor', () => {
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
-    expect(screen.getByText('Analiza dopasowania CV — 4/5')).toBeInTheDocument()
+    expect(screen.getByText('Analiza dopasowania CV — 80%')).toBeInTheDocument()
     expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
     expect(screen.getByRole('dialog')).toHaveTextContent('Dobre dopasowanie do roli.')
     expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')

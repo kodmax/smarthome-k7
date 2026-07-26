@@ -331,7 +331,7 @@ export const en: Translations = {
       checkCvMatch: 'Check match',
       viewMatchAnalysis: 'Show CV match analysis',
       matchAnalysisTitle: 'CV match analysis',
-      matchAnalysisScore: '{score}/5',
+      matchAnalysisScore: '{score}%',
       matchAnalysisSummarySection: 'Summary',
       matchAnalysisStrengthsSection: 'Strengths',
       matchAnalysisGapsSection: 'Gaps',

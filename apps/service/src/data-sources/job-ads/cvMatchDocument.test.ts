@@ -3,7 +3,7 @@ import { cvMatchContentToMatchAnalysis, digestCvMatchContentHash, parseCvMatchCo
 
 const content = {
   analyzedAt: '2026-01-01T00:00:00.000Z',
-  score: 4,
+  score: 80,
   summary: 'Dobre dopasowanie.',
   strengths: 'React, TypeScript.',
   gaps: 'Brak doświadczenia w GraphQL.',
@@ -27,7 +27,7 @@ describe('cvMatchDocument', () => {
     expect(
       parseCvMatchContent({
         analyzedAt: '2026-01-01T00:00:00.000Z',
-        score: 4,
+        score: 80,
         summary: 'Dobre dopasowanie.',
         analysis: 'Szczegółowa analiza.',
       }),

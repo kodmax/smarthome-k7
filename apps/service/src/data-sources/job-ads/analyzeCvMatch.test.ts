@@ -64,7 +64,7 @@ describe('analyzeCvMatch', () => {
   it('returns parsed structured analysis from OpenAI', async () => {
     const create = vi.fn().mockResolvedValue({
       output_text: JSON.stringify({
-        score: 4,
+        score: 80,
         summary: 'Dobre dopasowanie.',
         strengths: 'React, TypeScript.',
         gaps: 'Brak doświadczenia w GraphQL.',
@@ -82,7 +82,7 @@ describe('analyzeCvMatch', () => {
     const analysis = await analyzeCvMatch(openai, 'Moje CV', posting)
 
     expect(analysis).toEqual({
-      score: 4,
+      score: 80,
       summary: 'Dobre dopasowanie.',
       strengths: 'React, TypeScript.',
       gaps: 'Brak doświadczenia w GraphQL.',

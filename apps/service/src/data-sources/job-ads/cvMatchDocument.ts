@@ -42,8 +42,8 @@ export function parseCvMatchContent(content: DocumentRow['content']): CvMatchCon
   if (
     typeof record.score !== 'number' ||
     !Number.isInteger(record.score) ||
-    record.score < 1 ||
-    record.score > 5 ||
+    record.score < 0 ||
+    record.score > 100 ||
     !isNonEmptyString(record.summary) ||
     !isNonEmptyString(record.strengths) ||
     !isNonEmptyString(record.gaps) ||

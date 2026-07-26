@@ -331,7 +331,7 @@ export const pl: Translations = {
       checkCvMatch: 'Sprawdź dopasowanie',
       viewMatchAnalysis: 'Pokaż analizę dopasowania CV',
       matchAnalysisTitle: 'Analiza dopasowania CV',
-      matchAnalysisScore: '{score}/5',
+      matchAnalysisScore: '{score}%',
       matchAnalysisSummarySection: 'Podsumowanie',
       matchAnalysisStrengthsSection: 'Mocne strony',
       matchAnalysisGapsSection: 'Luki',

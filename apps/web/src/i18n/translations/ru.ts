@@ -331,7 +331,7 @@ export const ru: Translations = {
       checkCvMatch: 'Проверить соответствие',
       viewMatchAnalysis: 'Показать анализ соответствия CV',
       matchAnalysisTitle: 'Анализ соответствия CV',
-      matchAnalysisScore: '{score}/5',
+      matchAnalysisScore: '{score}%',
       matchAnalysisSummarySection: 'Резюме',
       matchAnalysisStrengthsSection: 'Сильные стороны',
       matchAnalysisGapsSection: 'Пробелы',

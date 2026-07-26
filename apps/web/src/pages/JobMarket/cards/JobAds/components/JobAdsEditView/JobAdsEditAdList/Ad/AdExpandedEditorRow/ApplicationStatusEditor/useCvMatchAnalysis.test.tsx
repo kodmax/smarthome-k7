@@ -58,7 +58,7 @@ describe('useCvMatchAnalysis', () => {
       expect(result.current.dialogOpen).toBe(true)
     })
     expect(result.current.dialogText).toBe(expectedDialogText)
-    expect(result.current.dialogTitle).toBe('Analiza dopasowania CV — 4/5')
+    expect(result.current.dialogTitle).toBe('Analiza dopasowania CV — 80%')
     expect(result.current.analyzing).toBe(false)
   })
 
@@ -121,7 +121,7 @@ describe('useCvMatchAnalysis', () => {
         },
       ),
     )
-    expect(result.current.dialogTitle).toBe('Analiza dopasowania CV — 4/5')
+    expect(result.current.dialogTitle).toBe('Analiza dopasowania CV — 80%')
   })
 
   it('resets state when resetWhen changes', () => {

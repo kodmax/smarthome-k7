@@ -13,9 +13,9 @@ const CV_MATCH_RESPONSE_FORMAT = {
     properties: {
       score: {
         type: 'integer',
-        minimum: 1,
-        maximum: 5,
-        description: 'Overall CV match score from 1 to 5.',
+        minimum: 0,
+        maximum: 100,
+        description: 'Overall CV match score from 0 to 100 percent.',
       },
       summary: {
         type: 'string',
@@ -146,8 +146,8 @@ function parseCvMatchAnalysisResult(raw: string): CvMatchAnalysisResult {
   if (
     typeof score !== 'number' ||
     !Number.isInteger(score) ||
-    score < 1 ||
-    score > 5 ||
+    score < 0 ||
+    score > 100 ||
     !isNonEmptyString(summary) ||
     !isNonEmptyString(strengths) ||
     !isNonEmptyString(gaps) ||

@@ -40,7 +40,9 @@ export function getJobAdFilterCategory(status: JobApplyStatus): JobAdsFilter {
 
 export function filterJobAdsByCategory(ads: JobAdWithMeta[], filter: JobAdsFilter): JobAdWithMeta[] {
   if (filter === 'with-match-analysis') {
-    return ads.filter(ad => ad.matchAnalysis !== null)
+    return ads
+      .filter(ad => ad.matchAnalysis !== null && getJobAdFilterCategory(ad.meta.application.status) !== 'finished')
+      .sort((left, right) => (right.matchAnalysis?.score ?? 0) - (left.matchAnalysis?.score ?? 0))
   }
 
   return ads.filter(ad => getJobAdFilterCategory(ad.meta.application.status) === filter)

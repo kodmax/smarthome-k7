@@ -17,7 +17,7 @@ export function matchAnalysis(
   overrides: Partial<JobAdMatchAnalysis> & Pick<JobAdMatchAnalysis, 'analyzedAt'>,
 ): JobAdMatchAnalysis {
   return {
-    score: 4,
+    score: 80,
     summary: 'Dobre dopasowanie.',
     strengths: 'React, TypeScript.',
     gaps: 'Brak doświadczenia w GraphQL.',

@@ -50,8 +50,61 @@ describe('jobAdsFilter', () => {
         meta: { application: { status: 'applied' } },
         matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-02T00:00:00.000Z', summary: 'Strong fit' }),
       }),
+      jobAd({
+        id: '4',
+        title: 'Terminal analyzed',
+        meta: { application: { status: 'offer-accepted' } },
+        matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-03T00:00:00.000Z', summary: 'Done' }),
+      }),
     ]
 
     expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.id)).toEqual(['2', '3'])
+  })
+
+  it('excludes finished ads from with-match-analysis filter', () => {
+    const ads = [
+      jobAd({
+        id: '1',
+        title: 'Accepted with analysis',
+        meta: { application: { status: 'offer-accepted' } },
+        matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z', summary: 'OK' }),
+      }),
+      jobAd({
+        id: '2',
+        title: 'Rejected with analysis',
+        meta: { application: { status: 'rejected' } },
+        matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-02T00:00:00.000Z', summary: 'No' }),
+      }),
+      jobAd({
+        id: '3',
+        title: 'Active with analysis',
+        meta: { application: { status: 'interview' } },
+        matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-03T00:00:00.000Z', summary: 'Strong fit' }),
+      }),
+    ]
+
+    expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.id)).toEqual(['2', '3'])
+  })
+
+  it('sorts with-match-analysis ads by score descending', () => {
+    const ads = [
+      jobAd({
+        id: '1',
+        title: 'Moderate fit',
+        matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z', score: 60 }),
+      }),
+      jobAd({
+        id: '2',
+        title: 'Strong fit',
+        matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-02T00:00:00.000Z', score: 90 }),
+      }),
+      jobAd({
+        id: '3',
+        title: 'Good fit',
+        matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-03T00:00:00.000Z', score: 75 }),
+      }),
+    ]
+
+    expect(filterJobAdsByCategory(ads, 'with-match-analysis').map(ad => ad.id)).toEqual(['2', '3', '1'])
   })
 })

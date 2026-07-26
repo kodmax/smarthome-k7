@@ -11,7 +11,7 @@ const sectionLabels = {
 
 const matchAnalysis = {
   analyzedAt: '2026-01-01T00:00:00.000Z',
-  score: 4,
+  score: 80,
   summary: 'Dobre dopasowanie.',
   strengths: 'React, TypeScript.',
   gaps: 'Brak doświadczenia w GraphQL.',
@@ -21,7 +21,7 @@ const matchAnalysis = {
 
 describe('formatMatchAnalysisScore', () => {
   it('formats score with label template', () => {
-    expect(formatMatchAnalysisScore(matchAnalysis, { matchAnalysisScore: '{score}/5' })).toBe('4/5')
+    expect(formatMatchAnalysisScore(matchAnalysis, { matchAnalysisScore: '{score}%' })).toBe('80%')
   })
 })
 
@@ -30,9 +30,9 @@ describe('formatMatchAnalysisTitle', () => {
     expect(
       formatMatchAnalysisTitle(matchAnalysis, {
         matchAnalysisTitle: 'Analiza dopasowania CV',
-        matchAnalysisScore: '{score}/5',
+        matchAnalysisScore: '{score}%',
       }),
-    ).toBe('Analiza dopasowania CV — 4/5')
+    ).toBe('Analiza dopasowania CV — 80%')
   })
 })
 

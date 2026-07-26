@@ -150,9 +150,9 @@ describe('Ad', () => {
 
     fireEvent.click(screen.getByLabelText('Pokaż analizę dopasowania CV'))
 
-    expect(screen.getByText('4/5')).toBeInTheDocument()
+    expect(screen.getByText('80%')).toBeInTheDocument()
     expect(screen.getByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByText('Analiza dopasowania CV — 4/5')).toBeInTheDocument()
+    expect(screen.getByText('Analiza dopasowania CV — 80%')).toBeInTheDocument()
     expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
     expect(screen.getByRole('dialog')).toHaveTextContent('Silne dopasowanie do roli TypeScript.')
     expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
