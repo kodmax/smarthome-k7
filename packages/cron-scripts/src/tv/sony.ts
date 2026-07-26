@@ -18,11 +18,15 @@ const run = async (sony: IpControl) => {
 
   if (await isNoSignal(sony)) {
     setTimeout(() => {
-      isNoSignal(sony).then(noSignal => {
-        if (noSignal) {
-          return sony.setPowerStatus('standby')
-        }
-      })
+      void isNoSignal(sony)
+        .then(noSignal => {
+          if (noSignal) {
+            return sony.setPowerStatus('standby')
+          }
+        })
+        .catch(() => {
+          // ignore
+        })
     }, 60_000)
   }
 }
