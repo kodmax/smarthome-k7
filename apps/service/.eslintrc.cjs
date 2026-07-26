@@ -8,6 +8,7 @@ module.exports = {
   ignorePatterns: [
     "scripts/**",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/*.d.ts"
   ]
 };

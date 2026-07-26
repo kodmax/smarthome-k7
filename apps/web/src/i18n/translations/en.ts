@@ -420,6 +420,12 @@ export const en: Translations = {
     description: 'It looks like you lost your connection. Check your network and try again.',
     retry: 'Refresh',
   },
+  error: {
+    title: 'Something went wrong',
+    description: 'An unexpected error occurred in the app. You can try again.',
+    retry: 'Try again',
+    unexpected: 'Unexpected error',
+  },
   dateTime: {
     todayShort: 'Today',
     tomorrowShort: 'Tomorrow',

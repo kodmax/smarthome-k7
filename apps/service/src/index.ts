@@ -5,12 +5,17 @@ import { initKnxCronJobs } from '@repo/cron-scripts'
 import { getDbPool } from '@repo/db'
 import { config } from './config'
 import path from 'node:path'
+import { appMode, isDevelopment } from './env'
 import { getDependency, registerDependency } from './di'
 import { initKnxFeeds, initWebFeeds } from './feeds'
 import { knxInit } from './knx-init'
 import { registerApollo, registerKnxCron, setupGracefulShutdown } from './graceful-shutdown'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
+
+if (isDevelopment) {
+  console.info(`[app] ${appMode} mode`)
+}
 
 registerDependency('config', config)
 registerDependency('db', getDbPool())

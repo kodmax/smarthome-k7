@@ -392,4 +392,10 @@ export type Translations = {
     description: string
     retry: string
   }
+  error: {
+    title: string
+    description: string
+    retry: string
+    unexpected: string
+  }
 }

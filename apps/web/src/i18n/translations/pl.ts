@@ -420,6 +420,12 @@ export const pl: Translations = {
     description: 'Wygląda na to, że jesteś offline. Sprawdź sieć i spróbuj ponownie.',
     retry: 'Odśwież',
   },
+  error: {
+    title: 'Coś poszło nie tak',
+    description: 'W aplikacji wystąpił nieoczekiwany błąd. Możesz spróbować ponownie.',
+    retry: 'Spróbuj ponownie',
+    unexpected: 'Nieoczekiwany błąd',
+  },
   dateTime: {
     todayShort: 'Dziś',
     tomorrowShort: 'Jutro',

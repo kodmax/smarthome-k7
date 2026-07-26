@@ -1,11 +1,12 @@
 import { registerSW } from 'virtual:pwa-register'
+import { isDevelopment } from '@/env'
 
 export function registerServiceWorker(): void {
   if (!('serviceWorker' in navigator)) {
     return
   }
 
-  if (import.meta.env.DEV) {
+  if (isDevelopment) {
     void navigator.serviceWorker.getRegistrations().then(registrations => {
       for (const registration of registrations) {
         void registration.unregister()

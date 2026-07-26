@@ -420,6 +420,12 @@ export const ru: Translations = {
     description: 'Похоже, вы offline. Проверьте сеть и попробуйте снова.',
     retry: 'Обновить',
   },
+  error: {
+    title: 'Что-то пошло не так',
+    description: 'В приложении произошла непредвиденная ошибка. Попробуйте ещё раз.',
+    retry: 'Попробовать снова',
+    unexpected: 'Непредвиденная ошибка',
+  },
   dateTime: {
     todayShort: 'Сегодня',
     tomorrowShort: 'Завтра',
