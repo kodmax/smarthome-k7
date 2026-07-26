@@ -18,6 +18,7 @@ export function initSentry(): void {
   Sentry.init({
     dsn,
     environment: mode,
+    release: import.meta.env.VITE_SENTRY_RELEASE,
     integrations: [
       Sentry.reactRouterBrowserTracingIntegration({
         useEffect,

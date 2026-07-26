@@ -15,6 +15,7 @@ export function initSentry(): void {
   Sentry.init({
     dsn,
     environment: appMode,
+    release: process.env.SENTRY_RELEASE,
     tracesSampleRate: 0.2,
   })
 

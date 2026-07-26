@@ -30,6 +30,7 @@ declare module 'process' {
         readonly OPENAI_API_KEY: string
 
         readonly SENTRY_DSN?: string
+        readonly SENTRY_RELEASE?: string
       }
     }
   }

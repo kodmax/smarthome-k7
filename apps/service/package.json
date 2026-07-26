@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@repo/types": "*",
+    "@sentry/cli": "^3.6.2",
     "@types/node": "^17.0.36",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
@@ -36,13 +37,14 @@
     "vitest": "^4.1.8"
   },
   "scripts": {
-    "bundle": "bun build src/index.ts --target=node --format=cjs --outdir=./dist",
+    "bundle": "bun build src/index.ts --target=node --format=cjs --outdir=./dist --sourcemap=linked",
     "dev": "yarn bundle && sh -c 'bun build --watch src/index.ts --target=node --format=cjs --outdir=./dist & exec node --watch dist/index.js'",
     "dev:local": "sh -c 'yarn workspace @repo/chronos dev & yarn workspace @repo/apollo-ws dev & yarn workspace @repo/cron-scripts dev & yarn workspace @repo/db dev & yarn workspace @repo/di dev & yarn workspace @repo/knx-schema dev & yarn workspace @repo/transmission dev & exec yarn dev'",
     "start": "node dist/index.js",
     "build": "tsc && yarn bundle",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "vitest run"
+    "test": "vitest run",
+    "sentry:upload-sourcemaps": "sh scripts/upload-sourcemaps.sh"
   }
 }
