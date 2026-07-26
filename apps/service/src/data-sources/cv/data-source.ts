@@ -6,6 +6,7 @@ import { Inject } from '@/di'
 import {
   CV_SCOPE,
   CV_TEXT_ID,
+  digestCvPdfSourceHash,
   digestDocumentContentHash,
   parseCvTextContent,
   parseUploadCommandArgs,
@@ -25,7 +26,10 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'upload':
-        await this.commandUpload(args)
+        if (await this.commandUpload(args)) {
+          await this.touchCvTextModifiedAt()
+          this.push()
+        }
         break
     }
   }
@@ -70,6 +74,7 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
         cv: {
           modifiedAt: toModifiedAtIso(row.modified_at),
           text: content.text,
+          hash: row.hash,
         },
       }
     } finally {
@@ -77,31 +82,68 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
     }
   }
 
-  private async commandUpload(args: string): Promise<void> {
+  private async loadCvTextSourceHash(): Promise<string | null> {
+    const conn = await this.db.getConnection()
+    try {
+      const rows = (await conn.query(
+        `select source_hash
+         from documents
+         where scope = ? and id = ?`,
+        [CV_SCOPE, CV_TEXT_ID],
+      )) as { source_hash: string | null }[]
+
+      return rows[0]?.source_hash ?? null
+    } finally {
+      conn.release()
+    }
+  }
+
+  private async commandUpload(args: string): Promise<boolean> {
     const parsed = parseUploadCommandArgs(args)
     if (parsed === null) {
-      return
+      return false
+    }
+
+    const sourceHash = digestCvPdfSourceHash(parsed.base64)
+    const existingSourceHash = await this.loadCvTextSourceHash()
+    if (existingSourceHash === sourceHash) {
+      return true
     }
 
     const text = await extractPdfText(this.openai, parsed.base64)
     const content: CvTextContent = { text }
     const hash = digestDocumentContentHash(CV_TEXT_ID, content)
 
-    await this.upsertCvText(content, hash)
-    this.push()
+    await this.upsertCvText(content, hash, sourceHash)
+    return true
   }
 
-  private async upsertCvText(content: CvTextContent, hash: string): Promise<void> {
+  private async touchCvTextModifiedAt(): Promise<void> {
     const conn = await this.db.getConnection()
     try {
       await conn.query(
-        `insert into documents (scope, id, hash, content)
-         values (?, ?, ?, ?)
+        `update documents
+         set modified_at = current_timestamp()
+         where scope = ? and id = ?`,
+        [CV_SCOPE, CV_TEXT_ID],
+      )
+    } finally {
+      conn.release()
+    }
+  }
+
+  private async upsertCvText(content: CvTextContent, hash: string, sourceHash: string): Promise<void> {
+    const conn = await this.db.getConnection()
+    try {
+      await conn.query(
+        `insert into documents (scope, id, hash, source_hash, content)
+         values (?, ?, ?, ?, ?)
          on duplicate key update
            hash = values(hash),
+           source_hash = values(source_hash),
            content = values(content),
            modified_at = current_timestamp()`,
-        [CV_SCOPE, CV_TEXT_ID, hash, JSON.stringify(content)],
+        [CV_SCOPE, CV_TEXT_ID, hash, sourceHash, JSON.stringify(content)],
       )
     } finally {
       conn.release()

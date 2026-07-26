@@ -2,6 +2,7 @@ import { WebSocket, WebSocketServer, AddressInfo } from 'ws'
 import { Socket } from 'net'
 import { ApolloEvents } from './ApolloEvents'
 import { DataSourceCommand } from './DataSource'
+import { formatCommandArgsForLog } from './formatCommandArgsForLog'
 
 export type ApolloWebSocketOptions = {
   /**
@@ -137,8 +138,9 @@ export class Server {
           this.vent.emit('feeds-refresh', feeds.values())
         } else if (cmd === 'command') {
           const [sourceId, name, ...args] = params
+          const argsText = args.join(' ')
           const command: DataSourceCommand = {
-            args: args.join(' '),
+            args: argsText,
             sourceId,
             name,
           }
@@ -146,7 +148,7 @@ export class Server {
           this.vent.emit(
             'sys-log',
             6,
-            `Client <${client.socket.remoteAddress}> requested feed ${sourceId} command ${name} with arguments "${args.join(' ')}"`,
+            `Client <${client.socket.remoteAddress}> requested feed ${sourceId} command ${name} with arguments "${formatCommandArgsForLog(argsText)}"`,
           )
           this.vent.emit('command', command)
         } else {

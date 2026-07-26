@@ -76,6 +76,18 @@ describe('Server', () => {
     })
   })
 
+  it('logs truncated command arguments when args are long', async () => {
+    const logs: string[] = []
+    server.vent.on('sys-log', (_priority, msg) => logs.push(msg))
+
+    const longArgs = 'a'.repeat(150)
+    ws.send(`command cv upload ${longArgs}`)
+
+    await vi.waitFor(() => expect(logs.some(msg => msg.includes('… (150 chars)'))).toBe(true))
+    expect(logs.some(msg => msg.includes(`${'a'.repeat(100)}… (150 chars)`))).toBe(true)
+    expect(logs.some(msg => msg.includes('a'.repeat(150)))).toBe(false)
+  })
+
   it('broadcasts feed updates only to subscribed clients', async () => {
     const messages: string[] = []
     ws.on('message', data => messages.push(data.toString()))

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   CV_TEXT_ID,
+  digestCvPdfSourceHash,
   digestDocumentContentHash,
   parseCvTextContent,
   parseUploadCommandArgs,
@@ -24,6 +25,15 @@ describe('documentRecord', () => {
     expect(hash).toHaveLength(64)
     expect(hash).toBe(digestDocumentContentHash(CV_TEXT_ID, { text: 'Hello CV' }))
     expect(hash).not.toBe(digestDocumentContentHash(CV_TEXT_ID, { text: 'Other CV' }))
+  })
+
+  it('hashes cv pdf source from base64 bytes', () => {
+    const base64 = Buffer.from('pdf bytes').toString('base64')
+    const otherBase64 = Buffer.from('other pdf').toString('base64')
+
+    expect(digestCvPdfSourceHash(base64)).toHaveLength(64)
+    expect(digestCvPdfSourceHash(base64)).toBe(digestCvPdfSourceHash(base64))
+    expect(digestCvPdfSourceHash(base64)).not.toBe(digestCvPdfSourceHash(otherBase64))
   })
 
   it('parses cv-text content from object and json string', () => {

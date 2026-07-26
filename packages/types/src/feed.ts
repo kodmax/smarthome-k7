@@ -450,6 +450,7 @@ export type MySkillsFeed = {
 export type CvData = {
   modifiedAt: string
   text: string
+  hash: string
 }
 
 export type CvFeed = {

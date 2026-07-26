@@ -19,6 +19,10 @@ export type UploadCommandArgs = {
   base64: string
 }
 
+export function digestCvPdfSourceHash(base64: string): string {
+  return createHash('sha256').update(Buffer.from(base64, 'base64')).digest('hex')
+}
+
 export function digestDocumentContentHash(documentId: string, content: CvTextContent): string {
   switch (documentId) {
     case CV_TEXT_ID:
