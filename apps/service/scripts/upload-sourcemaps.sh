@@ -22,9 +22,13 @@ if [[ ! -f ./dist/index.js || ! -f ./dist/index.js.map ]]; then
 fi
 
 sentry-cli releases new "$SENTRY_RELEASE" --project "$SENTRY_SERVICE_PROJECT" || true
-sentry-cli sourcemaps upload ./dist/index.js \
+
+# Modify dist in place so systemd runs the same files Sentry receives (Debug ID matching).
+sentry-cli sourcemaps inject ./dist
+sentry-cli sourcemaps upload ./dist \
   --release "$SENTRY_RELEASE" \
   --project "$SENTRY_SERVICE_PROJECT"
+
 sentry-cli releases finalize "$SENTRY_RELEASE" --project "$SENTRY_SERVICE_PROJECT"
 
 echo "[sentry] source maps uploaded (release=$SENTRY_RELEASE)"

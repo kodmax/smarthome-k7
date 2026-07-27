@@ -23,6 +23,11 @@ export const pl: Translations = {
     darkAriaLabel: 'Ciemny motyw',
     language: 'Język',
     languageAriaLabel: 'Język aplikacji',
+    sentryTest: 'Sentry',
+    sentryTestDescription: 'Wyślij testowy błąd, żeby sprawdzić source mapy w Sentry.',
+    sentryTestButton: 'Wyślij testowy błąd',
+    sentryTestSent: 'Testowy błąd wysłany do Sentry.',
+    sentryTestUnavailable: 'Sentry jest dostępne tylko w produkcji z skonfigurowanym DSN.',
   },
   stockMarket: {
     title: 'Giełda',

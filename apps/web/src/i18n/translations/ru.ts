@@ -23,6 +23,11 @@ export const ru: Translations = {
     darkAriaLabel: 'Тёмная тема',
     language: 'Язык',
     languageAriaLabel: 'Язык приложения',
+    sentryTest: 'Sentry',
+    sentryTestDescription: 'Отправить тестовую ошибку для проверки source maps в Sentry.',
+    sentryTestButton: 'Отправить тестовую ошибку',
+    sentryTestSent: 'Тестовая ошибка отправлена в Sentry.',
+    sentryTestUnavailable: 'Sentry доступен только в production при настроенном DSN.',
   },
   stockMarket: {
     title: 'Биржа',

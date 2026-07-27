@@ -31,6 +31,11 @@ export VITE_SENTRY_RELEASE="$SENTRY_RELEASE"
 yarn build
 yarn workspace service sentry:upload-sourcemaps
 
+if [[ -n "${SENTRY_AUTH_TOKEN:-}" ]] && ! grep -rqE '//# debugId=' "$WEB_DIST_DIR/assets/" 2>/dev/null; then
+  echo '[sentry] web dist missing debug IDs — rebuilding web (turbo cache may have skipped @sentry/vite-plugin)' >&2
+  TURBO_FORCE=true yarn workspace web build
+fi
+
 tmp="$(mktemp /tmp/apollo.env.XXXXXX)"
 trap 'rm -f "$tmp"' EXIT
 

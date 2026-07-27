@@ -1,9 +1,10 @@
-import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Box, Button, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { useColorScheme } from '@mui/material/styles'
 import { iconStyles, SunMoonIcon } from '@repo/assets'
-import { type FC, type MouseEvent } from 'react'
+import { type FC, type MouseEvent, useState } from 'react'
 import { PageHeader } from '@/app/components/PageHeader'
 import { PageWrapper } from '@/app/components/PageWrapper'
+import { isSentryEnabled, sendSentryTestEvent } from '@/app/errors'
 import { type AppColorMode } from '@/app/theme/colorMode'
 import { APP_LOCALES, type AppLocale, LOCALE_LABELS, useLocale, useTranslations } from '@/i18n'
 
@@ -11,6 +12,8 @@ export const Appearance: FC<Record<string, never>> = () => {
   const { mode, setMode } = useColorScheme()
   const { locale, setLocale } = useLocale()
   const { t } = useTranslations()
+  const [sentryTestSent, setSentryTestSent] = useState(false)
+  const sentryEnabled = isSentryEnabled()
 
   const handleModeChange = (_event: MouseEvent<HTMLElement>, value: AppColorMode | null) => {
     if (value !== null) {
@@ -21,6 +24,12 @@ export const Appearance: FC<Record<string, never>> = () => {
   const handleLocaleChange = (_event: MouseEvent<HTMLElement>, value: AppLocale | null) => {
     if (value !== null) {
       setLocale(value)
+    }
+  }
+
+  const handleSentryTest = () => {
+    if (sendSentryTestEvent()) {
+      setSentryTestSent(true)
     }
   }
 
@@ -58,7 +67,7 @@ export const Appearance: FC<Record<string, never>> = () => {
         </ToggleButtonGroup>
       </Box>
 
-      <Box>
+      <Box sx={{ mb: 4 }}>
         <Typography variant='h3' sx={{ mb: 2 }}>
           {t.appearance.language}
         </Typography>
@@ -75,6 +84,23 @@ export const Appearance: FC<Record<string, never>> = () => {
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
+      </Box>
+
+      <Box>
+        <Typography variant='h3' sx={{ mb: 1 }}>
+          {t.appearance.sentryTest}
+        </Typography>
+        <Typography variant='body2' sx={{ color: 'text.secondary', mb: 2 }}>
+          {sentryEnabled ? t.appearance.sentryTestDescription : t.appearance.sentryTestUnavailable}
+        </Typography>
+        <Button variant='outlined' onClick={handleSentryTest} disabled={!sentryEnabled}>
+          {t.appearance.sentryTestButton}
+        </Button>
+        {sentryTestSent ? (
+          <Typography variant='body2' sx={{ color: 'success.main', mt: 1 }}>
+            {t.appearance.sentryTestSent}
+          </Typography>
+        ) : null}
       </Box>
     </PageWrapper>
   )

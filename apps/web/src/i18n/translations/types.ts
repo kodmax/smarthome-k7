@@ -21,6 +21,11 @@ export type Translations = {
     darkAriaLabel: string
     language: string
     languageAriaLabel: string
+    sentryTest: string
+    sentryTestDescription: string
+    sentryTestButton: string
+    sentryTestSent: string
+    sentryTestUnavailable: string
   }
   stockMarket: {
     title: string
