@@ -8,9 +8,9 @@ import { logHourlyConsumption } from './log-hourly-consumption.js'
 export function initKnxCronJobs(knx: KnxLink, logger?: Logger): Chronos {
   const chronos = new Chronos(logger)
 
-  chronos.addJob('0 * * * *', 'clocks-sync', () => clocksSync(knx))
-  chronos.addJob('0 * * * *', 'log-hourly-consumption', () => logHourlyConsumption(knx))
-  chronos.addJob('*/15 * * * *', 'log-air-condition', () => logAirCondition(knx))
+  chronos.addJob('0 * * * *', 'clocks-sync', () => clocksSync(knx, logger))
+  chronos.addJob('0 * * * *', 'log-hourly-consumption', () => logHourlyConsumption(knx, logger))
+  chronos.addJob('*/15 * * * *', 'log-air-condition', () => logAirCondition(knx, logger))
 
   return chronos
 }

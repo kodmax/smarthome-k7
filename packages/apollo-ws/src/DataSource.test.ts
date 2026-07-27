@@ -386,7 +386,7 @@ describe('DataSource', () => {
     )
 
     await expect(dataSource.getData()).rejects.toThrow('fetch failed')
-    expect(onError).toHaveBeenCalledWith(failure, 'Data source <getdata-fail> update error')
+    expect(onError).toHaveBeenCalledWith(failure, 'Data source update error')
   })
 
   it('calls onError from reportError callback', async () => {
@@ -415,6 +415,6 @@ describe('DataSource', () => {
     await createDataSource(PushFailSource, onError)
     await new Promise<void>(resolve => queueMicrotask(() => resolve()))
 
-    expect(onError).toHaveBeenCalledWith(failure, 'Push data source <push-fail> update error')
+    expect(onError).toHaveBeenCalledWith(failure, 'Push data source update error')
   })
 })

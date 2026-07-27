@@ -1,40 +1,29 @@
-import pino from 'pino'
+import { createLogger } from '@repo/logger'
 import { DPT_StartStop, KnxLink } from 'js-knx'
 import { config } from '../src/config'
 
-const logger = pino({ name: 'knx-go' })
+const logger = createLogger({ name: 'knx-go' })
 
 const main = async () => {
+  logger.info({ host: config.knx.host }, 'Establishing KNX connection')
+  const start = Date.now()
   const knx = new KnxLink(config.knx.host)
   await knx.connect()
-  logger.info('KNX connection established.')
+  logger.info({ host: config.knx.host, durationMs: Date.now() - start }, 'KNX connection established')
 
-  const start = knx.group({
+  const startGroup = knx.group({
     address: '5/2/1',
     DataType: DPT_StartStop,
   })
 
-  // const stop = knx.group({
-  //   DataType: DPT_StartStop,
-  //   address: '5/2/4',
-  // })
-
-  // const reset = knx.group({
-  //   DataType: DPT_StartStop,
-  //   address: '5/2/6'
-  // })
-
-  // const reading = knx.group({
-  //   DataType: DPT_ActiveEnergy,
-  //   address: '5/2/2',
-  // })
-
-  // await stop.write(1)
-  await start.write(1)
-  await start.write(1)
-  // await reading.requestValue()
+  await startGroup.write(1)
+  await startGroup.write(1)
 
   await knx.disconnect()
+  logger.info({ host: config.knx.host }, 'KNX disconnected')
 }
 
-main()
+main().catch(err => {
+  logger.error({ err, host: config.knx.host }, 'KNX script failed')
+  process.exitCode = 1
+})

@@ -4,13 +4,20 @@ export function createSilentLogger(): pino.Logger {
   return pino({ level: 'silent' })
 }
 
-export function createCaptureLogger(): { logger: pino.Logger; getMessages: () => string[] } {
+export function createCaptureLogger(): {
+  logger: pino.Logger
+  getMessages: () => string[]
+  getEntries: () => Record<string, unknown>[]
+} {
   const messages: string[] = []
+  const entries: Record<string, unknown>[] = []
   const logger = pino(
     { level: 'debug' },
     {
       write(chunk: string) {
-        messages.push(JSON.parse(chunk).msg as string)
+        const entry = JSON.parse(chunk) as Record<string, unknown>
+        entries.push(entry)
+        messages.push(entry.msg as string)
       },
     },
   )
@@ -18,5 +25,6 @@ export function createCaptureLogger(): { logger: pino.Logger; getMessages: () =>
   return {
     logger,
     getMessages: () => messages,
+    getEntries: () => entries,
   }
 }

@@ -1,8 +1,9 @@
 import { knxSchema } from '@repo/knx-schema'
 import { getDbPool } from '@repo/db'
+import type { Logger } from '@repo/logger'
 import { KnxLink } from 'js-knx'
 
-export async function logAirCondition(knx: KnxLink): Promise<void> {
+export async function logAirCondition(knx: KnxLink, logger?: Logger): Promise<void> {
   const db = await getDbPool().getConnection()
 
   try {
@@ -32,6 +33,8 @@ export async function logAirCondition(knx: KnxLink): Promise<void> {
       'insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)',
       readings.map(([reading_name, reading_value]) => [timestamp, reading_name, reading_value]),
     )
+
+    logger?.info({ readingCount: readings.length, timestamp: timestamp.toISOString() }, 'Air condition readings logged')
   } finally {
     await db.release()
   }

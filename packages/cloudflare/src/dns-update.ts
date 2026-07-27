@@ -11,23 +11,31 @@ const cloudflare = new CloudflareDNS({
   token: TOKEN,
 })
 
-cloudflare.getPublicIp().then(async publicIP => {
-  logger.info({ publicIP }, 'Public ip')
-  const record = await cloudflare.getRecord(ZONE_ID, DOMAIN, 'A')
-  logger.info({ configuredIp: record.content }, 'Configured ip')
+const logContext = { domain: DOMAIN, zoneId: ZONE_ID }
 
-  if (publicIP === record.content) {
-    logger.info('No update needed')
-    return
-  }
+cloudflare
+  .getPublicIp()
+  .then(async publicIP => {
+    logger.info({ ...logContext, publicIP }, 'Public ip')
+    const record = await cloudflare.getRecord(ZONE_ID, DOMAIN, 'A')
+    logger.info({ ...logContext, configuredIp: record.content }, 'Configured ip')
 
-  await cloudflare.updateRecord(ZONE_ID, record.id, {
-    type: 'A',
-    content: publicIP,
-    ttl: 120,
-    proxied: false,
-    name: DOMAIN,
+    if (publicIP === record.content) {
+      logger.info(logContext, 'No update needed')
+      return
+    }
+
+    await cloudflare.updateRecord(ZONE_ID, record.id, {
+      type: 'A',
+      content: publicIP,
+      ttl: 120,
+      proxied: false,
+      name: DOMAIN,
+    })
+
+    logger.info({ ...logContext, publicIP, previousIp: record.content }, 'DNS record updated')
   })
-
-  logger.info('Updated')
-})
+  .catch(err => {
+    logger.error({ err, ...logContext }, 'DNS update failed')
+    process.exitCode = 1
+  })

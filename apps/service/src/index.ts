@@ -3,7 +3,7 @@ process.setMaxListeners(11)
 import { Server, FSCache, RedisCache, Feeds } from '@repo/apollo-ws'
 import { initKnxCronJobs } from '@repo/cron-scripts'
 import { getDbPool } from '@repo/db'
-import { createLogger, readScopedLogLevel } from '@repo/logger'
+import { createLogger, readScopedLogLevel, redactUrl } from '@repo/logger'
 import { config } from './config'
 import path from 'node:path'
 import { appMode, isDevelopment } from '@repo/env'
@@ -36,13 +36,13 @@ setupGracefulShutdown(logger)
 Server.listen(
   { logger: logger.child({ component: 'ws' }, { level: readScopedLogLevel('ws') }), onError: reportProductionError },
   async apollo => {
-    if (!config.redis.disabled) {
+    const cacheBackend = config.redis.disabled ? 'fs' : 'redis'
+
+    if (cacheBackend === 'redis') {
       registerDependency('redis', await initRedisClient(logger))
-      logger.info('Redis connected')
     }
 
-    logger.info({ cacheDir: path.resolve(config.cache.dir) }, 'Feed cache directory')
-    const cache = config.redis.disabled ? new FSCache(config.cache.dir) : new RedisCache(getDependency('redis'))
+    const cache = cacheBackend === 'fs' ? new FSCache(config.cache.dir) : new RedisCache(getDependency('redis'))
     const feeds = new Feeds(cache, apollo.vent, {
       logger: logger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
       onError: reportProductionError,
@@ -51,13 +51,13 @@ Server.listen(
     registerApollo(apollo, feeds)
 
     await initWebFeeds(feeds)
-    logger.info('Web feeds initialized')
+    logger.info({ feedCount: feeds.getFeedCount() }, 'Web feeds initialized')
 
     if (!config.knx.disabled) {
       const knx = await knxInit(logger.child({ component: 'knx' }, { level: readScopedLogLevel('knx') }))
       registerDependency('knx', knx)
       await initKnxFeeds(feeds, knx)
-      logger.info('KNX feeds initialized')
+      logger.info({ feedCount: feeds.getFeedCount() }, 'KNX feeds initialized')
 
       if (!config.cron.disabled) {
         registerKnxCron(
@@ -66,5 +66,19 @@ Server.listen(
         logger.info('KNX cron jobs initialized')
       }
     }
+
+    logger.info(
+      {
+        appMode,
+        cacheBackend,
+        ...(cacheBackend === 'fs' ? { cacheDir: path.resolve(config.cache.dir) } : {}),
+        knx: !config.knx.disabled,
+        cron: !config.cron.disabled,
+        redis: cacheBackend === 'redis',
+        ...(cacheBackend === 'redis' ? { redisHost: redactUrl(config.redis.url) } : {}),
+        feedCount: feeds.getFeedCount(),
+      },
+      'Service initialized',
+    )
   },
 )

@@ -39,7 +39,7 @@ describe('Chronos', () => {
 
     await vi.advanceTimersByTimeAsync(60_000)
     expect(script).toHaveBeenCalledTimes(1)
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('still running'))
+    expect(warnSpy).toHaveBeenCalledWith({ jobId: 'slow' }, expect.stringContaining('still running'))
   })
 
   it('does not schedule further ticks after stop()', async () => {

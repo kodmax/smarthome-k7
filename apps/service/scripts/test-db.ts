@@ -1,4 +1,4 @@
-import pino from 'pino'
+import { createLogger } from '@repo/logger'
 import DateTime from '../src/DateTime'
 import db from '../src/db'
 import {
@@ -9,7 +9,7 @@ import {
   getFirstReadingSince,
 } from '../src/data-sources/energy/helpers'
 
-const logger = pino({ name: 'test-db' })
+const logger = createLogger({ name: 'test-db' })
 const AVG_PERIOD_DAYS = 30
 
 const test = async () => {
@@ -48,4 +48,9 @@ const test = async () => {
   }
 }
 
-test().then(results => logger.info(results))
+test()
+  .then(results => logger.info(results, 'Energy boundary test complete'))
+  .catch(err => {
+    logger.error({ err }, 'Energy boundary test failed')
+    process.exitCode = 1
+  })

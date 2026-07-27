@@ -180,7 +180,7 @@ describe('Feeds data source registration', () => {
     vent.emit('command', { sourceId: 'cmd-src', name: 'fail', args: '' })
 
     await vi.waitFor(() => expect(onError).toHaveBeenCalledTimes(1))
-    expect(onError).toHaveBeenCalledWith(failure, 'Data source <cmd-src> command <fail> execution error')
+    expect(onError).toHaveBeenCalledWith(failure, 'Data source command execution error')
   })
 
   it('runs maintenance sequentially for all registered data sources at 3 AM', async () => {

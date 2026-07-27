@@ -5,14 +5,15 @@ import { registerKnxLink } from './graceful-shutdown'
 import { captureProductionError } from './sentry'
 
 export const knxInit = async (logger: Logger): Promise<KnxLink> => {
-  logger.info('Establishing KNX connection ...')
+  logger.info({ host: config.knx.host }, 'Establishing KNX connection')
+  const start = Date.now()
   const link = new KnxLink(config.knx.host)
   link.on('error', e => {
-    logger.error({ err: e }, 'KNX link error')
+    logger.error({ err: e, host: config.knx.host }, 'KNX link error')
     captureProductionError(e)
   })
   await link.connect()
-  logger.info('KNX connection established')
+  logger.info({ host: config.knx.host, durationMs: Date.now() - start }, 'KNX connection established')
 
   registerKnxLink(link)
 

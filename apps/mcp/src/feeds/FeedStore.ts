@@ -106,7 +106,8 @@ export class FeedStore {
     this.ws = ws
 
     ws.on('open', () => {
-      this.logger.info('apollo ws connected')
+      const queuedCommands = this.commandQueue.length
+      this.logger.info({ url: this.url, ...(queuedCommands > 0 ? { queuedCommands } : {}) }, 'Apollo WS connected')
       ws.send(`subscribe ${[...this.subscriptions].join(' ')}`)
 
       for (const commandText of this.commandQueue) {
@@ -135,13 +136,13 @@ export class FeedStore {
     })
 
     ws.on('close', () => {
-      this.logger.warn('apollo ws disconnected, reconnecting')
+      this.logger.warn({ url: this.url, reconnectDelayMs: RECONNECT_DELAY_MS }, 'Apollo WS disconnected, reconnecting')
       this.ws = null
       this.scheduleReconnect()
     })
 
     ws.on('error', error => {
-      this.logger.error({ err: error }, 'apollo ws error')
+      this.logger.error({ err: error, url: this.url }, 'Apollo WS error')
     })
   }
 

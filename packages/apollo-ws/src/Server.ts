@@ -1,4 +1,4 @@
-import { WebSocket, WebSocketServer, AddressInfo } from 'ws'
+import { WebSocket, WebSocketServer } from 'ws'
 import { Socket } from 'net'
 import type { Logger } from '@repo/logger'
 import { ApolloEvents } from './ApolloEvents'
@@ -19,6 +19,10 @@ type Client = {
   subscriptions: Set<string>
   socket: Socket
   ws: WebSocket
+}
+
+function clientIp(socket: Socket): string {
+  return socket.remoteAddress ?? 'unknown'
 }
 
 export class Server {
@@ -80,7 +84,7 @@ export class Server {
       })
     }
 
-    this.options.logger.info('Apollo WebSocket Server closed.')
+    this.options.logger.info('Apollo WebSocket Server closed')
   }
 
   private feed(id: string, value: unknown): void {
@@ -88,25 +92,22 @@ export class Server {
 
     const outbox: Promise<Client>[] = []
     for (const client of this.clients) {
+      const ip = clientIp(client.socket)
       if (client.subscriptions.has('*') || client.subscriptions.has(id)) {
         outbox.push(
           new Promise((resolve, reject) => {
-            this.options.logger.debug(`Feed Client <${client.socket.remoteAddress}> with <${id}>`)
+            this.options.logger.debug({ feedId: id, clientIp: ip }, 'Feed broadcast to client')
             client.ws.send(`FEED ${id} ${content}`, e => (e ? reject(e) : resolve(client)))
           }),
         )
       } else {
-        this.options.logger.debug(`Skip Feed Client <${client.socket.remoteAddress}> with <${id}>`)
+        this.options.logger.debug({ feedId: id, clientIp: ip }, 'Skip feed broadcast to client')
       }
     }
 
-    Promise.all(outbox)
-      .then(() => {
-        // this.options.logger.info(`Feed <${id}> broadcast successful. [ ${clients.map(client => `<${client.socket.remoteAddress}>`)} ]`)
-      })
-      .catch(e => {
-        notifyError(this.options.logger, this.options.onError, 'warn', `Feed <${id}> broadcast error`, e)
-      })
+    Promise.all(outbox).catch(e => {
+      notifyError(this.options.logger, this.options.onError, 'warn', 'Feed broadcast error', e, { feedId: id })
+    })
   }
 
   private connect(): Promise<void> {
@@ -119,8 +120,9 @@ export class Server {
         socket: req.socket,
         ws,
       }
+      const ip = clientIp(client.socket)
 
-      this.options.logger.info(`Client <${client.socket.remoteAddress}> connected.`)
+      this.options.logger.info({ clientIp: ip }, 'Client connected')
 
       ws.on('message', data => {
         const [cmd, ...params] = data.toString('utf-8').split(' ')
@@ -128,14 +130,12 @@ export class Server {
         if (cmd === 'subscribe') {
           params.forEach(sub => client.subscriptions.add(sub))
 
-          this.options.logger.info(`Client <${client.socket.remoteAddress}> requests subscription of [ ${params} ].`)
+          this.options.logger.info({ clientIp: ip, feedIds: params }, 'Client subscribed')
           this.vent.emit('feeds-request', params)
         } else if (cmd === 'refresh') {
           const feeds = new Set<string>(params)
 
-          this.options.logger.info(
-            `Client <${client.socket.remoteAddress}> requests refresh of [ ${[...feeds.values()]} ].`,
-          )
+          this.options.logger.info({ clientIp: ip, feedIds: [...feeds] }, 'Client requested refresh')
           this.vent.emit('feeds-refresh', feeds.values())
         } else if (cmd === 'command') {
           const [sourceId, name, ...args] = params
@@ -147,27 +147,27 @@ export class Server {
           }
 
           this.options.logger.info(
-            `Client <${client.socket.remoteAddress}> requested feed ${sourceId} command ${name} with arguments "${formatCommandArgsForLog(argsText)}"`,
+            {
+              clientIp: ip,
+              sourceId,
+              commandName: name,
+              commandArgs: formatCommandArgsForLog(argsText),
+            },
+            'Client requested command',
           )
           this.vent.emit('command', command)
         } else {
-          this.options.logger.info(`Client <${client.socket.remoteAddress}> sent unknown command <${cmd}>`)
+          this.options.logger.info({ clientIp: ip, cmd }, 'Client sent unknown command')
         }
       })
 
       this.clients.add(client)
       ws.on('error', e => {
-        notifyError(
-          this.options.logger,
-          this.options.onError,
-          'warn',
-          `Client <${client.socket.remoteAddress}> socket error`,
-          e,
-        )
+        notifyError(this.options.logger, this.options.onError, 'warn', 'Client socket error', e, { clientIp: ip })
       })
 
       ws.on('close', () => {
-        this.options.logger.info(`Client <${client.socket.remoteAddress}> disconnected.`)
+        this.options.logger.info({ clientIp: ip }, 'Client disconnected')
         this.clients.delete(client)
       })
     })
@@ -176,10 +176,7 @@ export class Server {
 
     return new Promise((resolve, reject) => {
       server.on('listening', () => {
-        const addr = server.address() as AddressInfo
-        const port =
-          typeof server.address() === 'string' ? server.address() : `${addr.family} ${addr.address}:${addr.port}`
-        this.options.logger.info(`Apollo WebSocket Server listening for connections at <${port}>`)
+        this.options.logger.info({ port: this.options.port }, 'Apollo WebSocket Server listening')
 
         resolve()
       })
@@ -191,6 +188,7 @@ export class Server {
           'fatal',
           'Apollo WebSocket Server network port bind error',
           e,
+          { port: this.options.port },
         )
         reject(e)
       })

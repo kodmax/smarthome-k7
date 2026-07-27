@@ -35,7 +35,7 @@ export class Feeds {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.feed(id).catch(e => {
-            notifyError(this.options.logger, this.options.onError, 'warn', `Feed request error <${id}> update error`, e)
+            notifyError(this.options.logger, this.options.onError, 'warn', 'Feed request error', e, { feedId: id })
           })
         }
       }
@@ -45,7 +45,7 @@ export class Feeds {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.refresh(id).catch(e => {
-            notifyError(this.options.logger, this.options.onError, 'warn', `Feed request error <${id}> update error`, e)
+            notifyError(this.options.logger, this.options.onError, 'warn', 'Feed refresh error', e, { feedId: id })
           })
         }
       }
@@ -55,10 +55,13 @@ export class Feeds {
       for (const feed of this.feeds.values()) {
         if (Array.from(feed.sources.values()).find(source => source.getId() === sourceId)) {
           try {
-            this.options.logger.debug(`Refreshing feed <${feed.feedId}> due to source <${sourceId}> update`)
+            this.options.logger.debug({ feedId: feed.feedId, sourceId }, 'Refreshing feed due to source update')
             await this.feed(feed.feedId, sourceId)
           } catch (e) {
-            notifyError(this.options.logger, this.options.onError, 'warn', `Feed <${feed.feedId}> update error`, e)
+            notifyError(this.options.logger, this.options.onError, 'warn', 'Feed update error', e, {
+              feedId: feed.feedId,
+              sourceId,
+            })
           }
         }
       }
@@ -67,20 +70,17 @@ export class Feeds {
     this.vent.on('command', async ev => {
       const registration = this.sourcesById.get(ev.sourceId)
       if (registration === undefined) {
-        this.options.logger.info(`Command ignored: unknown data source <${ev.sourceId}>`)
+        this.options.logger.info({ sourceId: ev.sourceId, commandName: ev.name }, 'Command ignored: unknown source')
         return
       }
 
       try {
         await registration.dataSource.handleCommand(ev.name, ev.args)
       } catch (e) {
-        notifyError(
-          this.options.logger,
-          this.options.onError,
-          'warn',
-          `Data source <${ev.sourceId}> command <${ev.name}> execution error`,
-          e,
-        )
+        notifyError(this.options.logger, this.options.onError, 'warn', 'Data source command execution error', e, {
+          sourceId: ev.sourceId,
+          commandName: ev.name,
+        })
       }
     })
   }
@@ -90,11 +90,12 @@ export class Feeds {
       const sourceId = dataSource.getId()
 
       try {
-        this.options.logger.debug(`Data source <${sourceId}> maintenance starting`)
+        this.options.logger.debug({ sourceId }, 'Data source maintenance starting')
+        const start = Date.now()
         await dataSource.maintenance()
-        this.options.logger.debug(`Data source <${sourceId}> maintenance completed`)
+        this.options.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source maintenance completed')
       } catch (e) {
-        notifyError(this.options.logger, this.options.onError, 'warn', `Data source <${sourceId}> maintenance error`, e)
+        notifyError(this.options.logger, this.options.onError, 'warn', 'Data source maintenance error', e, { sourceId })
       }
     }
   }
@@ -128,13 +129,9 @@ export class Feeds {
         try {
           await dataSource.getData(true)
         } catch (e) {
-          notifyError(
-            this.options.logger,
-            this.options.onError,
-            'warn',
-            `Crontab data source <${sourceId}> update error`,
-            e,
-          )
+          notifyError(this.options.logger, this.options.onError, 'warn', 'Crontab data source update error', e, {
+            sourceId,
+          })
           throw e
         }
       })
@@ -189,15 +186,15 @@ export class Feeds {
     try {
       const content = feed.cb(await this.refreshData(feed))
 
-      this.options.logger.debug(`Feed <${feedId}> update successful.`)
+      this.options.logger.debug({ feedId }, 'Feed update successful')
       this.vent.emit('feed', feedId, content)
     } catch (e) {
       if (e instanceof NonErrorException) {
-        this.options.logger.info(`Feed <${feedId}> update skipped: ${e.message}`)
+        this.options.logger.info({ feedId, skipReason: e.message }, 'Feed update skipped')
         return
       }
 
-      notifyError(this.options.logger, this.options.onError, 'warn', `Feed <${feedId}> callback error`, e)
+      notifyError(this.options.logger, this.options.onError, 'warn', 'Feed callback error', e, { feedId })
     }
   }
 
@@ -210,15 +207,18 @@ export class Feeds {
     try {
       const content = feed.cb(await this.getData(feed, triggeredBy))
 
-      this.options.logger.debug(`Feed <${feedId}> update successful.`)
+      this.options.logger.debug(
+        { feedId, ...(triggeredBy !== undefined ? { triggeredBy } : {}) },
+        'Feed update successful',
+      )
       this.vent.emit('feed', feedId, content)
     } catch (e) {
       if (e instanceof NonErrorException) {
-        this.options.logger.info(`Feed <${feedId}> update skipped: ${e.message}`)
+        this.options.logger.info({ feedId, skipReason: e.message }, 'Feed update skipped')
         return
       }
 
-      notifyError(this.options.logger, this.options.onError, 'warn', `Feed <${feedId}> callback error`, e)
+      notifyError(this.options.logger, this.options.onError, 'warn', 'Feed callback error', e, { feedId, triggeredBy })
     }
   }
 
@@ -243,6 +243,10 @@ export class Feeds {
       sources,
       feedId,
     })
+  }
+
+  public getFeedCount(): number {
+    return this.feeds.size
   }
 
   public close(): void {

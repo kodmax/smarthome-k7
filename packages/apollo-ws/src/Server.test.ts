@@ -84,9 +84,19 @@ describe('Server', () => {
     const longArgs = 'a'.repeat(150)
     ws.send(`command cv upload ${longArgs}`)
 
-    await vi.waitFor(() => expect(capture.getMessages().some(msg => msg.includes('… (150 chars)'))).toBe(true))
-    expect(capture.getMessages().some(msg => msg.includes(`${'a'.repeat(100)}… (150 chars)`))).toBe(true)
-    expect(capture.getMessages().some(msg => msg.includes('a'.repeat(150)))).toBe(false)
+    await vi.waitFor(() =>
+      expect(
+        capture
+          .getEntries()
+          .some(
+            entry =>
+              entry.commandArgs === `${'a'.repeat(100)}… (150 chars)` &&
+              entry.sourceId === 'cv' &&
+              entry.commandName === 'upload',
+          ),
+      ).toBe(true),
+    )
+    expect(capture.getEntries().some(entry => entry.commandArgs === longArgs)).toBe(false)
   })
 
   it('broadcasts feed updates only to subscribed clients', async () => {

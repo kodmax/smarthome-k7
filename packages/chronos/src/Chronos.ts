@@ -55,20 +55,21 @@ export class Chronos {
         job.when[4].includes(dw)
       ) {
         if (job.state === JobState.RUNNING) {
-          this.logger?.warn(`Crontab job <${job.id}> still running, skiping execution`)
+          this.logger?.warn({ jobId: job.id }, 'Crontab job still running, skipping execution')
         } else {
-          this.logger?.info(`Crontab job <${job.id}> starting`)
+          this.logger?.info({ jobId: job.id }, 'Crontab job starting')
           job.state = JobState.RUNNING
+          const start = Date.now()
 
           job
             .script()
             .then(() => {
               job.state = JobState.IDLE
-              this.logger?.info(`Crontab job <${job.id}> completed successfully`)
+              this.logger?.info({ jobId: job.id, durationMs: Date.now() - start }, 'Crontab job completed')
             })
             .catch(e => {
               job.state = JobState.ERROR
-              this.logger?.error(`Crontab job <${job.id}> error: ${e}`)
+              this.logger?.error({ err: e, jobId: job.id, durationMs: Date.now() - start }, 'Crontab job failed')
             })
         }
       }
@@ -105,5 +106,7 @@ export class Chronos {
       clearTimeout(this.tickTimeout)
       this.tickTimeout = undefined
     }
+
+    this.logger?.info('Chronos stopped')
   }
 }

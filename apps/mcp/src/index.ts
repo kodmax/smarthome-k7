@@ -41,7 +41,7 @@ async function main(): Promise<void> {
   const server = createServer(feedStore)
   const transport = new StdioServerTransport()
   await server.connect(transport)
-  logger.info('ready on stdio (15 tools: ping + 14 dashboard)')
+  logger.info({ apolloWsUrl, toolCount: 15 }, 'ready on stdio')
 }
 
 main().catch(error => {

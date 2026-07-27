@@ -1,10 +1,11 @@
 import { knxSchema } from '@repo/knx-schema'
 import { getDbPool } from '@repo/db'
+import type { Logger } from '@repo/logger'
 import { KnxLink } from 'js-knx'
 
 const METER_TOTAL_READING = 'meter_total'
 
-export async function logHourlyConsumption(knx: KnxLink): Promise<void> {
+export async function logHourlyConsumption(knx: KnxLink, logger?: Logger): Promise<void> {
   const now = new Date().getTime() - new Date().getTimezoneOffset() * 60_000
   const db = await getDbPool().getConnection()
 
@@ -21,6 +22,11 @@ export async function logHourlyConsumption(knx: KnxLink): Promise<void> {
       METER_TOTAL_READING,
       total.value,
     ])
+
+    logger?.info(
+      { readingName: METER_TOTAL_READING, readingValue: total.value, hour: thisHour.toISOString() },
+      'Hourly consumption logged',
+    )
   } finally {
     await db.release()
   }

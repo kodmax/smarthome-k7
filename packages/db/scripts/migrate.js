@@ -126,7 +126,7 @@ async function cmdUp() {
       }
     }
 
-    logger.info('Done')
+    logger.info({ action: 'up', count: pending.length }, 'Migrations complete')
   } finally {
     await conn.end()
   }
@@ -159,7 +159,7 @@ async function cmdDown() {
       throw err
     }
 
-    logger.info('Done')
+    logger.info({ action: 'down', count: 1 }, 'Migration rollback complete')
   } finally {
     await conn.end()
   }

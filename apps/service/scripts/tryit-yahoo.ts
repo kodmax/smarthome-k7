@@ -1,12 +1,9 @@
-import pino from 'pino'
-import pretty from 'pino-pretty'
+import { createLogger } from '@repo/logger'
 
-const stream = pretty({ colorize: true, translateTime: 'SYS:standard' })
-const logger = pino({ name: 'tryit', level: 'info' }, stream)
+const logger = createLogger({ name: 'tryit' })
+const ch = logger.child({ component: 'yahoo-fetch' }, { level: 'debug' })
 
-const ch = logger.child({ prop: 'child', component: 'child-logger' }, { level: 'debug', redact: ['something'] })
+logger.info({ foo: 'bar' }, 'Logger dziala')
 
-logger.info({ foo: 'bar', baz: 'bar' }, 'Logger dziala')
-
-ch.debug('debug')
+ch.debug({ prop: 'child' }, 'debug message')
 ch.info({ something: true }, 'something else')

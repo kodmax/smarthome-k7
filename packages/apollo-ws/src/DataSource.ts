@@ -96,8 +96,7 @@ class DataSource<T, TCache = T> {
     const definition = new sourceClass(
       content => dataSource.push(content),
       e => {
-        const context = `Push data source <${sourceId}> update error`
-        notifyError(logger, onError, 'warn', context, e)
+        notifyError(logger, onError, 'warn', 'Push data source update error', e, { sourceId })
       },
     )
     sourceId = definition.getId()
@@ -137,7 +136,7 @@ class DataSource<T, TCache = T> {
       await this.cacheEntry.write(this.definition.toCacheContent(content))
     }
 
-    this.logger.debug(`Push data source <${this.definition.getId()}>`)
+    this.logger.debug({ sourceId: this.definition.getId() }, 'Push data source')
     this.vent.emit('data-update', this.definition.getId())
   }
 
@@ -180,12 +179,12 @@ class DataSource<T, TCache = T> {
     if (this.updating) {
       return this.updating
     } else if (!forceRefresh && this.definition.getCacheTTL() > 0 && (await this.isCacheFresh())) {
-      this.logger.debug(`Cache hit on data source <${this.definition.getId()}>`)
+      this.logger.debug({ sourceId: this.definition.getId(), cacheHit: true }, 'Cache hit on data source')
 
       const snapshot = await this.cacheEntry.getSnapshot()
       return this.definition.composeContent(snapshot!.getContent())
     } else {
-      const fetch = this.fetchAndCompose()
+      const fetch = this.fetchAndCompose(forceRefresh)
       const content = await fetch.promise
 
       if (fetch.initiated) {
@@ -196,10 +195,13 @@ class DataSource<T, TCache = T> {
     }
   }
 
-  private fetchAndCompose(): { promise: Promise<T>; initiated: boolean } {
+  private fetchAndCompose(forceRefresh = false): { promise: Promise<T>; initiated: boolean } {
     if (this.updating) {
       return { promise: this.updating, initiated: false }
     }
+
+    const sourceId = this.definition.getId()
+    const start = Date.now()
 
     const promise = new Promise<T>((resolve, reject) => {
       this.definition
@@ -209,12 +211,11 @@ class DataSource<T, TCache = T> {
           const content = await this.definition.composeContent(cached)
           resolve(content)
 
-          this.logger.info(`Data source <${this.definition.getId()}> content refreshed`)
+          this.logger.info({ sourceId, forceRefresh, durationMs: Date.now() - start }, 'Data source content refreshed')
           this.updating = void 0
         })
         .catch(e => {
-          const context = `Data source <${this.definition.getId()}> update error`
-          notifyError(this.logger, this.onError, 'warn', context, e)
+          notifyError(this.logger, this.onError, 'warn', 'Data source update error', e, { sourceId })
           this.updating = void 0
           reject(e)
         })

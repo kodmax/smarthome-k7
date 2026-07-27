@@ -25,13 +25,15 @@ export const registerApollo = (server: Server, feeds: Feeds): void => {
   apolloFeeds = feeds
 }
 
-const closeConnections = async (): Promise<void> => {
+const closeConnections = async (logger: Logger): Promise<void> => {
   if (knxCron !== undefined) {
     knxCron.stop()
+    logger.info({ step: 'knx-cron' }, 'Shutdown step complete')
   }
 
   if (apolloFeeds !== undefined) {
     apolloFeeds.close()
+    logger.info({ step: 'feeds' }, 'Shutdown step complete')
   }
 
   const knx = knxLink
@@ -40,19 +42,27 @@ const closeConnections = async (): Promise<void> => {
   if (knx !== undefined) {
     try {
       await knx.disconnect()
+      logger.info({ step: 'knx' }, 'Shutdown step complete')
     } catch (err) {
-      shutdownLogger?.error({ err }, 'KNX disconnect failed')
+      shutdownLogger?.error({ err, step: 'knx' }, 'KNX disconnect failed')
       captureProductionError(err)
     }
   }
 
   if (apolloServer !== undefined) {
     await apolloServer.close()
+    logger.info({ step: 'ws' }, 'Shutdown step complete')
   }
 
-  await closeRedisClient()
+  if (await closeRedisClient()) {
+    logger.info({ step: 'redis' }, 'Shutdown step complete')
+  }
+
   await closeDbPool()
+  logger.info({ step: 'db' }, 'Shutdown step complete')
+
   await closeSentry()
+  logger.info({ step: 'sentry' }, 'Shutdown step complete')
 }
 
 export const setupGracefulShutdown = (logger: Logger): void => {
@@ -60,17 +70,22 @@ export const setupGracefulShutdown = (logger: Logger): void => {
 
   const shutdown = (signal: string): void => {
     if (shuttingDown) {
+      logger.warn({ signal }, 'Shutdown already in progress')
       process.exit(1)
       return
     }
     shuttingDown = true
 
-    logger.info({ signal }, 'Exiting')
+    const start = Date.now()
+    logger.info({ signal }, 'Shutdown started')
 
-    closeConnections()
-      .then(() => process.exit(0))
+    closeConnections(logger)
+      .then(() => {
+        logger.info({ signal, durationMs: Date.now() - start }, 'Shutdown complete')
+        process.exit(0)
+      })
       .catch(err => {
-        logger.error({ err }, 'Failed during shutdown')
+        logger.error({ err, signal, durationMs: Date.now() - start }, 'Failed during shutdown')
         captureProductionError(err)
         void closeSentry().finally(() => process.exit(1))
       })

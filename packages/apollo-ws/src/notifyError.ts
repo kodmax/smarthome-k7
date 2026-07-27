@@ -2,6 +2,8 @@ import type { Level, Logger } from '@repo/logger'
 
 export type ErrorHandler = (error: unknown, context: string) => void
 
+export type LogContext = Record<string, unknown>
+
 export const noopErrorHandler: ErrorHandler = () => void 0
 
 export function notifyError(
@@ -10,7 +12,8 @@ export function notifyError(
   level: Level,
   context: string,
   error: unknown,
+  fields?: LogContext,
 ): void {
-  logger[level]({ err: error }, context)
+  logger[level]({ err: error, ...fields }, context)
   onError(error, context)
 }
