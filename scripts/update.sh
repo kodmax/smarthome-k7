@@ -27,9 +27,6 @@ yarn install --frozen-lockfile
 
 export SENTRY_RELEASE="$(git rev-parse HEAD)"
 export VITE_SENTRY_RELEASE="$SENTRY_RELEASE"
-# Bun inlines process.env.NODE_ENV at bundle time; brackets in @repo/env read it at process start.
-# globalEnv in turbo.json invalidates cache when NODE_ENV changes.
-export NODE_ENV=production
 
 yarn build
 yarn workspace service sentry:upload-sourcemaps
