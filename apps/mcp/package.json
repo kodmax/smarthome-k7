@@ -13,6 +13,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@repo/knx-schema": "*",
+    "@repo/logger": "*",
     "@repo/types": "*",
     "ws": "^8.18.3",
     "zod": "^3.25.76"

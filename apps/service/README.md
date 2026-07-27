@@ -13,8 +13,8 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 ```sh
 cp .env.example .env   # fill in values
 
-yarn dev                          # from repo root — everything with a dev script
-yarn workspace service dev:local  # backend + library watchers, without web
+yarn dev                          # from repo root — web, service, library watchers
+yarn workspace service dev        # service only (no web, no @repo/* watchers)
 yarn workspace service start      # production (after build)
 ```
 

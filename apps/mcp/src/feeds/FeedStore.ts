@@ -1,4 +1,5 @@
 import WebSocket, { type ClientOptions } from 'ws'
+import type { Logger } from '@repo/logger'
 
 const RECONNECT_DELAY_MS = 3000
 const DEFAULT_FEED_TIMEOUT_MS = 15000
@@ -19,6 +20,7 @@ export class FeedStore {
 
   constructor(
     private readonly url: string,
+    private readonly logger: Logger,
     private readonly wsOptions: ClientOptions = {},
   ) {}
 
@@ -104,7 +106,7 @@ export class FeedStore {
     this.ws = ws
 
     ws.on('open', () => {
-      console.error('[dashboard-mcp] apollo ws connected')
+      this.logger.info('apollo ws connected')
       ws.send(`subscribe ${[...this.subscriptions].join(' ')}`)
 
       for (const commandText of this.commandQueue) {
@@ -133,13 +135,13 @@ export class FeedStore {
     })
 
     ws.on('close', () => {
-      console.error('[dashboard-mcp] apollo ws disconnected, reconnecting…')
+      this.logger.warn('apollo ws disconnected, reconnecting')
       this.ws = null
       this.scheduleReconnect()
     })
 
     ws.on('error', error => {
-      console.error('[dashboard-mcp] apollo ws error:', error.message)
+      this.logger.error({ err: error }, 'apollo ws error')
     })
   }
 

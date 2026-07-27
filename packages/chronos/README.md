@@ -7,7 +7,7 @@ Minute-resolution cron scheduler for Node.js — runs jobs on standard five-fiel
 Exports from `src/index.ts`:
 
 - `Chronos` — scheduler with `addJob(cron, id, fn)` and `close()`
-- `ChronosLogger` — optional callback for job lifecycle logs
+- `Chronos` — optional `Logger` from `@repo/logger` for job lifecycle logs
 - Log priority constants
 
 ```ts

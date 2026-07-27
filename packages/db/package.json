@@ -21,6 +21,7 @@
     "db:create": "node scripts/migrate.js create"
   },
   "dependencies": {
+    "@repo/logger": "*",
     "mariadb": "^3.0.0"
   },
   "devDependencies": {

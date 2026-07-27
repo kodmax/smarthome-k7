@@ -1,5 +1,8 @@
 import * as Sentry from '@sentry/node'
-import { appMode, isDevelopment } from '../env'
+import { createLogger } from '@repo/logger'
+import { appMode, isDevelopment } from '@repo/env'
+
+const logger = createLogger({ name: 'sentry' })
 
 export function initSentry(): void {
   if (isDevelopment) {
@@ -8,7 +11,7 @@ export function initSentry(): void {
 
   const dsn = process.env.SENTRY_DSN
   if (!dsn) {
-    console.info(`[sentry] disabled (${appMode}, missing SENTRY_DSN)`)
+    logger.info({ appMode }, 'Sentry disabled (missing SENTRY_DSN)')
     return
   }
 

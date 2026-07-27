@@ -1,10 +1,13 @@
+import pino from 'pino'
 import { DPT_StartStop, KnxLink } from 'js-knx'
 import { config } from '../src/config'
+
+const logger = pino({ name: 'knx-go' })
 
 const main = async () => {
   const knx = new KnxLink(config.knx.host)
   await knx.connect()
-  console.log('KNX connection established.')
+  logger.info('KNX connection established.')
 
   const start = knx.group({
     address: '5/2/1',

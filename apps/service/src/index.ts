@@ -1,11 +1,12 @@
 #!/usr/bin/ts-node
 process.setMaxListeners(11)
-import { Server, FSCache, RedisCache, sysLog, Feeds } from '@repo/apollo-ws'
+import { Server, FSCache, RedisCache, Feeds } from '@repo/apollo-ws'
 import { initKnxCronJobs } from '@repo/cron-scripts'
 import { getDbPool } from '@repo/db'
+import { createLogger } from '@repo/logger'
 import { config } from './config'
 import path from 'node:path'
-import { appMode, isDevelopment } from './env'
+import { appMode, isDevelopment } from '@repo/env'
 import { getDependency, registerDependency } from './di'
 import { initKnxFeeds, initWebFeeds } from './feeds'
 import { knxInit } from './knx-init'
@@ -14,8 +15,10 @@ import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
 import { initSentry, captureProductionError } from './sentry'
 
+const logger = createLogger({ name: 'service' })
+
 if (isDevelopment) {
-  console.info(`[app] ${appMode} mode`)
+  logger.info({ appMode }, 'app mode')
 }
 
 initSentry()
@@ -28,37 +31,35 @@ registerDependency('config', config)
 registerDependency('db', getDbPool())
 registerDependency('openai', initOpenAIClient())
 
-setupGracefulShutdown()
+setupGracefulShutdown(logger)
 
-Server.listen({ onError: reportProductionError }, async apollo => {
+Server.listen({ logger: logger.child({ component: 'ws' }), onError: reportProductionError }, async apollo => {
   if (!config.redis.disabled) {
-    registerDependency('redis', await initRedisClient())
-    console.log('Redis connected')
+    registerDependency('redis', await initRedisClient(logger))
+    logger.info('Redis connected')
   }
 
-  console.log('Feed cache directory:', path.resolve(config.cache.dir))
+  logger.info({ cacheDir: path.resolve(config.cache.dir) }, 'Feed cache directory')
   const cache = config.redis.disabled ? new FSCache(config.cache.dir) : new RedisCache(getDependency('redis'))
-  const feeds = new Feeds(cache, apollo.vent, { onError: reportProductionError })
+  const feeds = new Feeds(cache, apollo.vent, {
+    logger: logger.child({ component: 'feeds' }),
+    onError: reportProductionError,
+  })
 
   registerApollo(apollo, feeds)
-  sysLog(apollo.vent, 6)
 
   await initWebFeeds(feeds)
-  console.log('Web feeds initialized!')
+  logger.info('Web feeds initialized')
 
   if (!config.knx.disabled) {
-    const knx = await knxInit()
+    const knx = await knxInit(logger.child({ component: 'knx' }))
     registerDependency('knx', knx)
     await initKnxFeeds(feeds, knx)
-    console.log('KNX feeds initialized!')
+    logger.info('KNX feeds initialized')
 
     if (!config.cron.disabled) {
-      registerKnxCron(
-        initKnxCronJobs(knx, (priority: number, msg: string) => {
-          apollo.vent.emit('sys-log', priority, msg)
-        }),
-      )
-      console.log('KNX cron jobs initialized!')
+      registerKnxCron(initKnxCronJobs(knx, logger.child({ component: 'knx-cron' })))
+      logger.info('KNX cron jobs initialized')
     }
   }
 })

@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node'
-import { isProduction } from '../env'
+import { isProduction } from '@repo/env'
 
 export function captureInvalidInput(context: string, cause?: unknown): void {
   if (!isProduction) {

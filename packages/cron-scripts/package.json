@@ -29,6 +29,7 @@
     "@repo/chronos": "*",
     "@repo/db": "*",
     "@repo/knx-schema": "*",
+    "@repo/logger": "*",
     "dotenv": "^17.4.2",
     "js-knx": "^3.1.0",
     "sony-bravia-ip-control": "^1.1.0"

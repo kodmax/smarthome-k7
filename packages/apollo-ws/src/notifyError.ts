@@ -1,16 +1,16 @@
-import type { ApolloEvents } from './ApolloEvents'
+import type { Level, Logger } from '@repo/logger'
 
 export type ErrorHandler = (error: unknown, context: string) => void
 
 export const noopErrorHandler: ErrorHandler = () => void 0
 
 export function notifyError(
-  vent: ApolloEvents,
+  logger: Logger,
   onError: ErrorHandler,
-  priority: number,
+  level: Level,
   context: string,
   error: unknown,
 ): void {
-  vent.emit('sys-log', priority, context, error)
+  logger[level]({ err: error }, context)
   onError(error, context)
 }

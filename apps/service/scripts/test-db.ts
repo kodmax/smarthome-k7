@@ -1,3 +1,4 @@
+import pino from 'pino'
 import DateTime from '../src/DateTime'
 import db from '../src/db'
 import {
@@ -8,6 +9,7 @@ import {
   getFirstReadingSince,
 } from '../src/data-sources/energy/helpers'
 
+const logger = pino({ name: 'test-db' })
 const AVG_PERIOD_DAYS = 30
 
 const test = async () => {
@@ -46,4 +48,4 @@ const test = async () => {
   }
 }
 
-test().then(results => console.log(results))
+test().then(results => logger.info(results))

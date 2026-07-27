@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "concurrency": "12",
   "globalPassThroughEnv": [
     "SENTRY_AUTH_TOKEN",
     "SENTRY_ORG",

@@ -19,17 +19,19 @@
   },
   "author": "Marcin Malinowski <mm.kodmax@gmail.com>",
   "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@repo/chronos": "*",
+    "@repo/logger": "*",
+    "ws": "^8.7.0"
+  },
   "devDependencies": {
     "@repo/eslint-config": "*",
+    "@repo/logger": "*",
     "@repo/typescript-config": "*",
     "@types/node": "^17.0.35",
     "@types/ws": "^8.5.3",
     "eslint": "^8.57.0",
     "typescript": "5.5.4",
     "vitest": "^4.1.8"
-  },
-  "dependencies": {
-    "@repo/chronos": "*",
-    "ws": "^8.7.0"
   }
 }

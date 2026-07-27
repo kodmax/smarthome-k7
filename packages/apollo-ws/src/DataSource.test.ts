@@ -6,6 +6,7 @@ import { ApolloEvents } from './ApolloEvents'
 import { FSCache } from './cache'
 import { DataSource, DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
 import { NoRecentContent } from './Errors'
+import { createSilentLogger } from '@repo/logger'
 import { noopErrorHandler } from './notifyError'
 
 function createTestSourceClass<T, TCache = T>(options: {
@@ -74,7 +75,7 @@ describe('DataSource', () => {
 
     const vent = new ApolloEvents()
     const cache = new FSCache(cacheDir)
-    const dataSource = await DataSource.fromClass(SourceClass, cache, vent, onError)
+    const dataSource = await DataSource.fromClass(SourceClass, cache, vent, createSilentLogger(), onError)
 
     return {
       dataSource,
@@ -243,7 +244,7 @@ describe('DataSource', () => {
     cacheDirs.push(cacheDir)
     const vent = new ApolloEvents()
     const cache = new FSCache(cacheDir)
-    const dataSource = await DataSource.fromClass(NotifySource, cache, vent, noopErrorHandler)
+    const dataSource = await DataSource.fromClass(NotifySource, cache, vent, createSilentLogger(), noopErrorHandler)
 
     vent.on('data-update', sourceId => updates.push(sourceId))
     await dataSource.getData()

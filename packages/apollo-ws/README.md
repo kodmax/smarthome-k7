@@ -10,7 +10,7 @@ Exports from `src/index.ts`:
 - `Feeds` — feed and data source registry
 - `DataSource` — single source (fetch, cron, cache)
 - `Cache` — on-disk result persistence
-- `sysLog` — system logging
+- `Server`, `Feeds`, `DataSource` — accept injected Pino `Logger` via options
 
 Message protocol: `FEED <topic> <json>`. Client-side subscriptions and commands are handled by `@repo/feed-client`.
 

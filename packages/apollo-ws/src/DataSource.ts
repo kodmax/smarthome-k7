@@ -1,3 +1,4 @@
+import type { Logger } from '@repo/logger'
 import type { Cache, CacheEntry } from './cache'
 import { NoRecentContent } from './Errors'
 import { ApolloEvents } from './ApolloEvents'
@@ -77,6 +78,7 @@ class DataSource<T, TCache = T> {
     private definition: DataSourceDefinition<T, TCache>,
     private cacheEntry: CacheEntry<TCache>,
     private vent: ApolloEvents,
+    private logger: Logger,
     private onError: ErrorHandler,
   ) {}
 
@@ -84,6 +86,7 @@ class DataSource<T, TCache = T> {
     sourceClass: DataSourceDefinitionClass<T, TCache>,
     cache: Cache,
     vent: ApolloEvents,
+    logger: Logger,
     onError: ErrorHandler,
   ): Promise<DataSource<T, TCache>> {
     // eslint-disable-next-line prefer-const -- forward ref: push callback needs dataSource before assignment
@@ -94,7 +97,7 @@ class DataSource<T, TCache = T> {
       content => dataSource.push(content),
       e => {
         const context = `Push data source <${sourceId}> update error`
-        notifyError(vent, onError, 4, context, e)
+        notifyError(logger, onError, 'warn', context, e)
       },
     )
     sourceId = definition.getId()
@@ -102,7 +105,7 @@ class DataSource<T, TCache = T> {
     const cacheEntry = await cache.getEntry<TCache>(definition.isVolatile() ? undefined : definition.getId(), {
       ttlMs: definition.getCacheTTL(),
     })
-    dataSource = new DataSource(definition, cacheEntry, vent, onError)
+    dataSource = new DataSource(definition, cacheEntry, vent, logger, onError)
 
     return dataSource
   }
@@ -134,7 +137,7 @@ class DataSource<T, TCache = T> {
       await this.cacheEntry.write(this.definition.toCacheContent(content))
     }
 
-    this.vent.emit('sys-log', 7, `Push data source <${this.definition.getId()}>`)
+    this.logger.debug(`Push data source <${this.definition.getId()}>`)
     this.vent.emit('data-update', this.definition.getId())
   }
 
@@ -177,7 +180,7 @@ class DataSource<T, TCache = T> {
     if (this.updating) {
       return this.updating
     } else if (!forceRefresh && this.definition.getCacheTTL() > 0 && (await this.isCacheFresh())) {
-      this.vent.emit('sys-log', 7, `Cache hit on data source <${this.definition.getId()}>`)
+      this.logger.debug(`Cache hit on data source <${this.definition.getId()}>`)
 
       const snapshot = await this.cacheEntry.getSnapshot()
       return this.definition.composeContent(snapshot!.getContent())
@@ -206,12 +209,12 @@ class DataSource<T, TCache = T> {
           const content = await this.definition.composeContent(cached)
           resolve(content)
 
-          this.vent.emit('sys-log', 4, `Data source <${this.definition.getId()}> content refreshed`)
+          this.logger.info(`Data source <${this.definition.getId()}> content refreshed`)
           this.updating = void 0
         })
         .catch(e => {
           const context = `Data source <${this.definition.getId()}> update error`
-          notifyError(this.vent, this.onError, 4, context, e)
+          notifyError(this.logger, this.onError, 'warn', context, e)
           this.updating = void 0
           reject(e)
         })

@@ -4,6 +4,9 @@
 const fs = require('fs/promises')
 const path = require('path')
 const mariadb = require('mariadb')
+const { createLogger } = require('@repo/logger')
+
+const logger = createLogger({ name: 'db-migrate' })
 
 const PACKAGE_DIR = path.join(__dirname, '..')
 const MIGRATIONS_DIR = path.join(PACKAGE_DIR, 'migrations')
@@ -80,16 +83,13 @@ async function cmdStatus() {
     const pending = all.filter(base => !applied.has(migrationRecordName(base)))
 
     if (pending.length === 0) {
-      console.log('[INFO] No pending migrations')
+      logger.info('No pending migrations')
     } else {
-      console.log(
-        '[INFO] Pending migrations:',
-        pending.map(base => migrationRecordName(base)),
-      )
+      logger.info({ pending: pending.map(base => migrationRecordName(base)) }, 'Pending migrations')
     }
 
     if (applied.size > 0) {
-      console.log('[INFO] Applied migrations:', [...applied])
+      logger.info({ applied: [...applied] }, 'Applied migrations')
     }
   } finally {
     await conn.end()
@@ -106,7 +106,7 @@ async function cmdUp() {
     const pending = all.filter(base => !applied.has(migrationRecordName(base)))
 
     if (pending.length === 0) {
-      console.log('[INFO] No migrations to run')
+      logger.info('No migrations to run')
       return
     }
 
@@ -119,14 +119,14 @@ async function cmdUp() {
         await conn.query(sql)
         await conn.query('INSERT INTO migrations (name, run_on) VALUES (?, NOW())', [name])
         await conn.commit()
-        console.log(`[INFO] Processed migration ${base}`)
+        logger.info({ migration: base }, 'Processed migration')
       } catch (err) {
         await conn.rollback()
         throw err
       }
     }
 
-    console.log('[INFO] Done')
+    logger.info('Done')
   } finally {
     await conn.end()
   }
@@ -140,7 +140,7 @@ async function cmdDown() {
     const applied = await getAppliedNames(conn)
 
     if (applied.length === 0) {
-      console.log('[INFO] No migrations to rollback')
+      logger.info('No migrations to rollback')
       return
     }
 
@@ -153,13 +153,13 @@ async function cmdDown() {
       await conn.query(sql)
       await conn.query('DELETE FROM migrations WHERE name = ?', [lastName])
       await conn.commit()
-      console.log(`[INFO] Rolled back migration ${base}`)
+      logger.info({ migration: base }, 'Rolled back migration')
     } catch (err) {
       await conn.rollback()
       throw err
     }
 
-    console.log('[INFO] Done')
+    logger.info('Done')
   } finally {
     await conn.end()
   }
@@ -200,9 +200,10 @@ exports._meta = { version: 1 }
   await fs.writeFile(upPath, `-- ${base} up\n`)
   await fs.writeFile(downPath, `-- ${base} down\n`)
 
-  console.log(`[INFO] Created migration ${base}`)
-  console.log(`  ${path.relative(PACKAGE_DIR, upPath)}`)
-  console.log(`  ${path.relative(PACKAGE_DIR, downPath)}`)
+  logger.info(
+    { migration: base, upPath: path.relative(PACKAGE_DIR, upPath), downPath: path.relative(PACKAGE_DIR, downPath) },
+    'Created migration',
+  )
 }
 
 async function main() {
@@ -230,6 +231,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error('[ERROR]', err.message || err)
+  logger.error({ err }, 'Migration failed')
   process.exit(1)
 })

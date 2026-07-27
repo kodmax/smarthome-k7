@@ -3,7 +3,6 @@ import type { DataSourceCommand } from './DataSource'
 
 export type ApolloEventMap = {
   feed: [feedId: string, value: unknown]
-  'sys-log': [priority: number, msg: string, err?: unknown]
   'data-update': [sourceId: string]
   command: [command: DataSourceCommand]
   'feeds-request': [feedIds: string[]]

@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node'
-import { isProduction } from '../env'
+import { isProduction } from '@repo/env'
 
 export function captureProductionError(error: unknown): void {
   if (!isProduction) {

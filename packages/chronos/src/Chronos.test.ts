@@ -1,3 +1,4 @@
+import { createSilentLogger } from '@repo/logger'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Chronos } from './Chronos'
 
@@ -26,15 +27,11 @@ describe('Chronos', () => {
   })
 
   it('skips execution when the previous run is still in progress', async () => {
-    const skipLogs: string[] = []
-    const log = (priority: number, msg: string) => {
-      if (priority === 3) {
-        skipLogs.push(msg)
-      }
-    }
+    const logger = createSilentLogger()
+    const warnSpy = vi.spyOn(logger, 'warn')
 
     const script = vi.fn(() => new Promise<void>(() => {}))
-    chronos = new Chronos(log)
+    chronos = new Chronos(logger)
     chronos.addJob('* * * * *', 'slow', script)
 
     await vi.advanceTimersByTimeAsync(10_000)
@@ -42,7 +39,7 @@ describe('Chronos', () => {
 
     await vi.advanceTimersByTimeAsync(60_000)
     expect(script).toHaveBeenCalledTimes(1)
-    expect(skipLogs.some(msg => msg.includes('still running'))).toBe(true)
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('still running'))
   })
 
   it('does not schedule further ticks after stop()', async () => {

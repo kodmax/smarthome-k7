@@ -1,5 +1,6 @@
 import { WebSocket, WebSocketServer, AddressInfo } from 'ws'
 import { Socket } from 'net'
+import type { Logger } from '@repo/logger'
 import { ApolloEvents } from './ApolloEvents'
 import { DataSourceCommand } from './DataSource'
 import { formatCommandArgsForLog } from './formatCommandArgsForLog'
@@ -10,6 +11,7 @@ export type ApolloWebSocketOptions = {
    * Defaults to 3678
    */
   port?: number
+  logger: Logger
   onError: ErrorHandler
 }
 
@@ -41,10 +43,10 @@ export class Server {
   }
 
   public static async listen<T>(
-    { port = 3678, onError }: ApolloWebSocketOptions,
+    { port = 3678, logger, onError }: ApolloWebSocketOptions,
     init: (instance: Server) => Promise<T>,
   ): Promise<T> {
-    const serv = new Server({ port, onError })
+    const serv = new Server({ port, logger, onError })
     const ret = await init(serv)
     await serv.connect()
 
@@ -52,7 +54,8 @@ export class Server {
   }
 
   private constructor(
-    private readonly options: Required<Pick<ApolloWebSocketOptions, 'port'>> & Pick<ApolloWebSocketOptions, 'onError'>,
+    private readonly options: Required<Pick<ApolloWebSocketOptions, 'port' | 'logger'>> &
+      Pick<ApolloWebSocketOptions, 'onError'>,
   ) {}
 
   public async close(): Promise<void> {
@@ -77,7 +80,7 @@ export class Server {
       })
     }
 
-    this.vent.emit('sys-log', 5, 'Apollo WebSocket Server closed.')
+    this.options.logger.info('Apollo WebSocket Server closed.')
   }
 
   private feed(id: string, value: unknown): void {
@@ -88,21 +91,21 @@ export class Server {
       if (client.subscriptions.has('*') || client.subscriptions.has(id)) {
         outbox.push(
           new Promise((resolve, reject) => {
-            this.vent.emit('sys-log', 7, `Feed Client <${client.socket.remoteAddress}> with <${id}>`)
+            this.options.logger.debug(`Feed Client <${client.socket.remoteAddress}> with <${id}>`)
             client.ws.send(`FEED ${id} ${content}`, e => (e ? reject(e) : resolve(client)))
           }),
         )
       } else {
-        this.vent.emit('sys-log', 7, `Skip Feed Client <${client.socket.remoteAddress}> with <${id}>`)
+        this.options.logger.debug(`Skip Feed Client <${client.socket.remoteAddress}> with <${id}>`)
       }
     }
 
     Promise.all(outbox)
       .then(() => {
-        // this.vent.emit('sys-log', 6, `Feed <${id}> broadcast successful. [ ${clients.map(client => `<${client.socket.remoteAddress}>`)} ]`)
+        // this.options.logger.info(`Feed <${id}> broadcast successful. [ ${clients.map(client => `<${client.socket.remoteAddress}>`)} ]`)
       })
       .catch(e => {
-        notifyError(this.vent, this.options.onError, 4, `Feed <${id}> broadcast error`, e)
+        notifyError(this.options.logger, this.options.onError, 'warn', `Feed <${id}> broadcast error`, e)
       })
   }
 
@@ -117,7 +120,7 @@ export class Server {
         ws,
       }
 
-      this.vent.emit('sys-log', 6, `Client <${client.socket.remoteAddress}> connected.`)
+      this.options.logger.info(`Client <${client.socket.remoteAddress}> connected.`)
 
       ws.on('message', data => {
         const [cmd, ...params] = data.toString('utf-8').split(' ')
@@ -125,18 +128,12 @@ export class Server {
         if (cmd === 'subscribe') {
           params.forEach(sub => client.subscriptions.add(sub))
 
-          this.vent.emit(
-            'sys-log',
-            6,
-            `Client <${client.socket.remoteAddress}> requests subscription of [ ${params} ].`,
-          )
+          this.options.logger.info(`Client <${client.socket.remoteAddress}> requests subscription of [ ${params} ].`)
           this.vent.emit('feeds-request', params)
         } else if (cmd === 'refresh') {
           const feeds = new Set<string>(params)
 
-          this.vent.emit(
-            'sys-log',
-            6,
+          this.options.logger.info(
             `Client <${client.socket.remoteAddress}> requests refresh of [ ${[...feeds.values()]} ].`,
           )
           this.vent.emit('feeds-refresh', feeds.values())
@@ -149,24 +146,28 @@ export class Server {
             name,
           }
 
-          this.vent.emit(
-            'sys-log',
-            6,
+          this.options.logger.info(
             `Client <${client.socket.remoteAddress}> requested feed ${sourceId} command ${name} with arguments "${formatCommandArgsForLog(argsText)}"`,
           )
           this.vent.emit('command', command)
         } else {
-          this.vent.emit('sys-log', 5, `Client <${client.socket.remoteAddress}> sent unknown command <${cmd}>`)
+          this.options.logger.info(`Client <${client.socket.remoteAddress}> sent unknown command <${cmd}>`)
         }
       })
 
       this.clients.add(client)
       ws.on('error', e => {
-        notifyError(this.vent, this.options.onError, 5, `Client <${client.socket.remoteAddress}> socket error`, e)
+        notifyError(
+          this.options.logger,
+          this.options.onError,
+          'warn',
+          `Client <${client.socket.remoteAddress}> socket error`,
+          e,
+        )
       })
 
       ws.on('close', () => {
-        this.vent.emit('sys-log', 6, `Client <${client.socket.remoteAddress}> disconnected.`)
+        this.options.logger.info(`Client <${client.socket.remoteAddress}> disconnected.`)
         this.clients.delete(client)
       })
     })
@@ -178,13 +179,19 @@ export class Server {
         const addr = server.address() as AddressInfo
         const port =
           typeof server.address() === 'string' ? server.address() : `${addr.family} ${addr.address}:${addr.port}`
-        this.vent.emit('sys-log', 5, `Apollo WebSocket Server listening for connections at <${port}>`)
+        this.options.logger.info(`Apollo WebSocket Server listening for connections at <${port}>`)
 
         resolve()
       })
 
       server.on('error', e => {
-        notifyError(this.vent, this.options.onError, 2, 'Apollo WebSocket Server network port bind error', e)
+        notifyError(
+          this.options.logger,
+          this.options.onError,
+          'fatal',
+          'Apollo WebSocket Server network port bind error',
+          e,
+        )
         reject(e)
       })
     })

@@ -8,6 +8,7 @@ import { FSCache } from './cache'
 import { DuplicateDataSourceIdError } from './Errors'
 import { Feeds } from './Feeds'
 import { DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
+import { createSilentLogger } from '@repo/logger'
 import { noopErrorHandler } from './notifyError'
 
 function waitForDataUpdate(vent: ApolloEventsType, sourceId: string): Promise<void> {
@@ -103,7 +104,7 @@ describe('Feeds data source registration', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
 
-    return new Feeds(new FSCache(cacheDir), new ApolloEvents(), { onError })
+    return new Feeds(new FSCache(cacheDir), new ApolloEvents(), { logger: createSilentLogger(), onError })
   }
 
   it('reuses the same DataSource when the same definition class is registered in multiple feeds', async () => {
@@ -138,7 +139,7 @@ describe('Feeds data source registration', () => {
     const vent = new ApolloEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new Feeds(new FSCache(cacheDir), vent, { onError: noopErrorHandler })
+    const feeds = new Feeds(new FSCache(cacheDir), vent, { logger: createSilentLogger(), onError: noopErrorHandler })
 
     const SourceClass = createTestSourceClass({
       id: 'routed-src',
@@ -165,7 +166,7 @@ describe('Feeds data source registration', () => {
     const vent = new ApolloEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new Feeds(new FSCache(cacheDir), vent, { onError })
+    const feeds = new Feeds(new FSCache(cacheDir), vent, { logger: createSilentLogger(), onError })
 
     await feeds.addFeed('cmd-feed', {
       src: createTestSourceClass({
@@ -241,7 +242,7 @@ describe('Feeds composition', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
 
-    const feeds = new Feeds(new FSCache(cacheDir), vent, { onError: noopErrorHandler })
+    const feeds = new Feeds(new FSCache(cacheDir), vent, { logger: createSilentLogger(), onError: noopErrorHandler })
     activeFeeds.push(feeds)
 
     return { vent, feeds }
@@ -486,7 +487,7 @@ describe('Feeds composition', () => {
     const vent = new ApolloEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new Feeds(new FSCache(cacheDir), vent, { onError: noopErrorHandler })
+    const feeds = new Feeds(new FSCache(cacheDir), vent, { logger: createSilentLogger(), onError: noopErrorHandler })
     activeFeeds.push(feeds)
 
     const getDataA = vi.fn(async () => ({ value: 1 }))

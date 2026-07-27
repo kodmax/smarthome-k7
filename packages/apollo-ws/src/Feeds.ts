@@ -1,7 +1,7 @@
-import { Chronos } from '@repo/chronos'
-import { DataSource, DSCT, AnyDataSourceDefinitionClass } from './DataSource'
 import type { Cache } from './cache'
 import type { DS, Feed, FeedCb, FeedSources, FeedsOptions, SourceDataTypes, SourceRegistration } from './Feeds.types'
+import { Chronos } from '@repo/chronos'
+import { DataSource, DSCT, AnyDataSourceDefinitionClass } from './DataSource'
 import { ApolloEvents } from './ApolloEvents'
 import { notifyError } from './notifyError'
 
@@ -22,7 +22,7 @@ export class Feeds {
     private vent: ApolloEvents,
     private options: FeedsOptions,
   ) {
-    this.chronos = new Chronos((priority, msg) => this.vent.emit('sys-log', priority, msg))
+    this.chronos = new Chronos(options.logger.child({ component: 'feeds-cron' }))
 
     this.chronos.addJob(DATA_SOURCES_MAINTENANCE_CRON, 'data-sources-maintenance', () =>
       this.runDataSourcesMaintenance(),
@@ -32,7 +32,7 @@ export class Feeds {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.feed(id).catch(e => {
-            notifyError(this.vent, this.options.onError, 4, `Feed request error <${id}> update error`, e)
+            notifyError(this.options.logger, this.options.onError, 'warn', `Feed request error <${id}> update error`, e)
           })
         }
       }
@@ -42,7 +42,7 @@ export class Feeds {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.refresh(id).catch(e => {
-            notifyError(this.vent, this.options.onError, 4, `Feed request error <${id}> update error`, e)
+            notifyError(this.options.logger, this.options.onError, 'warn', `Feed request error <${id}> update error`, e)
           })
         }
       }
@@ -52,10 +52,10 @@ export class Feeds {
       for (const feed of this.feeds.values()) {
         if (Array.from(feed.sources.values()).find(source => source.getId() === sourceId)) {
           try {
-            this.vent.emit('sys-log', 7, `Refreshing feed <${feed.feedId}> due to source <${sourceId}> update`)
+            this.options.logger.debug(`Refreshing feed <${feed.feedId}> due to source <${sourceId}> update`)
             await this.feed(feed.feedId, sourceId)
           } catch (e) {
-            notifyError(this.vent, this.options.onError, 4, `Feed <${feed.feedId}> update error`, e)
+            notifyError(this.options.logger, this.options.onError, 'warn', `Feed <${feed.feedId}> update error`, e)
           }
         }
       }
@@ -64,7 +64,7 @@ export class Feeds {
     this.vent.on('command', async ev => {
       const registration = this.sourcesById.get(ev.sourceId)
       if (registration === undefined) {
-        this.vent.emit('sys-log', 6, `Command ignored: unknown data source <${ev.sourceId}>`)
+        this.options.logger.info(`Command ignored: unknown data source <${ev.sourceId}>`)
         return
       }
 
@@ -72,9 +72,9 @@ export class Feeds {
         await registration.dataSource.handleCommand(ev.name, ev.args)
       } catch (e) {
         notifyError(
-          this.vent,
+          this.options.logger,
           this.options.onError,
-          4,
+          'warn',
           `Data source <${ev.sourceId}> command <${ev.name}> execution error`,
           e,
         )
@@ -87,11 +87,11 @@ export class Feeds {
       const sourceId = dataSource.getId()
 
       try {
-        this.vent.emit('sys-log', 7, `Data source <${sourceId}> maintenance starting`)
+        this.options.logger.debug(`Data source <${sourceId}> maintenance starting`)
         await dataSource.maintenance()
-        this.vent.emit('sys-log', 7, `Data source <${sourceId}> maintenance completed`)
+        this.options.logger.debug(`Data source <${sourceId}> maintenance completed`)
       } catch (e) {
-        notifyError(this.vent, this.options.onError, 4, `Data source <${sourceId}> maintenance error`, e)
+        notifyError(this.options.logger, this.options.onError, 'warn', `Data source <${sourceId}> maintenance error`, e)
       }
     }
   }
@@ -105,7 +105,13 @@ export class Feeds {
       }
     }
 
-    const dataSource = await DataSource.fromClass(sourceClass, this.cache, this.vent, this.options.onError)
+    const dataSource = await DataSource.fromClass(
+      sourceClass,
+      this.cache,
+      this.vent,
+      this.options.logger,
+      this.options.onError,
+    )
     const sourceId = dataSource.getId()
 
     const existingById = this.sourcesById.get(sourceId)
@@ -119,7 +125,13 @@ export class Feeds {
         try {
           await dataSource.getData(true)
         } catch (e) {
-          notifyError(this.vent, this.options.onError, 4, `Crontab data source <${sourceId}> update error`, e)
+          notifyError(
+            this.options.logger,
+            this.options.onError,
+            'warn',
+            `Crontab data source <${sourceId}> update error`,
+            e,
+          )
           throw e
         }
       })
@@ -174,15 +186,15 @@ export class Feeds {
     try {
       const content = feed.cb(await this.refreshData(feed))
 
-      this.vent.emit('sys-log', 7, `Feed <${feedId}> update successful.`)
+      this.options.logger.debug(`Feed <${feedId}> update successful.`)
       this.vent.emit('feed', feedId, content)
     } catch (e) {
       if (e instanceof NonErrorException) {
-        this.vent.emit('sys-log', 6, `Feed <${feedId}> update skipped: ${e.message}`)
+        this.options.logger.info(`Feed <${feedId}> update skipped: ${e.message}`)
         return
       }
 
-      notifyError(this.vent, this.options.onError, 4, `Feed <${feedId}> callback error`, e)
+      notifyError(this.options.logger, this.options.onError, 'warn', `Feed <${feedId}> callback error`, e)
     }
   }
 
@@ -195,15 +207,15 @@ export class Feeds {
     try {
       const content = feed.cb(await this.getData(feed, triggeredBy))
 
-      this.vent.emit('sys-log', 7, `Feed <${feedId}> update successful.`)
+      this.options.logger.debug(`Feed <${feedId}> update successful.`)
       this.vent.emit('feed', feedId, content)
     } catch (e) {
       if (e instanceof NonErrorException) {
-        this.vent.emit('sys-log', 6, `Feed <${feedId}> update skipped: ${e.message}`)
+        this.options.logger.info(`Feed <${feedId}> update skipped: ${e.message}`)
         return
       }
 
-      notifyError(this.vent, this.options.onError, 4, `Feed <${feedId}> callback error`, e)
+      notifyError(this.options.logger, this.options.onError, 'warn', `Feed <${feedId}> callback error`, e)
     }
   }
 

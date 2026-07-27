@@ -27,10 +27,6 @@ export const TICK_INTERVAL_MS = 60_000
 
 export const TICK_LEAD_MS = 5_000
 
-export const LOG_PRIORITY_WARN = 3
-
-export const LOG_PRIORITY_INFO = 4
-
 export const CRON_MINUTE = { min: 0, max: 59 } as const
 
 export const CRON_HOUR = { min: 0, max: 23 } as const

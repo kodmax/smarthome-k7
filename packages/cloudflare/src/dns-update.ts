@@ -1,4 +1,7 @@
 import { CloudflareDNS } from './CloudflareDNS'
+import { createLogger } from '@repo/logger'
+
+const logger = createLogger({ name: 'cloudflare-dns' })
 
 const TOKEN = process.env.CLOUDFLARE_API_TOKEN ?? ''
 const ZONE_ID = process.env.CLOUDFLARE_ZONE_ID ?? ''
@@ -9,12 +12,12 @@ const cloudflare = new CloudflareDNS({
 })
 
 cloudflare.getPublicIp().then(async publicIP => {
-  console.log(`Public ip: ${publicIP}`)
+  logger.info({ publicIP }, 'Public ip')
   const record = await cloudflare.getRecord(ZONE_ID, DOMAIN, 'A')
-  console.log(`Configured ip: ${record.content}`)
+  logger.info({ configuredIp: record.content }, 'Configured ip')
 
   if (publicIP === record.content) {
-    console.log('No update needed.')
+    logger.info('No update needed')
     return
   }
 
@@ -26,5 +29,5 @@ cloudflare.getPublicIp().then(async publicIP => {
     name: DOMAIN,
   })
 
-  console.log('Updated!')
+  logger.info('Updated')
 })

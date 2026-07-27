@@ -22,16 +22,16 @@ debounce timers and closes WebSocket connections.
 
 ## Event bus (`ApolloEvents`)
 
-Typed wrapper over Node `EventEmitter`. Create one instance on `Server.vent` and pass it into `Feeds` (and `sysLog()`).
+Typed wrapper over Node `EventEmitter`. Create one instance on `Server.vent` and pass it into `Feeds`. Pass a Pino
+`Logger` (from `@repo/logger`) into `Server.listen()` and `Feeds` options for operational logging.
 
-| Event           | Payload                   | When                                                  |
-| --------------- | ------------------------- | ----------------------------------------------------- |
-| `feed`          | `feedId`, `value`         | Feed composed successfully                            |
-| `sys-log`       | `priority`, `msg`, `err?` | Logging (see `sysLog()`)                              |
-| `data-update`   | `sourceId`                | Source cache changed after push, fetch, or cron       |
-| `command`       | `DataSourceCommand`       | WS client command routed to push sources              |
-| `feeds-request` | `feedIds[]`               | Client subscribe — compose feed, refresh all sources  |
-| `feeds-refresh` | `feedIds`                 | Client refresh — force `getData(true)` on all sources |
+| Event           | Payload             | When                                                  |
+| --------------- | ------------------- | ----------------------------------------------------- |
+| `feed`          | `feedId`, `value`   | Feed composed successfully                            |
+| `data-update`   | `sourceId`          | Source cache changed after push, fetch, or cron       |
+| `command`       | `DataSourceCommand` | WS client command routed to push sources              |
+| `feeds-request` | `feedIds[]`         | Client subscribe — compose feed, refresh all sources  |
+| `feeds-refresh` | `feedIds`           | Client refresh — force `getData(true)` on all sources |
 
 ## How feeds are composed (two paths)
 
@@ -52,8 +52,8 @@ refresh — intentional; the server debounce merges rapid multi-source updates.
 
 - **1 s debounce** on `feed` in `Server` — multi-source feeds update one source at a time; debounce sends one broadcast
   with the final combined state. Do not add per-source debounce or remove the global timer.
-- **Refresh log at priority 4** in `DataSource` — successful fetch is logged as warning; cache hit stays at 7 (debug).
-  This is deliberate visibility, not a bug.
+- **Refresh log at `info`** in `DataSource` — successful fetch is logged at info; cache hit stays at debug. This is
+  deliberate visibility, not a bug.
 - **No stale fallback** when `script()` fails — reject and let UI show missing data; do not serve old cache after a
   failed refresh.
 - **Corrupt cache JSON** on disk → `CorruptCacheError` at startup (fail-fast). **ENOENT** → empty cache (normal first

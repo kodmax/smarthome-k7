@@ -1,4 +1,5 @@
 import type { Feeds, Server } from '@repo/apollo-ws'
+import type { Logger } from '@repo/logger'
 import { closeDbPool } from '@repo/db'
 import { captureProductionError, closeSentry } from './sentry'
 import { closeRedisClient } from './redis'
@@ -9,6 +10,7 @@ let knxCron: { stop(): void } | undefined
 let apolloFeeds: Feeds | undefined
 let apolloServer: Server | undefined
 let shuttingDown = false
+let shutdownLogger: Logger | undefined
 
 export const registerKnxLink = (link: KnxLink): void => {
   knxLink = link
@@ -39,7 +41,7 @@ const closeConnections = async (): Promise<void> => {
     try {
       await knx.disconnect()
     } catch (err) {
-      console.error('KNX disconnect failed:', err)
+      shutdownLogger?.error({ err }, 'KNX disconnect failed')
       captureProductionError(err)
     }
   }
@@ -53,7 +55,9 @@ const closeConnections = async (): Promise<void> => {
   await closeSentry()
 }
 
-export const setupGracefulShutdown = (): void => {
+export const setupGracefulShutdown = (logger: Logger): void => {
+  shutdownLogger = logger
+
   const shutdown = (signal: string): void => {
     if (shuttingDown) {
       process.exit(1)
@@ -61,12 +65,12 @@ export const setupGracefulShutdown = (): void => {
     }
     shuttingDown = true
 
-    console.log(`${signal}. Exiting.`)
+    logger.info({ signal }, 'Exiting')
 
     closeConnections()
       .then(() => process.exit(0))
       .catch(err => {
-        console.error('Failed during shutdown:', err)
+        logger.error({ err }, 'Failed during shutdown')
         captureProductionError(err)
         void closeSentry().finally(() => process.exit(1))
       })

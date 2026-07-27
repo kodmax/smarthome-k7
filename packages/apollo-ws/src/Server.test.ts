@@ -1,5 +1,6 @@
 import { createServer } from 'net'
 import WebSocket from 'ws'
+import { createCaptureLogger } from '@repo/logger'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Server } from './Server'
 import { noopErrorHandler } from './notifyError'
@@ -27,10 +28,12 @@ describe('Server', () => {
   let port: number
   let server: Server
   let ws: WebSocket
+  let capture: ReturnType<typeof createCaptureLogger>
 
   beforeEach(async () => {
+    capture = createCaptureLogger()
     port = await getFreePort()
-    await Server.listen({ port, onError: noopErrorHandler }, async instance => {
+    await Server.listen({ port, logger: capture.logger, onError: noopErrorHandler }, async instance => {
       server = instance
     })
 
@@ -78,15 +81,12 @@ describe('Server', () => {
   })
 
   it('logs truncated command arguments when args are long', async () => {
-    const logs: string[] = []
-    server.vent.on('sys-log', (_priority, msg) => logs.push(msg))
-
     const longArgs = 'a'.repeat(150)
     ws.send(`command cv upload ${longArgs}`)
 
-    await vi.waitFor(() => expect(logs.some(msg => msg.includes('… (150 chars)'))).toBe(true))
-    expect(logs.some(msg => msg.includes(`${'a'.repeat(100)}… (150 chars)`))).toBe(true)
-    expect(logs.some(msg => msg.includes('a'.repeat(150)))).toBe(false)
+    await vi.waitFor(() => expect(capture.getMessages().some(msg => msg.includes('… (150 chars)'))).toBe(true))
+    expect(capture.getMessages().some(msg => msg.includes(`${'a'.repeat(100)}… (150 chars)`))).toBe(true)
+    expect(capture.getMessages().some(msg => msg.includes('a'.repeat(150)))).toBe(false)
   })
 
   it('broadcasts feed updates only to subscribed clients', async () => {

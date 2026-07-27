@@ -1,9 +1,12 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
+import { createLogger, destination } from '@repo/logger'
 import { apolloWsOptions, apolloWsUrl } from './config.js'
 import { DASHBOARD_FEED_IDS } from './feeds/dashboardFeeds.js'
 import { FeedStore } from './feeds/FeedStore.js'
 import { registerDashboardTools } from './tools/dashboardTools.js'
+
+const logger = createLogger({ name: 'dashboard-mcp', destination: destination(2) })
 
 function createServer(feedStore: FeedStore): McpServer {
   const server = new McpServer({
@@ -28,16 +31,16 @@ function createServer(feedStore: FeedStore): McpServer {
 }
 
 async function main(): Promise<void> {
-  const feedStore = new FeedStore(apolloWsUrl, apolloWsOptions)
+  const feedStore = new FeedStore(apolloWsUrl, logger.child({ component: 'feeds' }), apolloWsOptions)
   feedStore.start(DASHBOARD_FEED_IDS)
 
   const server = createServer(feedStore)
   const transport = new StdioServerTransport()
   await server.connect(transport)
-  console.error('[dashboard-mcp] ready on stdio (15 tools: ping + 14 dashboard)')
+  logger.info('ready on stdio (15 tools: ping + 14 dashboard)')
 }
 
 main().catch(error => {
-  console.error('[dashboard-mcp] fatal error:', error)
+  logger.fatal({ err: error }, 'fatal error')
   process.exit(1)
 })

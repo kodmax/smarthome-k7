@@ -15,6 +15,7 @@
     "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput"
   },
   "devDependencies": {
+    "pino": "^9.6.0",
     "@repo/typescript-config": "*",
     "@types/node": "^17.0.35",
     "dotenv": "^17.4.2",

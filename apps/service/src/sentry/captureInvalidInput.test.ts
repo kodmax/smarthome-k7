@@ -8,7 +8,7 @@ vi.mock('@sentry/node', () => ({
   captureException,
 }))
 
-vi.mock('../env', () => ({
+vi.mock('@repo/env', () => ({
   isProduction: true,
 }))
 

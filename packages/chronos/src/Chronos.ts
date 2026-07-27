@@ -1,3 +1,4 @@
+import type { Logger } from '@repo/logger'
 import {
   CRON_DAY_OF_MONTH,
   CRON_DAY_OF_WEEK,
@@ -6,20 +7,18 @@ import {
   CRON_MONTH,
   CronDayOfWeek,
   CronMonth,
-  LOG_PRIORITY_INFO,
-  LOG_PRIORITY_WARN,
   TICK_INTERVAL_MS,
   TICK_LEAD_MS,
 } from './constants'
 import { decode } from './decode'
-import { Job, JobState, Worker, ChronosLogger } from './types'
+import { Job, JobState, Worker } from './types'
 
 export class Chronos {
   private jobs: Job[] = []
   private tickTimeout: NodeJS.Timeout | undefined
   private stopped = false
 
-  public constructor(private readonly log?: ChronosLogger) {
+  public constructor(private readonly logger?: Logger) {
     this.next()
   }
 
@@ -56,20 +55,20 @@ export class Chronos {
         job.when[4].includes(dw)
       ) {
         if (job.state === JobState.RUNNING) {
-          this.log?.(LOG_PRIORITY_WARN, `Crontab job <${job.id}> still running, skiping execution`)
+          this.logger?.warn(`Crontab job <${job.id}> still running, skiping execution`)
         } else {
-          this.log?.(LOG_PRIORITY_INFO, `Crontab job <${job.id}> starting`)
+          this.logger?.info(`Crontab job <${job.id}> starting`)
           job.state = JobState.RUNNING
 
           job
             .script()
             .then(() => {
               job.state = JobState.IDLE
-              this.log?.(LOG_PRIORITY_INFO, `Crontab job <${job.id}> completed successfully`)
+              this.logger?.info(`Crontab job <${job.id}> completed successfully`)
             })
             .catch(e => {
               job.state = JobState.ERROR
-              this.log?.(LOG_PRIORITY_WARN, `Crontab job <${job.id}> error: ${e}`)
+              this.logger?.error(`Crontab job <${job.id}> error: ${e}`)
             })
         }
       }
