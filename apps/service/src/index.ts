@@ -21,7 +21,7 @@ if (isDevelopment) {
   logger.info({ appMode }, 'app mode')
 }
 
-initSentry()
+initSentry(logger.child({ component: 'sentry' }, { level: readScopedLogLevel('sentry') }))
 
 const reportProductionError = (error: unknown, context: string) => {
   captureProductionError(error instanceof Error ? error : new Error(context, { cause: error }))

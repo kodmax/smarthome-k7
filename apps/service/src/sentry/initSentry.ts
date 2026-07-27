@@ -1,10 +1,8 @@
 import * as Sentry from '@sentry/node'
-import { createLogger } from '@repo/logger'
+import type { Logger } from '@repo/logger'
 import { appMode, isDevelopment } from '@repo/env'
 
-const logger = createLogger({ name: 'sentry' })
-
-export function initSentry(): void {
+export function initSentry(logger: Logger): void {
   if (isDevelopment) {
     return
   }
