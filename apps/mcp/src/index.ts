@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { createLogger, destination } from '@repo/logger'
+import { createLogger, destination, readScopedLogLevel } from '@repo/logger'
 import { apolloWsOptions, apolloWsUrl } from './config.js'
 import { DASHBOARD_FEED_IDS } from './feeds/dashboardFeeds.js'
 import { FeedStore } from './feeds/FeedStore.js'
@@ -31,7 +31,11 @@ function createServer(feedStore: FeedStore): McpServer {
 }
 
 async function main(): Promise<void> {
-  const feedStore = new FeedStore(apolloWsUrl, logger.child({ component: 'feeds' }), apolloWsOptions)
+  const feedStore = new FeedStore(
+    apolloWsUrl,
+    logger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
+    apolloWsOptions,
+  )
   feedStore.start(DASHBOARD_FEED_IDS)
 
   const server = createServer(feedStore)

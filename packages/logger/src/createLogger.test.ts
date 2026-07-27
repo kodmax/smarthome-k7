@@ -4,7 +4,7 @@ vi.mock('@repo/env', () => ({
   isProduction: true,
 }))
 
-import { createLogger } from './createLogger'
+import { createLogger, readScopedLogLevel } from './index'
 
 const env = process.env
 
@@ -12,8 +12,8 @@ afterEach(() => {
   process.env = { ...env }
 })
 
-describe('createLogger component levels', () => {
-  it('applies LOG_LEVEL_<COMPONENT> only to matching child loggers', () => {
+describe('createLogger', () => {
+  it('applies LOG_LEVEL_<COMPONENT> when passed explicitly to child()', () => {
     delete process.env.LOG_LEVEL
     process.env.LOG_LEVEL_FEEDS = 'debug'
 
@@ -27,8 +27,8 @@ describe('createLogger component levels', () => {
       },
     })
 
-    const feeds = logger.child({ component: 'feeds' })
-    const ws = logger.child({ component: 'ws' })
+    const feeds = logger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') })
+    const ws = logger.child({ component: 'ws' }, { level: readScopedLogLevel('ws') })
 
     feeds.debug('feeds debug')
     ws.debug('ws debug')

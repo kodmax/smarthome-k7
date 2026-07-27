@@ -1,5 +1,6 @@
 export { createLogger } from './createLogger'
 export type { CreateLoggerOptions } from './createLogger'
+export { readGlobalLogLevel, readScopedLogLevel } from './logLevel'
 export { createCaptureLogger, createSilentLogger } from './testLoggers'
 export type { Level, Logger } from 'pino'
 export { destination } from 'pino'

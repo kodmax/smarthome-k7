@@ -1,3 +1,4 @@
+import { readScopedLogLevel } from '@repo/logger'
 import type { Cache } from './cache'
 import type { DS, Feed, FeedCb, FeedSources, FeedsOptions, SourceDataTypes, SourceRegistration } from './Feeds.types'
 import { Chronos } from '@repo/chronos'
@@ -22,7 +23,9 @@ export class Feeds {
     private vent: ApolloEvents,
     private options: FeedsOptions,
   ) {
-    this.chronos = new Chronos(options.logger.child({ component: 'feeds-cron' }))
+    this.chronos = new Chronos(
+      options.logger.child({ component: 'feeds-cron' }, { level: readScopedLogLevel('feeds-cron') }),
+    )
 
     this.chronos.addJob(DATA_SOURCES_MAINTENANCE_CRON, 'data-sources-maintenance', () =>
       this.runDataSourcesMaintenance(),
