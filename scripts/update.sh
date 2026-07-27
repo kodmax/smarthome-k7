@@ -29,7 +29,11 @@ export SENTRY_RELEASE="$(git rev-parse HEAD)"
 export VITE_SENTRY_RELEASE="$SENTRY_RELEASE"
 
 yarn build
-yarn workspace service sentry:upload-sourcemaps
+
+if [[ -n "${SENTRY_AUTH_TOKEN:-}" ]] && ! grep -q '_sentryDebugIds' "$REPO_DIR/apps/service/dist/index.js" 2>/dev/null; then
+  echo '[sentry] service dist missing _sentryDebugIds — rebuilding service (turbo cache may have skipped esbuild plugin)' >&2
+  TURBO_FORCE=true yarn workspace service build
+fi
 
 if [[ -n "${SENTRY_AUTH_TOKEN:-}" ]] && ! grep -rqE '//# debugId=' "$WEB_DIST_DIR/assets/" 2>/dev/null; then
   echo '[sentry] web dist missing debug IDs — rebuilding web (turbo cache may have skipped @sentry/vite-plugin)' >&2

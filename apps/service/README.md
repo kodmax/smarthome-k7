@@ -5,7 +5,7 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 ## Stack
 
 - Node.js (CommonJS), TypeScript
-- Bun (bundling)
+- esbuild (bundling)
 - `@repo/apollo-ws`, `js-knx`, `@repo/db`, `@repo/transmission`, Vitest
 
 ## Running
@@ -50,8 +50,8 @@ KNX cron jobs (energy logging, clock sync, indoor readings) run in-process via `
 | Script                     | Description                     |
 | -------------------------- | ------------------------------- |
 | `dev`                      | Bundle + watch + `node --watch` |
-| `build`                    | `tsc` + Bun bundle              |
-| `bundle`                   | `bun build` → `dist/`           |
+| `build`                    | `tsc` + esbuild bundle          |
+| `bundle`                   | `esbuild` → `dist/index.js`     |
 | `start`                    | `node dist/index.js`            |
 | `test` / `lint` / `format` | Vitest / ESLint / Prettier      |
 

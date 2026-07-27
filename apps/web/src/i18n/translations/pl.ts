@@ -24,9 +24,9 @@ export const pl: Translations = {
     language: 'Język',
     languageAriaLabel: 'Język aplikacji',
     sentryTest: 'Sentry',
-    sentryTestDescription: 'Wyślij testowy błąd, żeby sprawdzić source mapy w Sentry.',
+    sentryTestDescription: 'Wyślij testowy błąd na frontend i backend, żeby sprawdzić source mapy w Sentry.',
     sentryTestButton: 'Wyślij testowy błąd',
-    sentryTestSent: 'Testowy błąd wysłany do Sentry.',
+    sentryTestSent: 'Testowe błędy wysłane do Sentry (web i service).',
     sentryTestUnavailable: 'Sentry jest dostępne tylko w produkcji z skonfigurowanym DSN.',
   },
   stockMarket: {

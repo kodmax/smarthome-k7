@@ -24,9 +24,9 @@ export const ru: Translations = {
     language: 'Язык',
     languageAriaLabel: 'Язык приложения',
     sentryTest: 'Sentry',
-    sentryTestDescription: 'Отправить тестовую ошибку для проверки source maps в Sentry.',
+    sentryTestDescription: 'Отправить тестовую ошибку на frontend и backend для проверки source maps в Sentry.',
     sentryTestButton: 'Отправить тестовую ошибку',
-    sentryTestSent: 'Тестовая ошибка отправлена в Sentry.',
+    sentryTestSent: 'Тестовые ошибки отправлены в Sentry (web и service).',
     sentryTestUnavailable: 'Sentry доступен только в production при настроенном DSN.',
   },
   stockMarket: {

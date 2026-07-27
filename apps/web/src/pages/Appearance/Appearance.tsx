@@ -1,6 +1,7 @@
 import { Box, Button, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { useColorScheme } from '@mui/material/styles'
 import { iconStyles, SunMoonIcon } from '@repo/assets'
+import { useCommand } from '@repo/feed-client'
 import { type FC, type MouseEvent, useState } from 'react'
 import { PageHeader } from '@/app/components/PageHeader'
 import { PageWrapper } from '@/app/components/PageWrapper'
@@ -14,6 +15,7 @@ export const Appearance: FC<Record<string, never>> = () => {
   const { t } = useTranslations()
   const [sentryTestSent, setSentryTestSent] = useState(false)
   const sentryEnabled = isSentryEnabled()
+  const throwSentryTest = useCommand('sentry-test', 'throw')
 
   const handleModeChange = (_event: MouseEvent<HTMLElement>, value: AppColorMode | null) => {
     if (value !== null) {
@@ -28,9 +30,12 @@ export const Appearance: FC<Record<string, never>> = () => {
   }
 
   const handleSentryTest = () => {
-    if (sendSentryTestEvent()) {
-      setSentryTestSent(true)
+    if (!sendSentryTestEvent()) {
+      return
     }
+
+    throwSentryTest()
+    setSentryTestSent(true)
   }
 
   const selectedMode: AppColorMode = mode === 'light' || mode === 'dark' || mode === 'system' ? mode : 'system'

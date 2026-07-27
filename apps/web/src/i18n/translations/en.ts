@@ -24,9 +24,9 @@ export const en: Translations = {
     language: 'Language',
     languageAriaLabel: 'Application language',
     sentryTest: 'Sentry',
-    sentryTestDescription: 'Send a test error to verify source maps in Sentry.',
+    sentryTestDescription: 'Send a test error to the frontend and backend to verify source maps in Sentry.',
     sentryTestButton: 'Send test error',
-    sentryTestSent: 'Test error sent to Sentry.',
+    sentryTestSent: 'Test errors sent to Sentry (web and service).',
     sentryTestUnavailable: 'Sentry is only available in production with a configured DSN.',
   },
   stockMarket: {
