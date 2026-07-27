@@ -17,7 +17,7 @@ function buildStream(destination: pino.DestinationStream): pino.DestinationStrea
   return pretty({
     colorize: true,
     translateTime: 'SYS:standard',
-    hideObject: true,
+    hideObject: false,
     destination,
   })
 }
