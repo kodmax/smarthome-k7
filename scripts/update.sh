@@ -51,5 +51,6 @@ sudo cp -R "$WEB_DIST_DIR/." "$WEB_ROOT/"
 echo "Frontend deployed!"
 
 sudo systemctl restart apollo-daemon
+echo "Service restarted!"
 
 echo "Update complete! release=$SENTRY_RELEASE"
