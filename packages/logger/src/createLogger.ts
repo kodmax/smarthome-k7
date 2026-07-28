@@ -1,10 +1,14 @@
 import pino from 'pino'
 import { isProduction } from '@repo/env'
+import { createJournaldStream } from './createJournaldStream'
+import { isJournaldLoggingEnabled } from './isJournaldLoggingEnabled'
 import { resolveRootLogLevel } from './logLevel'
 
 export type CreateLoggerOptions = {
   name?: string
   destination?: pino.DestinationStream
+  /** File descriptor when no custom destination is passed (default stdout). Used with LOG_JOURNALD=1. */
+  fd?: number
 }
 
 function buildStream(destination: pino.DestinationStream): pino.DestinationStream {
@@ -23,6 +27,12 @@ function buildStream(destination: pino.DestinationStream): pino.DestinationStrea
 }
 
 export function createLogger(options: CreateLoggerOptions = {}): pino.Logger {
-  const destination = options.destination ?? pino.destination(1)
-  return pino({ name: options.name, level: resolveRootLogLevel(options.name) }, buildStream(destination))
+  const level = resolveRootLogLevel(options.name)
+  const destination = options.destination ?? pino.destination(options.fd ?? 1)
+
+  if (isJournaldLoggingEnabled()) {
+    return pino({ name: options.name, level }, createJournaldStream(destination))
+  }
+
+  return pino({ name: options.name, level }, buildStream(destination))
 }
