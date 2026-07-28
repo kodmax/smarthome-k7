@@ -36,7 +36,7 @@ Cloudflare API v4.
 
 ## Scripts
 
-| Script            | Description                  |
-| ----------------- | ---------------------------- |
-| `build`           | `tsc` + Bun bundle → `dist/` |
-| `lint` / `format` | ESLint / Prettier            |
+| Script            | Description       |
+| ----------------- | ----------------- |
+| `build`           | `tsc` → `dist/`   |
+| `lint` / `format` | ESLint / Prettier |
