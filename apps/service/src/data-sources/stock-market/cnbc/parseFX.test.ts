@@ -33,6 +33,16 @@ describe('parseFXFromDocument', () => {
     })
   })
 
+  it('parses unchanged USD/PLN quote from CNBC HTML', () => {
+    expect(parseFXFromDocument(loadDocument('spx-unchanged.html'), 'PLN=', 'USD/PLN')).toEqual({
+      symbol: 'PLN=',
+      title: 'USD/PLN',
+      price: 7413.18,
+      netChange: 0,
+      percentageChange: 0,
+    })
+  })
+
   it('throws when quote price is missing', () => {
     expect(() => parseFXFromDocument(parseHTML('<div></div>').window.document, 'PLN=', 'USD/PLN')).toThrow(
       'cnbc:PLN=: ".QuoteStrip-lastPrice" not found',

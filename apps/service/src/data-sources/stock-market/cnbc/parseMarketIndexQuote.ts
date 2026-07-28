@@ -1,32 +1,14 @@
 import { MarketIndexQuote } from '@repo/types'
-import { getNumberContent } from '@/utils/get-number-content'
-import { requireText, withScraperSource } from '@/utils/scraper'
-
-const parseChangeText = (changeText: string): Pick<MarketIndexQuote, 'netChange' | 'percentageChange'> => {
-  const match = changeText.trim().match(/^(\+?-?[0-9,.]+)\s*\((\+?-?[0-9,.]+)%\)$/)
-  if (match === null) {
-    throw new Error(`change text "${changeText}" is not in expected format`)
-  }
-
-  return {
-    netChange: Number(match[1].replaceAll(',', '')),
-    percentageChange: Number(match[2].replaceAll(',', '')),
-  }
-}
+import { withScraperSource } from '@/utils/scraper'
+import { parseQuoteFieldsFromDocument } from './parseQuoteFromDocument'
 
 export const parseMarketIndexQuoteFromDocument = (
   document: Document,
   symbol: string,
   title: string,
 ): MarketIndexQuote =>
-  withScraperSource(`cnbc:${symbol}`, () => {
-    const price = getNumberContent(document, '.QuoteStrip-lastPrice')
-    const changeText = requireText(document, '[class*="QuoteStrip-change"]', 'quote change')
-
-    return {
-      symbol,
-      title,
-      price,
-      ...parseChangeText(changeText),
-    }
-  })
+  withScraperSource(`cnbc:${symbol}`, () => ({
+    symbol,
+    title,
+    ...parseQuoteFieldsFromDocument(document),
+  }))

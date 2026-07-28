@@ -47,6 +47,36 @@ describe('parseMarketIndexQuoteFromDocument', () => {
     })
   })
 
+  it('parses unchanged S&P 500 index quote from CNBC HTML', () => {
+    expect(parseMarketIndexQuoteFromDocument(loadDocument('spx-unchanged.html'), '.SPX', 'S&P 500')).toEqual({
+      symbol: '.SPX',
+      title: 'S&P 500',
+      price: 7413.18,
+      netChange: 0,
+      percentageChange: 0,
+    })
+  })
+
+  it('parses nested S&P 500 index quote from CNBC HTML', () => {
+    expect(parseMarketIndexQuoteFromDocument(loadDocument('spx-nested.html'), '.SPX', 'S&P 500')).toEqual({
+      symbol: '.SPX',
+      title: 'S&P 500',
+      price: 7413.18,
+      netChange: 1.2,
+      percentageChange: 0.02,
+    })
+  })
+
+  it('prefers JSON-LD quote fields over DOM markup', () => {
+    expect(parseMarketIndexQuoteFromDocument(loadDocument('spx-jsonld.html'), '.SPX', 'S&P 500')).toEqual({
+      symbol: '.SPX',
+      title: 'S&P 500',
+      price: 7413.18,
+      netChange: 1.2,
+      percentageChange: 0.02,
+    })
+  })
+
   it('throws when quote price is missing', () => {
     expect(() =>
       parseMarketIndexQuoteFromDocument(parseHTML('<div></div>').window.document, '.SPX', 'S&P 500'),
