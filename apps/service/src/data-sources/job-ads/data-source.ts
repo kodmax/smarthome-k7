@@ -195,7 +195,7 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
 
     const result = await conn.query(
       `update meta
-       set value = json_set(value, '$.applyStatus', 'no-response', '$.comment', cast(null as json))
+       set value = json_set(value, '$.applyStatus', 'no-response', '$.comment', null)
        where group_id = ?
          and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'applied'
@@ -213,7 +213,7 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
 
     const result = await conn.query(
       `update meta
-       set value = json_set(value, '$.applyStatus', 'archived', '$.comment', cast(null as json))
+       set value = json_set(value, '$.applyStatus', 'archived', '$.comment', null)
        where group_id = ?
          and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'no-response'
@@ -231,7 +231,7 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
 
     const result = await conn.query(
       `update meta
-       set value = json_set(value, '$.applyStatus', 'archived', '$.comment', cast(null as json))
+       set value = json_set(value, '$.applyStatus', 'archived', '$.comment', null)
        where group_id = ?
          and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'rejected'
