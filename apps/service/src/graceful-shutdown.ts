@@ -1,6 +1,7 @@
 import type { Feeds, Server } from '@repo/apollo-ws'
 import type { Logger } from '@repo/logger'
 import { closeDbPool } from '@repo/db'
+import { closePrometheus } from './prometheus'
 import { captureProductionError, closeSentry } from './sentry'
 import { closeRedisClient } from './redis'
 import type { KnxLink } from 'js-knx'
@@ -60,6 +61,9 @@ const closeConnections = async (logger: Logger): Promise<void> => {
 
   await closeDbPool()
   logger.info({ step: 'db' }, 'Shutdown step complete')
+
+  await closePrometheus()
+  logger.info({ step: 'metrics' }, 'Shutdown step complete')
 
   await closeSentry()
   logger.info({ step: 'sentry' }, 'Shutdown step complete')

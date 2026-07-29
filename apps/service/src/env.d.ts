@@ -31,6 +31,9 @@ declare module 'process' {
 
         readonly SENTRY_DSN?: string
         readonly SENTRY_RELEASE?: string
+
+        readonly NO_METRICS?: string
+        readonly METRICS_PORT?: string
       }
     }
   }
