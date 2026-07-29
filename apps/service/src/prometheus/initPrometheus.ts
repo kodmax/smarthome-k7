@@ -17,7 +17,7 @@ export function initPrometheus(logger: Logger): void {
     throw new Error('Environment variable METRICS_PORT must be a number')
   }
 
-  collectDefaultMetrics({ register, prefix: 'service_' })
+  collectDefaultMetrics({ register, prefix: 'apollo_daemon_' })
 
   metricsServer = createServer(async (req, res) => {
     if (req.url !== '/metrics' || req.method !== 'GET') {
