@@ -1,4 +1,6 @@
+import { Box } from '@mui/material'
 import { ListIcon } from '@repo/assets'
+import { designTokens } from '@repo/design-tokens'
 import { describe, expect, it } from 'vitest'
 import { ApolloCardAction } from './ApolloCardAction'
 import { BaseCard } from './BaseCard'
@@ -54,5 +56,76 @@ describe('BaseCard', () => {
     )
 
     expect(screen.queryByRole('button', { name: 'Edit preferences' })).not.toBeInTheDocument()
+  })
+
+  it('keeps header icon size and truncates long titles in narrow cards', () => {
+    const longTitle = 'Very long card title that should truncate with ellipsis'
+
+    const { container } = renderWithTheme(
+      <Box sx={{ width: 120 }}>
+        <ZoomStateProvider>
+          <BaseCard cardId='narrow-title-card' title={longTitle} icon={ListIcon} allowZoom={false}>
+            Content
+          </BaseCard>
+        </ZoomStateProvider>
+      </Box>,
+    )
+
+    const icon = container.querySelector('svg')
+    const title = screen.getByText(longTitle)
+
+    expect(icon).toHaveAttribute('width', String(designTokens.icon.sizeSm))
+    expect(icon).toHaveAttribute('height', String(designTokens.icon.sizeSm))
+    expect(title).toHaveStyle({ textOverflow: 'ellipsis' })
+  })
+
+  it('does not let long titles overlap headingInfo', () => {
+    const longTitle = 'Very long card title that should truncate with ellipsis'
+
+    renderWithTheme(
+      <Box sx={{ width: 180 }}>
+        <ZoomStateProvider>
+          <BaseCard
+            cardId='narrow-title-with-info'
+            title={longTitle}
+            icon={ListIcon}
+            allowZoom={false}
+            headingInfo={<span>42</span>}
+          >
+            Content
+          </BaseCard>
+        </ZoomStateProvider>
+      </Box>,
+    )
+
+    const title = screen.getByText(longTitle)
+    const headingInfo = screen.getByText('42')
+
+    expect(title.getBoundingClientRect().right).toBeLessThanOrEqual(headingInfo.getBoundingClientRect().left + 1)
+  })
+
+  it('does not let long titles overlap actions', () => {
+    const longTitle = 'Very long card title that should truncate with ellipsis'
+
+    renderWithTheme(
+      <Box sx={{ width: 180 }}>
+        <ZoomStateProvider>
+          <BaseCard
+            cardId='narrow-title-with-actions'
+            title={longTitle}
+            icon={ListIcon}
+            allowZoom={false}
+            actions={<ApolloCardAction title='Edit preferences' onClick={() => undefined} Icon={ListIcon} />}
+          >
+            Content
+          </BaseCard>
+        </ZoomStateProvider>
+      </Box>,
+    )
+
+    const title = screen.getByText(longTitle)
+    const action = screen.getByRole('button', { name: 'Edit preferences' })
+
+    expect(title.getBoundingClientRect().right).toBeLessThanOrEqual(action.getBoundingClientRect().left + 1)
   })
 })

@@ -40,7 +40,7 @@ export const ru: Translations = {
         title: 'S&P 500',
       },
       sp500Futures: {
-        title: 'S&P 500 Futures',
+        title: 'Фьючерсы',
       },
     },
     forex: {

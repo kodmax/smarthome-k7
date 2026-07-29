@@ -8,7 +8,9 @@ import {
   ApolloCardContent,
   ApolloCardContentArea,
   ApolloCardHeader,
+  ApolloCardHeaderMain,
   ApolloCardHeadingInfo,
+  ApolloCardIcon,
   ApolloCardRoot,
   ApolloCardTitle,
   ApolloCardTopFade,
@@ -58,14 +60,18 @@ export const BaseCard: FC<BaseCardProps> = ({
                   <BackIcon size={designTokens.icon.sizeSm} strokeWidth={designTokens.icon.strokeWidth} />
                 </IconButton>
               ) : null}
-              <Icon
-                size={designTokens.icon.sizeSm}
-                strokeWidth={designTokens.icon.strokeWidth}
-                glow='default'
-                aria-hidden
-              />
-              <ApolloCardTitle variant='h3'>{title}</ApolloCardTitle>
-              <ApolloCardHeadingInfo>{headingInfo}</ApolloCardHeadingInfo>
+              <ApolloCardIcon>
+                <Icon
+                  size={designTokens.icon.sizeSm}
+                  strokeWidth={designTokens.icon.strokeWidth}
+                  glow='default'
+                  aria-hidden
+                />
+              </ApolloCardIcon>
+              <ApolloCardHeaderMain>
+                <ApolloCardTitle variant='h3'>{title}</ApolloCardTitle>
+                {headingInfo !== undefined ? <ApolloCardHeadingInfo>{headingInfo}</ApolloCardHeadingInfo> : null}
+              </ApolloCardHeaderMain>
               {showActions ? (
                 <Actions>
                   {actions}

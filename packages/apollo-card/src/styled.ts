@@ -42,11 +42,27 @@ export const ApolloCardHeader = styled(Box, {
   borderBottom: `${designTokens.borderWidth.hairline}px solid ${theme.vars.palette.cardHeaderBorder.main}`,
 }))
 
+export const ApolloCardHeaderMain = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  flex: '1 1 0',
+  gap: designTokens.space[2],
+  minWidth: 0,
+})
+
+export const ApolloCardIcon = styled(Box)({
+  display: 'flex',
+  flexShrink: 0,
+  width: designTokens.icon.sizeSm,
+  height: designTokens.icon.sizeSm,
+})
+
 export const ApolloCardTitle = styled(Typography)({
   fontSize: designTokens.font.h3.size,
   fontWeight: designTokens.font.h3.weight,
   lineHeight: designTokens.font.h3.lineHeight,
-  flex: '0 0 auto',
+  flex: '1 1 0',
+  minWidth: 0,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
@@ -57,11 +73,11 @@ export const ApolloCardHeadingInfo = styled(Box)(({ theme }) => ({
   fontWeight: 500,
   lineHeight: designTokens.font.h3.lineHeight,
   color: theme.vars.palette.text.secondary,
-  flex: 1,
+  flex: '0 0 auto',
+  flexShrink: 0,
   minWidth: 0,
-  overflow: 'visible',
+  overflow: 'hidden',
   display: 'flex',
-  justifyContent: 'flex-end',
   alignItems: 'center',
   '& > span': {
     overflow: 'hidden',
@@ -75,6 +91,7 @@ export const Actions = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   flex: '0 0 auto',
+  flexShrink: 0,
   gap: designTokens.space[2],
 })
 
