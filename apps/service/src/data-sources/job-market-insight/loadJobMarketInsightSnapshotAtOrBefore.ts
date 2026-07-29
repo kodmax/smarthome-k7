@@ -1,5 +1,6 @@
 import { JobMarketInsightMetrics } from '@repo/types'
 import type { Pool } from 'mariadb'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 
 type SnapshotRow = {
   metrics: JobMarketInsightMetrics | string
@@ -15,13 +16,15 @@ export const loadJobMarketInsightSnapshotAtOrBefore = async (
   const conn = await db.getConnection()
 
   try {
-    const rows = (await conn.query(
-      `select metrics
+    const rows = (await observeDbQuery('select', 'job_market_insight_snapshots', () =>
+      conn.query(
+        `select metrics
        from job_market_insight_snapshots
        where snapshot_at <= ?
        order by snapshot_at desc
        limit 1`,
-      [atOrBefore],
+        [atOrBefore],
+      ),
     )) as SnapshotRow[]
 
     if (rows.length === 0) {

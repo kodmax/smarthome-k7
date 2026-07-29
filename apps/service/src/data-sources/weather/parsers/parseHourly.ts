@@ -1,5 +1,6 @@
 import { HourWeatherForecast } from '@repo/types'
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import * as suncalc from 'suncalc'
 import { basename } from 'path'
 import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
@@ -60,14 +61,16 @@ export const parseHourly = async (latitude: number, longitude: number): Promise<
   }
 
   const tomorrowDate = todayDate.shifted(1, DateTime.DAY)
+  const hourlyUrl = weatherPageUrls.hourly
+  const tomorrowHourlyUrl = weatherPageUrls.tomorrowHourly
   const today = parseHourlyFromDocument(
-    await fetchDocument(weatherPageUrls.hourly),
+    await observeHttpFetch(hourlyUrl, 'html', () => fetchDocument(hourlyUrl)),
     todayDate.getDate(),
     latitude,
     longitude,
   )
   const tomorrow = parseHourlyFromDocument(
-    await fetchDocument(weatherPageUrls.tomorrowHourly),
+    await observeHttpFetch(tomorrowHourlyUrl, 'html', () => fetchDocument(tomorrowHourlyUrl)),
     tomorrowDate.getDate(),
     latitude,
     longitude,

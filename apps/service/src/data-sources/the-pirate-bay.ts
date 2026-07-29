@@ -1,6 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { Torrent } from '@repo/types'
 import { fetchJSON } from '@/fetch'
+import { observeHttpFetch, observeScraperRefresh } from '@/prometheus/scraperMetrics'
 
 export class TorrentSource extends DataSourceDefinition<Torrent[]> {
   private query = ''
@@ -27,10 +28,13 @@ export class TorrentSource extends DataSourceDefinition<Torrent[]> {
   }
 
   public async getData(): Promise<Torrent[]> {
-    return await fetchJSON<Torrent[]>(
-      this.query !== ''
-        ? `https://apibay.org/q.php?q=${encodeURIComponent(this.query)}&cat=207`
-        : 'https://apibay.org/precompiled/data_top100_207.json',
-    )
+    return observeScraperRefresh(this.getId(), () => {
+      const url =
+        this.query !== ''
+          ? `https://apibay.org/q.php?q=${encodeURIComponent(this.query)}&cat=207`
+          : 'https://apibay.org/precompiled/data_top100_207.json'
+
+      return observeHttpFetch(url, 'json', () => fetchJSON<Torrent[]>(url))
+    })
   }
 }

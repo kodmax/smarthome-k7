@@ -1,7 +1,6 @@
 import { createServer, type Server as HttpServer } from 'node:http'
 import { collectDefaultMetrics, register } from 'prom-client'
 import type { Logger } from '@repo/logger'
-
 const DEFAULT_PORT = 9464
 
 let metricsServer: HttpServer | undefined

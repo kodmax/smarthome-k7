@@ -1,4 +1,5 @@
 import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
+import { observeScraperRefresh } from '@/prometheus/scraperMetrics'
 import { getMarketIndexQuotes } from './getMarketIndexQuotes'
 import { CnbcMarketIndicesData } from './types'
 
@@ -16,6 +17,6 @@ export class CnbcMarketIndicesSource extends DataSourceDefinition<CnbcMarketIndi
   }
 
   async getData() {
-    return getMarketIndexQuotes()
+    return observeScraperRefresh(this.getId(), () => getMarketIndexQuotes())
   }
 }

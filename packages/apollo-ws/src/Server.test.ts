@@ -124,4 +124,16 @@ describe('Server', () => {
 
     expect(messages).toEqual(['FEED debounced-feed {"value":3}'])
   })
+
+  it('emits clients-changed when clients connect and disconnect', async () => {
+    const counts: number[] = []
+    server.vent.on('clients-changed', count => counts.push(count))
+
+    const secondClient = new WebSocket(`ws://127.0.0.1:${port}`)
+    await waitForOpen(secondClient)
+    await vi.waitFor(() => expect(counts).toContain(2))
+
+    secondClient.close()
+    await vi.waitFor(() => expect(counts).toContain(1))
+  })
 })

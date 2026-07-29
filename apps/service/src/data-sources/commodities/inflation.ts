@@ -1,4 +1,5 @@
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import { parseInflationFromDocument } from './parseFromDocument'
 
 // eslint-disable-next-line max-len
@@ -11,7 +12,9 @@ type InflationData = Array<{
 }>
 
 const fetchInflationData = async (): Promise<InflationData> => {
-  return parseInflationFromDocument(await fetchDocument(inflationDataUrl, { accept: 'text/html' }))
+  return parseInflationFromDocument(
+    await observeHttpFetch(inflationDataUrl, 'html', () => fetchDocument(inflationDataUrl, { accept: 'text/html' })),
+  )
 }
 
 export type { InflationData }

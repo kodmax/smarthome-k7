@@ -162,6 +162,7 @@ export class Server {
       })
 
       this.clients.add(client)
+      this.vent.emit('clients-changed', this.clients.size)
       ws.on('error', e => {
         notifyError(this.options.logger, this.options.onError, 'warn', 'Client socket error', e, { clientIp: ip })
       })
@@ -169,6 +170,7 @@ export class Server {
       ws.on('close', () => {
         this.options.logger.info({ clientIp: ip }, 'Client disconnected')
         this.clients.delete(client)
+        this.vent.emit('clients-changed', this.clients.size)
       })
     })
 

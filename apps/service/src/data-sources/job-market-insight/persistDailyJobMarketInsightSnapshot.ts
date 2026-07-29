@@ -1,6 +1,7 @@
 import { JobMarketInsightMetrics } from '@repo/types'
 import type { Pool } from 'mariadb'
 import DateTime from '@/DateTime'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 
 const DAILY_SNAPSHOT_TIME = '18:00:00'
 
@@ -31,19 +32,23 @@ export const persistDailyJobMarketInsightSnapshot = async (
   const conn = await db.getConnection()
 
   try {
-    const existingRows = (await conn.query(
-      'select 1 from job_market_insight_snapshots where snapshot_at >= date(?) and snapshot_at < date(?) + interval 1 day limit 1',
-      [now.getDateTime(), now.getDateTime()],
+    const existingRows = (await observeDbQuery('select', 'job_market_insight_snapshots', () =>
+      conn.query(
+        'select 1 from job_market_insight_snapshots where snapshot_at >= date(?) and snapshot_at < date(?) + interval 1 day limit 1',
+        [now.getDateTime(), now.getDateTime()],
+      ),
     )) as unknown[]
 
     if (existingRows.length > 0) {
       return
     }
 
-    await conn.query('insert into job_market_insight_snapshots (snapshot_at, metrics) values (?, ?)', [
-      now.getDateTime(),
-      JSON.stringify(toSnapshotMetrics(metrics)),
-    ])
+    await observeDbQuery('insert', 'job_market_insight_snapshots', () =>
+      conn.query('insert into job_market_insight_snapshots (snapshot_at, metrics) values (?, ?)', [
+        now.getDateTime(),
+        JSON.stringify(toSnapshotMetrics(metrics)),
+      ]),
+    )
   } finally {
     conn.release()
   }

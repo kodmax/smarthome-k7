@@ -5,6 +5,7 @@ export type ApolloEventMap = {
   feed: [feedId: string, value: unknown]
   'data-update': [sourceId: string]
   command: [command: DataSourceCommand]
+  'clients-changed': [count: number]
   'feeds-request': [feedIds: string[]]
   'feeds-refresh': [feedIds: Iterable<string>]
 }

@@ -3,6 +3,7 @@ import { type CvCachedFeed, type CvFeed } from '@repo/types'
 import type OpenAI from 'openai'
 import type { Pool } from 'mariadb'
 import { Inject } from '@/di'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 import {
   CV_SCOPE,
   CV_TEXT_ID,
@@ -53,11 +54,13 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
   private async loadCvFromDb(): Promise<CvFeed> {
     const conn = await this.db.getConnection()
     try {
-      const rows = (await conn.query(
-        `select scope, id, hash, modified_at, content
+      const rows = (await observeDbQuery('select', 'documents', () =>
+        conn.query(
+          `select scope, id, hash, modified_at, content
          from documents
          where scope = ? and id = ?`,
-        [CV_SCOPE, CV_TEXT_ID],
+          [CV_SCOPE, CV_TEXT_ID],
+        ),
       )) as DocumentRecordRow[]
 
       const row = rows[0]
@@ -85,11 +88,13 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
   private async loadCvTextSourceHash(): Promise<string | null> {
     const conn = await this.db.getConnection()
     try {
-      const rows = (await conn.query(
-        `select source_hash
+      const rows = (await observeDbQuery('select', 'documents', () =>
+        conn.query(
+          `select source_hash
          from documents
          where scope = ? and id = ?`,
-        [CV_SCOPE, CV_TEXT_ID],
+          [CV_SCOPE, CV_TEXT_ID],
+        ),
       )) as { source_hash: string | null }[]
 
       return rows[0]?.source_hash ?? null
@@ -121,11 +126,13 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
   private async touchCvTextModifiedAt(): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(
-        `update documents
+      await observeDbQuery('update', 'documents', () =>
+        conn.query(
+          `update documents
          set modified_at = current_timestamp()
          where scope = ? and id = ?`,
-        [CV_SCOPE, CV_TEXT_ID],
+          [CV_SCOPE, CV_TEXT_ID],
+        ),
       )
     } finally {
       conn.release()
@@ -135,15 +142,17 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
   private async upsertCvText(content: CvTextContent, hash: string, sourceHash: string): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(
-        `insert into documents (scope, id, hash, source_hash, content)
+      await observeDbQuery('insert', 'documents', () =>
+        conn.query(
+          `insert into documents (scope, id, hash, source_hash, content)
          values (?, ?, ?, ?, ?)
          on duplicate key update
            hash = values(hash),
            source_hash = values(source_hash),
            content = values(content),
            modified_at = current_timestamp()`,
-        [CV_SCOPE, CV_TEXT_ID, hash, sourceHash, JSON.stringify(content)],
+          [CV_SCOPE, CV_TEXT_ID, hash, sourceHash, JSON.stringify(content)],
+        ),
       )
     } finally {
       conn.release()

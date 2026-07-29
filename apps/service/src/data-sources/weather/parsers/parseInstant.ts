@@ -1,4 +1,5 @@
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
 import { windDirectionCodes } from './windDirectionCodes'
@@ -91,5 +92,6 @@ export const parseInstantFromDocument = (document: Document): InstantWeather =>
   })
 
 export const parseInstant = async (): Promise<InstantWeather> => {
-  return parseInstantFromDocument(await fetchDocument(weatherPageUrls.instant))
+  const url = weatherPageUrls.instant
+  return parseInstantFromDocument(await observeHttpFetch(url, 'html', () => fetchDocument(url)))
 }

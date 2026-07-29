@@ -1,4 +1,5 @@
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import { detectOrigin } from './detectOrigin'
 import { parseJobPosting as parseJjitJobPosting } from './jjit/parseJobPosting'
 import { parseJobPosting as parseNfjJobPosting } from './nfj/parseJobPosting'
@@ -10,7 +11,7 @@ export async function fetchJobPostingDetails(adUrl: string): Promise<JobPostingD
     return null
   }
 
-  const document = await fetchDocument(adUrl)
+  const document = await observeHttpFetch(adUrl, 'html', () => fetchDocument(adUrl))
   switch (origin) {
     case 'jj':
       return parseJjitJobPosting(document)

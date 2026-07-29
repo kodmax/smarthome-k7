@@ -13,7 +13,7 @@ import { knxInit } from './knx-init'
 import { registerApollo, registerKnxCron, setupGracefulShutdown } from './graceful-shutdown'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
-import { initPrometheus } from './prometheus'
+import { initPrometheus, registerWsMetrics } from './prometheus'
 import { initSentry, captureProductionError } from './sentry'
 
 const logger = createLogger({ name: 'service' })
@@ -51,6 +51,7 @@ Server.listen(
     })
 
     registerApollo(apollo, feeds)
+    registerWsMetrics(apollo.vent)
 
     await initWebFeeds(feeds)
     logger.info({ feedCount: feeds.getFeedCount() }, 'Web feeds initialized')

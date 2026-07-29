@@ -1,4 +1,5 @@
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import { parseOilPriceFromDocument } from './parseFromDocument'
 
 type OilPrice = {
@@ -6,7 +7,9 @@ type OilPrice = {
 }
 
 const fetchOilPrice = async (): Promise<OilPrice> => {
-  return fetchDocument('https://www.cnbc.com/quotes/@CL.1', { accept: 'text/html' }).then(parseOilPriceFromDocument)
+  const url = 'https://www.cnbc.com/quotes/@CL.1'
+  const document = await observeHttpFetch(url, 'html', () => fetchDocument(url, { accept: 'text/html' }))
+  return parseOilPriceFromDocument(document)
 }
 
 export type { OilPrice }

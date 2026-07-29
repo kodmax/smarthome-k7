@@ -2,6 +2,7 @@ import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { MySkillsFeed } from '@repo/types'
 import type { Pool } from 'mariadb'
 import { Inject } from '@/di'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 import {
   normalizeSkillComment,
   parseSetSkillCommandArgs,
@@ -46,10 +47,12 @@ export class MySkillsSource extends DataSourceDefinition<MySkillsFeed, MySkillsC
   private async loadSkillsFromDb(): Promise<MySkillsFeed> {
     const conn = await this.db.getConnection()
     try {
-      const rows = (await conn.query(
-        `select skill_id, skill_name, experience_level, comment
+      const rows = (await observeDbQuery('select', 'my_skills', () =>
+        conn.query(
+          `select skill_id, skill_name, experience_level, comment
          from my_skills
          order by skill_name`,
+        ),
       )) as SkillRecordRow[]
 
       return {
@@ -88,13 +91,15 @@ export class MySkillsSource extends DataSourceDefinition<MySkillsFeed, MySkillsC
   private async upsertSkillLevel(input: { id: string; name: string; level: string }): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(
-        `insert into my_skills (skill_id, skill_name, experience_level, comment)
+      await observeDbQuery('insert', 'my_skills', () =>
+        conn.query(
+          `insert into my_skills (skill_id, skill_name, experience_level, comment)
          values (?, ?, ?, null)
          on duplicate key update
            skill_name = values(skill_name),
            experience_level = values(experience_level)`,
-        [input.id, input.name, input.level],
+          [input.id, input.name, input.level],
+        ),
       )
     } finally {
       conn.release()
@@ -104,7 +109,9 @@ export class MySkillsSource extends DataSourceDefinition<MySkillsFeed, MySkillsC
   private async updateSkillComment(skillId: string, comment: string | null): Promise<boolean> {
     const conn = await this.db.getConnection()
     try {
-      const result = await conn.query(`update my_skills set comment = ? where skill_id = ?`, [comment, skillId])
+      const result = await observeDbQuery('update', 'my_skills', () =>
+        conn.query(`update my_skills set comment = ? where skill_id = ?`, [comment, skillId]),
+      )
 
       return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
     } finally {

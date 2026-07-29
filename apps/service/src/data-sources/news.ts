@@ -2,6 +2,8 @@ import { createHash } from 'node:crypto'
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { Inject } from '@/di'
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch, observeScraperRefresh } from '@/prometheus/scraperMetrics'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { Article, NewsCachedFeed, NewsFeed } from '@repo/types'
 import type { config as AppConfig } from '../config'
 import type { Pool } from 'mariadb'
@@ -52,9 +54,9 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
   }
 
   async getData() {
-    return {
+    return observeScraperRefresh(this.getId(), async () => ({
       articles: await this.fetchArticles(),
-    }
+    }))
   }
 
   async composeContent(cached: NewsCachedFeed): Promise<NewsFeed> {
@@ -66,11 +68,13 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
   async maintenance() {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(
-        `delete from meta
+      await observeDbQuery('delete', 'meta', () =>
+        conn.query(
+          `delete from meta
          where group_id = ?
            and last_update_timestamp < current_timestamp() - interval ? day`,
-        [this.getId(), META_RETENTION_DAYS],
+          [this.getId(), META_RETENTION_DAYS],
+        ),
       )
     } finally {
       conn.release()
@@ -78,10 +82,12 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
   }
 
   private async fetchArticles(): Promise<NewsCachedFeed['articles']> {
-    const document = await fetchDocument(FEED_URL, {
-      accept: 'text/html',
-      cookie: `SOCS=${this.config.google.socs_cookie}`,
-    })
+    const document = await observeHttpFetch(FEED_URL, 'html', () =>
+      fetchDocument(FEED_URL, {
+        accept: 'text/html',
+        cookie: `SOCS=${this.config.google.socs_cookie}`,
+      }),
+    )
 
     return Array.from(document.querySelectorAll('a[href^="./read"][aria-label]')).map(anchor => {
       const href = new URL(anchor.getAttribute('href') ?? '', 'https://news.google.com').toString()
@@ -103,13 +109,15 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
     const conn = await this.db.getConnection()
     try {
       const uids = articles.map(article => article.uid)
-      const rows = (await conn.query(
-        `select item_uid, attribute_name from meta
+      const rows = (await observeDbQuery('select', 'meta', () =>
+        conn.query(
+          `select item_uid, attribute_name from meta
          where group_id = ?
            and attribute_name = 'read'
            and item_uid in (?)
            and value = true`,
-        [this.getId(), uids],
+          [this.getId(), uids],
+        ),
       )) as Array<{ item_uid: string; attribute_name: string }>
       const readUids = new Set(rows.map(row => row.item_uid))
 
@@ -125,11 +133,13 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
   private async markMeta(itemUid: string, attributeName: string, value: boolean): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(
-        `insert into meta (item_uid, attribute_name, group_id, value)
+      await observeDbQuery('insert', 'meta', () =>
+        conn.query(
+          `insert into meta (item_uid, attribute_name, group_id, value)
          values (?, ?, ?, ?)
          on duplicate key update value = values(value), group_id = values(group_id)`,
-        [itemUid, attributeName, this.getId(), value],
+          [itemUid, attributeName, this.getId(), value],
+        ),
       )
     } finally {
       conn.release()
@@ -139,11 +149,13 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
   private async unmarkMeta(itemUid: string, attributeName: string): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(`delete from meta where group_id = ? and item_uid = ? and attribute_name = ?`, [
-        this.getId(),
-        itemUid,
-        attributeName,
-      ])
+      await observeDbQuery('delete', 'meta', () =>
+        conn.query(`delete from meta where group_id = ? and item_uid = ? and attribute_name = ?`, [
+          this.getId(),
+          itemUid,
+          attributeName,
+        ]),
+      )
     } finally {
       conn.release()
     }

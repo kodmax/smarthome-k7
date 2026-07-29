@@ -1,4 +1,5 @@
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
 
@@ -20,5 +21,6 @@ export const parseAllergensFromDocument = (document: Document): AllergenForecast
   })
 
 export const parseAllergens = async (): Promise<AllergenForecast[]> => {
-  return parseAllergensFromDocument(await fetchDocument(weatherPageUrls.allergens))
+  const url = weatherPageUrls.allergens
+  return parseAllergensFromDocument(await observeHttpFetch(url, 'html', () => fetchDocument(url)))
 }

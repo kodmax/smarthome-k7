@@ -1,6 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../DateTime'
 import { Inject } from '@/di'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 import type { Pool } from 'mariadb'
 
 type RoomTempHistory = Array<{
@@ -50,8 +51,9 @@ export class IndoorTempHistorySource extends DataSourceDefinition<TempHistory> {
   async getData() {
     const conn = await this.db.getConnection()
     try {
-      const history = (await conn.query(
-        `select
+      const history = (await observeDbQuery('select', 'readings', () =>
+        conn.query(
+          `select
               reading_name,
               hour(timestamp) as hour,
               avg(reading_value) as value
@@ -60,7 +62,8 @@ export class IndoorTempHistorySource extends DataSourceDefinition<TempHistory> {
                 and reading_name in ('bathroom_floor_temp', 'bedroom_temp', 'livingroom_temp', 'bathroom_temp')
               group by reading_name, hour(timestamp)
               order by reading_name, hour(timestamp) ASC`,
-        [DateTime.now().getDate()],
+          [DateTime.now().getDate()],
+        ),
       )) as HistoryRecord[]
 
       const result: TempHistory = {

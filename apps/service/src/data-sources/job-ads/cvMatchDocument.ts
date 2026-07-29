@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import type { JobAdMatchAnalysis } from '@repo/types'
 import type { Pool } from 'mariadb'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { CV_SCOPE, CV_TEXT_ID } from '../cv/documentRecord'
 
 export const CV_MATCH_SCOPE = 'cv-match'
@@ -86,15 +87,17 @@ export function cvMatchContentToMatchAnalysis(content: CvMatchContent): JobAdMat
 export async function saveCvMatch(db: Pool, adId: string, content: CvMatchContent, cvTextHash: string): Promise<void> {
   const hash = digestCvMatchContentHash(content)
 
-  await db.query(
-    `insert into documents (scope, id, hash, source_hash, content)
+  await observeDbQuery('insert', 'documents', () =>
+    db.query(
+      `insert into documents (scope, id, hash, source_hash, content)
      values (?, ?, ?, ?, ?)
      on duplicate key update
        hash = values(hash),
        source_hash = values(source_hash),
        content = values(content),
        modified_at = current_timestamp()`,
-    [CV_MATCH_SCOPE, adId, hash, cvTextHash, JSON.stringify(content)],
+      [CV_MATCH_SCOPE, adId, hash, cvTextHash, JSON.stringify(content)],
+    ),
   )
 }
 
@@ -105,12 +108,14 @@ export async function loadCvMatchesByAdIds(db: Pool, adIds: string[]): Promise<M
 
   const conn = await db.getConnection()
   try {
-    const rows = (await conn.query(
-      `select id, source_hash, content, modified_at
+    const rows = (await observeDbQuery('select', 'documents', () =>
+      conn.query(
+        `select id, source_hash, content, modified_at
        from documents
        where scope = ?
          and id in (?)`,
-      [CV_MATCH_SCOPE, adIds],
+        [CV_MATCH_SCOPE, adIds],
+      ),
     )) as DocumentRow[]
 
     const result = new Map<string, LoadedCvMatch>()
@@ -140,11 +145,13 @@ export type LoadedCV = {
 export async function loadCV(db: Pool): Promise<LoadedCV | null> {
   const conn = await db.getConnection()
   try {
-    const rows = (await conn.query(
-      `select hash, content
+    const rows = (await observeDbQuery('select', 'documents', () =>
+      conn.query(
+        `select hash, content
        from documents
        where scope = ? and id = ?`,
-      [CV_SCOPE, CV_TEXT_ID],
+        [CV_SCOPE, CV_TEXT_ID],
+      ),
     )) as Array<{ hash: string; content: unknown }>
 
     const row = rows[0]

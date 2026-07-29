@@ -1,4 +1,5 @@
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import { CnbcMarketIndicesData } from './types'
 import { parseMarketIndexQuoteFromDocument } from './parseMarketIndexQuote'
 
@@ -7,8 +8,8 @@ const SP500_FUTURES_URL = 'https://www.cnbc.com/quotes/@SP.1'
 
 export const getMarketIndexQuotes = async (): Promise<CnbcMarketIndicesData> => {
   const [sp500Document, sp500FuturesDocument] = await Promise.all([
-    fetchDocument(SP500_URL, { accept: 'text/html' }),
-    fetchDocument(SP500_FUTURES_URL, { accept: 'text/html' }),
+    observeHttpFetch(SP500_URL, 'html', () => fetchDocument(SP500_URL, { accept: 'text/html' })),
+    observeHttpFetch(SP500_FUTURES_URL, 'html', () => fetchDocument(SP500_FUTURES_URL, { accept: 'text/html' })),
   ])
 
   return {

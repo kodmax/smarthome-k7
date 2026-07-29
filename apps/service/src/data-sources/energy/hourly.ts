@@ -1,6 +1,7 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import DateTime from '../../DateTime'
 import { Inject } from '@/di'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 import type { Pool } from 'mariadb'
 import { EnergyHourConsumption } from '@repo/types'
 import { dayStart, getStartOfDayReading, METER_TOTAL_READING } from './helpers'
@@ -31,8 +32,9 @@ export class EnergyHourlySource extends DataSourceDefinition<{
       const yesterday = DateTime.shift(-1, DateTime.DAY).getDate()
       const startOfDayValue = await getStartOfDayReading(conn, today, yesterday)
 
-      const bars = await conn.query(
-        `select
+      const bars = await observeDbQuery('select', 'readings', () =>
+        conn.query(
+          `select
             hour(date_sub(timestamp, interval 1 hour)) as hour,
             hourly_consumption
           from (
@@ -44,7 +46,8 @@ export class EnergyHourlySource extends DataSourceDefinition<{
               and timestamp >= ?
           ) as deltas
           where hourly_consumption is not null`,
-        [METER_TOTAL_READING, dayStart(today)],
+          [METER_TOTAL_READING, dayStart(today)],
+        ),
       )
 
       return {

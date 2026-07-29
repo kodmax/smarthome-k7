@@ -1,4 +1,6 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
+import { observeScraperRefresh } from '@/prometheus/scraperMetrics'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { Inject } from '@/di'
 import type { Pool } from 'mariadb'
 import { jjit } from './jjit/jjit'
@@ -142,17 +144,19 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
   }
 
   async getData() {
-    const allAds = new Map<string, JobAd>()
+    return observeScraperRefresh(this.getId(), async () => {
+      const allAds = new Map<string, JobAd>()
 
-    addAds(allAds, await jjit())
-    addAds(allAds, await nfj())
-    addAds(allAds, await theprotocol())
+      addAds(allAds, await jjit())
+      addAds(allAds, await nfj())
+      addAds(allAds, await theprotocol())
 
-    return {
-      ads: [...allAds.values()].sort(
-        (a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0),
-      ),
-    }
+      return {
+        ads: [...allAds.values()].sort(
+          (a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0),
+        ),
+      }
+    })
   }
 
   async composeContent(cached: JobAdsCachedFeed): Promise<JobAdsFeed> {
@@ -170,12 +174,14 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
   async maintenance() {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(
-        `delete from meta
+      await observeDbQuery('delete', 'meta', () =>
+        conn.query(
+          `delete from meta
          where group_id = ?
            and attribute_name not in (?)
            and last_update_timestamp < current_timestamp() - interval ? day`,
-        [this.getId(), PERSISTENT_META_ATTRIBUTE_NAMES, META_RETENTION_DAYS],
+          [this.getId(), PERSISTENT_META_ATTRIBUTE_NAMES, META_RETENTION_DAYS],
+        ),
       )
 
       const appliedChanged = await this.markStaleAppliedAsNoResponse(conn)
@@ -193,15 +199,17 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     const cutoff = new Date()
     cutoff.setDate(cutoff.getDate() - STALE_APPLIED_NO_RESPONSE_AFTER_DAYS)
 
-    const result = await conn.query(
-      `update meta
+    const result = await observeDbQuery('update', 'meta', () =>
+      conn.query(
+        `update meta
        set value = json_set(value, '$.applyStatus', 'no-response', '$.comment', null)
        where group_id = ?
          and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'applied'
          and json_extract(value, '$.appliedAt') is not null
          and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
-      [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
+        [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
+      ),
     )
 
     return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
@@ -211,15 +219,17 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     const cutoff = new Date()
     cutoff.setDate(cutoff.getDate() - STALE_NO_RESPONSE_ARCHIVE_AFTER_DAYS)
 
-    const result = await conn.query(
-      `update meta
+    const result = await observeDbQuery('update', 'meta', () =>
+      conn.query(
+        `update meta
        set value = json_set(value, '$.applyStatus', 'archived', '$.comment', null)
        where group_id = ?
          and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'no-response'
          and json_extract(value, '$.appliedAt') is not null
          and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
-      [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
+        [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
+      ),
     )
 
     return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
@@ -229,15 +239,17 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     const cutoff = new Date()
     cutoff.setDate(cutoff.getDate() - STALE_REJECTED_ARCHIVE_AFTER_DAYS)
 
-    const result = await conn.query(
-      `update meta
+    const result = await observeDbQuery('update', 'meta', () =>
+      conn.query(
+        `update meta
        set value = json_set(value, '$.applyStatus', 'archived', '$.comment', null)
        where group_id = ?
          and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'rejected'
          and json_extract(value, '$.rejectedAt') is not null
          and json_unquote(json_extract(value, '$.rejectedAt')) <= ?`,
-      [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
+        [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
+      ),
     )
 
     return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
@@ -251,20 +263,22 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     const conn = await this.db.getConnection()
     try {
       const ids = ads.map(ad => ad.id)
-      const rows = (await conn.query(
-        `select item_uid, attribute_name, value, last_update_timestamp
+      const rows = (await observeDbQuery('select', 'meta', () =>
+        conn.query(
+          `select item_uid, attribute_name, value, last_update_timestamp
          from meta
          where group_id = ?
            and attribute_name in (?, ?, ?, ?)
            and item_uid in (?)`,
-        [
-          this.getId(),
-          APPLICATION_ATTRIBUTE_NAME,
-          FAV_ATTRIBUTE_NAME,
-          AD_URL_ATTRIBUTE_NAME,
-          FIRST_PUBLISHED_AT_ATTRIBUTE_NAME,
-          ids,
-        ],
+          [
+            this.getId(),
+            APPLICATION_ATTRIBUTE_NAME,
+            FAV_ATTRIBUTE_NAME,
+            AD_URL_ATTRIBUTE_NAME,
+            FIRST_PUBLISHED_AT_ATTRIBUTE_NAME,
+            ids,
+          ],
+        ),
       )) as MetaRow[]
 
       const applicationById = new Map<string, JobAdApplicationMeta>()
@@ -347,25 +361,29 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       })
 
       if (adUrlToInsert.length > 0) {
-        await conn.batch(
-          `insert into meta (item_uid, attribute_name, group_id, value)
+        await observeDbQuery('insert', 'meta', () =>
+          conn.batch(
+            `insert into meta (item_uid, attribute_name, group_id, value)
            values (?, ?, ?, JSON_QUOTE(?))
            on duplicate key update value = value`,
-          adUrlToInsert.map(([itemId, advertUrl]) => [itemId, AD_URL_ATTRIBUTE_NAME, this.getId(), advertUrl]),
+            adUrlToInsert.map(([itemId, advertUrl]) => [itemId, AD_URL_ATTRIBUTE_NAME, this.getId(), advertUrl]),
+          ),
         )
       }
 
       if (firstPublishedAtToInsert.length > 0) {
-        await conn.batch(
-          `insert into meta (item_uid, attribute_name, group_id, value)
+        await observeDbQuery('insert', 'meta', () =>
+          conn.batch(
+            `insert into meta (item_uid, attribute_name, group_id, value)
            values (?, ?, ?, JSON_QUOTE(?))
            on duplicate key update value = value`,
-          firstPublishedAtToInsert.map(([itemId, publishedAt]) => [
-            itemId,
-            FIRST_PUBLISHED_AT_ATTRIBUTE_NAME,
-            this.getId(),
-            publishedAt,
-          ]),
+            firstPublishedAtToInsert.map(([itemId, publishedAt]) => [
+              itemId,
+              FIRST_PUBLISHED_AT_ATTRIBUTE_NAME,
+              this.getId(),
+              publishedAt,
+            ]),
+          ),
         )
       }
 
@@ -378,13 +396,15 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
   private async loadMetaStringValue(itemId: string, attributeName: string): Promise<string | null> {
     const conn = await this.db.getConnection()
     try {
-      const rows = (await conn.query(
-        `select value
+      const rows = (await observeDbQuery('select', 'meta', () =>
+        conn.query(
+          `select value
          from meta
          where group_id = ?
            and item_uid = ?
            and attribute_name = ?`,
-        [this.getId(), itemId, attributeName],
+          [this.getId(), itemId, attributeName],
+        ),
       )) as MetaRow[]
 
       const row = rows[0]
@@ -401,13 +421,15 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
   private async loadApplicationMeta(itemId: string): Promise<JobAdApplicationMeta> {
     const conn = await this.db.getConnection()
     try {
-      const rows = (await conn.query(
-        `select value
+      const rows = (await observeDbQuery('select', 'meta', () =>
+        conn.query(
+          `select value
          from meta
          where group_id = ?
            and item_uid = ?
            and attribute_name = ?`,
-        [this.getId(), itemId, APPLICATION_ATTRIBUTE_NAME],
+          [this.getId(), itemId, APPLICATION_ATTRIBUTE_NAME],
+        ),
       )) as MetaRow[]
 
       const row = rows[0]
@@ -435,22 +457,26 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     itemId: string,
     meta: JobAdApplicationMeta,
   ): Promise<void> {
-    await conn.query(
-      `insert into meta (item_uid, attribute_name, group_id, value)
+    await observeDbQuery('insert', 'meta', () =>
+      conn.query(
+        `insert into meta (item_uid, attribute_name, group_id, value)
        values (?, ?, ?, ?)
        on duplicate key update value = values(value), group_id = values(group_id)`,
-      [itemId, APPLICATION_ATTRIBUTE_NAME, this.getId(), meta],
+        [itemId, APPLICATION_ATTRIBUTE_NAME, this.getId(), meta],
+      ),
     )
   }
 
   private async markMeta(itemUid: string, attributeName: string, value: boolean): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(
-        `insert into meta (item_uid, attribute_name, group_id, value)
+      await observeDbQuery('insert', 'meta', () =>
+        conn.query(
+          `insert into meta (item_uid, attribute_name, group_id, value)
          values (?, ?, ?, ?)
          on duplicate key update value = values(value), group_id = values(group_id)`,
-        [itemUid, attributeName, this.getId(), value],
+          [itemUid, attributeName, this.getId(), value],
+        ),
       )
     } finally {
       conn.release()
@@ -460,11 +486,13 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
   private async unmarkMeta(itemUid: string, attributeName: string): Promise<void> {
     const conn = await this.db.getConnection()
     try {
-      await conn.query(`delete from meta where group_id = ? and item_uid = ? and attribute_name = ?`, [
-        this.getId(),
-        itemUid,
-        attributeName,
-      ])
+      await observeDbQuery('delete', 'meta', () =>
+        conn.query(`delete from meta where group_id = ? and item_uid = ? and attribute_name = ?`, [
+          this.getId(),
+          itemUid,
+          attributeName,
+        ]),
+      )
     } finally {
       conn.release()
     }

@@ -1,4 +1,5 @@
 import type { Pool } from 'mariadb'
+import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { captureInvalidInput, captureProductionError } from '@/sentry'
 
 export const JOB_ADS_PREFERENCES_SCOPE = 'job-ads'
@@ -46,12 +47,14 @@ type PreferenceRow = {
 export async function loadAcceptableSalary(db: Pool): Promise<number | null> {
   const conn = await db.getConnection()
   try {
-    const rows = (await conn.query(
-      `select value
+    const rows = (await observeDbQuery('select', 'preferences', () =>
+      conn.query(
+        `select value
        from preferences
        where scope = ?
          and preference_key = ?`,
-      [JOB_ADS_PREFERENCES_SCOPE, ACCEPTABLE_SALARY_PREFERENCE_KEY],
+        [JOB_ADS_PREFERENCES_SCOPE, ACCEPTABLE_SALARY_PREFERENCE_KEY],
+      ),
     )) as PreferenceRow[]
 
     const row = rows[0]
@@ -71,11 +74,13 @@ export async function loadAcceptableSalary(db: Pool): Promise<number | null> {
 export async function saveAcceptableSalary(db: Pool, value: number): Promise<void> {
   const conn = await db.getConnection()
   try {
-    await conn.query(
-      `insert into preferences (scope, preference_key, value)
+    await observeDbQuery('insert', 'preferences', () =>
+      conn.query(
+        `insert into preferences (scope, preference_key, value)
        values (?, ?, ?)
        on duplicate key update value = values(value)`,
-      [JOB_ADS_PREFERENCES_SCOPE, ACCEPTABLE_SALARY_PREFERENCE_KEY, value],
+        [JOB_ADS_PREFERENCES_SCOPE, ACCEPTABLE_SALARY_PREFERENCE_KEY, value],
+      ),
     )
   } finally {
     conn.release()

@@ -1,5 +1,6 @@
 import { DayWeatherForecast } from '@repo/types'
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import { basename } from 'path'
 import { requireElements, requireText, withScraperSource } from '@/utils/scraper'
 import { weatherPageUrls } from '../urls'
@@ -29,5 +30,6 @@ export const parseForecastFromDocument = (document: Document): DayWeatherForecas
   })
 
 export const parseForecast = async (): Promise<DayWeatherForecast[]> => {
-  return parseForecastFromDocument(await fetchDocument(weatherPageUrls.forecast))
+  const url = weatherPageUrls.forecast
+  return parseForecastFromDocument(await observeHttpFetch(url, 'html', () => fetchDocument(url)))
 }

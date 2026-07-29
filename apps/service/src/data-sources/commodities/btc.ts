@@ -1,4 +1,5 @@
 import { fetchDocument } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import { parseBtcPriceFromDocument } from './parseFromDocument'
 
 type BtcPrice = {
@@ -6,7 +7,9 @@ type BtcPrice = {
 }
 
 const fetchBtcPrice = async (): Promise<BtcPrice> => {
-  return fetchDocument('https://www.cnbc.com/quotes/BTC.BS=', { accept: 'text/html' }).then(parseBtcPriceFromDocument)
+  const url = 'https://www.cnbc.com/quotes/BTC.BS='
+  const document = await observeHttpFetch(url, 'html', () => fetchDocument(url, { accept: 'text/html' }))
+  return parseBtcPriceFromDocument(document)
 }
 
 export type { BtcPrice }

@@ -1,4 +1,5 @@
 import { fetchJSON } from '@/fetch'
+import { observeHttpFetch } from '@/prometheus/scraperMetrics'
 import { JobAd } from '@repo/types'
 import { toJobAd } from './toJobAd'
 import { JustJoinAd } from './types'
@@ -11,9 +12,9 @@ type JustJoinResponse = {
 }
 
 const jjit = async (): Promise<JobAd[]> => {
-  return fetchJSON<JustJoinResponse>(API_ENDPOINT_URL, { accept: 'application/json' }).then(resp =>
-    resp.data.map(toJobAd),
-  )
+  return observeHttpFetch(API_ENDPOINT_URL, 'json', () =>
+    fetchJSON<JustJoinResponse>(API_ENDPOINT_URL, { accept: 'application/json' }),
+  ).then(resp => resp.data.map(toJobAd))
 }
 
 export { jjit }
