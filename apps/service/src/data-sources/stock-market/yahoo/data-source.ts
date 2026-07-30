@@ -1,5 +1,4 @@
 import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
-import { observeScraperRefresh } from '@/prometheus/scraperMetrics'
 import { getTickerData, sleep } from './src'
 import { tickerList } from '../tickerList'
 import { YahooTickerData } from './types'
@@ -17,15 +16,17 @@ export class YahooMarketDataSource extends DataSourceDefinition<YahooTickerData[
     return CacheAgeUnit.HOUR * 24
   }
 
-  async getData() {
-    return observeScraperRefresh(this.getId(), async () => {
-      const yahooTickerData: YahooTickerData[] = []
-      for (const ticker of tickerList) {
-        yahooTickerData.push(await getTickerData(ticker))
-        await sleep(1000)
-      }
+  getSourceMetricType() {
+    return 'api' as const
+  }
 
-      return yahooTickerData
-    })
+  async getData() {
+    const yahooTickerData: YahooTickerData[] = []
+    for (const ticker of tickerList) {
+      yahooTickerData.push(await getTickerData(ticker))
+      await sleep(1000)
+    }
+
+    return yahooTickerData
   }
 }

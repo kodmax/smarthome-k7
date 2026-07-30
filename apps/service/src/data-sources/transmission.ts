@@ -66,6 +66,14 @@ export class TransmissionSource extends DataSourceDefinition<TransmissionFeed> {
     return CacheAgeUnit.MINUTE
   }
 
+  public getSourceMetricType() {
+    return 'other' as const
+  }
+
+  public isMetricsEnabled(): boolean {
+    return false
+  }
+
   public async getData(): Promise<TransmissionFeed> {
     const stats = await this.transmission.getSessionStats()
 

@@ -46,6 +46,10 @@ export default (knx: KnxLink): DataSourceDefinitionClass<LightsFeed> => {
       return CacheAgeUnit.HOUR
     }
 
+    public getSourceMetricType() {
+      return 'knx' as const
+    }
+
     public async getData(): Promise<LightsFeed> {
       for (const circuit of homeLights) {
         const status = this.statuses.get(circuit.id)

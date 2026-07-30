@@ -48,6 +48,10 @@ export class IndoorTempHistorySource extends DataSourceDefinition<TempHistory> {
     return CacheAgeUnit.MINUTE * 5
   }
 
+  getSourceMetricType() {
+    return 'db' as const
+  }
+
   async getData() {
     const conn = await this.db.getConnection()
     try {

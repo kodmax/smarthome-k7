@@ -1,5 +1,4 @@
 import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
-import { observeScraperRefresh } from '@/prometheus/scraperMetrics'
 import { getForexRates } from './getForexRates'
 import { CnbcForexData } from './types'
 
@@ -16,7 +15,11 @@ export class CnbcForexSource extends DataSourceDefinition<CnbcForexData> {
     return CacheAgeUnit.HOUR * 24
   }
 
+  getSourceMetricType() {
+    return 'scraper' as const
+  }
+
   async getData() {
-    return observeScraperRefresh(this.getId(), () => getForexRates())
+    return getForexRates()
   }
 }

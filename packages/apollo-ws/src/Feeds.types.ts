@@ -1,4 +1,9 @@
-import { DataSource, DataSourceDefinition, AnyDataSourceDefinitionClass } from './DataSource'
+import {
+  DataSource,
+  DataSourceDefinition,
+  AnyDataSourceDefinitionClass,
+  type DataSourceRefreshObserver,
+} from './DataSource'
 import type { ErrorHandler } from './notifyError'
 import type { Logger } from '@repo/logger'
 
@@ -30,4 +35,5 @@ export type Feed = {
 export type FeedsOptions = {
   logger: Logger
   onError: ErrorHandler
+  observeDataSourceRefresh?: DataSourceRefreshObserver
 }

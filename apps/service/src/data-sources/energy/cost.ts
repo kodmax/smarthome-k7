@@ -32,6 +32,10 @@ export class EnergyCostSource extends DataSourceDefinition<EnergyCost> {
     return CacheAgeUnit.DAY
   }
 
+  getSourceMetricType() {
+    return 'db' as const
+  }
+
   async getData() {
     const conn = await this.db.getConnection()
     try {

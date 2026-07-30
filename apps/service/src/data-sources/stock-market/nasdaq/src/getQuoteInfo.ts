@@ -1,5 +1,5 @@
 import { fetchJSON } from '@/fetch'
-import { observeHttpFetch } from '@/prometheus/scraperMetrics'
+import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { NasdaqApiQuoteInfo, NasdaqApiResponse } from './types'
 
 const nasdaqHeaders = {

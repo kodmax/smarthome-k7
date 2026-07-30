@@ -1,5 +1,5 @@
 import { fetchDocument } from '@/fetch'
-import { observeHttpFetch } from '@/prometheus/scraperMetrics'
+import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { detectOrigin } from './detectOrigin'
 import { parseJobPosting as parseJjitJobPosting } from './jjit/parseJobPosting'
 import { parseJobPosting as parseNfjJobPosting } from './nfj/parseJobPosting'

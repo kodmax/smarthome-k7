@@ -17,6 +17,14 @@ export class SentryTestSource extends DataSourceDefinition<SentryTestData> {
     return 0
   }
 
+  getSourceMetricType() {
+    return 'other' as const
+  }
+
+  isMetricsEnabled() {
+    return false
+  }
+
   async getData() {
     return {}
   }

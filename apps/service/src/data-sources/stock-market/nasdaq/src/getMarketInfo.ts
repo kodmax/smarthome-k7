@@ -1,5 +1,5 @@
 import { fetchJSON } from '@/fetch'
-import { observeHttpFetch } from '@/prometheus/scraperMetrics'
+import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { NasdaqApiMarketInfo, NasdaqApiResponse } from './types'
 import { NasdaqMarketInfo } from '../types'
 import { parseNasdaqEasternDisplay, parseNasdaqTradeDate } from './parseNasdaqEastern'

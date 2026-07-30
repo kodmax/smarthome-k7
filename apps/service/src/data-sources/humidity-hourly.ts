@@ -20,6 +20,10 @@ export class HumidityHourlySource extends DataSourceDefinition<{ date: string; t
     return CacheAgeUnit.MINUTE * 5
   }
 
+  getSourceMetricType() {
+    return 'db' as const
+  }
+
   async getData() {
     const conn = await this.db.getConnection()
     try {

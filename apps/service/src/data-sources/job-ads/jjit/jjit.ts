@@ -1,5 +1,5 @@
 import { fetchJSON } from '@/fetch'
-import { observeHttpFetch } from '@/prometheus/scraperMetrics'
+import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { JobAd } from '@repo/types'
 import { toJobAd } from './toJobAd'
 import { JustJoinAd } from './types'

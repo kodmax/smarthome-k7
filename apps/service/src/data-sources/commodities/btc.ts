@@ -1,5 +1,5 @@
 import { fetchDocument } from '@/fetch'
-import { observeHttpFetch } from '@/prometheus/scraperMetrics'
+import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { parseBtcPriceFromDocument } from './parseFromDocument'
 
 type BtcPrice = {

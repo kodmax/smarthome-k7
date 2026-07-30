@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
 import { Inject } from '@/di'
 import { fetchDocument } from '@/fetch'
-import { observeHttpFetch, observeScraperRefresh } from '@/prometheus/scraperMetrics'
+import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { Article, NewsCachedFeed, NewsFeed } from '@repo/types'
 import type { config as AppConfig } from '../config'
@@ -53,10 +53,14 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
     return CacheAgeUnit.MINUTE * 5
   }
 
+  getSourceMetricType() {
+    return 'scraper' as const
+  }
+
   async getData() {
-    return observeScraperRefresh(this.getId(), async () => ({
+    return {
       articles: await this.fetchArticles(),
-    }))
+    }
   }
 
   async composeContent(cached: NewsCachedFeed): Promise<NewsFeed> {

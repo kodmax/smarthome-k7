@@ -1,6 +1,6 @@
 import { HourWeatherForecast } from '@repo/types'
 import { fetchDocument } from '@/fetch'
-import { observeHttpFetch } from '@/prometheus/scraperMetrics'
+import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import * as suncalc from 'suncalc'
 import { basename } from 'path'
 import { requireElements, requireText, withScraperSource } from '@/utils/scraper'

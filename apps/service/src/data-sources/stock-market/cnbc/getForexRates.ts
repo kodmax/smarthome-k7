@@ -1,5 +1,5 @@
 import { fetchDocument } from '@/fetch'
-import { observeHttpFetch } from '@/prometheus/scraperMetrics'
+import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { CnbcForexData } from './types'
 import { parseFXFromDocument } from './parseFX'
 

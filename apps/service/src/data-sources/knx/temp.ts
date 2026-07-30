@@ -22,6 +22,10 @@ export default (id: string, dp: DPT_Value_Temp): DataSourceDefinitionClass<KnxRe
       return CacheAgeUnit.SECOND * 60
     }
 
+    public getSourceMetricType() {
+      return 'knx' as const
+    }
+
     public async getData(): Promise<KnxReading<number>> {
       return await dp.read()
     }

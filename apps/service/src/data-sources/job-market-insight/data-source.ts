@@ -29,6 +29,10 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
     return CacheAgeUnit.HOUR * 4
   }
 
+  getSourceMetricType() {
+    return 'api' as const
+  }
+
   async getData() {
     const allAds = new Map<string, JobAd>()
 

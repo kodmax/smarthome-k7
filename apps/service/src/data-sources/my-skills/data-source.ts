@@ -36,6 +36,10 @@ export class MySkillsSource extends DataSourceDefinition<MySkillsFeed, MySkillsC
     return CacheAgeUnit.HOUR * 4
   }
 
+  getSourceMetricType() {
+    return 'db' as const
+  }
+
   async getData(): Promise<MySkillsCachedFeed> {
     return {}
   }

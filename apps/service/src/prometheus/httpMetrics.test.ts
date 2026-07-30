@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { observeHttpFetch, observeHttpRequest, observeScraperRefresh } from './scraperMetrics'
+import { observeHttpFetch, observeHttpRequest } from './httpMetrics'
 
 describe('observeHttpFetch', () => {
   it('returns the callback result', async () => {
@@ -32,30 +32,5 @@ describe('observeHttpRequest', () => {
         throw error
       }),
     ).rejects.toThrow(error)
-  })
-})
-
-describe('observeScraperRefresh', () => {
-  it('returns the function result', async () => {
-    await expect(observeScraperRefresh('weather', async () => ({ ok: true }))).resolves.toEqual({ ok: true })
-  })
-
-  it('propagates errors', async () => {
-    const error = new Error('scrape failed')
-    await expect(
-      observeScraperRefresh('weather', async () => {
-        throw error
-      }),
-    ).rejects.toThrow(error)
-  })
-
-  it('is a no-op wrapper when NO_METRICS=1', async () => {
-    vi.stubEnv('NO_METRICS', '1')
-    const fn = vi.fn(async () => 'value')
-
-    await expect(observeScraperRefresh('weather', fn)).resolves.toBe('value')
-    expect(fn).toHaveBeenCalledOnce()
-
-    vi.unstubAllEnvs()
   })
 })

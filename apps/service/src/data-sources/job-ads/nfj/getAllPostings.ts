@@ -1,4 +1,4 @@
-import { observeHttpRequest } from '@/prometheus/scraperMetrics'
+import { observeHttpRequest } from '@/prometheus/httpMetrics'
 import { NoFluffJobsAd } from './types'
 
 const allPostingsUrl =

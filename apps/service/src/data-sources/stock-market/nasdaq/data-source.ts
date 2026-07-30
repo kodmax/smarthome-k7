@@ -1,5 +1,4 @@
 import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
-import { observeScraperRefresh } from '@/prometheus/scraperMetrics'
 import { tickerList } from '../tickerList'
 import { NasdaqMarketData } from './types'
 import { getMarketInfo, getTickerData } from './src'
@@ -17,11 +16,13 @@ export class NasdaqMarketDataSource extends DataSourceDefinition<NasdaqMarketDat
     return CacheAgeUnit.HOUR * 24
   }
 
-  async getData() {
-    return observeScraperRefresh(this.getId(), async () => {
-      const [marketInfo, tickers] = await Promise.all([getMarketInfo(), Promise.all(tickerList.map(getTickerData))])
+  getSourceMetricType() {
+    return 'api' as const
+  }
 
-      return { marketInfo, tickers }
-    })
+  async getData() {
+    const [marketInfo, tickers] = await Promise.all([getMarketInfo(), Promise.all(tickerList.map(getTickerData))])
+
+    return { marketInfo, tickers }
   }
 }

@@ -115,6 +115,7 @@ export class Feeds {
       this.vent,
       this.options.logger,
       this.options.onError,
+      this.options.observeDataSourceRefresh,
     )
     const sourceId = dataSource.getId()
 

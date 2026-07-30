@@ -43,6 +43,10 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
     return CacheAgeUnit.HOUR * 4
   }
 
+  getSourceMetricType() {
+    return 'db' as const
+  }
+
   async getData(): Promise<CvCachedFeed> {
     return {}
   }

@@ -22,6 +22,10 @@ export default (id: string, dp: DPT_ActiveEnergy): DataSourceDefinitionClass<Knx
       return CacheAgeUnit.SECOND * 3
     }
 
+    public getSourceMetricType() {
+      return 'knx' as const
+    }
+
     public async getData(): Promise<KnxReading<number>> {
       return await dp.read()
     }

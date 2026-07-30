@@ -1,5 +1,5 @@
 import { config } from '@/config'
-import { observeHttpRequest } from '@/prometheus/scraperMetrics'
+import { observeHttpRequest } from '@/prometheus/httpMetrics'
 import { SearchResults } from './types'
 
 const theprotocolAdsUrl =

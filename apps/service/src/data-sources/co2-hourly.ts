@@ -21,6 +21,10 @@ export class Co2HourlySource extends DataSourceDefinition<{ date: string; today:
     return CacheAgeUnit.MINUTE * 5
   }
 
+  getSourceMetricType() {
+    return 'db' as const
+  }
+
   async getData() {
     const conn = await this.db.getConnection()
     try {

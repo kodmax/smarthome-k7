@@ -1,5 +1,4 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
-import { observeScraperRefresh } from '@/prometheus/scraperMetrics'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { Inject } from '@/di'
 import type { Pool } from 'mariadb'
@@ -143,20 +142,22 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     return CacheAgeUnit.HOUR * 4
   }
 
+  getSourceMetricType() {
+    return 'api' as const
+  }
+
   async getData() {
-    return observeScraperRefresh(this.getId(), async () => {
-      const allAds = new Map<string, JobAd>()
+    const allAds = new Map<string, JobAd>()
 
-      addAds(allAds, await jjit())
-      addAds(allAds, await nfj())
-      addAds(allAds, await theprotocol())
+    addAds(allAds, await jjit())
+    addAds(allAds, await nfj())
+    addAds(allAds, await theprotocol())
 
-      return {
-        ads: [...allAds.values()].sort(
-          (a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0),
-        ),
-      }
-    })
+    return {
+      ads: [...allAds.values()].sort(
+        (a, b) => (b.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.monthlySalaryRangeAfterTaxes?.to ?? 0),
+      ),
+    }
   }
 
   async composeContent(cached: JobAdsCachedFeed): Promise<JobAdsFeed> {

@@ -1,7 +1,7 @@
 import { getNumberContent } from '@/utils/get-number-content'
 import { withScraperSource } from '@/utils/scraper'
 import { fetchDocument } from '@/fetch'
-import { observeHttpFetch } from '@/prometheus/scraperMetrics'
+import { observeHttpFetch } from '@/prometheus/httpMetrics'
 
 type NaturalGasPrice = {
   GJ: string

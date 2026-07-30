@@ -4,6 +4,14 @@ import { NoRecentContent } from './Errors'
 import { ApolloEvents } from './ApolloEvents'
 import { notifyError, type ErrorHandler } from './notifyError'
 
+export type SourceMetricType = 'knx' | 'scraper' | 'api' | 'db' | 'other'
+
+export type DataSourceRefreshObserver = <T>(
+  metricType: SourceMetricType,
+  sourceId: string,
+  fn: () => Promise<T>,
+) => Promise<T>
+
 export abstract class DataSourceDefinition<T, TCache = T> {
   public constructor(
     protected readonly push: (content?: T) => void | Promise<void>,
@@ -43,6 +51,14 @@ export abstract class DataSourceDefinition<T, TCache = T> {
   public isVolatile(): boolean {
     return false
   }
+
+  public getSourceMetricType(): SourceMetricType {
+    return 'other'
+  }
+
+  public isMetricsEnabled(): boolean {
+    return true
+  }
 }
 
 export type DataSourceDefinitionClass<T = unknown, TCache = T> = new (
@@ -80,6 +96,7 @@ class DataSource<T, TCache = T> {
     private vent: ApolloEvents,
     private logger: Logger,
     private onError: ErrorHandler,
+    private observeDataSourceRefresh: DataSourceRefreshObserver | undefined,
   ) {}
 
   public static async fromClass<T, TCache = T>(
@@ -88,6 +105,7 @@ class DataSource<T, TCache = T> {
     vent: ApolloEvents,
     logger: Logger,
     onError: ErrorHandler,
+    observeDataSourceRefresh?: DataSourceRefreshObserver,
   ): Promise<DataSource<T, TCache>> {
     // eslint-disable-next-line prefer-const -- forward ref: push callback needs dataSource before assignment
     let dataSource!: DataSource<T, TCache>
@@ -104,7 +122,7 @@ class DataSource<T, TCache = T> {
     const cacheEntry = await cache.getEntry<TCache>(definition.isVolatile() ? undefined : definition.getId(), {
       ttlMs: definition.getCacheTTL(),
     })
-    dataSource = new DataSource(definition, cacheEntry, vent, logger, onError)
+    dataSource = new DataSource(definition, cacheEntry, vent, logger, onError, observeDataSourceRefresh)
 
     return dataSource
   }
@@ -203,9 +221,18 @@ class DataSource<T, TCache = T> {
     const sourceId = this.definition.getId()
     const start = Date.now()
 
+    const runGetData = (): Promise<TCache> => {
+      const fetchData = () => this.definition.getData()
+
+      if (this.observeDataSourceRefresh !== undefined && this.definition.isMetricsEnabled()) {
+        return this.observeDataSourceRefresh(this.definition.getSourceMetricType(), sourceId, fetchData)
+      }
+
+      return fetchData()
+    }
+
     const promise = new Promise<T>((resolve, reject) => {
-      this.definition
-        .getData()
+      runGetData()
         .then(async cached => {
           await this.cacheEntry.write(cached)
           const content = await this.definition.composeContent(cached)

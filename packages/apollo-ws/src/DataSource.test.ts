@@ -4,7 +4,7 @@ import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApolloEvents } from './ApolloEvents'
 import { FSCache } from './cache'
-import { DataSource, DataSourceDefinition, DataSourceDefinitionClass } from './DataSource'
+import { DataSource, DataSourceDefinition, DataSourceDefinitionClass, type SourceMetricType } from './DataSource'
 import { NoRecentContent } from './Errors'
 import { createSilentLogger } from '@repo/logger'
 import { noopErrorHandler } from './notifyError'
@@ -16,6 +16,8 @@ function createTestSourceClass<T, TCache = T>(options: {
   getData?: () => Promise<TCache>
   composeContent?: (cached: TCache) => Promise<T>
   isVolatile?: boolean
+  getSourceMetricType?: () => SourceMetricType
+  isMetricsEnabled?: () => boolean
   handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
   maintenance?: () => void | Promise<void>
 }): DataSourceDefinitionClass<T, TCache> {
@@ -50,6 +52,14 @@ function createTestSourceClass<T, TCache = T>(options: {
       return options.isVolatile ?? false
     }
 
+    public getSourceMetricType(): SourceMetricType {
+      return options.getSourceMetricType?.() ?? 'other'
+    }
+
+    public isMetricsEnabled(): boolean {
+      return options.isMetricsEnabled?.() ?? true
+    }
+
     public async maintenance(): Promise<void> {
       await options.maintenance?.()
     }
@@ -69,13 +79,21 @@ describe('DataSource', () => {
   async function createDataSource<T, TCache = T>(
     SourceClass: DataSourceDefinitionClass<T, TCache>,
     onError = noopErrorHandler,
+    observeDataSourceRefresh?: Parameters<typeof DataSource.fromClass>[5],
   ) {
     const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-ds-'))
     cacheDirs.push(cacheDir)
 
     const vent = new ApolloEvents()
     const cache = new FSCache(cacheDir)
-    const dataSource = await DataSource.fromClass(SourceClass, cache, vent, createSilentLogger(), onError)
+    const dataSource = await DataSource.fromClass(
+      SourceClass,
+      cache,
+      vent,
+      createSilentLogger(),
+      onError,
+      observeDataSourceRefresh,
+    )
 
     return {
       dataSource,
@@ -370,6 +388,43 @@ describe('DataSource', () => {
     await dataSource.getData()
 
     expect(updates).toEqual(['getdata-emit'])
+  })
+
+  it('calls observeDataSourceRefresh when metrics are enabled', async () => {
+    const getData = vi.fn(async () => ({ value: 1 }))
+    const observeDataSourceRefresh = vi.fn(async (_metricType, _sourceId, fn) => fn())
+    const { dataSource } = await createDataSource(
+      createTestSourceClass({
+        id: 'metrics-src',
+        getSourceMetricType: () => 'api',
+        getData,
+      }),
+      noopErrorHandler,
+      observeDataSourceRefresh,
+    )
+
+    await expect(dataSource.getData()).resolves.toEqual({ value: 1 })
+    expect(observeDataSourceRefresh).toHaveBeenCalledOnce()
+    expect(observeDataSourceRefresh).toHaveBeenCalledWith('api', 'metrics-src', expect.any(Function))
+    expect(getData).toHaveBeenCalledOnce()
+  })
+
+  it('skips observeDataSourceRefresh when metrics are disabled', async () => {
+    const getData = vi.fn(async () => ({ value: 1 }))
+    const observeDataSourceRefresh = vi.fn(async (_metricType, _sourceId, fn) => fn())
+    const { dataSource } = await createDataSource(
+      createTestSourceClass({
+        id: 'no-metrics-src',
+        isMetricsEnabled: () => false,
+        getData,
+      }),
+      noopErrorHandler,
+      observeDataSourceRefresh,
+    )
+
+    await expect(dataSource.getData()).resolves.toEqual({ value: 1 })
+    expect(observeDataSourceRefresh).not.toHaveBeenCalled()
+    expect(getData).toHaveBeenCalledOnce()
   })
 
   it('calls onError when getData fails', async () => {

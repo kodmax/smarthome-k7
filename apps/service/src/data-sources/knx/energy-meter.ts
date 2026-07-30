@@ -70,6 +70,10 @@ export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> 
     return CacheAgeUnit.SECOND * 3
   }
 
+  getSourceMetricType() {
+    return 'knx' as const
+  }
+
   async getData() {
     return await this.intermediateReading.read()
   }

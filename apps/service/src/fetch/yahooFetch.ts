@@ -1,6 +1,6 @@
 import { URL } from 'url'
 import { parseHTML } from 'linkedom'
-import { observeHttpRequest } from '@/prometheus/scraperMetrics'
+import { observeHttpRequest } from '@/prometheus/httpMetrics'
 import { FetchError } from './FetchError'
 
 export async function yahooFetch(url: string): Promise<Document> {

@@ -13,7 +13,7 @@ import { knxInit } from './knx-init'
 import { registerApollo, registerKnxCron, setupGracefulShutdown } from './graceful-shutdown'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
-import { initPrometheus, registerWsMetrics } from './prometheus'
+import { initPrometheus, registerWsMetrics, observeDataSourceRefresh } from './prometheus'
 import { initSentry, captureProductionError } from './sentry'
 
 const logger = createLogger({ name: 'service' })
@@ -48,6 +48,7 @@ Server.listen(
     const feeds = new Feeds(cache, apollo.vent, {
       logger: logger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
       onError: reportProductionError,
+      observeDataSourceRefresh,
     })
 
     registerApollo(apollo, feeds)
