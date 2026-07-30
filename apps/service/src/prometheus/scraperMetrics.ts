@@ -2,8 +2,6 @@ import { Counter, Gauge, Histogram, register } from 'prom-client'
 import { FetchError } from '@/fetch/FetchError'
 import { isMetricsEnabled } from './metricsEnabled'
 
-const scraperDurationBuckets = [0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1, 2, 5]
-
 export type HttpContentFormat = 'json' | 'html'
 
 const scraperHttpRequests = new Counter({
@@ -17,7 +15,7 @@ const scraperHttpDuration = new Histogram({
   name: 'apollo_daemon_scraper_http_request_duration_seconds',
   help: 'HTTP request duration for scrapers in seconds',
   labelNames: ['host', 'format'],
-  buckets: scraperDurationBuckets,
+  buckets: [0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 7, 10],
   registers: [register],
 })
 
@@ -32,7 +30,7 @@ const scraperRefreshDuration = new Histogram({
   name: 'apollo_daemon_scraper_refresh_duration_seconds',
   help: 'Scraper data source refresh duration in seconds',
   labelNames: ['source'],
-  buckets: scraperDurationBuckets,
+  buckets: [0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 7, 10, 15],
   registers: [register],
 })
 
