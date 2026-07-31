@@ -2,6 +2,7 @@ import * as esbuild from 'esbuild'
 import { sentryEsbuildPlugin } from '@sentry/bundler-plugins/esbuild'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {externalizeThirdPartyPackagesPlugin} from './externalizeThirdPartyPackagesPlugin.mjs'
 
 const serviceRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 const watch = process.argv.includes('--watch')
@@ -24,14 +25,17 @@ if (process.env.SENTRY_AUTH_TOKEN) {
 
 /** @type {import('esbuild').BuildOptions} */
 const buildOptions = {
-  entryPoints: [join(serviceRoot, 'src/index.ts')],
-  outfile: join(serviceRoot, 'dist/index.js'),
+  entryPoints: [join(serviceRoot, 'src/otel-instrumentation.ts'), join(serviceRoot, 'src/index.ts')],
+  outdir: join(serviceRoot, 'dist'),
   bundle: true,
   platform: 'node',
   format: 'cjs',
   sourcemap: true,
   target: 'node18',
-  plugins,
+  plugins: [
+    externalizeThirdPartyPackagesPlugin(['@repo/', '@/']),
+    ...plugins
+  ],
   alias: {
     '@/utils': join(serviceRoot, 'src/data-sources/utils'),
     '@': join(serviceRoot, 'src'),
