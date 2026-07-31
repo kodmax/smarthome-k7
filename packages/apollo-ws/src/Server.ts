@@ -48,10 +48,10 @@ export class Server {
 
   public static async listen<T>(
     { port = 3678, logger, onError }: ApolloWebSocketOptions,
-    init: (instance: Server) => Promise<T>,
+    init: (instance: Server, logger: Logger, onError: ErrorHandler) => Promise<T>,
   ): Promise<T> {
     const serv = new Server({ port, logger, onError })
-    const ret = await init(serv)
+    const ret = await init(serv, logger, onError)
     await serv.connect()
 
     return ret

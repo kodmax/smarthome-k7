@@ -3,7 +3,7 @@ process.setMaxListeners(11)
 import { Server, FSCache, RedisCache, Feeds } from '@repo/apollo-ws'
 import { initKnxCronJobs } from '@repo/cron-scripts'
 import { getDbPool } from '@repo/db'
-import { createLogger, readScopedLogLevel, redactUrl } from '@repo/logger'
+import { createLogger, readScopedLogLevel } from '@repo/logger'
 import { config } from './config'
 import path from 'node:path'
 import { appMode, isDevelopment } from '@repo/env'
@@ -16,14 +16,14 @@ import { initRedisClient } from './redis'
 import { initPrometheus, registerWsMetrics, observeDataSourceRefresh } from './prometheus'
 import { initSentry, captureProductionError } from './sentry'
 
-const logger = createLogger({ name: 'service' })
+const rootLogger = createLogger({ name: 'service' })
 
 if (isDevelopment) {
-  logger.info({ appMode }, 'app mode')
+  rootLogger.info({ appMode }, 'App mode')
 }
 
-initSentry(logger.child({ component: 'sentry' }, { level: readScopedLogLevel('sentry') }))
-initPrometheus(logger.child({ component: 'metrics' }, { level: readScopedLogLevel('metrics') }))
+initSentry(rootLogger)
+initPrometheus(rootLogger)
 
 const reportProductionError = (error: unknown, context: string) => {
   captureProductionError(error instanceof Error ? error : new Error(context, { cause: error }))
@@ -33,20 +33,23 @@ registerDependency('config', config)
 registerDependency('db', getDbPool())
 registerDependency('openai', initOpenAIClient())
 
-setupGracefulShutdown(logger)
+setupGracefulShutdown(rootLogger)
 
 Server.listen(
-  { logger: logger.child({ component: 'ws' }, { level: readScopedLogLevel('ws') }), onError: reportProductionError },
-  async apollo => {
+  {
+    logger: rootLogger.child({ component: 'ws' }, { level: readScopedLogLevel('ws') }),
+    onError: reportProductionError,
+  },
+  async (apollo, logger) => {
     const cacheBackend = config.redis.disabled ? 'fs' : 'redis'
 
     if (cacheBackend === 'redis') {
-      registerDependency('redis', await initRedisClient(logger))
+      registerDependency('redis', await initRedisClient(rootLogger))
     }
 
     const cache = cacheBackend === 'fs' ? new FSCache(config.cache.dir) : new RedisCache(getDependency('redis'))
     const feeds = new Feeds(cache, apollo.vent, {
-      logger: logger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
+      logger: rootLogger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
       onError: reportProductionError,
       observeDataSourceRefresh,
     })
@@ -55,23 +58,23 @@ Server.listen(
     registerWsMetrics(apollo.vent)
 
     await initWebFeeds(feeds)
-    logger.info({ feedCount: feeds.getFeedCount() }, 'Web feeds initialized')
 
     if (!config.knx.disabled) {
-      const knx = await knxInit(logger.child({ component: 'knx' }, { level: readScopedLogLevel('knx') }))
+      const knx = await knxInit(logger)
       registerDependency('knx', knx)
       await initKnxFeeds(feeds, knx)
-      logger.info({ feedCount: feeds.getFeedCount() }, 'KNX feeds initialized')
 
       if (!config.cron.disabled) {
         registerKnxCron(
-          initKnxCronJobs(knx, logger.child({ component: 'knx-cron' }, { level: readScopedLogLevel('knx-cron') })),
+          initKnxCronJobs(knx, rootLogger.child({ component: 'knx-cron' }, { level: readScopedLogLevel('knx-cron') })),
         )
-        logger.info('KNX cron jobs initialized')
+        rootLogger.info('KNX cron jobs initialized')
       }
     }
 
-    logger.info(
+    logger.info({ feedCount: feeds.getFeedCount() }, 'Feeds initialized')
+
+    rootLogger.info(
       {
         appMode,
         cacheBackend,
@@ -79,7 +82,6 @@ Server.listen(
         knx: !config.knx.disabled,
         cron: !config.cron.disabled,
         redis: cacheBackend === 'redis',
-        ...(cacheBackend === 'redis' ? { redisHost: redactUrl(config.redis.url) } : {}),
         feedCount: feeds.getFeedCount(),
       },
       'Service initialized',

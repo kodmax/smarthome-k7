@@ -19,6 +19,8 @@ export function initSentry(logger: Logger): void {
     release: process.env.SENTRY_RELEASE,
     tracesSampleRate: 0.2,
   })
+
+  logger.info({ dsn }, 'Sentry enabled')
 }
 
 export async function closeSentry(timeoutMs = 2000): Promise<void> {
