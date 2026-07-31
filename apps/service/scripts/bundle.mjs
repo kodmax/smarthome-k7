@@ -33,7 +33,7 @@ const buildOptions = {
   sourcemap: true,
   target: 'node18',
   plugins: [
-    externalizeThirdPartyPackagesPlugin(['@repo/', '@/']),
+    externalizeThirdPartyPackagesPlugin(['@repo/', '@/', '_sentry-']),
     ...plugins
   ],
   alias: {

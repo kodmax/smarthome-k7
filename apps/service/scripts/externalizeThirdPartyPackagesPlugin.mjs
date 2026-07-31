@@ -3,7 +3,7 @@ import { sentryEsbuildPlugin } from '@sentry/bundler-plugins/esbuild'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const externalizeThirdPartyPackagesPlugin = (bundleImports = ['@repo/', '@/']) => {
+export const externalizeThirdPartyPackagesPlugin = (bundleImports = []) => {
   return {
     name: 'externalize-third-party-packages',
 
