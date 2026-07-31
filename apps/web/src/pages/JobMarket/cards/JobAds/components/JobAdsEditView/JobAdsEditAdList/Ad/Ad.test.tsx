@@ -180,7 +180,7 @@ describe('Ad', () => {
     expect(screen.getByText('6d')).toBeInTheDocument()
   })
 
-  it('does not show abbreviated applied days when status is not applied', () => {
+  it('does not show abbreviated applied days when the offer was never applied', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-07-19T12:00:00'))
 
@@ -191,7 +191,7 @@ describe('Ad', () => {
         meta: {
           application: {
             status: 'not-applied',
-            appliedAt: '2026-07-13T08:00:00.000Z',
+            appliedAt: null,
           },
         },
       }),
@@ -200,6 +200,28 @@ describe('Ad', () => {
     )
 
     expect(screen.queryByText('6d')).not.toBeInTheDocument()
+  })
+
+  it('shows abbreviated applied days after the title when status moved past applied', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-07-19T12:00:00'))
+
+    renderAd(
+      jobAd({
+        id: '7c',
+        title: 'Interview Role',
+        meta: {
+          application: {
+            status: 'interview',
+            appliedAt: '2026-07-13T08:00:00.000Z',
+          },
+        },
+      }),
+      true,
+      true,
+    )
+
+    expect(screen.getByText('6d')).toBeInTheDocument()
   })
 
   it('shows an edit button in edit mode', () => {

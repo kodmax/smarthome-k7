@@ -111,8 +111,6 @@ describe('ApplicationStatusEditor', () => {
 
     expect(screen.getByText('Firma')).toBeInTheDocument()
     expect(screen.getByText('Acme Corp')).toBeInTheDocument()
-    expect(screen.getByText('Data publikacji')).toBeInTheDocument()
-    expect(screen.getByText('1 stycznia 2026')).toBeInTheDocument()
     expect(screen.getByText('Obecny status')).toBeInTheDocument()
     expect(screen.getByText('Data zaaplikowania')).toBeInTheDocument()
     expect(screen.getByText('Wymagane umiejętności')).toBeInTheDocument()
@@ -216,8 +214,71 @@ describe('ApplicationStatusEditor', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
 
     expect(screen.getByLabelText('Nowy status')).toBeInTheDocument()
-    expect(screen.getByLabelText('Komentarz')).toBeDisabled()
+    expect(screen.getByLabelText('Komentarz')).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Zapisz' })).toBeDisabled()
+  })
+
+  it('submits comment without changing status', () => {
+    const onSave = vi.fn()
+
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '14',
+          title: 'Role',
+          meta: { application: { status: 'no-response', comment: 'Follow-up sent' } },
+        })}
+        onSave={onSave}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
+    fireEvent.change(screen.getByLabelText('Komentarz'), { target: { value: 'Second follow-up sent' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
+
+    expect(onSave).toHaveBeenCalledWith('no-response', 'Second follow-up sent')
+  })
+
+  it('does not list the current status in next status options', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({ id: '15', title: 'Role', meta: { application: { status: 'no-response' } } })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Nowy status' }))
+
+    expect(screen.queryByRole('option', { name: 'Brak odpowiedzi' })).not.toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Zarchiwizowane' })).toBeInTheDocument()
+  })
+
+  it('allows comment-only editing for archived ads', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '16',
+          title: 'Role',
+          meta: { application: { status: 'archived', comment: 'Old note' } },
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
+
+    expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Komentarz')).toHaveValue('Old note')
   })
 
   it('submits the selected status and trimmed comment', () => {

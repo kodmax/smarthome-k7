@@ -9,18 +9,20 @@ import {
   Clock,
   CircleX,
   Handshake,
-  Layers,
   MailCheck,
+  Unplug,
   XCircle,
+  Scale,
   type LucideIcon,
 } from 'lucide-react'
 
 export const APPLY_STATUS_ICONS: Record<JobApplyStatus, LucideIcon> = {
   'not-applied': CircleDashed,
+  consider: Scale,
   applied: MailCheck,
   'not-interested': Ban,
   'unmet-requirements': ClipboardX,
-  'stack-mismatch': Layers,
+  'stack-mismatch': Unplug,
   rejected: XCircle,
   'no-response': Clock,
   interview: Calendar,
@@ -32,6 +34,7 @@ export const APPLY_STATUS_ICONS: Record<JobApplyStatus, LucideIcon> = {
 
 export const APPLY_STATUS_COLORS: Record<JobApplyStatus, string> = {
   'not-applied': 'var(--mui-palette-text-disabled)',
+  consider: 'var(--mui-palette-info-main)',
   applied: 'var(--mui-palette-success-main)',
   'not-interested': 'var(--mui-palette-error-main)',
   'unmet-requirements': 'var(--mui-palette-warning-main)',

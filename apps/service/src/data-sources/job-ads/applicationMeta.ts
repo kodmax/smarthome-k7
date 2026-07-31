@@ -3,6 +3,7 @@ import { captureInvalidInput } from '@/sentry'
 
 const APPLY_STATUSES = new Set<JobApplyStatus>([
   'not-applied',
+  'consider',
   'applied',
   'not-interested',
   'unmet-requirements',

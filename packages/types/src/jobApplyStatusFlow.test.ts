@@ -13,12 +13,24 @@ describe('jobApplyStatusFlow', () => {
     expect(canTransition('applied', 'applied')).toBe(true)
   })
 
-  it('allows not-applied to applied, not-interested, unmet-requirements, and stack-mismatch', () => {
+  it('allows not-applied to applied, consider, not-interested, unmet-requirements, and stack-mismatch', () => {
     expect(canTransition('not-applied', 'applied')).toBe(true)
+    expect(canTransition('not-applied', 'consider')).toBe(true)
     expect(canTransition('not-applied', 'not-interested')).toBe(true)
     expect(canTransition('not-applied', 'unmet-requirements')).toBe(true)
     expect(canTransition('not-applied', 'stack-mismatch')).toBe(true)
     expect(canTransition('not-applied', 'withdrawn')).toBe(false)
+  })
+
+  it('allows consider to the same targets as not-applied', () => {
+    expect(availableTargetApplyStatuses('consider')).toEqual([
+      'applied',
+      'not-interested',
+      'unmet-requirements',
+      'stack-mismatch',
+    ])
+    expect(canTransition('consider', 'applied')).toBe(true)
+    expect(canTransition('consider', 'not-applied')).toBe(false)
   })
 
   it('allows not-interested to not-applied, applied, unmet-requirements, stack-mismatch, and archived', () => {
@@ -40,16 +52,23 @@ describe('jobApplyStatusFlow', () => {
     expect(canTransition('applied', 'unmet-requirements')).toBe(true)
   })
 
-  it('allows the same follow-up statuses from no-response as from applied', () => {
+  it('allows the same follow-up statuses from no-response as from applied, except no-response itself', () => {
     expect(availableTargetApplyStatuses('no-response')).toEqual([
       'rejected',
-      'no-response',
       'interview',
       'withdrawn',
       'unmet-requirements',
+      'archived',
     ])
     expect(canTransition('no-response', 'interview')).toBe(true)
     expect(canTransition('no-response', 'rejected')).toBe(true)
+    expect(canTransition('no-response', 'archived')).toBe(true)
+    expect(canTransition('no-response', 'no-response')).toBe(true)
+  })
+
+  it('never lists the current status as a target option', () => {
+    expect(availableTargetApplyStatuses('applied')).not.toContain('applied')
+    expect(availableTargetApplyStatuses('no-response')).not.toContain('no-response')
   })
 
   it('allows interview and offer follow-up statuses', () => {
@@ -89,25 +108,40 @@ describe('jobApplyStatusFlow', () => {
     expect(isHiddenApplyStatus('applied')).toBe(false)
     expect(isHiddenApplyStatus('interview')).toBe(false)
     expect(isHiddenApplyStatus('not-applied')).toBe(false)
+    expect(isHiddenApplyStatus('consider')).toBe(false)
     expect(isHiddenApplyStatus('unmet-requirements')).toBe(true)
   })
 
   it('allows transitions from unmet-requirements', () => {
-    expect(availableTargetApplyStatuses('unmet-requirements')).toEqual(['not-applied', 'applied', 'stack-mismatch'])
+    expect(availableTargetApplyStatuses('unmet-requirements')).toEqual([
+      'not-applied',
+      'applied',
+      'stack-mismatch',
+      'archived',
+    ])
     expect(canTransition('unmet-requirements', 'not-applied')).toBe(true)
     expect(canTransition('unmet-requirements', 'applied')).toBe(true)
     expect(canTransition('unmet-requirements', 'stack-mismatch')).toBe(true)
+    expect(canTransition('unmet-requirements', 'archived')).toBe(true)
   })
 
-  it('blocks transitions from stack-mismatch', () => {
-    expect(availableTargetApplyStatuses('stack-mismatch')).toEqual([])
+  it('blocks transitions from stack-mismatch except to archived', () => {
+    expect(availableTargetApplyStatuses('stack-mismatch')).toEqual(['archived'])
+    expect(canTransition('stack-mismatch', 'archived')).toBe(true)
     expect(canTransition('stack-mismatch', 'not-applied')).toBe(false)
   })
 
-  it('blocks transitions from terminal statuses', () => {
+  it('allows transition to archived from terminal statuses', () => {
+    expect(canTransition('rejected', 'archived')).toBe(true)
+    expect(canTransition('offer-accepted', 'archived')).toBe(true)
+    expect(canTransition('withdrawn', 'archived')).toBe(true)
+    expect(canTransition('stack-mismatch', 'archived')).toBe(true)
+  })
+
+  it('blocks other transitions from terminal statuses', () => {
     expect(canTransition('offer-accepted', 'withdrawn')).toBe(false)
     expect(canTransition('rejected', 'applied')).toBe(false)
     expect(canTransition('archived', 'applied')).toBe(false)
-    expect(canTransition('no-response', 'archived')).toBe(false)
+    expect(canTransition('no-response', 'archived')).toBe(true)
   })
 })

@@ -327,7 +327,6 @@ export const pl: Translations = {
       markAsApplied: 'Oznacz jako złożone',
       editApplication: 'Edytuj aplikację',
       company: 'Firma',
-      publicationDate: 'Data publikacji',
       currentApplicationStatus: 'Obecny status',
       applicationDate: 'Data zaaplikowania',
       rejectionDate: 'Data odrzucenia',
@@ -352,12 +351,15 @@ export const pl: Translations = {
       filters: {
         label: 'Filtr',
         latest: 'Najnowsze',
+        consider: 'Do rozważenia',
         withMatchAnalysis: 'Z analizą dopasowania',
         inProgress: 'W trakcie',
         notInterested: 'Nie interesują mnie',
         stretch: 'Do nadrobienia',
         rejectedNoResponse: 'Odrzucone i brak odpowiedzi',
         finished: 'Zakończone',
+        archived: 'Archiwalne',
+        applied: 'Zaaplikowane',
       },
       acceptableSalary: {
         label: 'Minimalne wynagrodzenie',
@@ -371,6 +373,7 @@ export const pl: Translations = {
       },
       applyStatus: {
         'not-applied': 'Nie aplikowano',
+        consider: 'Do rozważenia',
         applied: 'Zaaplikowane',
         'not-interested': 'Nie interesuje mnie',
         'unmet-requirements': 'Niespełnione wymagania',

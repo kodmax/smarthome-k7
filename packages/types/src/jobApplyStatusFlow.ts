@@ -1,5 +1,6 @@
 export type JobApplyStatus =
   | 'not-applied'
+  | 'consider'
   | 'applied'
   | 'not-interested'
   | 'unmet-requirements'
@@ -40,18 +41,36 @@ const APPLIED_FOLLOW_UP_STATUSES = [
   'unmet-requirements',
 ] as const satisfies readonly JobApplyStatus[]
 
+const NO_RESPONSE_FOLLOW_UP_STATUSES = [
+  'rejected',
+  'interview',
+  'withdrawn',
+  'unmet-requirements',
+  'archived',
+] as const satisfies readonly JobApplyStatus[]
+
+const PRE_APPLICATION_TARGETS = [
+  'applied',
+  'not-interested',
+  'unmet-requirements',
+  'stack-mismatch',
+] as const satisfies readonly JobApplyStatus[]
+
+const ARCHIVE_TRANSITION = ['archived'] as const satisfies readonly JobApplyStatus[]
+
 const TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
-  'not-applied': ['applied', 'not-interested', 'unmet-requirements', 'stack-mismatch'],
+  'not-applied': ['consider', ...PRE_APPLICATION_TARGETS],
+  consider: PRE_APPLICATION_TARGETS,
   applied: APPLIED_FOLLOW_UP_STATUSES,
   'not-interested': ['not-applied', 'applied', 'unmet-requirements', 'stack-mismatch', 'archived'],
-  'unmet-requirements': ['not-applied', 'applied', 'stack-mismatch'],
-  'stack-mismatch': [],
-  rejected: [],
-  'no-response': APPLIED_FOLLOW_UP_STATUSES,
+  'unmet-requirements': ['not-applied', 'applied', 'stack-mismatch', 'archived'],
+  'stack-mismatch': ARCHIVE_TRANSITION,
+  rejected: ARCHIVE_TRANSITION,
+  'no-response': NO_RESPONSE_FOLLOW_UP_STATUSES,
   interview: ['rejected', 'withdrawn', 'offer'],
   offer: ['offer-accepted', 'withdrawn'],
-  'offer-accepted': [],
-  withdrawn: [],
+  'offer-accepted': ARCHIVE_TRANSITION,
+  withdrawn: ARCHIVE_TRANSITION,
   archived: [],
 }
 
@@ -64,7 +83,7 @@ export function canTransition(from: JobApplyStatus, to: JobApplyStatus): boolean
 }
 
 export function availableTargetApplyStatuses(from: JobApplyStatus): JobApplyStatus[] {
-  return [...TRANSITIONS[from]]
+  return TRANSITIONS[from].filter(status => status !== from)
 }
 
 export function isTerminalApplyStatus(status: JobApplyStatus): boolean {

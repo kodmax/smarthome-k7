@@ -327,7 +327,6 @@ export const ru: Translations = {
       markAsApplied: 'Отметить как откликнутую',
       editApplication: 'Редактировать отклик',
       company: 'Компания',
-      publicationDate: 'Дата публикации',
       currentApplicationStatus: 'Текущий статус',
       applicationDate: 'Дата отклика',
       rejectionDate: 'Дата отказа',
@@ -352,12 +351,15 @@ export const ru: Translations = {
       filters: {
         label: 'Фильтр',
         latest: 'Новейшие',
+        consider: 'На рассмотрении',
         withMatchAnalysis: 'С анализом соответствия',
         inProgress: 'В процессе',
         notInterested: 'Не интересует',
         stretch: 'Пробел в навыках',
         rejectedNoResponse: 'Отклонённые и без ответа',
         finished: 'Завершённые',
+        archived: 'Архив',
+        applied: 'Отклик отправлен',
       },
       acceptableSalary: {
         label: 'Минимальная зарплата',
@@ -371,6 +373,7 @@ export const ru: Translations = {
       },
       applyStatus: {
         'not-applied': 'Не откликался',
+        consider: 'На рассмотрении',
         applied: 'Отклик отправлен',
         'not-interested': 'Не интересует',
         'unmet-requirements': 'Невыполненные требования',

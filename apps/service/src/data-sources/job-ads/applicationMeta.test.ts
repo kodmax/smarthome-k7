@@ -100,6 +100,20 @@ describe('applicationMeta', () => {
     expect(applyStatusChange(emptyApplicationMeta(), { applyStatus: 'offer-accepted' })).toBeNull()
   })
 
+  it('allows transition from not-applied to consider', () => {
+    expect(
+      applyStatusChange(emptyApplicationMeta(), {
+        applyStatus: 'consider',
+        comment: 'Salary too low',
+      }),
+    ).toEqual({
+      applyStatus: 'consider',
+      comment: 'Salary too low',
+      appliedAt: null,
+      rejectedAt: null,
+    })
+  })
+
   it('allows transition from not-applied to unmet-requirements', () => {
     expect(
       applyStatusChange(emptyApplicationMeta(), {

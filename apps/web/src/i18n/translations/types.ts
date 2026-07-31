@@ -293,7 +293,6 @@ export type Translations = {
       markAsApplied: string
       editApplication: string
       company: string
-      publicationDate: string
       currentApplicationStatus: string
       applicationDate: string
       rejectionDate: string
@@ -318,12 +317,15 @@ export type Translations = {
       filters: {
         label: string
         latest: string
+        consider: string
         withMatchAnalysis: string
         inProgress: string
         notInterested: string
         stretch: string
         rejectedNoResponse: string
         finished: string
+        archived: string
+        applied: string
       }
       acceptableSalary: {
         label: string
@@ -337,6 +339,7 @@ export type Translations = {
       }
       applyStatus: {
         'not-applied': string
+        consider: string
         applied: string
         'not-interested': string
         'unmet-requirements': string

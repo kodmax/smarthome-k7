@@ -1,6 +1,7 @@
-import { JobAdsFeedItem } from '@repo/types'
+import { isJobAdApplied, JobAdsFeedItem } from '@repo/types'
 import { FC, type ReactNode } from 'react'
 import { ApplyStatusIndicator } from './ApplyStatusIndicator'
+import { AppliedIndicator } from './AppliedIndicator'
 import { JobFavIndicator } from './JobFavIndicator'
 import { MatchAnalysisIndicator } from './MatchAnalysisIndicator'
 import { trailingGroupStyle } from './trailingGroupStyle'
@@ -11,7 +12,7 @@ function hasAdTitleTrailingContent(ad: Pick<JobAdsFeedItem, 'meta' | 'matchAnaly
     return true
   }
 
-  return ad.meta.fav || ad.meta.application.status !== 'not-applied' || ad.matchAnalysis !== null
+  return ad.meta.fav || ad.meta.application.status !== 'not-applied' || isJobAdApplied(ad) || ad.matchAnalysis !== null
 }
 
 export const AdTitleTrailing: FC<{
@@ -27,6 +28,7 @@ export const AdTitleTrailing: FC<{
     <span style={trailingGroupStyle}>
       {zoom ? <WorkplaceTypeIndicator workplaceType={ad.content.workplaceType} /> : null}
       <JobFavIndicator fav={ad.meta.fav} />
+      <AppliedIndicator ad={ad} />
       <ApplyStatusIndicator ad={ad} />
       <MatchAnalysisIndicator ad={ad} />
       {children}

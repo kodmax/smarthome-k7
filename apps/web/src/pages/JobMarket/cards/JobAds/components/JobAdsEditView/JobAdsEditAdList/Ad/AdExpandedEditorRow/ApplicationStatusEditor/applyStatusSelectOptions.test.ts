@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { applyStatusTargetOptions } from './applyStatusSelectOptions'
 
 describe('applyStatusTargetOptions', () => {
-  it('returns no options for terminal statuses', () => {
-    expect(applyStatusTargetOptions('rejected')).toEqual([])
-    expect(applyStatusTargetOptions('stack-mismatch')).toEqual([])
+  it('returns only archived for terminal statuses that can be archived', () => {
+    expect(applyStatusTargetOptions('rejected')).toEqual(['archived'])
+    expect(applyStatusTargetOptions('stack-mismatch')).toEqual(['archived'])
+    expect(applyStatusTargetOptions('offer-accepted')).toEqual(['archived'])
+    expect(applyStatusTargetOptions('withdrawn')).toEqual(['archived'])
     expect(applyStatusTargetOptions('archived')).toEqual([])
   })
 
@@ -19,11 +21,26 @@ describe('applyStatusTargetOptions', () => {
   })
 
   it('returns follow-up transitions from unmet-requirements', () => {
-    expect(applyStatusTargetOptions('unmet-requirements')).toEqual(['not-applied', 'applied', 'stack-mismatch'])
+    expect(applyStatusTargetOptions('unmet-requirements')).toEqual([
+      'not-applied',
+      'applied',
+      'stack-mismatch',
+      'archived',
+    ])
   })
 
-  it('includes unmet-requirements and stack-mismatch from not-applied', () => {
+  it('includes consider first, then pre-application targets from not-applied', () => {
     expect(applyStatusTargetOptions('not-applied')).toEqual([
+      'consider',
+      'applied',
+      'not-interested',
+      'unmet-requirements',
+      'stack-mismatch',
+    ])
+  })
+
+  it('returns the same follow-up transitions from consider as from not-applied', () => {
+    expect(applyStatusTargetOptions('consider')).toEqual([
       'applied',
       'not-interested',
       'unmet-requirements',
@@ -41,13 +58,13 @@ describe('applyStatusTargetOptions', () => {
     ])
   })
 
-  it('returns the same follow-up transitions from no-response as from applied', () => {
+  it('returns the same follow-up transitions from no-response as from applied, plus archived', () => {
     expect(applyStatusTargetOptions('no-response')).toEqual([
       'rejected',
-      'no-response',
       'interview',
       'withdrawn',
       'unmet-requirements',
+      'archived',
     ])
   })
 })

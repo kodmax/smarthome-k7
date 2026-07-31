@@ -3,23 +3,28 @@ import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { filterVisibleJobAds, isJobAdVisibleInNormalView } from './visibleJobAds'
 
 describe('visibleJobAds', () => {
-  it('shows not-applied, applied, interview and offer ads', () => {
+  it('shows not-applied, consider, applied, interview and offer ads', () => {
     expect(
       isJobAdVisibleInNormalView(jobAd({ id: '1', title: 'Open', meta: { application: { status: 'not-applied' } } })),
     ).toBe(true)
     expect(
-      isJobAdVisibleInNormalView(jobAd({ id: '2', title: 'Applied', meta: { application: { status: 'applied' } } })),
-    ).toBe(true)
-    expect(
       isJobAdVisibleInNormalView(
-        jobAd({ id: '3', title: 'Interview', meta: { application: { status: 'interview' } } }),
+        jobAd({ id: '2', title: 'Considering', meta: { application: { status: 'consider' } } }),
       ),
     ).toBe(true)
     expect(
-      isJobAdVisibleInNormalView(jobAd({ id: '4', title: 'Offer', meta: { application: { status: 'offer' } } })),
+      isJobAdVisibleInNormalView(jobAd({ id: '3', title: 'Applied', meta: { application: { status: 'applied' } } })),
     ).toBe(true)
     expect(
-      isJobAdVisibleInNormalView(jobAd({ id: '5', title: 'Rejected', meta: { application: { status: 'rejected' } } })),
+      isJobAdVisibleInNormalView(
+        jobAd({ id: '4', title: 'Interview', meta: { application: { status: 'interview' } } }),
+      ),
+    ).toBe(true)
+    expect(
+      isJobAdVisibleInNormalView(jobAd({ id: '5', title: 'Offer', meta: { application: { status: 'offer' } } })),
+    ).toBe(true)
+    expect(
+      isJobAdVisibleInNormalView(jobAd({ id: '6', title: 'Rejected', meta: { application: { status: 'rejected' } } })),
     ).toBe(false)
   })
 
@@ -28,10 +33,11 @@ describe('visibleJobAds', () => {
       filterVisibleJobAds([
         jobAd({ id: '1', title: 'Open', meta: { application: { status: 'not-applied' } } }),
         jobAd({ id: '2', title: 'Rejected', meta: { application: { status: 'rejected' } } }),
-        jobAd({ id: '3', title: 'Applied', meta: { application: { status: 'applied' } } }),
-        jobAd({ id: '4', title: 'Interview', meta: { application: { status: 'interview' } } }),
-        jobAd({ id: '5', title: 'Offer', meta: { application: { status: 'offer' } } }),
+        jobAd({ id: '3', title: 'Considering', meta: { application: { status: 'consider' } } }),
+        jobAd({ id: '4', title: 'Applied', meta: { application: { status: 'applied' } } }),
+        jobAd({ id: '5', title: 'Interview', meta: { application: { status: 'interview' } } }),
+        jobAd({ id: '6', title: 'Offer', meta: { application: { status: 'offer' } } }),
       ]).map(ad => ad.content.id),
-    ).toEqual(['1', '3', '4', '5'])
+    ).toEqual(['1', '3', '4', '5', '6'])
   })
 })

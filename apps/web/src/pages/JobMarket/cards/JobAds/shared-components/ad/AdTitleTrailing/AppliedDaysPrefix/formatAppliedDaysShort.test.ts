@@ -4,9 +4,11 @@ import { formatAppliedDaysShort } from './formatAppliedDaysShort'
 describe('formatAppliedDaysShort', () => {
   const now = new Date('2026-07-19T15:30:00')
 
-  it('formats abbreviated applied days', () => {
+  it('formats abbreviated applied days up to two weeks', () => {
     expect(formatAppliedDaysShort(null, now)).toBeNull()
     expect(formatAppliedDaysShort('2026-07-19T08:00:00', now)).toBe('0d')
     expect(formatAppliedDaysShort('2026-07-13T08:00:00', now)).toBe('6d')
+    expect(formatAppliedDaysShort('2026-07-05T08:00:00', now)).toBe('14d')
+    expect(formatAppliedDaysShort('2026-07-04T08:00:00', now)).toBeNull()
   })
 })

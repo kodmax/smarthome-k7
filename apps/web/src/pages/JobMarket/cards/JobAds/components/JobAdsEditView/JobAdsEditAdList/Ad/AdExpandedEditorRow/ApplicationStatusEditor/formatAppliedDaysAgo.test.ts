@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calendarDaysBetween, formatAppliedDaysAgo } from './formatAppliedDaysAgo'
+import { calendarDaysBetween, formatAppliedDaysAgo, formatApplicationTooltip } from './formatAppliedDaysAgo'
 
 describe('formatAppliedDaysAgo', () => {
   const now = new Date('2026-07-19T15:30:00')
@@ -25,5 +25,15 @@ describe('formatAppliedDaysAgo', () => {
     const to = new Date('2026-07-19T00:01:00')
 
     expect(calendarDaysBetween(from, to)).toBe(2)
+  })
+
+  it('builds application tooltips with applied days first', () => {
+    expect(formatApplicationTooltip('2026-07-16T08:00:00', 'pl', ['Zaaplikowane'], now)).toBe(
+      '3 dni temu\nZaaplikowane',
+    )
+    expect(formatApplicationTooltip('2026-07-16T08:00:00', 'pl', ['Rozmowa', 'Follow-up'], now)).toBe(
+      '3 dni temu\nRozmowa\nFollow-up',
+    )
+    expect(formatApplicationTooltip(null, 'pl', ['Do rozważenia'], now)).toBe('Do rozważenia')
   })
 })

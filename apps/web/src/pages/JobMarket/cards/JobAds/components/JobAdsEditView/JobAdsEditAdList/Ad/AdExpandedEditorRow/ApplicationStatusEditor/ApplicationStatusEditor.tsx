@@ -22,7 +22,7 @@ import { CvPreviewDialog } from '@/pages/JobMarket/cards/Cv/CvPreviewDialog'
 import { useLocale, useTranslations } from '@/i18n'
 import { ApplyStatusIcon } from '../../../../../../shared-components'
 import { applyStatusTargetOptions } from './applyStatusSelectOptions'
-import { formatAppliedDaysAgo, formatNotApplicable, formatPublicationDate } from './formatAppliedDaysAgo'
+import { formatAppliedDaysAgo, formatNotApplicable } from './formatAppliedDaysAgo'
 import { RequiredSkillTag } from './RequiredSkillTag'
 import { useCvMatchAnalysis } from './useCvMatchAnalysis'
 
@@ -45,15 +45,15 @@ export const ApplicationStatusEditor: FC<{
   const showRejectionDate = rejectedAt !== null
   const appliedDaysAgo = formatAppliedDaysAgo(ad.meta.application.appliedAt, locale)
   const rejectedDaysAgo = formatAppliedDaysAgo(rejectedAt, locale)
-  const publicationDate = formatPublicationDate(ad.content.publishedAt, locale)
   const notApplicable = formatNotApplicable(locale)
+  const savedComment = ad.meta.application.comment ?? ''
   const [isChangingStatus, setIsChangingStatus] = useState(false)
   const [nextStatus, setNextStatus] = useState<JobApplyStatus | typeof emptyNextStatus>(emptyNextStatus)
-  const [comment, setComment] = useState('')
+  const [comment, setComment] = useState(savedComment)
   const [menuPaperStyle, setMenuPaperStyle] = useState<CSSProperties>()
   const targetStatusOptions = useMemo(() => applyStatusTargetOptions(currentStatus), [currentStatus])
-  const canSubmit = nextStatus !== emptyNextStatus
-  const canChangeStatus = targetStatusOptions.length > 0
+  const hasStatusOptions = targetStatusOptions.length > 0
+  const canSubmit = nextStatus !== emptyNextStatus || comment.trim() !== savedComment.trim()
   const canAnalyzeCvMatch = ad.content.origin !== 'theprotocol' && !ad.meta.isCurrentCVUsed
   const {
     analyzing: analyzingCvMatch,
@@ -89,12 +89,17 @@ export const ApplicationStatusEditor: FC<{
   useEffect(() => {
     setIsChangingStatus(false)
     setNextStatus(emptyNextStatus)
-    setComment('')
-  }, [ad.content.id, currentStatus])
+    setComment(savedComment)
+  }, [ad.content.id, currentStatus, savedComment])
+
+  const handleOpenEditor = () => {
+    setComment(savedComment)
+    setNextStatus(emptyNextStatus)
+    setIsChangingStatus(true)
+  }
 
   const handleNextStatusChange = (event: SelectChangeEvent<JobApplyStatus | typeof emptyNextStatus>) => {
     setNextStatus(event.target.value as JobApplyStatus)
-    setComment('')
   }
 
   const handleStatusSelectOpen = (event: SyntheticEvent) => {
@@ -107,13 +112,14 @@ export const ApplicationStatusEditor: FC<{
       return
     }
 
-    onSave(nextStatus, comment.trim())
+    const applyStatus = nextStatus !== emptyNextStatus ? nextStatus : currentStatus
+    onSave(applyStatus, comment.trim())
   }
 
   const handleCancelChange = () => {
     setIsChangingStatus(false)
     setNextStatus(emptyNextStatus)
-    setComment('')
+    setComment(savedComment)
   }
 
   const handleFavToggle = () => {
@@ -156,12 +162,6 @@ export const ApplicationStatusEditor: FC<{
                 {labels.company}
               </Typography>
               <Typography>{ad.content.companyName}</Typography>
-            </Box>
-            <Box>
-              <Typography variant='caption' color='text.secondary' display='block'>
-                {labels.publicationDate}
-              </Typography>
-              <Typography>{publicationDate}</Typography>
             </Box>
             <Box>
               <Typography variant='caption' color='text.secondary' display='block'>
@@ -222,34 +222,36 @@ export const ApplicationStatusEditor: FC<{
               mt: `${designTokens.space[3]}px`,
             }}
           >
-            <FormControl
-              size='small'
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-notchedOutline legend': {
-                  maxWidth: '100%',
-                },
-              }}
-            >
-              <InputLabel id={`job-next-status-${ad.content.id}`} shrink>
-                {labels.newApplicationStatus}
-              </InputLabel>
-              <Select<JobApplyStatus | typeof emptyNextStatus>
-                labelId={`job-next-status-${ad.content.id}`}
-                value={nextStatus}
-                label={labels.newApplicationStatus}
-                displayEmpty
-                onChange={handleNextStatusChange}
-                onOpen={handleStatusSelectOpen}
-                MenuProps={statusSelectMenuProps}
+            {hasStatusOptions ? (
+              <FormControl
+                size='small'
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline legend': {
+                    maxWidth: '100%',
+                  },
+                }}
               >
-                {targetStatusOptions.map(status => (
-                  <MenuItem key={status} value={status}>
-                    {labels.applyStatus[status]}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                <InputLabel id={`job-next-status-${ad.content.id}`} shrink>
+                  {labels.newApplicationStatus}
+                </InputLabel>
+                <Select<JobApplyStatus | typeof emptyNextStatus>
+                  labelId={`job-next-status-${ad.content.id}`}
+                  value={nextStatus}
+                  label={labels.newApplicationStatus}
+                  displayEmpty
+                  onChange={handleNextStatusChange}
+                  onOpen={handleStatusSelectOpen}
+                  MenuProps={statusSelectMenuProps}
+                >
+                  {targetStatusOptions.map(status => (
+                    <MenuItem key={status} value={status}>
+                      {labels.applyStatus[status]}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : null}
 
             <TextField
               label={labels.applicationComment}
@@ -260,10 +262,17 @@ export const ApplicationStatusEditor: FC<{
               onChange={event => setComment(event.target.value)}
               size='small'
               fullWidth
-              disabled={!canSubmit}
               sx={{
                 '& .MuiOutlinedInput-notchedOutline legend': {
                   maxWidth: '100%',
+                },
+                '& .MuiOutlinedInput-root.MuiInputBase-multiline': {
+                  padding: `${designTokens.space[3]}px`,
+                },
+                '& .MuiOutlinedInput-root .MuiOutlinedInput-input': {
+                  padding: 0,
+                  margin: 0,
+                  boxSizing: 'border-box',
                 },
               }}
             />
@@ -305,11 +314,9 @@ export const ApplicationStatusEditor: FC<{
             >
               {labels.checkCvMatch}
             </Button>
-            {canChangeStatus ? (
-              <Button size='small' variant='outlined' onClick={() => setIsChangingStatus(true)}>
-                {labels.changeApplicationStatus}
-              </Button>
-            ) : null}
+            <Button size='small' variant='outlined' onClick={handleOpenEditor}>
+              {labels.changeApplicationStatus}
+            </Button>
           </Box>
         )}
       </Box>
