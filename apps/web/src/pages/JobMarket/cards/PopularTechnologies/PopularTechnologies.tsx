@@ -88,7 +88,6 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
                 </ApolloTableCell>
                 <ApolloValueCell sx={{ width: 48 }}>{labels.columns.offers}</ApolloValueCell>
                 <ApolloValueCell sx={{ width: 48 }}>{labels.columns.share}</ApolloValueCell>
-                <ApolloValueCell sx={{ width: 80 }}>{labels.columns.median}</ApolloValueCell>
               </TableRow>
             </TableHead>
 

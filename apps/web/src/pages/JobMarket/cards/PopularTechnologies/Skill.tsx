@@ -9,7 +9,7 @@ import { SkillExperienceEditor } from './SkillExperienceEditor'
 import { SkillLevelIndicator } from './SkillLevelIndicator'
 import { TechnologyLogo } from './TechnologyLogo'
 
-const columnCount = 6
+const columnCount = 5
 
 export const rankCellSx = {
   width: 32,
@@ -63,9 +63,6 @@ export const Skill: FC<Props> = ({
       </ApolloTableCell>
       <ApolloValueCell>{formatNumber(technology.offersCount, { fractionDigits: 0 })}</ApolloValueCell>
       <ApolloValueCell>{`${technology.sharePercent}%`}</ApolloValueCell>
-      <ApolloValueCell>
-        {technology.medianSalary !== null ? `${formatNumber(technology.medianSalary, { fractionDigits: 0 })} zł` : '--'}
-      </ApolloValueCell>
     </TableRow>
     {editMode && expanded ? (
       <TableRow>
