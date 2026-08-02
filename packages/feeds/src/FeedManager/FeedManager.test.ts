@@ -6,7 +6,7 @@ import { FeedEvents } from './FeedEvents'
 import { FSCache } from '../Cache'
 import { DuplicateDataSourceIdError } from './Errors'
 import { FeedManager } from './FeedManager'
-import { DataSourceDefinition, DataSourceDefinitionClass } from '../DataSource'
+import { DataSourceDefinition, DataSourceDefinitionCtor } from '../DataSource'
 import { createSilentLogger } from '@repo/logger'
 import { noopErrorHandler } from '../notifyError'
 
@@ -57,7 +57,7 @@ function createTestSourceClass<T>(options: {
   onInit?: (ctx: { push: (content?: T) => void }) => void
   handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
   maintenance?: () => void | Promise<void>
-}): DataSourceDefinitionClass<T> {
+}): DataSourceDefinitionCtor<T> {
   return class TestSource extends DataSourceDefinition<T> {
     public constructor(push: (content?: T) => void, reportError: (e: Error) => void) {
       super(push, reportError)

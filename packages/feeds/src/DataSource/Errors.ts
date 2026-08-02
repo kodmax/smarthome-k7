@@ -3,3 +3,9 @@ export class NoRecentContent extends Error {
     super('No recent content')
   }
 }
+
+export class DataSourceNotFound extends Error {
+  constructor() {
+    super('Data source not found in the registry')
+  }
+}

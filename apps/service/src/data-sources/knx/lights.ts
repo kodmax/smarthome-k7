@@ -1,9 +1,9 @@
-import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionClass } from '@repo/feeds'
+import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionCtor } from '@repo/feeds'
 import { homeLights, homeLightsById } from '@repo/knx-schema'
 import { LightsFeed } from '@repo/types'
 import { DPT_Generic_B1, DPT_Switch, KnxReading, type KnxLink } from 'js-knx'
 
-export default (knx: KnxLink): DataSourceDefinitionClass<LightsFeed> => {
+export default (knx: KnxLink): DataSourceDefinitionCtor<LightsFeed> => {
   return class LightsSource extends DataSourceDefinition<LightsFeed> {
     private readonly sets = new Map<string, DPT_Switch>()
     private readonly statuses = new Map<string, DPT_Generic_B1>()

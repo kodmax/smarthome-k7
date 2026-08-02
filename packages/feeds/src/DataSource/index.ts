@@ -1,4 +1,5 @@
 export * from './DataSourceDefinition'
+export * from './DataSourceRegistry'
 export * from './DataSource'
 export * from './Errors'
 export * from './types'

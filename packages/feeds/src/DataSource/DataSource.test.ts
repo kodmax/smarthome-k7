@@ -8,7 +8,7 @@ import { DataSource } from './DataSource'
 import { NoRecentContent } from './Errors'
 import { createSilentLogger } from '@repo/logger'
 import { noopErrorHandler } from '../notifyError'
-import { DataSourceDefinitionClass, SourceMetricType } from './types'
+import { DataSourceDefinitionCtor, SourceMetricType } from './types'
 import { DataSourceDefinition } from './DataSourceDefinition'
 
 function createTestSourceClass<T, TCache = T>(options: {
@@ -22,7 +22,7 @@ function createTestSourceClass<T, TCache = T>(options: {
   isMetricsEnabled?: () => boolean
   handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
   maintenance?: () => void | Promise<void>
-}): DataSourceDefinitionClass<T, TCache> {
+}): DataSourceDefinitionCtor<T, TCache> {
   return class TestSource extends DataSourceDefinition<T, TCache> {
     public async handleCommand(command: string, args: string, recentContent?: T): Promise<void> {
       await options.handleCommand?.(command, args, recentContent)
@@ -79,7 +79,7 @@ describe('DataSource', () => {
   })
 
   async function createDataSource<T, TCache = T>(
-    SourceClass: DataSourceDefinitionClass<T, TCache>,
+    SourceClass: DataSourceDefinitionCtor<T, TCache>,
     onError = noopErrorHandler,
     observeDataSourceRefresh?: Parameters<typeof DataSource.fromClass>[5],
   ) {

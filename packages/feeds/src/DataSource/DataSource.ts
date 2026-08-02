@@ -3,7 +3,7 @@ import type { Cache, CacheEntry } from '../Cache'
 import { NoRecentContent } from './Errors'
 import { FeedEvents } from '../FeedManager'
 import { notifyError, type ErrorHandler } from '../notifyError'
-import { DataSourceDefinitionClass, DataSourceRefreshObserver } from './types'
+import { DataSourceDefinitionCtor, DataSourceRefreshObserver } from './types'
 import { DataSourceDefinition } from './DataSourceDefinition'
 
 type DSCT<S> = S extends new (...args: never[]) => infer I
@@ -12,7 +12,7 @@ type DSCT<S> = S extends new (...args: never[]) => infer I
     : never
   : never
 
-type DSM<S extends Record<string, DataSourceDefinitionClass<unknown>>> = {
+type DSM<S extends Record<string, DataSourceDefinitionCtor<unknown>>> = {
   [K in keyof S]: DSCT<S[K]>
 }
 
@@ -31,7 +31,7 @@ class DataSource<T, TCache = T> {
   ) {}
 
   public static async fromClass<T, TCache = T>(
-    sourceClass: DataSourceDefinitionClass<T, TCache>,
+    sourceClass: DataSourceDefinitionCtor<T, TCache>,
     cache: Cache,
     vent: FeedEvents,
     logger: Logger,
@@ -56,6 +56,34 @@ class DataSource<T, TCache = T> {
     dataSource = new DataSource(definition, cacheEntry, vent, logger, onError, observeDataSourceRefresh)
 
     return dataSource
+  }
+
+  public static async fromClassWithDefinition<T, TCache = T>(
+    sourceClass: DataSourceDefinitionCtor<T, TCache>,
+    cache: Cache,
+    vent: FeedEvents,
+    logger: Logger,
+    onError: ErrorHandler,
+    observeDataSourceRefresh?: DataSourceRefreshObserver,
+  ): Promise<[DataSourceDefinition<T, TCache>, DataSource<T, TCache>]> {
+    // eslint-disable-next-line prefer-const -- forward ref: push callback needs dataSource before assignment
+    let dataSource!: DataSource<T, TCache>
+    let sourceId = ''
+
+    const definition = new sourceClass(
+      content => dataSource.push(content),
+      e => {
+        notifyError(logger, onError, 'warn', 'Push data source update error', e, { sourceId })
+      },
+    )
+    sourceId = definition.getId()
+
+    const cacheEntry = await cache.getEntry<TCache>(definition.isVolatile() ? undefined : definition.getId(), {
+      ttlMs: definition.getCacheTTL(),
+    })
+    dataSource = new DataSource(definition, cacheEntry, vent, logger, onError, observeDataSourceRefresh)
+
+    return [definition, dataSource]
   }
 
   public async handleCommand(command: string, args: string): Promise<void> {

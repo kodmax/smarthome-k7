@@ -1,7 +1,7 @@
-import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionClass } from '@repo/feeds'
+import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionCtor } from '@repo/feeds'
 import { DPT_Value_AirQuality, KnxReading } from 'js-knx'
 
-export default (id: string, dp: DPT_Value_AirQuality): DataSourceDefinitionClass<KnxReading<number>> => {
+export default (id: string, dp: DPT_Value_AirQuality): DataSourceDefinitionCtor<KnxReading<number>> => {
   return class KnxCo2Source extends DataSourceDefinition<KnxReading<number>> {
     public constructor(push: (content?: KnxReading<number>) => void, reportError: (e: Error) => void) {
       super(push, reportError)

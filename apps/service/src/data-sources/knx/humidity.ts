@@ -1,7 +1,7 @@
-import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionClass } from '@repo/feeds'
+import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionCtor } from '@repo/feeds'
 import { DPT_Value_Humidity, KnxReading } from 'js-knx'
 
-export default (id: string, dp: DPT_Value_Humidity): DataSourceDefinitionClass<KnxReading<number>> => {
+export default (id: string, dp: DPT_Value_Humidity): DataSourceDefinitionCtor<KnxReading<number>> => {
   return class KnxHumiditySource extends DataSourceDefinition<KnxReading<number>> {
     public constructor(push: (content?: KnxReading<number>) => void, reportError: (e: Error) => void) {
       super(push, reportError)
