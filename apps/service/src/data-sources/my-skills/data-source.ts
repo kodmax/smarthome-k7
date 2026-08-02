@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
 import { MySkillsFeed } from '@repo/types'
 import type { Pool } from 'mariadb'
 import { Inject } from '@/di'

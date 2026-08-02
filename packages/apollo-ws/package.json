@@ -21,6 +21,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@repo/chronos": "*",
+    "@repo/feeds": "*",
     "@repo/logger": "*",
     "ws": "^8.7.0"
   },

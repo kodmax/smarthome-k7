@@ -1,7 +1,4 @@
 import type { Snapshot } from './Snapshot'
-import type { RedisClient } from './RedisClient'
-
-export type { RedisClient }
 
 export enum CacheAgeUnit {
   SECOND = 1000,

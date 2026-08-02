@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionClass } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionClass } from '@repo/feeds'
 import { DPT_HVACMode, KnxReading } from 'js-knx'
 
 export default (id: string, dp: DPT_HVACMode): DataSourceDefinitionClass<KnxReading<number>> => {

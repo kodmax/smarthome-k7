@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
 import { Torrent } from '@repo/types'
 import { fetchJSON } from '@/fetch'
 import { observeHttpFetch } from '@/prometheus/httpMetrics'

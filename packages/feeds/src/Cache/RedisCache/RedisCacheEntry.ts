@@ -1,8 +1,8 @@
 import { CorruptCacheError } from '../Errors'
-import { Snapshot } from './Snapshot'
+import { Snapshot } from '../Snapshot'
 import type { RedisClient } from './RedisClient'
-import { isExpired } from './ttl'
-import type { CacheEntry } from './types'
+import { isExpired } from '../ttl'
+import type { CacheEntry } from '../types'
 
 type RedisCachePayload<T> = {
   timestamp: number

@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
 import { type CvCachedFeed, type CvFeed } from '@repo/types'
 import type OpenAI from 'openai'
 import type { Pool } from 'mariadb'

@@ -2,12 +2,14 @@ import { mkdtempSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApolloEvents } from './ApolloEvents'
-import { FSCache } from './cache'
-import { DataSource, DataSourceDefinition, DataSourceDefinitionClass, type SourceMetricType } from './DataSource'
+import { FeedEvents } from '../FeedManager'
+import { FSCache } from '../Cache'
+import { DataSource } from './DataSource'
 import { NoRecentContent } from './Errors'
 import { createSilentLogger } from '@repo/logger'
-import { noopErrorHandler } from './notifyError'
+import { noopErrorHandler } from '../notifyError'
+import { DataSourceDefinitionClass, SourceMetricType } from './types'
+import { DataSourceDefinition } from './DataSourceDefinition'
 
 function createTestSourceClass<T, TCache = T>(options: {
   id: string
@@ -81,10 +83,10 @@ describe('DataSource', () => {
     onError = noopErrorHandler,
     observeDataSourceRefresh?: Parameters<typeof DataSource.fromClass>[5],
   ) {
-    const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-ds-'))
+    const cacheDir = mkdtempSync(join(tmpdir(), 'ds-'))
     cacheDirs.push(cacheDir)
 
-    const vent = new ApolloEvents()
+    const vent = new FeedEvents()
     const cache = new FSCache(cacheDir)
     const dataSource = await DataSource.fromClass(
       SourceClass,
@@ -258,9 +260,9 @@ describe('DataSource', () => {
       }
     }
 
-    const cacheDir = mkdtempSync(join(tmpdir(), 'apollo-ws-ds-'))
+    const cacheDir = mkdtempSync(join(tmpdir(), 'ds-'))
     cacheDirs.push(cacheDir)
-    const vent = new ApolloEvents()
+    const vent = new FeedEvents()
     const cache = new FSCache(cacheDir)
     const dataSource = await DataSource.fromClass(NotifySource, cache, vent, createSilentLogger(), noopErrorHandler)
 

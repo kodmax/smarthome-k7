@@ -1,9 +1,9 @@
-import { Feeds } from '@repo/apollo-ws'
+import { FeedManager } from '@repo/feeds'
 import { toSkillId } from '@repo/common'
 import { JobAdsFeed } from '@repo/types'
 import { JobAdsSource, MySkillsSource } from '@/data-sources'
 
-export const addJobAdsFeed = (feeds: Feeds): Promise<void> =>
+export const addJobAdsFeed = (feeds: FeedManager): Promise<void> =>
   feeds.addFeed('job-ads', { jobAds: JobAdsSource, mySkills: MySkillsSource }, ({ jobAds, mySkills }): JobAdsFeed => {
     const notInterested = new Set(
       mySkills.skills.filter(skill => skill.level === 'not-interested').map(skill => skill.id),

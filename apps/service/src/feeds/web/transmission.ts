@@ -1,5 +1,5 @@
-import { Feeds } from '@repo/apollo-ws'
+import { FeedManager } from '@repo/feeds'
 import { TransmissionSource } from '@/data-sources'
 
-export const addTransmissionFeed = (feeds: Feeds): Promise<void> =>
+export const addTransmissionFeed = (feeds: FeedManager): Promise<void> =>
   feeds.addFeed('transmission', { transmission: TransmissionSource })

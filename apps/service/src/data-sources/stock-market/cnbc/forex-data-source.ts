@@ -1,4 +1,4 @@
-import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
+import { DataSourceDefinition, CacheAgeUnit } from '@repo/feeds'
 import { getForexRates } from './getForexRates'
 import { CnbcForexData } from './types'
 

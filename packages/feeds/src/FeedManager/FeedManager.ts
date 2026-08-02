@@ -1,18 +1,17 @@
 import { readScopedLogLevel } from '@repo/logger'
-import type { Cache } from './cache'
-import type { DS, Feed, FeedCb, FeedSources, FeedsOptions, SourceDataTypes, SourceRegistration } from './Feeds.types'
+import type { Cache } from '../Cache'
+import type { DS, Feed, FeedCb, FeedSources, FeedsOptions, SourceDataTypes, SourceRegistration } from './types'
 import { Chronos } from '@repo/chronos'
-import { DataSource, DSCT, AnyDataSourceDefinitionClass } from './DataSource'
-import { ApolloEvents } from './ApolloEvents'
-import { notifyError } from './notifyError'
+import { DataSource, DSCT, AnyDataSourceDefinitionClass, NoRecentContent } from '../DataSource'
+import { FeedEvents } from './FeedEvents'
+import { notifyError } from '../notifyError'
+import { DuplicateDataSourceIdError } from './Errors'
 
-import { DuplicateDataSourceIdError, NonErrorException } from './Errors'
-
-export type { FeedsOptions, SourceDataTypes } from './Feeds.types'
+export type { FeedsOptions, SourceDataTypes } from './types'
 
 const DATA_SOURCES_MAINTENANCE_CRON = '0 3 * * *'
 
-export class Feeds {
+export class FeedManager {
   private sourcesById = new Map<string, SourceRegistration>()
   private feeds: Map<string, Feed> = new Map()
 
@@ -20,7 +19,7 @@ export class Feeds {
 
   public constructor(
     private cache: Cache,
-    private vent: ApolloEvents,
+    private vent: FeedEvents,
     private options: FeedsOptions,
   ) {
     this.chronos = new Chronos(
@@ -190,7 +189,7 @@ export class Feeds {
       this.options.logger.debug({ feedId }, 'Feed update successful')
       this.vent.emit('feed', feedId, content)
     } catch (e) {
-      if (e instanceof NonErrorException) {
+      if (e instanceof NoRecentContent) {
         this.options.logger.info({ feedId, skipReason: e.message }, 'Feed update skipped')
         return
       }
@@ -214,7 +213,7 @@ export class Feeds {
       )
       this.vent.emit('feed', feedId, content)
     } catch (e) {
-      if (e instanceof NonErrorException) {
+      if (e instanceof NoRecentContent) {
         this.options.logger.info({ feedId, skipReason: e.message }, 'Feed update skipped')
         return
       }

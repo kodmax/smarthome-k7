@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
 import { Inject } from '@/di'
 import { fetchDocument } from '@/fetch'
 import { observeHttpFetch } from '@/prometheus/httpMetrics'

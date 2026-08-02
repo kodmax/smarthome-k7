@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { Inject } from '@/di'
 import type { Pool } from 'mariadb'

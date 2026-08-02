@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
 import { fetchDocument } from '@/fetch'
 import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { observeDbQuery } from '@/prometheus/dbMetrics'

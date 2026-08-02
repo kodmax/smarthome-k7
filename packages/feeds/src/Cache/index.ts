@@ -1,0 +1,6 @@
+export { Snapshot } from './Snapshot'
+export { FSCacheEntry, FSCache } from './FSCache'
+export { RedisCacheEntry, RedisCache, RedisClient } from './RedisCache'
+export { VolatileCacheEntry } from './VolatileCacheEntry'
+export { CacheAgeUnit, SnapshotContent } from './types'
+export type { Cache, CacheEntry, CacheOptions } from './types'

@@ -1,4 +1,4 @@
-import type { SourceMetricType } from '@repo/apollo-ws'
+import type { SourceMetricType } from '@repo/feeds'
 import { Counter, Gauge, Histogram, register } from 'prom-client'
 import { isMetricsEnabled } from './metricsEnabled'
 

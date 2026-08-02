@@ -15,6 +15,7 @@
     "@repo/knx-schema": "*",
     "@repo/logger": "*",
     "@repo/transmission": "*",
+    "@repo/feeds": "*",
     "@sentry/node": "^10.68.0",
     "dotenv": "^17.4.2",
     "js-knx": "^3.1.0",

@@ -1,11 +1,11 @@
-import { Feeds } from '@repo/apollo-ws'
+import { FeedManager } from '@repo/feeds'
 import { knxSchema } from '@repo/knx-schema'
 import type { KnxLink } from 'js-knx'
 import { Co2HourlySource } from '@/data-sources'
 import knxB1 from '@/data-sources/knx/b1'
 import knxCo2 from '@/data-sources/knx/co2'
 
-export const addHomeAirQualityCo2Feed = (feeds: Feeds, knx: KnxLink): void => {
+export const addHomeAirQualityCo2Feed = (feeds: FeedManager, knx: KnxLink): void => {
   const schema = knxSchema.home.airQuality.co2
   const co2Level = knxCo2('home.air-quality.co2', knx.group(schema.reading))
   const co2Alert = knxB1('home.air-quality.co2-alert', knx.group(schema.alert))

@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionClass } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition, DataSourceDefinitionClass } from '@repo/feeds'
 import { homeLights, homeLightsById } from '@repo/knx-schema'
 import { LightsFeed } from '@repo/types'
 import { DPT_Generic_B1, DPT_Switch, KnxReading, type KnxLink } from 'js-knx'

@@ -1,6 +1,7 @@
 #!/usr/bin/ts-node
 process.setMaxListeners(11)
-import { Server, FSCache, RedisCache, Feeds } from '@repo/apollo-ws'
+import { Server } from '@repo/apollo-ws'
+import { FSCache, RedisCache, FeedManager } from '@repo/feeds'
 import { initKnxCronJobs } from '@repo/cron-scripts'
 import { getDbPool } from '@repo/db'
 import { createLogger, readScopedLogLevel } from '@repo/logger'
@@ -48,7 +49,7 @@ Server.listen(
     }
 
     const cache = cacheBackend === 'fs' ? new FSCache(config.cache.dir) : new RedisCache(getDependency('redis'))
-    const feeds = new Feeds(cache, apollo.vent, {
+    const feeds = new FeedManager(cache, apollo.vent, {
       logger: rootLogger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
       onError: reportProductionError,
       observeDataSourceRefresh,

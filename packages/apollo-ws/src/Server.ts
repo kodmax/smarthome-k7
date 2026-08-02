@@ -1,10 +1,9 @@
 import { WebSocket, WebSocketServer } from 'ws'
 import { Socket } from 'net'
 import type { Logger } from '@repo/logger'
-import { ApolloEvents } from './ApolloEvents'
-import { DataSourceCommand } from './DataSource'
 import { formatCommandArgsForLog } from './formatCommandArgsForLog'
 import { notifyError, type ErrorHandler } from './notifyError'
+import { FeedEvents, DataSourceCommand } from '@repo/feeds'
 
 export type ApolloWebSocketOptions = {
   /**
@@ -26,7 +25,7 @@ function clientIp(socket: Socket): string {
 }
 
 export class Server {
-  public vent: ApolloEvents = new ApolloEvents()
+  public vent: FeedEvents = new FeedEvents()
   private readonly clients: Set<Client> = new Set<Client>()
   private readonly feedDebounceTimeout: Map<string, NodeJS.Timeout> = new Map()
   private wsServer: WebSocketServer | undefined

@@ -2,8 +2,8 @@ import { existsSync, mkdtempSync, readdirSync, rmSync, utimesSync, writeFileSync
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { FSCache } from '../FSCache'
 import { CorruptCacheError } from '../Errors'
-import { FSCache } from './FSCache'
 
 describe('FSCache', () => {
   const cacheDirs: string[] = []
@@ -16,7 +16,7 @@ describe('FSCache', () => {
   })
 
   function createCache() {
-    const dir = mkdtempSync(join(tmpdir(), 'apollo-ws-cache-'))
+    const dir = mkdtempSync(join(tmpdir(), 'cache-'))
     cacheDirs.push(dir)
     return new FSCache(dir)
   }

@@ -1,4 +1,4 @@
-import type { ApolloEvents } from '@repo/apollo-ws'
+import type { FeedEvents } from '@repo/feeds'
 import { Counter, Gauge, register } from 'prom-client'
 import { isMetricsEnabled } from './metricsEnabled'
 
@@ -15,7 +15,7 @@ const wsCommandsTotal = new Counter({
   registers: [register],
 })
 
-export const registerWsMetrics = (vent: ApolloEvents): void => {
+export const registerWsMetrics = (vent: FeedEvents): void => {
   if (!isMetricsEnabled()) {
     return
   }

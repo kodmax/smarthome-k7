@@ -1,73 +1,10 @@
 import type { Logger } from '@repo/logger'
-import type { Cache, CacheEntry } from './cache'
+import type { Cache, CacheEntry } from '../Cache'
 import { NoRecentContent } from './Errors'
-import { ApolloEvents } from './ApolloEvents'
-import { notifyError, type ErrorHandler } from './notifyError'
-
-export type SourceMetricType = 'knx' | 'scraper' | 'api' | 'db' | 'other'
-
-export type DataSourceRefreshObserver = <T>(
-  metricType: SourceMetricType,
-  sourceId: string,
-  fn: () => Promise<T>,
-) => Promise<T>
-
-export abstract class DataSourceDefinition<T, TCache = T> {
-  public constructor(
-    protected readonly push: (content?: T) => void | Promise<void>,
-    protected readonly reportError: (e: Error) => void,
-  ) {}
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public handleCommand(_command: string, _args: string, _recentContent?: T): Promise<void> {
-    return Promise.resolve()
-  }
-
-  public abstract getId(): string
-  public abstract getCacheTTL(): number
-  public abstract getData(): Promise<TCache>
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public isCacheValid(_cached: TCache): boolean {
-    return true
-  }
-
-  public composeContent(cached: TCache): Promise<T> {
-    return Promise.resolve(cached as unknown as T)
-  }
-
-  public toCacheContent(content: T): TCache {
-    return content as unknown as TCache
-  }
-
-  public getCron(): string | undefined {
-    return undefined
-  }
-
-  public maintenance(): Promise<void> {
-    return Promise.resolve()
-  }
-
-  public isVolatile(): boolean {
-    return false
-  }
-
-  public getSourceMetricType(): SourceMetricType {
-    return 'other'
-  }
-
-  public isMetricsEnabled(): boolean {
-    return true
-  }
-}
-
-export type DataSourceDefinitionClass<T = unknown, TCache = T> = new (
-  push: (content?: T) => void | Promise<void>,
-  reportError: (e: Error) => void,
-) => DataSourceDefinition<T, TCache>
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyDataSourceDefinitionClass = DataSourceDefinitionClass<any, any>
+import { FeedEvents } from '../FeedManager'
+import { notifyError, type ErrorHandler } from '../notifyError'
+import { DataSourceDefinitionClass, DataSourceRefreshObserver } from './types'
+import { DataSourceDefinition } from './DataSourceDefinition'
 
 type DSCT<S> = S extends new (...args: never[]) => infer I
   ? I extends DataSourceDefinition<infer T, unknown>
@@ -81,19 +18,13 @@ type DSM<S extends Record<string, DataSourceDefinitionClass<unknown>>> = {
 
 type DD = DataSourceDefinition<unknown>
 
-export type DataSourceCommand = {
-  sourceId: string
-  name: string
-  args: string
-}
-
 class DataSource<T, TCache = T> {
   private updating: Promise<T> | undefined
 
   private constructor(
     private definition: DataSourceDefinition<T, TCache>,
     private cacheEntry: CacheEntry<TCache>,
-    private vent: ApolloEvents,
+    private vent: FeedEvents,
     private logger: Logger,
     private onError: ErrorHandler,
     private observeDataSourceRefresh: DataSourceRefreshObserver | undefined,
@@ -102,7 +33,7 @@ class DataSource<T, TCache = T> {
   public static async fromClass<T, TCache = T>(
     sourceClass: DataSourceDefinitionClass<T, TCache>,
     cache: Cache,
-    vent: ApolloEvents,
+    vent: FeedEvents,
     logger: Logger,
     onError: ErrorHandler,
     observeDataSourceRefresh?: DataSourceRefreshObserver,

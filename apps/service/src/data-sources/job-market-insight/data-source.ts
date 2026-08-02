@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
 import { JobAd, JobMarketInsightCachedFeed, JobMarketInsightFeed } from '@repo/types'
 import type { Pool } from 'mariadb'
 import DateTime from '@/DateTime'

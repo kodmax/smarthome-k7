@@ -1,11 +1,11 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { isFileSystemError } from '../fs-error'
+import { isFileSystemError } from './fs-error'
 import { CorruptCacheError } from '../Errors'
 import { FSCacheEntry } from './FSCacheEntry'
-import { VolatileCacheEntry } from './VolatileCacheEntry'
-import { isExpired } from './ttl'
-import type { Cache, CacheEntry, CacheOptions } from './types'
+import { VolatileCacheEntry } from '../VolatileCacheEntry'
+import { isExpired } from '../ttl'
+import type { Cache, CacheEntry, CacheOptions } from '../types'
 
 class FSCache implements Cache {
   private readonly path: string

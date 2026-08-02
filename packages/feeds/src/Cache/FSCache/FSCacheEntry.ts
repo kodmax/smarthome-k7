@@ -1,10 +1,10 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import { isFileSystemError } from '../fs-error'
+import { isFileSystemError } from './fs-error'
 import { CorruptCacheError } from '../Errors'
-import { Snapshot } from './Snapshot'
-import { isExpired } from './ttl'
-import type { CacheEntry } from './types'
+import { Snapshot } from '../Snapshot'
+import { isExpired } from '../ttl'
+import type { CacheEntry } from '../types'
 
 class FSCacheEntry<T> implements CacheEntry<T> {
   public constructor(

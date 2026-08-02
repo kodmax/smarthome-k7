@@ -1,4 +1,4 @@
-import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
+import { DataSourceDefinition, CacheAgeUnit } from '@repo/feeds'
 import DateTime from '../DateTime'
 import { Inject } from '@/di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'

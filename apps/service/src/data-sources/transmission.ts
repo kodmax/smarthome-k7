@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/apollo-ws'
+import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
 import { TransmissionFeed } from '@repo/types'
 import { Transmission3 } from '@repo/transmission'
 import { Inject } from '@/di'

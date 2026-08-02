@@ -1,4 +1,5 @@
-import type { Feeds, Server } from '@repo/apollo-ws'
+import type { Server } from '@repo/apollo-ws'
+import type { FeedManager } from '@repo/feeds'
 import type { Logger } from '@repo/logger'
 import { closeDbPool } from '@repo/db'
 import { closePrometheus } from './prometheus'
@@ -8,7 +9,7 @@ import type { KnxLink } from 'js-knx'
 
 let knxLink: KnxLink | undefined
 let knxCron: { stop(): void } | undefined
-let apolloFeeds: Feeds | undefined
+let apolloFeeds: FeedManager | undefined
 let apolloServer: Server | undefined
 let shuttingDown = false
 let shutdownLogger: Logger | undefined
@@ -21,7 +22,7 @@ export const registerKnxCron = (chronos: { stop(): void }): void => {
   knxCron = chronos
 }
 
-export const registerApollo = (server: Server, feeds: Feeds): void => {
+export const registerApollo = (server: Server, feeds: FeedManager): void => {
   apolloServer = server
   apolloFeeds = feeds
 }

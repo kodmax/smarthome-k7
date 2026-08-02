@@ -1,4 +1,4 @@
-import { DataSourceDefinition, CacheAgeUnit } from '@repo/apollo-ws'
+import { DataSourceDefinition, CacheAgeUnit } from '@repo/feeds'
 import { getTickerData, sleep } from './src'
 import { tickerList } from '../tickerList'
 import { YahooTickerData } from './types'

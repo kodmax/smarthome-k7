@@ -1,4 +1,4 @@
-import { Feeds } from '@repo/apollo-ws'
+import { FeedManager } from '@repo/feeds'
 import { addFxRatesFeed } from './fx-rates'
 import { addJobMarketInsightFeed } from './job-market-insight'
 import { addJobAdsFeed } from './job-ads'
@@ -11,7 +11,7 @@ import { addTransmissionFeed } from './transmission'
 import { addWeatherFeed } from './weather'
 import { addSentryTestFeed } from './sentry-test'
 
-export const initWebFeeds = async (feeds: Feeds): Promise<void> => {
+export const initWebFeeds = async (feeds: FeedManager): Promise<void> => {
   await Promise.all([
     addWeatherFeed(feeds),
     addStockMarketFeed(feeds),

@@ -1,4 +1,4 @@
-import { DataSourceDefinition } from '@repo/apollo-ws'
+import { DataSourceDefinition } from '@repo/feeds'
 
 type SentryTestData = Record<string, never>
 

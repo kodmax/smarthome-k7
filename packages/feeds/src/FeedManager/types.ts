@@ -3,8 +3,8 @@ import {
   DataSourceDefinition,
   AnyDataSourceDefinitionClass,
   type DataSourceRefreshObserver,
-} from './DataSource'
-import type { ErrorHandler } from './notifyError'
+} from '../DataSource'
+import type { ErrorHandler } from '../notifyError'
 import type { Logger } from '@repo/logger'
 
 export type DS = DataSource<unknown>

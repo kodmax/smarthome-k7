@@ -1,8 +1,8 @@
 import { CorruptCacheError } from '../Errors'
 import { RedisCacheEntry } from './RedisCacheEntry'
-import { VolatileCacheEntry } from './VolatileCacheEntry'
-import { isExpired } from './ttl'
-import type { Cache, CacheEntry, CacheOptions } from './types'
+import { VolatileCacheEntry } from '../VolatileCacheEntry'
+import { isExpired } from '../ttl'
+import type { Cache, CacheEntry, CacheOptions } from '../types'
 import type { RedisClient } from './RedisClient'
 
 type RedisCachePayload<T> = {
@@ -13,7 +13,7 @@ type RedisCachePayload<T> = {
 class RedisCache implements Cache {
   public constructor(
     private readonly redis: RedisClient,
-    private readonly keyPrefix = 'apollo-ws:cache:',
+    private readonly keyPrefix = 'smarthome-k7:cache:',
   ) {}
 
   public async getEntry<T>(id?: string, options?: CacheOptions): Promise<CacheEntry<T>> {

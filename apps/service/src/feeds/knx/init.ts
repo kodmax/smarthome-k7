@@ -1,4 +1,4 @@
-import { Feeds } from '@repo/apollo-ws'
+import { FeedManager } from '@repo/feeds'
 import { knxSchema } from '@repo/knx-schema'
 import { KnxLink } from 'js-knx'
 import { addEnergyFeed } from './energy'
@@ -8,7 +8,7 @@ import { addHomeAirQualityHumidityFeed } from './home-air-quality-humidity'
 import { addHomeTempFeed } from './home-temp'
 import { addLightsFeed } from './lights'
 
-export const initKnxFeeds = async (feeds: Feeds, knx: KnxLink): Promise<void> => {
+export const initKnxFeeds = async (feeds: FeedManager, knx: KnxLink): Promise<void> => {
   addHeatingFeed(feeds, knx)
   addEnergyFeed(feeds, knx)
   addLightsFeed(feeds, knx)

@@ -1,11 +1,11 @@
-import { Feeds } from '@repo/apollo-ws'
+import { FeedManager } from '@repo/feeds'
 import { StockMarketFeed, TickerData } from '@repo/types'
 import { YahooTickerData } from '@/data-sources/stock-market/yahoo/types'
 import { CnbcMarketIndicesSource, NasdaqMarketDataSource, YahooMarketDataSource } from '@/data-sources'
 import { NasdaqTickerData } from '@/data-sources/stock-market/nasdaq/types'
 import { tickerList } from '@/data-sources/stock-market/tickerList'
 
-export const addStockMarketFeed = (feeds: Feeds): Promise<void> =>
+export const addStockMarketFeed = (feeds: FeedManager): Promise<void> =>
   feeds.addFeed(
     'stock-market',
     {

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { CorruptCacheError } from '../Errors'
-import { RedisCache } from './RedisCache'
+import { RedisCache } from '../RedisCache'
 import type { RedisClient } from './RedisClient'
+import { CorruptCacheError } from '../Errors'
 
 describe('RedisCache', () => {
   const stores: Map<string, string>[] = []
@@ -53,7 +53,7 @@ describe('RedisCache', () => {
     const reloaded = await cache.getEntry<{ value: number }>('persisted', { ttlMs: Number.MAX_SAFE_INTEGER })
 
     expect((await reloaded.getSnapshot())?.getContent()).toEqual({ value: 42 })
-    expect(JSON.parse(stores[0].get('apollo-ws:cache:persisted')!)).toMatchObject({ content: { value: 42 } })
+    expect(JSON.parse(stores[0].get('smarthome-k7:cache:persisted')!)).toMatchObject({ content: { value: 42 } })
   })
 
   it('sets EX when writing with ttlMs', async () => {
@@ -64,7 +64,7 @@ describe('RedisCache', () => {
 
     expect(setCalls[0]).toEqual([
       {
-        key: 'apollo-ws:cache:ttl-key',
+        key: 'smarthome-k7:cache:ttl-key',
         value: expect.stringContaining('"value":42'),
         options: { EX: 60 },
       },
@@ -110,7 +110,7 @@ describe('RedisCache', () => {
   })
 
   it('throws CorruptCacheError for invalid JSON in redis', async () => {
-    const cache = createCache(createMockRedis({ 'apollo-ws:cache:broken': '{ not-json' }))
+    const cache = createCache(createMockRedis({ 'smarthome-k7:cache:broken': '{ not-json' }))
 
     await expect(cache.getEntry('broken')).rejects.toThrow(CorruptCacheError)
   })
@@ -122,25 +122,25 @@ describe('RedisCache', () => {
     const entry = await cache.getEntry<{ value: number }>('expiring', { ttlMs: 1000 })
     await entry.write({ value: 1 })
 
-    expect(stores[0].has('apollo-ws:cache:expiring')).toBe(true)
+    expect(stores[0].has('smarthome-k7:cache:expiring')).toBe(true)
 
     vi.advanceTimersByTime(1001)
 
     expect(await entry.getSnapshot()).toBeNull()
-    expect(stores[0].has('apollo-ws:cache:expiring')).toBe(false)
+    expect(stores[0].has('smarthome-k7:cache:expiring')).toBe(false)
   })
 
   it('deletes expired key on getEntry()', async () => {
     const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000
     const cache = createCache(
       createMockRedis({
-        'apollo-ws:cache:stale': JSON.stringify({ timestamp: twoHoursAgo, content: { value: 1 } }),
+        'smarthome-k7:cache:stale': JSON.stringify({ timestamp: twoHoursAgo, content: { value: 1 } }),
       }),
     )
 
     const entry = await cache.getEntry<{ value: number }>('stale', { ttlMs: 60_000 })
 
     expect(await entry.getSnapshot()).toBeNull()
-    expect(stores[0].has('apollo-ws:cache:stale')).toBe(false)
+    expect(stores[0].has('smarthome-k7:cache:stale')).toBe(false)
   })
 })

@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
-import type { DataSourceCommand } from './DataSource'
+import type { DataSourceCommand } from '../DataSource'
 
-export type ApolloEventMap = {
+export type FeedEventMap = {
   feed: [feedId: string, value: unknown]
   'data-update': [sourceId: string]
   command: [command: DataSourceCommand]
@@ -10,26 +10,26 @@ export type ApolloEventMap = {
   'feeds-refresh': [feedIds: Iterable<string>]
 }
 
-type EventKey = keyof ApolloEventMap
+type EventKey = keyof FeedEventMap
 
-export class ApolloEvents {
+export class FeedEvents {
   private readonly emitter = new EventEmitter()
 
-  public emit<K extends EventKey>(event: K, ...args: ApolloEventMap[K]): boolean {
+  public emit<K extends EventKey>(event: K, ...args: FeedEventMap[K]): boolean {
     return this.emitter.emit(event, ...args)
   }
 
-  public on<K extends EventKey>(event: K, listener: (...args: ApolloEventMap[K]) => void): this {
+  public on<K extends EventKey>(event: K, listener: (...args: FeedEventMap[K]) => void): this {
     this.emitter.on(event, listener as (...args: unknown[]) => void)
     return this
   }
 
-  public addListener<K extends EventKey>(event: K, listener: (...args: ApolloEventMap[K]) => void): this {
+  public addListener<K extends EventKey>(event: K, listener: (...args: FeedEventMap[K]) => void): this {
     this.emitter.addListener(event, listener as (...args: unknown[]) => void)
     return this
   }
 
-  public removeListener<K extends EventKey>(event: K, listener: (...args: ApolloEventMap[K]) => void): this {
+  public removeListener<K extends EventKey>(event: K, listener: (...args: FeedEventMap[K]) => void): this {
     this.emitter.removeListener(event, listener as (...args: unknown[]) => void)
     return this
   }
