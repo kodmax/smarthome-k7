@@ -1,10 +1,13 @@
-import { FeedManager } from '@repo/feeds'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
 import { toSkillId } from '@repo/common'
 import { JobAdsFeed } from '@repo/types'
-import { JobAdsSource, MySkillsSource } from '@/data-sources'
+import { DataSourceRegistryType } from '@/data-sources'
 
-export const addJobAdsFeed = (feeds: FeedManager): Promise<void> =>
-  feeds.addFeed('job-ads', { jobAds: JobAdsSource, mySkills: MySkillsSource }, ({ jobAds, mySkills }): JobAdsFeed => {
+export const addJobAdsFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
+  feeds.registerFeed('job-ads', dataSources.getByIds(['jobAds', 'mySkills']), ({ jobAds, mySkills }): JobAdsFeed => {
     const notInterested = new Set(
       mySkills.skills.filter(skill => skill.level === 'not-interested').map(skill => skill.id),
     )

@@ -1,8 +1,17 @@
 import { readScopedLogLevel } from '@repo/logger'
 import type { Cache } from '../Cache'
-import type { DS, Feed, FeedCb, FeedSources, FeedsOptions, SourceDataTypes, SourceRegistration } from './types'
+import type {
+  DS,
+  DataSourceDataTypes,
+  Feed,
+  FeedCb,
+  FeedSources,
+  FeedsOptions,
+  SourceDataTypes,
+  SourceRegistration,
+} from './types'
 import { Chronos } from '@repo/chronos'
-import { DataSource, DSCT, AnyDataSourceDefinitionClass, NoRecentContent } from '../DataSource'
+import { DataSource, DSCT, AnyDataSourceDefinitionClass, NoRecentContent, AnyDataSource } from '../DataSource'
 import { FeedEvents } from './FeedEvents'
 import { notifyError } from '../notifyError'
 import { DuplicateDataSourceIdError } from './Errors'
@@ -220,6 +229,23 @@ export class FeedManager {
 
       notifyError(this.options.logger, this.options.onError, 'warn', 'Feed callback error', e, { feedId, triggeredBy })
     }
+  }
+
+  public async registerFeed<R, S extends Record<string, AnyDataSource>>(
+    feedId: string,
+    dataSources: S,
+    cb: (content: DataSourceDataTypes<S>) => R,
+  ): Promise<void> {
+    const sources: FeedSources = new Map()
+    for (const contentName of Object.keys(dataSources)) {
+      sources.set(contentName, dataSources[contentName])
+    }
+
+    this.feeds.set(feedId, {
+      cb: content => cb(content as DataSourceDataTypes<S>),
+      sources,
+      feedId,
+    })
   }
 
   public async addFeed<R, S extends Record<string, AnyDataSourceDefinitionClass>>(

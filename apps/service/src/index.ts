@@ -1,7 +1,7 @@
 #!/usr/bin/ts-node
 process.setMaxListeners(11)
 import { Server } from '@repo/apollo-ws'
-import { FSCache, RedisCache, FeedManager, FeedEvents } from '@repo/feeds'
+import { FSCache, RedisCache, FeedManager, FeedEvents, DataSourceRegistry } from '@repo/feeds'
 import { initKnxCronJobs } from '@repo/cron-scripts'
 import { getDbPool } from '@repo/db'
 import { createLogger, readScopedLogLevel } from '@repo/logger'
@@ -16,6 +16,7 @@ import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
 import { initPrometheus, registerWsMetrics, observeDataSourceRefresh } from './prometheus'
 import { initSentry, captureProductionError } from './sentry'
+import { DataSourceRegistryType } from './data-sources'
 
 const main = async () => {
   const rootLogger = createLogger({ name: 'service' })
@@ -44,8 +45,16 @@ const main = async () => {
   }
 
   const feedEvents = new FeedEvents()
-
   const cache = cacheBackend === 'fs' ? new FSCache(config.cache.dir) : new RedisCache(getDependency('redis'))
+
+  const dataSources = new DataSourceRegistry<DataSourceRegistryType>({
+    logger: rootLogger.child({ component: 'data-source' }),
+    onError: reportProductionError,
+    observeDataSourceRefresh,
+    feedEvents,
+    cache,
+  })
+
   const feeds = new FeedManager(cache, feedEvents, {
     logger: rootLogger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
     onError: reportProductionError,
@@ -61,7 +70,7 @@ const main = async () => {
 
   registerWsMetrics(feedEvents)
 
-  await initWebFeeds(feeds)
+  await initWebFeeds(feeds, dataSources)
 
   if (!config.knx.disabled) {
     const knx = await knxInit(rootLogger)

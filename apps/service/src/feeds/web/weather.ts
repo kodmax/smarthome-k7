@@ -1,5 +1,6 @@
-import { FeedManager } from '@repo/feeds'
-import { WeatherSource } from '@/data-sources'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistryType } from '@/data-sources'
 
-export const addWeatherFeed = (feeds: FeedManager): Promise<void> =>
-  feeds.addFeed('weather', { weather: WeatherSource })
+export const addWeatherFeed = (feeds: FeedManager, dataSources: DataSourceRegistry<DataSourceRegistryType>): void => {
+  feeds.registerFeed('weather', dataSources.getByIds(['weather']), ({ weather }) => weather)
+}

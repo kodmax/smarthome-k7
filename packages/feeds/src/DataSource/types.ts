@@ -26,6 +26,9 @@ export type DataSourceCacheFromCtor<T extends DataSourceDefinitionCtor<unknown, 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyDataSourceDefinitionClass = DataSourceDefinitionCtor<any, any>
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyDataSource = DataSource<any, any>
+
 export type SourceMetricType = 'knx' | 'scraper' | 'api' | 'db' | 'other'
 
 export type DataSourceRefreshObserver = <T>(
@@ -33,3 +36,10 @@ export type DataSourceRefreshObserver = <T>(
   sourceId: string,
   fn: () => Promise<T>,
 ) => Promise<T>
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RegistryBaseType = Record<string, DataSourceDefinitionCtor<any, any>>
+
+export type DataSourcesByIds<R extends RegistryBaseType, K extends readonly (keyof R)[]> = {
+  [P in K[number]]: DataSource<DataSourceValueFromCtor<R[P]>, DataSourceCacheFromCtor<R[P]>>
+}

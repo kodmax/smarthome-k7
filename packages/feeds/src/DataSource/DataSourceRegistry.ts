@@ -1,6 +1,6 @@
 import { DataSource } from './DataSource'
 import { DataSourceNotFound } from './Errors'
-import { DataSourceDefinitionCtor, DataSourceFromCtor, DataSourceRefreshObserver, DefinitionFromCtor } from './types'
+import { DataSourceFromCtor, DataSourceRefreshObserver, DefinitionFromCtor, RegistryBaseType } from './types'
 import { Cache } from '../Cache'
 import { FeedEvents } from '../FeedManager'
 import { Logger } from '@repo/logger'
@@ -15,7 +15,8 @@ type DataSourceRegistryParams = {
   observeDataSourceRefresh: DataSourceRefreshObserver
 }
 
-export class DataSourceRegistry<T extends Record<string, DataSourceDefinitionCtor<unknown, unknown>>> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class DataSourceRegistry<T extends RegistryBaseType> {
   private definitions: Map<keyof T, DataSourceDefinition<unknown, unknown>> = new Map()
   private dataSources: Map<keyof T, DataSource<unknown, unknown>> = new Map()
 
@@ -44,6 +45,7 @@ export class DataSourceRegistry<T extends Record<string, DataSourceDefinitionCto
       this.onError,
       this.observeDataSourceRefresh,
     )
+    this.logger.info({ id }, 'Data source registered')
     this.definitions.set(id, definition)
     this.dataSources.set(id, ds)
   }
@@ -64,5 +66,11 @@ export class DataSourceRegistry<T extends Record<string, DataSourceDefinitionCto
     }
 
     return ds as DataSourceFromCtor<T[K]>
+  }
+
+  getByIds<K extends readonly (keyof T)[]>(ids: K): { [key in K[number]]: DataSourceFromCtor<T[key]> } {
+    return Object.fromEntries(ids.map(id => [id, this.get(id)])) as {
+      [key in K[number]]: DataSourceFromCtor<T[key]>
+    }
   }
 }

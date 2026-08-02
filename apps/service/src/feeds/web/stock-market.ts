@@ -1,18 +1,17 @@
-import { FeedManager } from '@repo/feeds'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
 import { StockMarketFeed, TickerData } from '@repo/types'
 import { YahooTickerData } from '@/data-sources/stock-market/yahoo/types'
-import { CnbcMarketIndicesSource, NasdaqMarketDataSource, YahooMarketDataSource } from '@/data-sources'
+import { DataSourceRegistryType } from '@/data-sources'
 import { NasdaqTickerData } from '@/data-sources/stock-market/nasdaq/types'
 import { tickerList } from '@/data-sources/stock-market/tickerList'
 
-export const addStockMarketFeed = (feeds: FeedManager): Promise<void> =>
-  feeds.addFeed(
+export const addStockMarketFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
+  feeds.registerFeed(
     'stock-market',
-    {
-      nasdaqMarketData: NasdaqMarketDataSource,
-      yahooMarketData: YahooMarketDataSource,
-      cnbcMarketIndices: CnbcMarketIndicesSource,
-    },
+    dataSources.getByIds(['nasdaqMarketData', 'yahooMarketData', 'cnbcMarketIndices']),
     ({ nasdaqMarketData, yahooMarketData, cnbcMarketIndices }): StockMarketFeed => {
       const yahooMap: Map<string, YahooTickerData> = new Map()
       for (const data of yahooMarketData) {

@@ -1,5 +1,7 @@
-import { FeedManager } from '@repo/feeds'
-import { TorrentSource } from '@/data-sources'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistryType } from '@/data-sources'
 
-export const addTopTorrentsFeed = (feeds: FeedManager): Promise<void> =>
-  feeds.addFeed('top-torrents', { torrents: TorrentSource })
+export const addTopTorrentsFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> => feeds.registerFeed('top-torrents', dataSources.getByIds(['torrents']), ({ torrents }) => torrents)

@@ -1,5 +1,8 @@
-import { FeedManager } from '@repo/feeds'
-import { SentryTestSource } from '@/data-sources'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistryType } from '@/data-sources'
 
-export const addSentryTestFeed = (feeds: FeedManager): Promise<void> =>
-  feeds.addFeed('sentry-test', { sentryTest: SentryTestSource })
+export const addSentryTestFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
+  feeds.registerFeed('sentry-test', dataSources.getByIds(['sentryTest']), ({ sentryTest }) => sentryTest)

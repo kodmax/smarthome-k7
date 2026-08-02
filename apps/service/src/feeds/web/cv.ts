@@ -1,4 +1,5 @@
-import { FeedManager } from '@repo/feeds'
-import { CvSource } from '@/data-sources'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistryType } from '@/data-sources'
 
-export const addCvFeed = (feeds: FeedManager): Promise<void> => feeds.addFeed('cv', { cv: CvSource })
+export const addCvFeed = (feeds: FeedManager, dataSources: DataSourceRegistry<DataSourceRegistryType>): Promise<void> =>
+  feeds.registerFeed('cv', dataSources.getByIds(['cv']), ({ cv }) => cv)

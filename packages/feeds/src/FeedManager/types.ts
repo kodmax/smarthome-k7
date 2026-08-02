@@ -3,6 +3,7 @@ import {
   DataSourceDefinition,
   AnyDataSourceDefinitionClass,
   type DataSourceRefreshObserver,
+  AnyDataSource,
 } from '../DataSource'
 import type { ErrorHandler } from '../notifyError'
 import type { Logger } from '@repo/logger'
@@ -15,6 +16,10 @@ export type SourceDataTypes<S extends Record<string, AnyDataSourceDefinitionClas
       ? T
       : never
     : never
+}
+
+export type DataSourceDataTypes<S extends Record<string, AnyDataSource>> = {
+  [K in keyof S]: S[K] extends DataSource<infer T, unknown> ? T : never
 }
 
 export type FeedSources = Map<string, DataSource<unknown>>
