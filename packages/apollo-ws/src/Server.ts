@@ -12,6 +12,7 @@ export type ApolloWebSocketOptions = {
   port?: number
   logger: Logger
   onError: ErrorHandler
+  feedEvents: FeedEvents
 }
 
 type Client = {
@@ -25,7 +26,7 @@ function clientIp(socket: Socket): string {
 }
 
 export class Server {
-  public vent: FeedEvents = new FeedEvents()
+  private readonly feedEvents: FeedEvents
   private readonly clients: Set<Client> = new Set<Client>()
   private readonly feedDebounceTimeout: Map<string, NodeJS.Timeout> = new Map()
   private wsServer: WebSocketServer | undefined
@@ -45,21 +46,23 @@ export class Server {
     )
   }
 
-  public static async listen<T>(
-    { port = 3678, logger, onError }: ApolloWebSocketOptions,
-    init: (instance: Server, logger: Logger, onError: ErrorHandler) => Promise<T>,
-  ): Promise<T> {
-    const serv = new Server({ port, logger, onError })
-    const ret = await init(serv, logger, onError)
+  public static async listen(
+    { port = 3678, logger, onError, feedEvents }: ApolloWebSocketOptions,
+    init?: (instance: Server, logger: Logger, onError: ErrorHandler) => Promise<void>,
+  ): Promise<Server> {
+    const serv = new Server({ port, logger, onError, feedEvents })
     await serv.connect()
 
-    return ret
+    if (init !== undefined) {
+      await init(serv, logger, onError)
+    }
+
+    return serv
   }
 
-  private constructor(
-    private readonly options: Required<Pick<ApolloWebSocketOptions, 'port' | 'logger'>> &
-      Pick<ApolloWebSocketOptions, 'onError'>,
-  ) {}
+  private constructor(private readonly options: ApolloWebSocketOptions) {
+    this.feedEvents = options.feedEvents
+  }
 
   public async close(): Promise<void> {
     for (const timeoutId of this.feedDebounceTimeout.values()) {
@@ -67,7 +70,7 @@ export class Server {
     }
     this.feedDebounceTimeout.clear()
 
-    this.vent.removeListener('feed', this.onFeed)
+    this.feedEvents.removeListener('feed', this.onFeed)
 
     for (const client of this.clients) {
       client.ws.close()
@@ -130,12 +133,12 @@ export class Server {
           params.forEach(sub => client.subscriptions.add(sub))
 
           this.options.logger.info({ clientIp: ip, feedIds: params }, 'Client subscribed')
-          this.vent.emit('feeds-request', params)
+          this.feedEvents.emit('feeds-request', params)
         } else if (cmd === 'refresh') {
           const feeds = new Set<string>(params)
 
           this.options.logger.info({ clientIp: ip, feedIds: [...feeds] }, 'Client requested refresh')
-          this.vent.emit('feeds-refresh', feeds.values())
+          this.feedEvents.emit('feeds-refresh', feeds.values())
         } else if (cmd === 'command') {
           const [sourceId, name, ...args] = params
           const argsText = args.join(' ')
@@ -154,14 +157,14 @@ export class Server {
             },
             'Client requested command',
           )
-          this.vent.emit('command', command)
+          this.feedEvents.emit('command', command)
         } else {
           this.options.logger.info({ clientIp: ip, cmd }, 'Client sent unknown command')
         }
       })
 
       this.clients.add(client)
-      this.vent.emit('clients-changed', this.clients.size)
+      this.feedEvents.emit('clients-changed', this.clients.size)
       ws.on('error', e => {
         notifyError(this.options.logger, this.options.onError, 'warn', 'Client socket error', e, { clientIp: ip })
       })
@@ -169,11 +172,11 @@ export class Server {
       ws.on('close', () => {
         this.options.logger.info({ clientIp: ip }, 'Client disconnected')
         this.clients.delete(client)
-        this.vent.emit('clients-changed', this.clients.size)
+        this.feedEvents.emit('clients-changed', this.clients.size)
       })
     })
 
-    this.vent.addListener('feed', this.onFeed)
+    this.feedEvents.addListener('feed', this.onFeed)
 
     return new Promise((resolve, reject) => {
       server.on('listening', () => {

@@ -4,6 +4,7 @@ import { createCaptureLogger } from '@repo/logger'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Server } from './Server'
 import { noopErrorHandler } from './notifyError'
+import { FeedEvents } from '@repo/feeds'
 
 function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -29,11 +30,13 @@ describe('Server', () => {
   let server: Server
   let ws: WebSocket
   let capture: ReturnType<typeof createCaptureLogger>
+  let feedEvents: FeedEvents
 
   beforeEach(async () => {
     capture = createCaptureLogger()
     port = await getFreePort()
-    await Server.listen({ port, logger: capture.logger, onError: noopErrorHandler }, async instance => {
+    feedEvents = new FeedEvents()
+    await Server.listen({ port, logger: capture.logger, onError: noopErrorHandler, feedEvents }, async instance => {
       server = instance
     })
 
@@ -48,7 +51,7 @@ describe('Server', () => {
 
   it('parses subscribe and emits feeds-request', async () => {
     const requested: string[][] = []
-    server.vent.on('feeds-request', feedIds => requested.push([...feedIds]))
+    feedEvents.on('feeds-request', feedIds => requested.push([...feedIds]))
 
     ws.send('subscribe feed-a feed-b')
 
@@ -58,7 +61,7 @@ describe('Server', () => {
 
   it('parses refresh and emits feeds-refresh', async () => {
     const refreshed: string[][] = []
-    server.vent.on('feeds-refresh', feedIds => refreshed.push([...feedIds]))
+    feedEvents.on('feeds-refresh', feedIds => refreshed.push([...feedIds]))
 
     ws.send('refresh weather job-ads')
 
@@ -68,7 +71,7 @@ describe('Server', () => {
 
   it('parses command and emits command with joined args', async () => {
     const commands: Array<{ sourceId: string; name: string; args: string }> = []
-    server.vent.on('command', command => commands.push(command))
+    feedEvents.on('command', command => commands.push(command))
 
     ws.send('command knx-light toggle on fast')
 
@@ -105,7 +108,7 @@ describe('Server', () => {
     ws.send('subscribe my-feed')
     await new Promise(resolve => setTimeout(resolve, 20))
 
-    server.vent.emit('feed', 'my-feed', { value: 1 })
+    feedEvents.emit('feed', 'my-feed', { value: 1 })
     await new Promise(resolve => setTimeout(resolve, 1100))
 
     expect(messages).toEqual(['FEED my-feed {"value":1}'])
@@ -117,9 +120,9 @@ describe('Server', () => {
     ws.send('subscribe debounced-feed')
     await new Promise(resolve => setTimeout(resolve, 20))
 
-    server.vent.emit('feed', 'debounced-feed', { value: 1 })
-    server.vent.emit('feed', 'debounced-feed', { value: 2 })
-    server.vent.emit('feed', 'debounced-feed', { value: 3 })
+    feedEvents.emit('feed', 'debounced-feed', { value: 1 })
+    feedEvents.emit('feed', 'debounced-feed', { value: 2 })
+    feedEvents.emit('feed', 'debounced-feed', { value: 3 })
     await new Promise(resolve => setTimeout(resolve, 1100))
 
     expect(messages).toEqual(['FEED debounced-feed {"value":3}'])
@@ -127,7 +130,7 @@ describe('Server', () => {
 
   it('emits clients-changed when clients connect and disconnect', async () => {
     const counts: number[] = []
-    server.vent.on('clients-changed', count => counts.push(count))
+    feedEvents.on('clients-changed', count => counts.push(count))
 
     const secondClient = new WebSocket(`ws://127.0.0.1:${port}`)
     await waitForOpen(secondClient)
