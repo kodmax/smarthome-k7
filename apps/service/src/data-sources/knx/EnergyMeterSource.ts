@@ -1,35 +1,24 @@
 import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { knxSchema } from '@repo/knx-schema'
 import { DPT_ActiveEnergy, DPT_StartStop, KnxReading, type KnxLink } from 'js-knx'
-import { Inject } from '../../di'
+import { Inject } from '@/di'
 
 export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> {
   @Inject('knx')
   declare private readonly knx: KnxLink
 
-  declare private readonly intermediateReading: DPT_ActiveEnergy
-  declare private readonly reset: DPT_StartStop
-  declare private readonly start: DPT_StartStop
-  declare private readonly stop: DPT_StartStop
+  protected readonly intermediateReading: DPT_ActiveEnergy
+  protected readonly reset: DPT_StartStop
+  protected readonly start: DPT_StartStop
+  protected readonly stop: DPT_StartStop
 
   public constructor(push: (content?: KnxReading<number>) => void, reportError: (e: Error) => void) {
     super(push, reportError)
 
-    this.intermediateReading = this.knx.group({
-      address: '5/2/2',
-      DataType: DPT_ActiveEnergy,
-    })
-    this.reset = this.knx.group({
-      address: '5/2/6',
-      DataType: DPT_StartStop,
-    })
-    this.start = this.knx.group({
-      address: '5/2/1',
-      DataType: DPT_StartStop,
-    })
-    this.stop = this.knx.group({
-      address: '5/2/4',
-      DataType: DPT_StartStop,
-    })
+    this.intermediateReading = this.knx.group(knxSchema.home.energy.consumption.meter)
+    this.reset = this.knx.group(knxSchema.home.energy.consumption.meterReset)
+    this.start = this.knx.group(knxSchema.home.energy.consumption.meterStart)
+    this.stop = this.knx.group(knxSchema.home.energy.consumption.meterStop)
     this.intermediateReading.onValue(reading => {
       this.push(reading)
     })

@@ -44,10 +44,10 @@ function heatingOn(reading: { value: number; text?: string }): string {
 
 export function formatHeating(feed: TemperatureData): string {
   const lines = [
-    `Salon: ${heatingOn(feed.status.salon)} (${feed.mode.livingroom.text})`,
-    `Sypialnia: ${heatingOn(feed.status.sypialnia)} (${feed.mode.bedroom.text})`,
-    `Łazienka: ${heatingOn(feed.status.lazienka)} (${feed.mode.bathroom.text})`,
-    `Podłoga łazienki: ${heatingOn(feed.status.lazienkaPodloga)}`,
+    `Salon: ${heatingOn(feed.status.livingroom)} (${feed.mode.livingroom.text})`,
+    `Sypialnia: ${heatingOn(feed.status.bedroom)} (${feed.mode.bedroom.text})`,
+    `Łazienka: ${heatingOn(feed.status.bathroom)} (${feed.mode.bathroom.text})`,
+    `Podłoga łazienki: ${heatingOn(feed.status.bathroomFloor)}`,
   ]
   return lines.join('\n')
 }

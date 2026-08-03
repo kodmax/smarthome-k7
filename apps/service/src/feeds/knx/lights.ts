@@ -1,7 +1,7 @@
-import { FeedManager } from '@repo/feeds'
-import lightsSource from '@/data-sources/knx/lights'
-import type { KnxLink } from 'js-knx'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistryType } from '@/data-sources'
 
-export const addLightsFeed = (feeds: FeedManager, knx: KnxLink): void => {
-  feeds.addFeed('home.lights', { lights: lightsSource(knx) })
-}
+export const addLightsFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> => feeds.addFeed('home.lights', dataSources.getByIds(['homeLights']), ({ homeLights }) => homeLights)

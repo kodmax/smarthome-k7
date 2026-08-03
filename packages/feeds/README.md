@@ -1,24 +1,56 @@
 # @repo/feeds
 
-Real-time feed framework — data source registry and feeds collection.
+Feed framework for `apps/service` — data sources, cache, registry, and feed composition. WebSocket transport lives in
+[`@repo/apollo-ws`](../apollo-ws).
+
+## Architecture
+
+```
+DataSourceRegistry.add(id, SourceClass)   ← creates DataSource, per-source cron, nightly maintenance
+        ↓
+FeedManager.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source feeds
+        ↓
+FeedEvents (feed / data-update / command / feeds-request / feeds-refresh)
+        ↓
+@repo/apollo-ws Server   ← debounce + FEED <id> <json> broadcast
+```
+
+Business logic (scrapers, KNX classes, feed wiring) stays in [`apps/service`](../../apps/service). This package is
+infrastructure only.
 
 ## API
 
 Exports from `src/index.ts`:
 
-- `Feeds` — feed and data source registry
-- `DataSource` — single source (fetch, cron, cache)
-- `Cache` — on-disk result persistence
-- `Feeds`, `DataSource` — accept injected Pino `Logger` via options
+| Export                                | Role                                                                    |
+| ------------------------------------- | ----------------------------------------------------------------------- |
+| `DataSourceRegistry`                  | Register source classes, cron + maintenance, `getByIds()`               |
+| `FeedManager`                         | Compose feeds from ready-made `DataSource` instances                    |
+| `DataSource` / `DataSourceDefinition` | Fetch, push, cache, commands                                            |
+| `FeedEvents`                          | Shared event bus (service passes one instance to WS + registry + feeds) |
+| `FSCache` / `RedisCache`              | Persistent or volatile cache backends                                   |
 
-## Usage
+## Usage (in service)
 
-Primary consumer is [`apps/service`](../../apps/service), which registers feeds and starts the server.
+```ts
+const feedEvents = new FeedEvents()
+const cache = new FSCache(config.cache.dir)
 
-```sh
-yarn workspace @repo/feeds build
-yarn workspace @repo/feeds test
+const dataSources = new DataSourceRegistry<DataSourceRegistryType>({
+  cache,
+  feedEvents,
+  logger,
+  onError,
+  observeDataSourceRefresh,
+})
+
+const feeds = new FeedManager(feedEvents, { logger, onError })
+
+await dataSources.add('weather', WeatherSource)
+await feeds.addFeed('weather', dataSources.getByIds(['weather']), ({ weather }) => weather)
 ```
+
+Shutdown: `dataSources.close()` stops Chronos jobs (wired in `apps/service/src/graceful-shutdown.ts`).
 
 ## Scripts
 
@@ -28,9 +60,8 @@ yarn workspace @repo/feeds test
 | `test`            | Vitest                         |
 | `lint` / `format` | ESLint / Prettier              |
 
-Package entry: `dist/index.js` with types in `dist/index.d.ts`. Cron scheduling lives in [`@repo/chronos`](../chronos).
-Agent notes: [`AGENTS.md`](./AGENTS.md).
+Agent notes: [`AGENTS.md`](./AGENTS.md). Cron scheduling uses [`@repo/chronos`](../chronos).
 
 ## Stack
 
-TypeScript, redis, eslink.
+TypeScript, Pino (`@repo/logger`), optional Redis cache.

@@ -1,45 +1,70 @@
-import { FeedManager } from '@repo/feeds'
-import type { KnxLink } from 'js-knx'
-import { DPT_Value_Temp } from 'js-knx'
-import { IndoorTempHistorySource, type TempHistory } from '@/data-sources'
-import knxTemp from '@/data-sources/knx/temp'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistryType } from '@/data-sources'
 import DateTime from '@/DateTime'
 
-export type HomeTempRoomSchema = {
-  history: keyof TempHistory
-  reading: { address: string; DataType: typeof DPT_Value_Temp }
-  setpoint?: { address: string; DataType: typeof DPT_Value_Temp }
-}
-
-export const addHomeTempFeed = (feeds: FeedManager, knx: KnxLink, feed: string, schema: HomeTempRoomSchema): void => {
-  const reading = knxTemp(`temp.${feed}`, knx.group(schema.reading))
-
-  if (schema.setpoint) {
-    const setpoint = knxTemp(`temp.${feed}.setpoint`, knx.group(schema.setpoint))
-    feeds.addFeed(
-      `home.temp.${feed}`,
-      { reading, setpoint, indoorTempHistory: IndoorTempHistorySource },
-      ({ reading, setpoint, indoorTempHistory }) => ({
-        reading,
-        history: {
-          date: DateTime.now().getDate(),
-          today: indoorTempHistory[schema.history],
-        },
-        setpoint: setpoint.value.toFixed(1),
-      }),
-    )
-    return
-  }
-
+export const addBathroomFloorTempFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
   feeds.addFeed(
-    `home.temp.${feed}`,
-    { reading, indoorTempHistory: IndoorTempHistorySource },
-    ({ reading, indoorTempHistory }) => ({
-      reading,
+    'home.temp.bathroom-floor',
+    dataSources.getByIds(['bathroomFloorTempReading', 'indoorTempHistory']),
+    ({ bathroomFloorTempReading, indoorTempHistory }) => ({
+      reading: bathroomFloorTempReading,
       history: {
         date: DateTime.now().getDate(),
-        today: indoorTempHistory[schema.history],
+        today: indoorTempHistory.bathroomFloor,
       },
     }),
   )
-}
+
+export const addBedroomTempFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
+  feeds.addFeed(
+    'home.temp.bedroom',
+    dataSources.getByIds(['bedroomTempReading', 'bedroomTempSetpoint', 'indoorTempHistory']),
+    ({ bedroomTempReading, bedroomTempSetpoint, indoorTempHistory }) => ({
+      reading: bedroomTempReading,
+      history: {
+        date: DateTime.now().getDate(),
+        today: indoorTempHistory.bedroom,
+      },
+      setpoint: bedroomTempSetpoint.value.toFixed(1),
+    }),
+  )
+
+export const addLivingRoomTempFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
+  feeds.addFeed(
+    'home.temp.livingroom',
+    dataSources.getByIds(['livingRoomTempReading', 'livingRoomTempSetpoint', 'indoorTempHistory']),
+    ({ livingRoomTempReading, livingRoomTempSetpoint, indoorTempHistory }) => ({
+      reading: livingRoomTempReading,
+      history: {
+        date: DateTime.now().getDate(),
+        today: indoorTempHistory.livingroom,
+      },
+      setpoint: livingRoomTempSetpoint.value.toFixed(1),
+    }),
+  )
+
+export const addBathroomTempFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
+  feeds.addFeed(
+    'home.temp.bathroom',
+    dataSources.getByIds(['bathroomTempReading', 'bathroomTempSetpoint', 'indoorTempHistory']),
+    ({ bathroomTempReading, bathroomTempSetpoint, indoorTempHistory }) => ({
+      reading: bathroomTempReading,
+      history: {
+        date: DateTime.now().getDate(),
+        today: indoorTempHistory.bathroom,
+      },
+      setpoint: bathroomTempSetpoint.value.toFixed(1),
+    }),
+  )

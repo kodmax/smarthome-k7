@@ -54,7 +54,7 @@ export const Indoor: FC<Record<string, never>> = () => {
         <TableBody>
           <KnxReading
             feed='home.air-quality.co2'
-            label={labels.co2Level}
+            label={labels.co2Reading}
             range={{ optimal: 400, highest: 1500 }}
             bars={{ historyKey: 'today', highest: 2000, lowest: 400, optimal: 600, color: true }}
             icon={
@@ -67,7 +67,7 @@ export const Indoor: FC<Record<string, never>> = () => {
           />
           <KnxReading
             feed='home.air-quality.humidity'
-            label={labels.humidity}
+            label={labels.humidityReading}
             range={optimalHumidityRange}
             bars={{ historyKey: 'today', color: true, ...optimalHumidityRange }}
           />

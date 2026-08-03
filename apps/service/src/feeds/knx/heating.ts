@@ -1,40 +1,41 @@
-import { FeedManager } from '@repo/feeds'
-import { knxSchema } from '@repo/knx-schema'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
 import { TemperatureData } from '@repo/types'
-import type { KnxLink } from 'js-knx'
-import knxB1 from '@/data-sources/knx/b1'
-import KnxHVACMode from '@/data-sources/knx/hvac-mode'
+import { DataSourceRegistryType } from '@/data-sources'
 
-export const addHeatingFeed = (feeds: FeedManager, knx: KnxLink): void => {
-  const schema = knxSchema.home.heating
-  const heatersReadings = {
-    bathroomState: knxB1('home.heating.lazienka.water-heating', knx.group(schema.bathroom.waterHeating)),
-    bathroomFloorState: knxB1('home.heating.lazienka.floor-heating', knx.group(schema.bathroom.floorHeating)),
-    livingRoomState: knxB1('home.heating.salon.water-heating', knx.group(schema.livingRoom.waterHeating)),
-    bedroomState: knxB1('home.heating.sypialnia.water-heating', knx.group(schema.bedroom.waterHeating)),
-  }
-
-  const hvacModes = {
-    livingroomMode: KnxHVACMode('home.heating.hvacmode.living-room', knx.group(schema.livingRoom.hvacMode)),
-    bathroomMode: KnxHVACMode('home.heating.hvacmode.bathroom', knx.group(schema.bathroom.hvacMode)),
-    bedroomMode: KnxHVACMode('home.heating.hvacmode.bedroom', knx.group(schema.bedroom.hvacMode)),
-  }
-
+export const addHeatingFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
   feeds.addFeed(
     'heating',
-    { ...heatersReadings, ...hvacModes },
-    (readings): TemperatureData => ({
+    dataSources.getByIds([
+      'bathroomHeatingState',
+      'bathroomFloorHeatingState',
+      'livingRoomHeatingState',
+      'bedroomHeatingState',
+      'livingRoomHeatingMode',
+      'bathroomHeatingMode',
+      'bedroomHeatingMode',
+    ]),
+    ({
+      bathroomHeatingState,
+      bathroomFloorHeatingState,
+      livingRoomHeatingState,
+      bedroomHeatingState,
+      livingRoomHeatingMode,
+      bathroomHeatingMode,
+      bedroomHeatingMode,
+    }): TemperatureData => ({
       status: {
-        lazienka: readings.bathroomState,
-        lazienkaPodloga: readings.bathroomFloorState,
-        sypialnia: readings.bedroomState,
-        salon: readings.livingRoomState,
+        bathroom: bathroomHeatingState,
+        bathroomFloor: bathroomFloorHeatingState,
+        bedroom: bedroomHeatingState,
+        livingroom: livingRoomHeatingState,
       },
       mode: {
-        livingroom: readings.livingroomMode,
-        bathroom: readings.bathroomMode,
-        bedroom: readings.bedroomMode,
+        livingroom: livingRoomHeatingMode,
+        bathroom: bathroomHeatingMode,
+        bedroom: bedroomHeatingMode,
       },
     }),
   )
-}

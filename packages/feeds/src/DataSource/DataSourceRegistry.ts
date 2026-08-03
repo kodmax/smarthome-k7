@@ -1,5 +1,5 @@
 import { DataSource } from './DataSource'
-import { DataSourceNotFound } from './Errors'
+import { DataSourceNotFound, DuplicateDataSourceIdError } from './Errors'
 import { DataSourceFromCtor, DataSourceRefreshObserver, DefinitionFromCtor, RegistryBaseType } from './types'
 import { Cache } from '../Cache'
 import { FeedEvents } from '../FeedManager'
@@ -7,7 +7,8 @@ import { Logger, readScopedLogLevel } from '@repo/logger'
 import { ErrorHandler, notifyError } from '../notifyError'
 import { DataSourceDefinition } from './DataSourceDefinition'
 import { Chronos } from '@repo/chronos'
-import { DuplicateDataSourceIdError } from '../FeedManager/Errors'
+
+const DATA_SOURCES_MAINTENANCE_CRON = '0 3 * * *'
 
 type DataSourceRegistryParams = {
   cache: Cache
@@ -40,6 +41,27 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
     this.chronos = new Chronos(
       params.logger.child({ component: 'data-source-cron' }, { level: readScopedLogLevel('data-source-cron') }),
     )
+
+    this.chronos.addJob(DATA_SOURCES_MAINTENANCE_CRON, 'data-sources-maintenance', () => this.runMaintenance())
+  }
+
+  private async runMaintenance(): Promise<void> {
+    for (const ds of this.dataSources.values()) {
+      const sourceId = ds.getId()
+
+      try {
+        this.logger.debug({ sourceId }, 'Data source maintenance starting')
+        const start = Date.now()
+        await ds.maintenance()
+        this.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source maintenance completed')
+      } catch (e) {
+        notifyError(this.logger, this.onError, 'warn', 'Data source maintenance error', e, { sourceId })
+      }
+    }
+  }
+
+  public close(): void {
+    this.chronos.stop()
   }
 
   async add<K extends keyof T>(id: K, ctor: T[K]): Promise<void> {

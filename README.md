@@ -10,7 +10,8 @@ WebSocket.
 | [`apps/web`](apps/web)                                     | React dashboard (Vite, MUI)                   |
 | [`apps/service`](apps/service)                             | Backend — feeds, cache, WebSocket             |
 | [`apps/mcp`](apps/mcp)                                     | MCP server for Cursor (dashboard tools)       |
-| [`packages/apollo-ws`](packages/apollo-ws)                 | WebSocket server and feed registry            |
+| [`packages/feeds`](packages/feeds)                         | Data sources, cache, registry, feed composer  |
+| [`packages/apollo-ws`](packages/apollo-ws)                 | WebSocket server (port 3678)                  |
 | [`packages/apollo-card`](packages/apollo-card)             | Zoomable dashboard card shell                 |
 | [`packages/feed-client`](packages/feed-client)             | React hooks for feed subscriptions            |
 | [`packages/types`](packages/types)                         | Shared feed payload types                     |
@@ -68,17 +69,21 @@ yarn workspace service dev
 ## Architecture
 
 ```
-apps/service  ──►  @repo/apollo-ws  ──►  WebSocket :3678
-       │                                      │
-       ├── @repo/knx-schema                   ├── @repo/feed-client ──► apps/web
-       ├── @repo/db                           └── apps/mcp (Cursor)
-       ├── @repo/cron-scripts (KNX jobs)
-       └── scrapers
+apps/service
+    ├── @repo/feeds        DataSourceRegistry + FeedManager + cache
+    ├── @repo/apollo-ws    WebSocket :3678
+    ├── @repo/knx-schema
+    ├── @repo/db
+    ├── @repo/cron-scripts (KNX jobs)
+    └── scrapers / KNX data sources
+              │
+              ├── @repo/feed-client ──► apps/web
+              └── apps/mcp (Cursor)
 ```
 
-The backend registers feeds (weather, stock market, news, job-ads, torrents, energy, heating, CO₂, humidity, room
-temperatures, lights) and pushes updates to clients. The frontend subscribes to topics via `@repo/feed-client`.
-[`apps/mcp`](apps/mcp) exposes the same data (and light control) to Cursor via MCP tools.
+The backend registers data sources in `DataSourceRegistry`, composes feeds in `FeedManager`, and pushes updates over
+WebSocket. The frontend subscribes to topics via `@repo/feed-client`. [`apps/mcp`](apps/mcp) exposes the same data (and
+light control) to Cursor via MCP tools.
 
 KNX scheduled tasks (energy logging, clock sync, indoor readings) run inside [`apps/service`](apps/service) via
 [`@repo/cron-scripts`](packages/cron-scripts). `tv/sony.ts` remains a separate optional script.

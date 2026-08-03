@@ -9,7 +9,7 @@ export const addStockMarketFeed = (
   feeds: FeedManager,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
-  feeds.registerFeed(
+  feeds.addFeed(
     'stock-market',
     dataSources.getByIds(['nasdaqMarketData', 'yahooMarketData', 'cnbcMarketIndices']),
     ({ nasdaqMarketData, yahooMarketData, cnbcMarketIndices }): StockMarketFeed => {

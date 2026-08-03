@@ -218,8 +218,8 @@ export type Translations = {
     }
     indoor: {
       title: string
-      co2Level: string
-      humidity: string
+      co2Reading: string
+      humidityReading: string
       airQuality: string
       dusk: string
       dawn: string

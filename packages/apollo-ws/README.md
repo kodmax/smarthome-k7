@@ -1,24 +1,30 @@
 # @repo/apollo-ws
 
-WebSocket server for feed events
+WebSocket server for the smart home dashboard — protocol, client subscriptions, command routing, and feed broadcast.
+
+Feed composition and data sources live in [`@repo/feeds`](../feeds).
 
 ## API
 
 Exports from `src/index.ts`:
 
 - `Server` — WebSocket server (default port **3678**)
-- `Server` — accept injected Pino `Logger` via options
+- `Server.listen({ feedEvents, logger, onError, port? })` — shares one `FeedEvents` instance with `@repo/feeds`
 
-Message protocol: `FEED <topic> <json>`. Client-side subscriptions and commands are handled by `@repo/feed-client`.
+Message protocol: `FEED <topic> <json>`. Subscriptions and commands are handled by [`@repo/feed-client`](../feed-client)
+on the client side.
 
 ## Usage
 
-Primary consumer is [`apps/service`](../../apps/service), which registers feeds and starts the server.
+Primary consumer is [`apps/service`](../../apps/service):
 
-```sh
-yarn workspace @repo/apollo-ws build
-yarn workspace @repo/apollo-ws test
+```ts
+const feedEvents = new FeedEvents()
+const apollo = await Server.listen({ feedEvents, logger, onError })
 ```
+
+Incoming client messages emit on `feedEvents` (`feeds-request`, `feeds-refresh`, `command`). Outgoing updates listen on
+`feed` (1 s debounce per topic).
 
 ## Scripts
 
@@ -28,9 +34,8 @@ yarn workspace @repo/apollo-ws test
 | `test`            | Vitest                         |
 | `lint` / `format` | ESLint / Prettier              |
 
-Package entry: `dist/index.js` with types in `dist/index.d.ts`. Cron scheduling lives in [`@repo/chronos`](../chronos).
 Agent notes: [`AGENTS.md`](./AGENTS.md).
 
 ## Stack
 
-TypeScript, `ws`, Bun (bundling).
+TypeScript, `ws`, Bun (bundling in service).

@@ -232,7 +232,7 @@ export const ru: Translations = {
         line1: 'В ближайшие часы температура опустится до {value}°C.',
       },
       ventilate: {
-        highCo2: 'Высокий уровень CO₂ — проветривание улучшит качество воздуха.',
+        highCo2: 'CO₂ высокий — проветривание улучшит качество воздуха.',
         elevatedCo2: 'Повышенный CO₂ — рассмотрите краткое проветривание.',
         highHumidity: 'Высокая влажность в доме, а на улице воздух суше.',
       },
@@ -252,8 +252,8 @@ export const ru: Translations = {
     },
     indoor: {
       title: 'Качество воздуха',
-      co2Level: 'Уровень CO₂',
-      humidity: 'Влажность',
+      co2Reading: 'CO₂',
+      humidityReading: 'Влажность',
       airQuality: 'AQI',
       dusk: 'Закат',
       dawn: 'Рассвет',

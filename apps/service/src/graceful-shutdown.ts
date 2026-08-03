@@ -1,5 +1,4 @@
 import type { Server } from '@repo/apollo-ws'
-import type { FeedManager } from '@repo/feeds'
 import type { Logger } from '@repo/logger'
 import { closeDbPool } from '@repo/db'
 import { closePrometheus } from './prometheus'
@@ -9,8 +8,8 @@ import type { KnxLink } from 'js-knx'
 
 let knxLink: KnxLink | undefined
 let knxCron: { stop(): void } | undefined
-let apolloFeeds: FeedManager | undefined
 let apolloServer: Server | undefined
+let dataSourceRegistry: { close(): void } | undefined
 let shuttingDown = false
 let shutdownLogger: Logger | undefined
 
@@ -22,9 +21,12 @@ export const registerKnxCron = (chronos: { stop(): void }): void => {
   knxCron = chronos
 }
 
-export const registerApollo = (server: Server, feeds: FeedManager): void => {
+export const registerDataSources = (registry: { close(): void }): void => {
+  dataSourceRegistry = registry
+}
+
+export const registerApollo = (server: Server): void => {
   apolloServer = server
-  apolloFeeds = feeds
 }
 
 const closeConnections = async (logger: Logger): Promise<void> => {
@@ -33,9 +35,9 @@ const closeConnections = async (logger: Logger): Promise<void> => {
     logger.info({ step: 'knx-cron' }, 'Shutdown step complete')
   }
 
-  if (apolloFeeds !== undefined) {
-    apolloFeeds.close()
-    logger.info({ step: 'feeds' }, 'Shutdown step complete')
+  if (dataSourceRegistry !== undefined) {
+    dataSourceRegistry.close()
+    logger.info({ step: 'data-sources' }, 'Shutdown step complete')
   }
 
   const knx = knxLink

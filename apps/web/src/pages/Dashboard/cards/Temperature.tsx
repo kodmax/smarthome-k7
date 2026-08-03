@@ -56,7 +56,7 @@ export const Temperature: FC<Record<string, never>> = () => {
                 <KnxStateIcon<TemperatureData>
                   icon={payload => icons[payload.mode.bathroom.text] ?? HeaterIcon}
                   id='heating'
-                  active={payload => payload.status.lazienkaPodloga.value === 1}
+                  active={payload => payload.status.bathroomFloor.value === 1}
                 />
               ) : undefined
             }
@@ -73,7 +73,7 @@ export const Temperature: FC<Record<string, never>> = () => {
                 <KnxStateIcon<TemperatureData>
                   icon={payload => icons[payload.mode.livingroom.text] ?? HeaterIcon}
                   id='heating'
-                  active={payload => payload.status.salon.value === 1}
+                  active={payload => payload.status.livingroom.value === 1}
                 />
               ) : undefined
             }
@@ -90,7 +90,7 @@ export const Temperature: FC<Record<string, never>> = () => {
                 <KnxStateIcon<TemperatureData>
                   icon={payload => icons[payload.mode.bedroom.text] ?? HeaterIcon}
                   id='heating'
-                  active={payload => payload.status.sypialnia.value === 1}
+                  active={payload => payload.status.bedroom.value === 1}
                 />
               ) : undefined
             }
@@ -107,7 +107,7 @@ export const Temperature: FC<Record<string, never>> = () => {
                 <KnxStateIcon<TemperatureData>
                   icon={payload => icons[payload.mode.bathroom.text] ?? HeaterIcon}
                   id='heating'
-                  active={payload => payload.status.lazienka.value === 1}
+                  active={payload => payload.status.bathroom.value === 1}
                 />
               ) : undefined
             }

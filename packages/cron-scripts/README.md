@@ -11,8 +11,8 @@ Scheduled job implementations for the smart home backend. KNX jobs run **inside*
 | `src/knx/log-hourly-consumption.ts` | `0 * * * *`     | Hourly energy readings → MariaDB |
 | `src/knx/log-air-condition.ts`      | `*/15 * * * *`  | Temperature, humidity, CO₂ logs  |
 
-Service wires these in [`src/knx/schedule.ts`](src/knx/schedule.ts) and starts them when KNX is enabled (`NO_CRON`
-unset).
+Service wires these in [`packages/cron-scripts/src/knx/schedule.ts`](src/knx/schedule.ts) and starts them when KNX is
+enabled (`NO_CRON` unset).
 
 ## Standalone script
 

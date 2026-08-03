@@ -4,9 +4,8 @@ import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FeedEvents } from './FeedEvents'
 import { FSCache } from '../Cache'
-import { DuplicateDataSourceIdError } from './Errors'
 import { FeedManager } from './FeedManager'
-import { DataSourceDefinition, DataSourceDefinitionCtor } from '../DataSource'
+import { DataSource, DataSourceDefinition, DataSourceDefinitionCtor } from '../DataSource'
 import { createSilentLogger } from '@repo/logger'
 import { noopErrorHandler } from '../notifyError'
 
@@ -90,6 +89,10 @@ function createTestSourceClass<T>(options: {
   }
 }
 
+async function createDataSource<T>(cache: FSCache, vent: FeedEvents, SourceClass: DataSourceDefinitionCtor<T>) {
+  return DataSource.fromClass(SourceClass, cache, vent, createSilentLogger(), noopErrorHandler)
+}
+
 describe('Feeds data source registration', () => {
   const cacheDirs: string[] = []
 
@@ -103,34 +106,37 @@ describe('Feeds data source registration', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
 
-    return new FeedManager(new FSCache(cacheDir), new FeedEvents(), { logger: createSilentLogger(), onError })
+    return {
+      cache: new FSCache(cacheDir),
+      vent: new FeedEvents(),
+      feeds: new FeedManager(new FeedEvents(), { logger: createSilentLogger(), onError }),
+    }
   }
 
-  it('reuses the same DataSource when the same definition class is registered in multiple feeds', async () => {
-    const feeds = createFeeds()
+  it('reuses the same DataSource instance when passed explicitly to multiple feeds', async () => {
+    const { cache, vent, feeds } = createFeeds()
     const SourceClass = createTestSourceClass({ id: 'shared-source' })
+    const shared = await createDataSource(cache, vent, SourceClass)
 
-    await feeds.addFeed('feed-a', { src: SourceClass })
-    await feeds.addFeed('feed-b', { src: SourceClass })
+    await feeds.addFeed('feed-a', { src: shared }, ({ src }) => src)
+    await feeds.addFeed('feed-b', { src: shared }, ({ src }) => src)
 
-    await expect(feeds.addFeed('feed-c', { src: SourceClass })).resolves.toBeUndefined()
+    await expect(feeds.addFeed('feed-c', { src: shared }, ({ src }) => src)).resolves.toBeUndefined()
   })
 
-  it('throws when a different definition class reuses an existing data source id', async () => {
-    const feeds = createFeeds()
-    const FirstSource = createTestSourceClass({ id: 'duplicate-id' })
-    const SecondSource = createTestSourceClass({ id: 'duplicate-id' })
+  it('allows different ids for different data source instances', async () => {
+    const { cache, vent, feeds } = createFeeds()
 
-    await feeds.addFeed('feed-a', { src: FirstSource })
-
-    await expect(feeds.addFeed('feed-b', { src: SecondSource })).rejects.toThrow(DuplicateDataSourceIdError)
-  })
-
-  it('allows different ids for different definition classes', async () => {
-    const feeds = createFeeds()
-
-    await feeds.addFeed('feed-a', { src: createTestSourceClass({ id: 'source-a' }) })
-    await feeds.addFeed('feed-b', { src: createTestSourceClass({ id: 'source-b' }) })
+    await feeds.addFeed(
+      'feed-a',
+      { src: await createDataSource(cache, vent, createTestSourceClass({ id: 'source-a' })) },
+      ({ src }) => src,
+    )
+    await feeds.addFeed(
+      'feed-b',
+      { src: await createDataSource(cache, vent, createTestSourceClass({ id: 'source-b' })) },
+      ({ src }) => src,
+    )
   })
 
   it('routes commands through vent to the push source handler', async () => {
@@ -138,22 +144,27 @@ describe('Feeds data source registration', () => {
     const vent = new FeedEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new FeedManager(new FSCache(cacheDir), vent, {
+    const cache = new FSCache(cacheDir)
+    const feeds = new FeedManager(vent, {
       logger: createSilentLogger(),
       onError: noopErrorHandler,
     })
 
-    const SourceClass = createTestSourceClass({
-      id: 'routed-src',
-      isVolatile: true,
-      handleCommand: (command, args) => {
-        if (command === 'setLevel') {
-          commandHandler(args)
-        }
-      },
-    })
+    const src = await createDataSource(
+      cache,
+      vent,
+      createTestSourceClass({
+        id: 'routed-src',
+        isVolatile: true,
+        handleCommand: (command, args) => {
+          if (command === 'setLevel') {
+            commandHandler(args)
+          }
+        },
+      }),
+    )
 
-    await feeds.addFeed('routed', { src: SourceClass })
+    await feeds.addFeed('routed', { src }, ({ src: routedSrc }) => routedSrc)
 
     vent.emit('command', { sourceId: 'routed-src', name: 'setLevel', args: '50' })
     vent.emit('command', { sourceId: 'other-src', name: 'setLevel', args: '99' })
@@ -168,59 +179,26 @@ describe('Feeds data source registration', () => {
     const vent = new FeedEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new FeedManager(new FSCache(cacheDir), vent, { logger: createSilentLogger(), onError })
+    const cache = new FSCache(cacheDir)
+    const feeds = new FeedManager(vent, { logger: createSilentLogger(), onError })
 
-    await feeds.addFeed('cmd-feed', {
-      src: createTestSourceClass({
+    const src = await createDataSource(
+      cache,
+      vent,
+      createTestSourceClass({
         id: 'cmd-src',
         handleCommand: async () => {
           throw failure
         },
       }),
-    })
+    )
+
+    await feeds.addFeed('cmd-feed', { src }, ({ src: cmdSrc }) => cmdSrc)
 
     vent.emit('command', { sourceId: 'cmd-src', name: 'fail', args: '' })
 
     await vi.waitFor(() => expect(onError).toHaveBeenCalledTimes(1))
     expect(onError).toHaveBeenCalledWith(failure, 'Data source command execution error')
-  })
-
-  it('runs maintenance sequentially for all registered data sources at 3 AM', async () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2024-01-01T02:59:55.000'))
-
-    try {
-      const order: string[] = []
-      const feeds = createFeeds()
-
-      await feeds.addFeed('feed-a', {
-        src: createTestSourceClass({
-          id: 'maint-a',
-          maintenance: async () => {
-            order.push('maint-a-start')
-            await new Promise(resolve => setTimeout(resolve, 20))
-            order.push('maint-a-end')
-          },
-        }),
-      })
-      await feeds.addFeed('feed-b', {
-        src: createTestSourceClass({
-          id: 'maint-b',
-          maintenance: () => {
-            order.push('maint-b')
-          },
-        }),
-      })
-
-      await vi.advanceTimersByTimeAsync(10_000)
-      await vi.advanceTimersByTimeAsync(50)
-
-      expect(order).toEqual(['maint-a-start', 'maint-a-end', 'maint-b'])
-
-      feeds.close()
-    } finally {
-      vi.useRealTimers()
-    }
   })
 })
 
@@ -228,12 +206,8 @@ const FRESH_CACHE_TTL_MS = 3_600_000
 
 describe('Feeds composition', () => {
   const cacheDirs: string[] = []
-  const activeFeeds: FeedManager[] = []
 
   afterEach(() => {
-    for (const feeds of activeFeeds.splice(0)) {
-      feeds.close()
-    }
     for (const dir of cacheDirs.splice(0)) {
       rmSync(dir, { recursive: true, force: true })
     }
@@ -243,19 +217,19 @@ describe('Feeds composition', () => {
     const vent = new FeedEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
+    const cache = new FSCache(cacheDir)
 
-    const feeds = new FeedManager(new FSCache(cacheDir), vent, {
+    const feeds = new FeedManager(vent, {
       logger: createSilentLogger(),
       onError: noopErrorHandler,
     })
-    activeFeeds.push(feeds)
 
-    return { vent, feeds }
+    return { vent, feeds, cache }
   }
 
   describe('data-update source selection (triggeredBy)', () => {
     it('reads the trigger source from cache via getRecentContent without re-running getData script', async () => {
-      const { vent, feeds } = createCompositionFeeds()
+      const { vent, feeds, cache } = createCompositionFeeds()
 
       let pushA: (content: { value: number }) => void = () => {}
       let pushB: (content: { value: number }) => void = () => {}
@@ -280,7 +254,11 @@ describe('Feeds composition', () => {
         },
       })
 
-      await feeds.addFeed('composed', { a: SourceA, b: SourceB }, content => content)
+      await feeds.addFeed(
+        'composed',
+        { a: await createDataSource(cache, vent, SourceA), b: await createDataSource(cache, vent, SourceB) },
+        content => content,
+      )
 
       const sourcesReady = Promise.all([waitForDataUpdate(vent, 'source-a'), waitForDataUpdate(vent, 'source-b')])
       pushA({ value: 10 })
@@ -304,7 +282,7 @@ describe('Feeds composition', () => {
     })
 
     it('runs getData script on non-trigger sources that have no cache', async () => {
-      const { vent, feeds } = createCompositionFeeds()
+      const { vent, feeds, cache } = createCompositionFeeds()
 
       let pushWarm: (content: { value: number }) => void = () => {}
       const getDataCold = vi.fn(async () => ({ value: 99 }))
@@ -322,7 +300,14 @@ describe('Feeds composition', () => {
         getData: getDataCold,
       })
 
-      await feeds.addFeed('partial', { warm: WarmSource, cold: ColdSource }, content => content)
+      await feeds.addFeed(
+        'partial',
+        {
+          warm: await createDataSource(cache, vent, WarmSource),
+          cold: await createDataSource(cache, vent, ColdSource),
+        },
+        content => content,
+      )
 
       const feedEvents: unknown[] = []
       vent.on('feed', (_id, value) => feedEvents.push(value))
@@ -337,7 +322,7 @@ describe('Feeds composition', () => {
     })
 
     it('fetches sibling content via ensureContent when sibling has no cache', async () => {
-      const { vent, feeds } = createCompositionFeeds()
+      const { vent, feeds, cache } = createCompositionFeeds()
 
       let pushB: (content: { value: number }) => void = () => {}
       const getDataA = vi.fn(async () => ({ value: 10 }))
@@ -357,7 +342,11 @@ describe('Feeds composition', () => {
         },
       })
 
-      await feeds.addFeed('composed', { a: SourceA, b: SourceB }, content => content)
+      await feeds.addFeed(
+        'composed',
+        { a: await createDataSource(cache, vent, SourceA), b: await createDataSource(cache, vent, SourceB) },
+        content => content,
+      )
 
       const feedEvents: unknown[] = []
       vent.on('feed', (_id, value) => feedEvents.push(value))
@@ -373,7 +362,7 @@ describe('Feeds composition', () => {
     })
 
     it('composes feed when trigger source emits data-update without writing new cache content', async () => {
-      const { vent, feeds } = createCompositionFeeds()
+      const { vent, feeds, cache } = createCompositionFeeds()
 
       let pushTrigger: (content?: { value: number }) => void = () => {}
       const getDataTrigger = vi.fn(async () => ({ value: 100 }))
@@ -393,7 +382,14 @@ describe('Feeds composition', () => {
         getData: getDataSibling,
       })
 
-      await feeds.addFeed('job-ads-feed', { jobAds: TriggerSource, mySkills: SiblingSource }, content => content)
+      await feeds.addFeed(
+        'job-ads-feed',
+        {
+          jobAds: await createDataSource(cache, vent, TriggerSource),
+          mySkills: await createDataSource(cache, vent, SiblingSource),
+        },
+        content => content,
+      )
 
       const warmReady = waitForDataUpdate(vent, 'job-ads')
       pushTrigger({ value: 42 })
@@ -418,7 +414,7 @@ describe('Feeds composition', () => {
     })
 
     it('does not skip feed when only a non-trigger source lacks recent content', async () => {
-      const { vent, feeds } = createCompositionFeeds()
+      const { vent, feeds, cache } = createCompositionFeeds()
 
       let pushTrigger: (content: { value: number }) => void = () => {}
       const getDataSibling = vi.fn(async () => ({ value: 77 }))
@@ -436,7 +432,14 @@ describe('Feeds composition', () => {
         getData: getDataSibling,
       })
 
-      await feeds.addFeed('mixed', { trigger: TriggerSource, sibling: SiblingSource }, content => content)
+      await feeds.addFeed(
+        'mixed',
+        {
+          trigger: await createDataSource(cache, vent, TriggerSource),
+          sibling: await createDataSource(cache, vent, SiblingSource),
+        },
+        content => content,
+      )
 
       const feedEvents: unknown[] = []
       vent.on('feed', (_id, value) => feedEvents.push(value))
@@ -451,7 +454,7 @@ describe('Feeds composition', () => {
     })
 
     it('does not cascade data-update when sibling is fetched during feed composition', async () => {
-      const { vent, feeds } = createCompositionFeeds()
+      const { vent, feeds, cache } = createCompositionFeeds()
 
       let pushWarm: (content: { value: number }) => void = () => {}
       const getDataCold = vi.fn(async () => ({ value: 99 }))
@@ -469,7 +472,14 @@ describe('Feeds composition', () => {
         getData: getDataCold,
       })
 
-      await feeds.addFeed('no-cascade', { warm: WarmSource, cold: ColdSource }, content => content)
+      await feeds.addFeed(
+        'no-cascade',
+        {
+          warm: await createDataSource(cache, vent, WarmSource),
+          cold: await createDataSource(cache, vent, ColdSource),
+        },
+        content => content,
+      )
 
       const dataUpdates: string[] = []
       const feedEvents: unknown[] = []
@@ -492,21 +502,25 @@ describe('Feeds composition', () => {
     const vent = new FeedEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
-    const feeds = new FeedManager(new FSCache(cacheDir), vent, {
+    const cache = new FSCache(cacheDir)
+    const feeds = new FeedManager(vent, {
       logger: createSilentLogger(),
       onError: noopErrorHandler,
     })
-    activeFeeds.push(feeds)
 
     const getDataA = vi.fn(async () => ({ value: 1 }))
     const getDataB = vi.fn(async () => ({ value: 2 }))
 
-    await feeds.addFeed('refresh-a-feed', {
-      a: createTestSourceClass({ id: 'refresh-a', getData: getDataA }),
-    })
-    await feeds.addFeed('refresh-b-feed', {
-      b: createTestSourceClass({ id: 'refresh-b', getData: getDataB }),
-    })
+    await feeds.addFeed(
+      'refresh-a-feed',
+      { a: await createDataSource(cache, vent, createTestSourceClass({ id: 'refresh-a', getData: getDataA })) },
+      content => content,
+    )
+    await feeds.addFeed(
+      'refresh-b-feed',
+      { b: await createDataSource(cache, vent, createTestSourceClass({ id: 'refresh-b', getData: getDataB })) },
+      content => content,
+    )
 
     const refreshDone = Promise.all([waitForDataUpdate(vent, 'refresh-a'), waitForDataUpdate(vent, 'refresh-b')])
     vent.emit('feeds-refresh', ['refresh-a-feed', 'refresh-b-feed'])

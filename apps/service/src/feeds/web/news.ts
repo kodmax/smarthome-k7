@@ -4,4 +4,4 @@ import { DataSourceRegistryType } from '@/data-sources'
 export const addNewsFeed = (
   feeds: FeedManager,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
-): Promise<void> => feeds.registerFeed('news', dataSources.getByIds(['news']), ({ news }) => news)
+): Promise<void> => feeds.addFeed('news', dataSources.getByIds(['news']), ({ news }) => news)

@@ -292,10 +292,10 @@ export type LightsFeed = {
 
 export type TemperatureData = {
   status: {
-    lazienka: KnxReading<number>
-    lazienkaPodloga: KnxReading<number>
-    sypialnia: KnxReading<number>
-    salon: KnxReading<number>
+    bathroom: KnxReading<number>
+    bathroomFloor: KnxReading<number>
+    bedroom: KnxReading<number>
+    livingroom: KnxReading<number>
   }
   mode: {
     livingroom: KnxReading<number>

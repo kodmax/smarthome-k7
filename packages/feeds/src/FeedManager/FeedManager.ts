@@ -1,45 +1,19 @@
-import { readScopedLogLevel } from '@repo/logger'
-import type { Cache } from '../Cache'
-import type {
-  DS,
-  DataSourceDataTypes,
-  Feed,
-  FeedCb,
-  FeedSources,
-  FeedsOptions,
-  SourceDataTypes,
-  SourceRegistration,
-} from './types'
-import { Chronos } from '@repo/chronos'
-import { DataSource, DSCT, AnyDataSourceDefinitionClass, NoRecentContent, AnyDataSource } from '../DataSource'
+import type { DataSourceDataTypes, Feed, FeedSources, FeedsOptions, SourceRegistration } from './types'
+import { NoRecentContent, AnyDataSource } from '../DataSource'
 import { FeedEvents } from './FeedEvents'
 import { notifyError } from '../notifyError'
-import { DuplicateDataSourceIdError } from './Errors'
 
-export type { FeedsOptions, SourceDataTypes } from './types'
-
-const DATA_SOURCES_MAINTENANCE_CRON = '0 3 * * *'
+export type { DataSourceDataTypes, FeedsOptions } from './types'
 
 export class FeedManager {
   private sourcesById = new Map<string, SourceRegistration>()
   private feeds: Map<string, Feed> = new Map()
 
-  private chronos: Chronos
-
   public constructor(
-    private cache: Cache,
-    private vent: FeedEvents,
+    private feedEvents: FeedEvents,
     private options: FeedsOptions,
   ) {
-    this.chronos = new Chronos(
-      options.logger.child({ component: 'feeds-cron' }, { level: readScopedLogLevel('feeds-cron') }),
-    )
-
-    this.chronos.addJob(DATA_SOURCES_MAINTENANCE_CRON, 'data-sources-maintenance', () =>
-      this.runDataSourcesMaintenance(),
-    )
-
-    this.vent.on('feeds-request', feedsIds => {
+    this.feedEvents.on('feeds-request', feedsIds => {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.feed(id).catch(e => {
@@ -49,7 +23,7 @@ export class FeedManager {
       }
     })
 
-    this.vent.on('feeds-refresh', feedsIds => {
+    this.feedEvents.on('feeds-refresh', feedsIds => {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.refresh(id).catch(e => {
@@ -59,7 +33,7 @@ export class FeedManager {
       }
     })
 
-    this.vent.addListener('data-update', async (sourceId: string) => {
+    this.feedEvents.addListener('data-update', async (sourceId: string) => {
       for (const feed of this.feeds.values()) {
         if (Array.from(feed.sources.values()).find(source => source.getId() === sourceId)) {
           try {
@@ -75,7 +49,7 @@ export class FeedManager {
       }
     })
 
-    this.vent.on('command', async ev => {
+    this.feedEvents.on('command', async ev => {
       const registration = this.sourcesById.get(ev.sourceId)
       if (registration === undefined) {
         this.options.logger.info({ sourceId: ev.sourceId, commandName: ev.name }, 'Command ignored: unknown source')
@@ -93,64 +67,7 @@ export class FeedManager {
     })
   }
 
-  private async runDataSourcesMaintenance(): Promise<void> {
-    for (const { dataSource } of this.sourcesById.values()) {
-      const sourceId = dataSource.getId()
-
-      try {
-        this.options.logger.debug({ sourceId }, 'Data source maintenance starting')
-        const start = Date.now()
-        await dataSource.maintenance()
-        this.options.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source maintenance completed')
-      } catch (e) {
-        notifyError(this.options.logger, this.options.onError, 'warn', 'Data source maintenance error', e, { sourceId })
-      }
-    }
-  }
-
-  private async getOrCreateDataSource<S extends AnyDataSourceDefinitionClass, T = DSCT<S>>(
-    sourceClass: S,
-  ): Promise<DataSource<T>> {
-    for (const registration of this.sourcesById.values()) {
-      if (registration.sourceClass === sourceClass) {
-        return registration.dataSource as DataSource<T>
-      }
-    }
-
-    const dataSource = await DataSource.fromClass(
-      sourceClass,
-      this.cache,
-      this.vent,
-      this.options.logger,
-      this.options.onError,
-      this.options.observeDataSourceRefresh,
-    )
-    const sourceId = dataSource.getId()
-
-    const existingById = this.sourcesById.get(sourceId)
-    if (existingById !== undefined && existingById.sourceClass !== sourceClass) {
-      throw new DuplicateDataSourceIdError(sourceId)
-    }
-
-    const cron = dataSource.getCron()
-    if (cron) {
-      this.chronos.addJob(cron, sourceId, async () => {
-        try {
-          await dataSource.getData(true)
-        } catch (e) {
-          notifyError(this.options.logger, this.options.onError, 'warn', 'Crontab data source update error', e, {
-            sourceId,
-          })
-          throw e
-        }
-      })
-    }
-
-    this.sourcesById.set(sourceId, { sourceClass, dataSource: dataSource as DS })
-    return dataSource
-  }
-
-  private async getSourceContent(src: DS, triggeredBy?: string): Promise<unknown> {
+  private async getSourceContent(src: SourceRegistration['dataSource'], triggeredBy?: string): Promise<unknown> {
     if (triggeredBy === src.getId()) {
       return src.getRecentContent()
     }
@@ -196,7 +113,7 @@ export class FeedManager {
       const content = feed.cb(await this.refreshData(feed))
 
       this.options.logger.debug({ feedId }, 'Feed update successful')
-      this.vent.emit('feed', feedId, content)
+      this.feedEvents.emit('feed', feedId, content)
     } catch (e) {
       if (e instanceof NoRecentContent) {
         this.options.logger.info({ feedId, skipReason: e.message }, 'Feed update skipped')
@@ -220,7 +137,7 @@ export class FeedManager {
         { feedId, ...(triggeredBy !== undefined ? { triggeredBy } : {}) },
         'Feed update successful',
       )
-      this.vent.emit('feed', feedId, content)
+      this.feedEvents.emit('feed', feedId, content)
     } catch (e) {
       if (e instanceof NoRecentContent) {
         this.options.logger.info({ feedId, skipReason: e.message }, 'Feed update skipped')
@@ -231,7 +148,7 @@ export class FeedManager {
     }
   }
 
-  public async registerFeed<R, S extends Record<string, AnyDataSource>>(
+  public async addFeed<R, S extends Record<string, AnyDataSource>>(
     feedId: string,
     dataSources: S,
     cb: (content: DataSourceDataTypes<S>) => R,
@@ -241,7 +158,7 @@ export class FeedManager {
       const ds = dataSources[contentName]
       const sourceId = ds.getId()
 
-      this.sourcesById.set(sourceId, { sourceClass: null, dataSource: ds })
+      this.sourcesById.set(sourceId, { dataSource: ds })
       sources.set(contentName, ds)
     }
 
@@ -252,34 +169,7 @@ export class FeedManager {
     })
   }
 
-  public async addFeed<R, S extends Record<string, AnyDataSourceDefinitionClass>>(
-    feedId: string,
-    sourcesDefinitions: S,
-    cb?: (content: SourceDataTypes<S>) => R,
-  ): Promise<void> {
-    const sources: FeedSources = new Map()
-    for (const contentName of Object.keys(sourcesDefinitions)) {
-      const sourceClass = sourcesDefinitions[contentName]
-
-      sources.set(contentName, await this.getOrCreateDataSource(sourceClass))
-    }
-
-    const srcNames = Object.keys(sourcesDefinitions)
-    const defaultCallback: FeedCb = content => content[srcNames[0]]
-    const callback: FeedCb = cb !== undefined ? content => cb(content as SourceDataTypes<S>) : defaultCallback
-
-    this.feeds.set(feedId, {
-      cb: callback,
-      sources,
-      feedId,
-    })
-  }
-
   public getFeedCount(): number {
     return this.feeds.size
-  }
-
-  public close(): void {
-    this.chronos.stop()
   }
 }

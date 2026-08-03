@@ -4,6 +4,7 @@ import {
   DPT_Date,
   DPT_DateTime,
   DPT_HVACMode,
+  DPT_StartStop,
   DPT_Time,
   DPT_Value_AirQuality,
   DPT_Value_Humidity,
@@ -38,6 +39,9 @@ export const knxSchema = {
       consumption: {
         meterTotalReading: { address: '5/2/3', DataType: DPT_ActiveEnergy },
         meter: { address: '5/2/2', DataType: DPT_ActiveEnergy },
+        meterStart: { address: '5/2/1', DataType: DPT_StartStop },
+        meterStop: { address: '5/2/4', DataType: DPT_StartStop },
+        meterReset: { address: '5/2/6', DataType: DPT_StartStop },
       },
       powerDraw: { address: '5/0/1', DataType: DPT_Value_Power },
     },

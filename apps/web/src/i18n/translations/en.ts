@@ -252,8 +252,8 @@ export const en: Translations = {
     },
     indoor: {
       title: 'Air quality',
-      co2Level: 'CO₂ level',
-      humidity: 'Humidity',
+      co2Reading: 'CO₂',
+      humidityReading: 'Humidity',
       airQuality: 'AQI',
       dusk: 'Dusk',
       dawn: 'Dawn',

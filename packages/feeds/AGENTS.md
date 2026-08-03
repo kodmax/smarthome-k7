@@ -1,29 +1,31 @@
 # `@repo/feeds`
 
-Real-time feed framework used by `apps/service`. WebSocket server on port **3678**, feed registry, disk cache, cron
-refresh, KNX push/command routing. Client: `@repo/feed-client`.
+Feed framework used by `apps/service`. Works together with `@repo/apollo-ws` (WebSocket on port **3678**). Client:
+`@repo/feed-client`.
 
-Business logic and feed definitions live in `apps/service/src/feeds/**` — keep this package infrastructure-only.
+Business logic and feed definitions live in `apps/service/src/feeds/**` and `apps/service/src/data-sources/**` — keep
+this package infrastructure-only.
 
 ## Architecture
 
 ```
-DataSource (fetch / push / cron)
-    → cache (volatile RAM or persistent JSON)
+DataSourceRegistry.add(id, SourceClass)
+    → DataSource (fetch / push / cron / maintenance)
+    → cache (volatile RAM or persistent JSON / Redis)
     → data-update event
-Feeds (compose multi-source feed, callback)
+FeedManager.addFeed(feedId, getByIds([...]), cb)
     → feed event
-Server (debounce 1 s, broadcast FEED <id> <json>)
+Server (@repo/apollo-ws, debounce 1 s)
     → WebSocket clients
 ```
 
-Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `Feeds.close()` stops cron, then `Server.close()` clears
-debounce timers and closes WebSocket connections.
+Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `DataSourceRegistry.close()` stops Chronos jobs, then
+`Server.close()` clears debounce timers and closes WebSocket connections.
 
-## Event bus (`ApolloEvents`)
+## Event bus (`FeedEvents`)
 
-Typed wrapper over Node `EventEmitter`. Create one instance on `Server.vent` and pass it into `Feeds`. Pass a Pino
-`Logger` (from `@repo/logger`) into `Server.listen()` and `Feeds` options for operational logging.
+Create one instance in service and pass it to `Server.listen()`, `DataSourceRegistry`, and `FeedManager`. Pass Pino
+`Logger` via options for operational logging.
 
 | Event           | Payload             | When                                                  |
 | --------------- | ------------------- | ----------------------------------------------------- |
@@ -64,11 +66,13 @@ refresh — intentional; the server debounce merges rapid multi-source updates.
 
 ## Feed conventions
 
-- Register feeds via `feeds.addFeed(feedId, sources, cb?)` in `apps/service`.
-- `addFeed` is fully typed: callback receives `SourceDataTypes<S>`. Internally stored as `FeedCb`
+- Register data sources via `dataSources.add(id, SourceClass)` in `apps/service`.
+- Compose feeds via `feeds.addFeed(feedId, dataSources.getByIds([...]), cb)` — callback is required.
+- `addFeed` is fully typed: callback receives `DataSourceDataTypes<S>`. Internally stored as `FeedCb`
   (`Record<string, unknown>` → `unknown`) because feeds live in a homogeneous `Map`.
-- Reuse data sources by stable `id` (import singletons like `indoorTempHistory`). Same definition object → shared
-  `DataSource`. Same `id`, different object → `DuplicateDataSourceIdError`.
+- Reuse data sources by registry key — `getByIds` returns the same instance registered once in `DataSourceRegistry`.
+- Cron jobs for data sources (per-source refresh + nightly maintenance at 03:00) are registered in `DataSourceRegistry`.
+- KNX sources: class per group address in `apps/service/src/data-sources/knx/`, barrel `knx/index.ts`.
 - `volatile: true` — in-memory cache only (typical KNX push sources). Persistent sources use JSON files under the cache
   directory.
 
@@ -82,5 +86,5 @@ yarn lint
 
 ## Tests still to add (P4)
 
-`Feeds.test.ts` covers data-source registration. Still missing: `DataSource`, `Server` protocol/debounce,
-`Cache`/`CacheEntry`. Cron scheduling lives in `@repo/chronos`.
+`FeedManager.test.ts` and `DataSourceRegistry.test.ts` cover registration, composition, and maintenance. Still missing:
+`Server` protocol/debounce (in `@repo/apollo-ws`). Cron scheduling lives in `@repo/chronos`.

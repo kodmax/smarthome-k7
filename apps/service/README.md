@@ -6,7 +6,19 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 
 - Node.js (CommonJS), TypeScript
 - esbuild (bundling)
-- `@repo/apollo-ws`, `js-knx`, `@repo/db`, `@repo/transmission`, Vitest
+- `@repo/feeds`, `@repo/apollo-ws`, `js-knx`, `@repo/db`, `@repo/transmission`, Vitest
+
+## Startup
+
+`src/index.ts` wires:
+
+1. `FeedEvents` — shared event bus
+2. `DataSourceRegistry` — register all source classes (cron + nightly maintenance)
+3. `FeedManager` — compose feeds from registry instances
+4. `@repo/apollo-ws` `Server.listen()` — WebSocket on port **3678**
+5. `initWebFeeds()` / `initKnxFeeds()` — register sources, then `feeds.addFeed(...)`
+
+Graceful shutdown (`graceful-shutdown.ts`): KNX cron → `dataSources.close()` → KNX disconnect → WebSocket close.
 
 ## Running
 
@@ -38,9 +50,13 @@ Copy `.env.example` and fill in:
 
 ## Feeds
 
-**Web (scraping):** `weather`, `stock-market`, `news`, `job-ads`, `top-torrents`, `transmission`
+**Web (scraping):** `weather`, `stock-market`, `news`, `job-ads`, `job-market-insight`, `my-skills`, `cv`, `fx-rates`,
+`top-torrents`, `transmission`, `sentry-test`
 
 **KNX:** energy, heating, CO₂, humidity, room temperatures, lights (`home.lights`)
+
+Feed wiring: `apps/service/src/feeds/web/` and `apps/service/src/feeds/knx/`. Data source classes:
+`apps/service/src/data-sources/` (KNX push sources in `data-sources/knx/`).
 
 KNX cron jobs (energy logging, clock sync, indoor readings) run in-process via `@repo/cron-scripts` →
 `initKnxCronJobs()`. Disabled with `NO_CRON=1` or `NO_KNX=1`.
@@ -57,14 +73,15 @@ KNX cron jobs (energy logging, clock sync, indoor readings) run in-process via `
 
 ## Monorepo dependencies
 
-| Package              | Role                                   |
-| -------------------- | -------------------------------------- |
-| `@repo/apollo-ws`    | WebSocket server, cache, feed registry |
-| `@repo/cron-scripts` | KNX scheduled jobs (in-process)        |
-| `@repo/db`           | Shared MariaDB pool + migrations       |
-| `@repo/transmission` | Transmission BitTorrent RPC client     |
-| `@repo/knx-schema`   | KNX group address map                  |
-| `@repo/types`        | Feed payload type contracts            |
+| Package              | Role                                            |
+| -------------------- | ----------------------------------------------- |
+| `@repo/feeds`        | Data sources, cache, registry, feed composition |
+| `@repo/apollo-ws`    | WebSocket server                                |
+| `@repo/cron-scripts` | KNX scheduled jobs (in-process)                 |
+| `@repo/db`           | Shared MariaDB pool + migrations                |
+| `@repo/transmission` | Transmission BitTorrent RPC client              |
+| `@repo/knx-schema`   | KNX group address map                           |
+| `@repo/types`        | Feed payload type contracts                     |
 
 Entry point: `src/index.ts`.
 

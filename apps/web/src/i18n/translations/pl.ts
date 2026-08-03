@@ -232,7 +232,7 @@ export const pl: Translations = {
         line1: 'Temperatura w najbliższych godzinach spadnie do {value}°C.',
       },
       ventilate: {
-        highCo2: 'Poziom CO₂ jest wysoki — przewietrzenie poprawi jakość powietrza.',
+        highCo2: 'CO₂ jest wysokie — przewietrzenie poprawi jakość powietrza.',
         elevatedCo2: 'CO₂ jest podwyższone — rozważ krótkie przewietrzenie.',
         highHumidity: 'Wilgotność w domu jest wysoka, a na dworze powietrze jest suchsze.',
       },
@@ -252,8 +252,8 @@ export const pl: Translations = {
     },
     indoor: {
       title: 'Jakość powietrza',
-      co2Level: 'Poziom CO₂',
-      humidity: 'Wilgotność',
+      co2Reading: 'CO₂',
+      humidityReading: 'Wilgotność',
       airQuality: 'AQI',
       dusk: 'Zmierzch',
       dawn: 'Świt',

@@ -1,22 +1,16 @@
-import { FeedManager } from '@repo/feeds'
-import { knxSchema } from '@repo/knx-schema'
-import type { KnxLink } from 'js-knx'
-import { Co2HourlySource } from '@/data-sources'
-import knxB1 from '@/data-sources/knx/b1'
-import knxCo2 from '@/data-sources/knx/co2'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistryType } from '@/data-sources'
 
-export const addHomeAirQualityCo2Feed = (feeds: FeedManager, knx: KnxLink): void => {
-  const schema = knxSchema.home.airQuality.co2
-  const co2Level = knxCo2('home.air-quality.co2', knx.group(schema.reading))
-  const co2Alert = knxB1('home.air-quality.co2-alert', knx.group(schema.alert))
-
+export const addHomeAirQualityCo2Feed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
   feeds.addFeed(
     'home.air-quality.co2',
-    { co2Hourly: Co2HourlySource, co2Level, co2Alert },
-    ({ co2Level, co2Hourly, co2Alert }) => ({
-      reading: co2Level,
+    dataSources.getByIds(['co2Hourly', 'co2Reading', 'co2Alert']),
+    ({ co2Reading, co2Hourly, co2Alert }) => ({
+      reading: co2Reading,
       history: co2Hourly,
       alert: co2Alert,
     }),
   )
-}

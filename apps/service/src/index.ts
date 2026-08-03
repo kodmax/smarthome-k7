@@ -11,7 +11,7 @@ import { appMode, isDevelopment } from '@repo/env'
 import { getDependency, registerDependency } from './di'
 import { initKnxFeeds, initWebFeeds } from './feeds'
 import { knxInit } from './knx-init'
-import { registerApollo, registerKnxCron, setupGracefulShutdown } from './graceful-shutdown'
+import { registerApollo, registerDataSources, registerKnxCron, setupGracefulShutdown } from './graceful-shutdown'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
 import { initPrometheus, registerWsMetrics, observeDataSourceRefresh } from './prometheus'
@@ -55,10 +55,9 @@ const main = async () => {
     cache,
   })
 
-  const feeds = new FeedManager(cache, feedEvents, {
+  const feeds = new FeedManager(feedEvents, {
     logger: rootLogger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
     onError: reportProductionError,
-    observeDataSourceRefresh,
   })
 
   const apollo = await Server.listen({
@@ -66,7 +65,8 @@ const main = async () => {
     onError: reportProductionError,
     feedEvents,
   })
-  registerApollo(apollo, feeds)
+  registerApollo(apollo)
+  registerDataSources(dataSources)
 
   registerWsMetrics(feedEvents)
 
@@ -75,7 +75,7 @@ const main = async () => {
   if (!config.knx.disabled) {
     const knx = await knxInit(rootLogger)
     registerDependency('knx', knx)
-    await initKnxFeeds(feeds, knx)
+    await initKnxFeeds(feeds, dataSources)
 
     if (!config.cron.disabled) {
       registerKnxCron(

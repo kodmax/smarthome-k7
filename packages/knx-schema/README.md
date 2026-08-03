@@ -8,7 +8,8 @@ Exports `knxSchema` from `src/home.knx-schema.ts` — sections include:
 
 - system clocks
 - air quality (CO₂, humidity)
-- energy and heating
+- energy (meter readings, start/stop/reset commands)
+- heating
 - room temperatures
 - lights (`home.lights.ts`)
 

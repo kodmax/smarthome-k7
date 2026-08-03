@@ -5,7 +5,7 @@ export const addJobMarketInsightFeed = (
   feeds: FeedManager,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
-  feeds.registerFeed(
+  feeds.addFeed(
     'job-market-insight',
     dataSources.getByIds(['jobMarketInsight']),
     ({ jobMarketInsight }) => jobMarketInsight,

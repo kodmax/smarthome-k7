@@ -1,40 +1,37 @@
-import { FeedManager } from '@repo/feeds'
-import { knxSchema } from '@repo/knx-schema'
+import { DataSourceRegistry, FeedManager } from '@repo/feeds'
 import { EnergyFeed } from '@repo/types'
-import { EnergyCostSource, EnergyHourlySource, EnergyMeterSource } from '@/data-sources'
-import knxEnergy from '@/data-sources/knx/energy'
-import knxPower from '@/data-sources/knx/power'
-import type { KnxLink } from 'js-knx'
+import { DataSourceRegistryType } from '@/data-sources'
 
 const energyMeterOffset = 12307130 + 181000
 
-export const addEnergyFeed = (feeds: FeedManager, knx: KnxLink): void => {
-  const schema = knxSchema.home.energy
-  const energyReadings = {
-    total: knxEnergy('home.energy-consumption.meter-total-reading', knx.group(schema.consumption.meterTotalReading)),
-    instant: knxPower('home.power-draw', knx.group(schema.powerDraw)),
-    meter: EnergyMeterSource,
-  }
-
+export const addEnergyFeed = (
+  feeds: FeedManager,
+  dataSources: DataSourceRegistry<DataSourceRegistryType>,
+): Promise<void> =>
   feeds.addFeed(
     'energy',
-    { energyCost: EnergyCostSource, energyConsumption: EnergyHourlySource, ...energyReadings },
-    ({ energyCost, total, instant, energyConsumption, meter }): EnergyFeed => ({
+    dataSources.getByIds([
+      'energyCost',
+      'energyHourlyConsumption',
+      'energyMeterTotalReading',
+      'energyPowerDraw',
+      'energyMeter',
+    ]),
+    ({ energyCost, energyHourlyConsumption, energyMeterTotalReading, energyPowerDraw, energyMeter }): EnergyFeed => ({
       daily: {
         reading: {
-          ...total,
-          value: (total.value - energyConsumption.startOfDayValue) / 1000,
+          ...energyMeterTotalReading,
+          value: (energyMeterTotalReading.value - energyHourlyConsumption.startOfDayValue) / 1000,
           unit: 'kWh',
         },
-        history: { today: energyConsumption.bars },
+        history: { today: energyHourlyConsumption.bars },
       },
-      instant: { reading: instant },
-      meter: { reading: meter },
+      instant: { reading: energyPowerDraw },
+      meter: { reading: energyMeter },
       total: {
-        reading: total,
-        adjusted: total.value + energyMeterOffset,
+        reading: energyMeterTotalReading,
+        adjusted: energyMeterTotalReading.value + energyMeterOffset,
       },
       cost: energyCost,
     }),
   )
-}
