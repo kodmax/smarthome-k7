@@ -24,27 +24,40 @@ export class EnergyMeterSource extends DataSource<KnxReading<number>> {
     })
   }
 
-  async handleCommand(command: string): Promise<void> {
+  public async handleCommand(command: string, _args: string): Promise<void> {
     switch (command) {
       case 'reset':
-        await this.stop.write(1)
-        await this.reset.write(1)
+        await this.resetMeter()
         return
-
       case 'start':
-        await this.reset.write(1)
-        await this.start.write(1)
-        await this.start.write(1)
+        await this.startMeter()
         return
-
       case 'stop':
-        await this.stop.write(1)
+        await this.stopMeter()
         return
-
       case 'request-readings':
-        await this.intermediateReading.requestValue()
+        await this.requestReadings()
         return
     }
+  }
+
+  public async resetMeter(): Promise<void> {
+    await this.stop.write(1)
+    await this.reset.write(1)
+  }
+
+  public async startMeter(): Promise<void> {
+    await this.reset.write(1)
+    await this.start.write(1)
+    await this.start.write(1)
+  }
+
+  public async stopMeter(): Promise<void> {
+    await this.stop.write(1)
+  }
+
+  public async requestReadings(): Promise<void> {
+    await this.intermediateReading.requestValue()
   }
 
   static getId() {

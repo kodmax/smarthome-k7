@@ -39,7 +39,7 @@ describe('skillRecord', () => {
     expect(normalizeSkillComment('Keep me')).toBe('Keep me')
   })
 
-  it('parses set-skill command args', () => {
+  it('parses set-skill-level command args', () => {
     expect(
       parseSetSkillCommandArgs(
         JSON.stringify({

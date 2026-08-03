@@ -8,6 +8,8 @@ import {
   parseSetSkillCommandArgs,
   parseSetSkillCommentCommandArgs,
   skillRowToMySkill,
+  type SetSkillCommandArgs,
+  type SetSkillCommentCommandArgs,
   type SkillRecordRow,
 } from './skillRecord'
 
@@ -19,12 +21,20 @@ export class MySkillsSource extends DataSource<MySkillsFeed, MySkillsCachedFeed>
 
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
-      case 'set-skill':
-        await this.commandSetSkill(args)
+      case 'set-skill-level': {
+        const parsed = parseSetSkillCommandArgs(args)
+        if (parsed !== null) {
+          await this.setSkillLevel(parsed)
+        }
         break
-      case 'set-skill-comment':
-        await this.commandSetSkillComment(args)
+      }
+      case 'set-skill-comment': {
+        const parsed = parseSetSkillCommentCommandArgs(args)
+        if (parsed !== null) {
+          await this.setSkillComment(parsed)
+        }
         break
+      }
     }
   }
 
@@ -70,29 +80,19 @@ export class MySkillsSource extends DataSource<MySkillsFeed, MySkillsCachedFeed>
     }
   }
 
-  private async commandSetSkill(args: string): Promise<void> {
-    const parsed = parseSetSkillCommandArgs(args)
-    if (parsed === null) {
-      return
-    }
-
-    await this.upsertSkillLevel(parsed)
+  public async setSkillLevel(input: SetSkillCommandArgs): Promise<void> {
+    await this.upsertSkillLevel(input)
     void this.push()
   }
 
-  private async commandSetSkillComment(args: string): Promise<void> {
-    const parsed = parseSetSkillCommentCommandArgs(args)
-    if (parsed === null) {
-      return
-    }
-
-    const updated = await this.updateSkillComment(parsed.id, normalizeSkillComment(parsed.comment))
+  public async setSkillComment(input: SetSkillCommentCommandArgs): Promise<void> {
+    const updated = await this.updateSkillComment(input.id, normalizeSkillComment(input.comment))
     if (updated) {
       void this.push()
     }
   }
 
-  private async upsertSkillLevel(input: { id: string; name: string; level: string }): Promise<void> {
+  private async upsertSkillLevel(input: SetSkillCommandArgs): Promise<void> {
     const conn = await this.db.getConnection()
     try {
       await observeDbQuery('insert', 'my_skills', () =>

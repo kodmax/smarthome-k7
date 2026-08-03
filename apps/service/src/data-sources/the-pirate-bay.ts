@@ -9,10 +9,14 @@ export class TorrentSource extends DataSource<Torrent[]> {
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'search':
-        this.query = args
-        void this.push(await this.fetchData())
+        await this.search(args)
         return
     }
+  }
+
+  public async search(query: string): Promise<void> {
+    this.query = query
+    void this.push(await this.fetchData())
   }
 
   static getId(): string {

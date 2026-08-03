@@ -41,7 +41,7 @@ export function parseSetSkillCommandArgs(args: string): SetSkillCommandArgs | nu
   try {
     const parsed = JSON.parse(args) as Record<string, unknown>
     if (typeof parsed.id !== 'string' || typeof parsed.name !== 'string' || !isSkillExperienceLevel(parsed.level)) {
-      captureInvalidInput('my-skills: invalid set-skill command args', args)
+      captureInvalidInput('my-skills: invalid set-skill-level command args', args)
       return null
     }
 
@@ -51,7 +51,7 @@ export function parseSetSkillCommandArgs(args: string): SetSkillCommandArgs | nu
       level: parsed.level,
     }
   } catch (cause) {
-    captureInvalidInput('my-skills: failed to parse set-skill command args', cause)
+    captureInvalidInput('my-skills: failed to parse set-skill-level command args', cause)
     return null
   }
 }

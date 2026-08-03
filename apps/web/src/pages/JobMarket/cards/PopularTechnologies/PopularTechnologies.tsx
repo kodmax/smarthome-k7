@@ -18,7 +18,7 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
   const labels = t.jobMarket.popularTechnologies
   const feed = useFeed<JobMarketInsightFeed>('job-market-insight')
   const mySkillsFeed = useFeed<MySkillsFeed>('my-skills')
-  const setSkill = useCommand('my-skills', 'set-skill')
+  const setSkillLevel = useCommand('my-skills', 'set-skill-level')
   const setSkillComment = useCommand('my-skills', 'set-skill-comment')
 
   const skillsById = useMemo(() => {
@@ -49,9 +49,9 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
 
   const onLevelChange = useCallback(
     (id: string, name: string, level: SkillExperienceLevel) => {
-      setSkill(JSON.stringify({ id, name, level }))
+      setSkillLevel(JSON.stringify({ id, name, level }))
     },
-    [setSkill],
+    [setSkillLevel],
   )
 
   const onCommentBlur = useCallback(

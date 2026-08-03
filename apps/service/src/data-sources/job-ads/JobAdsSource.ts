@@ -23,6 +23,7 @@ import {
   parseApplicationMeta,
   parseChangeStateCommandArgs,
   resolveStatusChangedAt,
+  type ChangeStateCommandArgs,
 } from './applicationMeta'
 import { isMetaFlagTrue } from './metaFlag'
 import type OpenAI from 'openai'
@@ -55,20 +56,28 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
 
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
-      case 'change-state':
-        await this.commandChangeState(args)
+      case 'change-state': {
+        const parsed = parseChangeStateCommandArgs(args)
+        if (parsed !== null) {
+          await this.changeState(parsed)
+        }
         break
+      }
       case 'fav':
-        await this.commandFav(args)
+        await this.fav(args)
         break
       case 'unfav':
-        await this.commandUnfav(args)
+        await this.unfav(args)
         break
-      case 'set-acceptable-salary':
-        await this.commandSetAcceptableSalary(args)
+      case 'set-acceptable-salary': {
+        const parsed = parseSetAcceptableSalaryCommandArgs(args)
+        if (parsed !== null) {
+          await this.setAcceptableSalary(parsed.value)
+        }
         break
+      }
       case 'analyze-cv-match':
-        await this.commandAnalyzeCvMatch(args)
+        await this.analyzeCvMatch(args.trim())
         break
       default:
         return
@@ -77,24 +86,14 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     await this.push()
   }
 
-  private async commandSetAcceptableSalary(args: string): Promise<void> {
-    const parsed = parseSetAcceptableSalaryCommandArgs(args)
-    if (parsed === null) {
-      return
-    }
-
-    await saveAcceptableSalary(this.db, parsed.value)
+  public async setAcceptableSalary(value: number): Promise<void> {
+    await saveAcceptableSalary(this.db, value)
   }
 
-  private async commandChangeState(args: string): Promise<void> {
-    const parsed = parseChangeStateCommandArgs(args)
-    if (parsed === null) {
-      return
-    }
-
-    await this.saveApplicationChange(parsed.id, {
-      applyStatus: parsed.applyStatus,
-      comment: parsed.comment,
+  public async changeState(input: ChangeStateCommandArgs): Promise<void> {
+    await this.saveApplicationChange(input.id, {
+      applyStatus: input.applyStatus,
+      comment: input.comment,
     })
   }
 
@@ -111,17 +110,15 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     await this.writeApplicationMeta(itemId, next)
   }
 
-  private async commandFav(itemId: string): Promise<void> {
+  public async fav(itemId: string): Promise<void> {
     await this.markMeta(itemId, FAV_ATTRIBUTE_NAME, true)
   }
 
-  private async commandUnfav(itemId: string): Promise<void> {
+  public async unfav(itemId: string): Promise<void> {
     await this.unmarkMeta(itemId, FAV_ATTRIBUTE_NAME)
   }
 
-  private async commandAnalyzeCvMatch(args: string): Promise<void> {
-    const adId = args.trim()
-
+  public async analyzeCvMatch(adId: string): Promise<void> {
     await runAnalyzeCvMatchCommand({
       db: this.db,
       openai: this.openai,

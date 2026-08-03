@@ -20,10 +20,14 @@ export class TransmissionSource extends DataSource<TransmissionFeed> {
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'download':
-        await this.transmission.addTorrent(args)
-        this.startPolling()
+        await this.download(args)
         return
     }
+  }
+
+  public async download(torrent: string): Promise<void> {
+    await this.transmission.addTorrent(torrent)
+    this.startPolling()
   }
 
   private stopPolling(): void {

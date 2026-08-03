@@ -23,20 +23,20 @@ export class NewsSource extends DataSource<NewsFeed, NewsCachedFeed> {
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'read':
-        await this.commandRead(args)
+        await this.read(args)
         break
       case 'unread':
-        await this.commandUnread(args)
+        await this.unread(args)
         break
     }
   }
 
-  private async commandRead(itemUid: string): Promise<void> {
+  public async read(itemUid: string): Promise<void> {
     await this.markMeta(itemUid, 'read', true)
     void this.push()
   }
 
-  private async commandUnread(itemUid: string): Promise<void> {
+  public async unread(itemUid: string): Promise<void> {
     await this.unmarkMeta(itemUid, 'read')
     void this.push()
   }

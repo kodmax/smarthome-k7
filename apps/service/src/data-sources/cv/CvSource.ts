@@ -14,6 +14,7 @@ import {
   toModifiedAtIso,
   type CvTextContent,
   type DocumentRecordRow,
+  type UploadCommandArgs,
 } from './documentRecord'
 import { extractPdfText } from './extractPdfText'
 
@@ -26,14 +27,18 @@ export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
 
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
-      case 'upload':
-        await this.upload(args)
+      case 'upload': {
+        const parsed = parseUploadCommandArgs(args)
+        if (parsed !== null) {
+          await this.upload(parsed)
+        }
         break
+      }
     }
   }
 
-  public async upload(args: string): Promise<void> {
-    if (!(await this.uploadPdf(args))) {
+  public async upload(input: UploadCommandArgs): Promise<void> {
+    if (!(await this.uploadPdf(input))) {
       return
     }
 
@@ -113,19 +118,14 @@ export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
     }
   }
 
-  private async uploadPdf(args: string): Promise<boolean> {
-    const parsed = parseUploadCommandArgs(args)
-    if (parsed === null) {
-      return false
-    }
-
-    const sourceHash = digestCvPdfSourceHash(parsed.base64)
+  private async uploadPdf(input: UploadCommandArgs): Promise<boolean> {
+    const sourceHash = digestCvPdfSourceHash(input.base64)
     const existingSourceHash = await this.loadCvTextSourceHash()
     if (existingSourceHash === sourceHash) {
       return true
     }
 
-    const text = await extractPdfText(this.openai, parsed.base64)
+    const text = await extractPdfText(this.openai, input.base64)
     const content: CvTextContent = { text }
     const hash = digestDocumentContentHash(CV_TEXT_ID, content)
 
