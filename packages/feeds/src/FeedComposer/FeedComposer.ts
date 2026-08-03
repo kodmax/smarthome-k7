@@ -4,7 +4,7 @@ import { FeedEvents } from './FeedEvents'
 
 export type { DataSourceDataTypes, FeedsOptions } from './types'
 
-export class FeedManager {
+export class FeedComposer {
   private sourcesById = new Map<string, SourceRegistration>()
   private feeds: Map<string, Feed> = new Map()
 

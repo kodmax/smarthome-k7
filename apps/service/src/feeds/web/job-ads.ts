@@ -1,10 +1,10 @@
-import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistry, FeedComposer } from '@repo/feeds'
 import { toSkillId } from '@repo/common'
 import { JobAdsFeed } from '@repo/types'
 import { DataSourceRegistryType } from '@/data-sources'
 
 export const addJobAdsFeed = (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
   feeds.addFeed('job-ads', dataSources.getByIds(['jobAds', 'mySkills']), ({ jobAds, mySkills }): JobAdsFeed => {

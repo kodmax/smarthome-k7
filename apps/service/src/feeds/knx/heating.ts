@@ -1,9 +1,9 @@
-import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistry, FeedComposer } from '@repo/feeds'
 import { TemperatureData } from '@repo/types'
 import { DataSourceRegistryType } from '@/data-sources'
 
 export const addHeatingFeed = (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
   feeds.addFeed(

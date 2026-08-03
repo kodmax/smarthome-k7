@@ -1,11 +1,11 @@
-import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistry, FeedComposer } from '@repo/feeds'
 import { EnergyFeed } from '@repo/types'
 import { DataSourceRegistryType } from '@/data-sources'
 
 const energyMeterOffset = 12307130 + 181000
 
 export const addEnergyFeed = (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
   feeds.addFeed(

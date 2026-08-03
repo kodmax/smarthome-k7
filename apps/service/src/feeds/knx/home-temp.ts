@@ -1,9 +1,9 @@
-import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistry, FeedComposer } from '@repo/feeds'
 import { DataSourceRegistryType } from '@/data-sources'
 import DateTime from '@/DateTime'
 
 export const addBathroomFloorTempFeed = (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
   feeds.addFeed(
@@ -19,7 +19,7 @@ export const addBathroomFloorTempFeed = (
   )
 
 export const addBedroomTempFeed = (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
   feeds.addFeed(
@@ -36,7 +36,7 @@ export const addBedroomTempFeed = (
   )
 
 export const addLivingRoomTempFeed = (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
   feeds.addFeed(
@@ -53,7 +53,7 @@ export const addLivingRoomTempFeed = (
   )
 
 export const addBathroomTempFeed = (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
   feeds.addFeed(

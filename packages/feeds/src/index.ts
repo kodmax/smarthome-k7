@@ -11,4 +11,4 @@ export {
 } from './DataSource'
 export { FSCache, FSCacheEntry, RedisCache, RedisCacheEntry, VolatileCacheEntry, CacheAgeUnit } from './Cache'
 export type { Cache, CacheEntry, RedisClient } from './Cache'
-export { FeedManager, FeedEvents, FeedEventMap, FeedsOptions } from './FeedManager'
+export { FeedComposer, FeedEvents, FeedEventMap, FeedsOptions } from './FeedComposer'

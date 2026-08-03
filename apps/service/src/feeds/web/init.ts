@@ -1,4 +1,4 @@
-import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistry, FeedComposer } from '@repo/feeds'
 import { addFxRatesFeed } from './fx-rates'
 import { addJobMarketInsightFeed } from './job-market-insight'
 import { addJobAdsFeed } from './job-ads'
@@ -28,7 +28,7 @@ import {
 } from '@/data-sources'
 
 export const initWebFeeds = async (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> => {
   await dataSources.add('weather', WeatherSource)

@@ -12,12 +12,12 @@ handles the wire protocol and client lifecycle.
 
 ## Wiring (service)
 
-One `FeedEvents` instance is shared by `Server`, `DataSourceRegistry`, and `FeedManager`:
+One `FeedEvents` instance is shared by `Server`, `DataSourceRegistry`, and `FeedComposer`:
 
 ```ts
 const feedEvents = new FeedEvents()
 const dataSources = new DataSourceRegistry({ feedEvents, cache, ... })
-const feeds = new FeedManager(feedEvents, { logger, onError })
+const feeds = new FeedComposer(feedEvents, { logger, onError })
 const apollo = await Server.listen({ feedEvents, logger, onError })
 ```
 

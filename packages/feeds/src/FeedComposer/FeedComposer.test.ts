@@ -4,7 +4,7 @@ import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FeedEvents } from './FeedEvents'
 import { FSCache } from '../Cache'
-import { FeedManager } from './FeedManager'
+import { FeedComposer } from './FeedComposer'
 import { DataSource, DataSourceCtor, DataSourceParams } from '../DataSource'
 import type { CacheEntry } from '../Cache'
 import { createSilentLogger } from '@repo/logger'
@@ -121,7 +121,7 @@ describe('Feeds data source registration', () => {
     return {
       cache: new FSCache(cacheDir),
       vent: new FeedEvents(),
-      feeds: new FeedManager(new FeedEvents(), { logger: createSilentLogger(), onError }),
+      feeds: new FeedComposer(new FeedEvents(), { logger: createSilentLogger(), onError }),
     }
   }
 
@@ -157,7 +157,7 @@ describe('Feeds data source registration', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
     const cache = new FSCache(cacheDir)
-    const feeds = new FeedManager(vent, {
+    const feeds = new FeedComposer(vent, {
       logger: createSilentLogger(),
       onError: noopOnError,
     })
@@ -192,7 +192,7 @@ describe('Feeds data source registration', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
     const cache = new FSCache(cacheDir)
-    const feeds = new FeedManager(vent, { logger: createSilentLogger(), onError })
+    const feeds = new FeedComposer(vent, { logger: createSilentLogger(), onError })
 
     const src = await createDataSource(
       cache,
@@ -231,7 +231,7 @@ describe('Feeds composition', () => {
     cacheDirs.push(cacheDir)
     const cache = new FSCache(cacheDir)
 
-    const feeds = new FeedManager(vent, {
+    const feeds = new FeedComposer(vent, {
       logger: createSilentLogger(),
       onError: noopOnError,
     })
@@ -546,7 +546,7 @@ describe('Feeds composition', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
     const cache = new FSCache(cacheDir)
-    const feeds = new FeedManager(vent, {
+    const feeds = new FeedComposer(vent, {
       logger: createSilentLogger(),
       onError: noopOnError,
     })

@@ -14,7 +14,7 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 
 1. `FeedEvents` — shared event bus
 2. `DataSourceRegistry` — register all source classes (cron + nightly maintenance)
-3. `FeedManager` — compose feeds from registry instances
+3. `FeedComposer` — compose feeds from registry instances
 4. `@repo/apollo-ws` `Server.listen()` — WebSocket on port **3678**
 5. `initWebFeeds()` / `initKnxFeeds()` — register sources, then `feeds.addFeed(...)`
 

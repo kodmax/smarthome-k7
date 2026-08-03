@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { FeedEvents, FeedManager } from '../FeedManager'
+import { FeedEvents, FeedComposer } from '../FeedComposer'
 import { FSCache } from '../Cache'
 import { DataSource } from './DataSource'
 import { createSilentLogger } from '@repo/logger'
@@ -276,7 +276,7 @@ describe('DataSource', () => {
       logger: createSilentLogger(),
       onError: noopOnError,
     })
-    const feeds = new FeedManager(vent, { logger: createSilentLogger(), onError: noopOnError })
+    const feeds = new FeedComposer(vent, { logger: createSilentLogger(), onError: noopOnError })
     await feeds.addFeed('notify', { src: dataSource }, ({ src }) => src)
 
     vent.on('data-update', sourceId => updates.push(sourceId))

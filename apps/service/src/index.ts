@@ -1,7 +1,7 @@
 #!/usr/bin/ts-node
 process.setMaxListeners(11)
 import { Server } from '@repo/apollo-ws'
-import { FSCache, RedisCache, FeedManager, FeedEvents, DataSourceRegistry } from '@repo/feeds'
+import { FSCache, RedisCache, FeedComposer, FeedEvents, DataSourceRegistry } from '@repo/feeds'
 import { initKnxCronJobs } from '@repo/cron-scripts'
 import { getDbPool } from '@repo/db'
 import { createLogger, readScopedLogLevel } from '@repo/logger'
@@ -61,7 +61,7 @@ const main = async () => {
     cache,
   })
 
-  const feeds = new FeedManager(feedEvents, {
+  const feeds = new FeedComposer(feedEvents, {
     logger: rootLogger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
     onError: reportProductionError,
   })

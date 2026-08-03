@@ -1,6 +1,6 @@
 import type { Logger } from '@repo/logger'
 import type { CacheEntry } from '../Cache'
-import { FeedEvents } from '../FeedManager'
+import { FeedEvents } from '../FeedComposer'
 import { DataSource } from './DataSource'
 
 export type DataSourceCommand = {

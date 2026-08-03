@@ -13,7 +13,7 @@ DataSourceRegistry.add(id, SourceClass)
     → DataSource (fetch / push / cron / maintenance)
     → cache (volatile RAM or persistent JSON / Redis)
     → data-update event
-FeedManager.addFeed(feedId, getByIds([...]), cb)
+FeedComposer.addFeed(feedId, getByIds([...]), cb)
     → feed event
 Server (@repo/apollo-ws, debounce 1 s)
     → WebSocket clients
@@ -24,7 +24,7 @@ Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `DataSourceRegistry
 
 ## Event bus (`FeedEvents`)
 
-Create one instance in service and pass it to `Server.listen()`, `DataSourceRegistry`, and `FeedManager`. Pass Pino
+Create one instance in service and pass it to `Server.listen()`, `DataSourceRegistry`, and `FeedComposer`. Pass Pino
 `Logger` via options for operational logging.
 
 | Event           | Payload                        | When                                                  |
@@ -38,10 +38,10 @@ Create one instance in service and pass it to `Server.listen()`, `DataSourceRegi
 
 ### When to use events vs `onError`
 
-| Mechanism                         | When                                                                                                                                                                              |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FeedEvents` (`error`)            | **Async entry points** — KNX callbacks, timers, etc. where `reportError` emits on the event bus.                                                                                  |
-| `onError` (injected from service) | **In-process async flow** — errors in `FeedManager`, `DataSource`, `DataSourceRegistry` while feeds infrastructure is already on the stack; log + `onError` inline at catch site. |
+| Mechanism                         | When                                                                                                                                                                               |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FeedEvents` (`error`)            | **Async entry points** — KNX callbacks, timers, etc. where `reportError` emits on the event bus.                                                                                   |
+| `onError` (injected from service) | **In-process async flow** — errors in `FeedComposer`, `DataSource`, `DataSourceRegistry` while feeds infrastructure is already on the stack; log + `onError` inline at catch site. |
 
 Do **not** route all feeds errors through `FeedEvents` — the event bus is not an error bus.
 
@@ -55,8 +55,8 @@ composition pass.
 uses `getRecentContent()` (push already wrote to cache before emitting `data-update`; KNX volatile cache stays warm in
 RAM). Other sources in the same feed use `ensureContent()` — read from cache when available, otherwise fetch without
 emitting another `data-update`. Do **not** use `getRecentContent()` for all sources (regression from 28fb434): siblings
-without cache would return `null` from `getRecentContent()`; if the **trigger** source has no cache, `FeedManager` skips
-the feed event entirely.
+without cache would return `null` from `getRecentContent()`; if the **trigger** source has no cache, `FeedComposer`
+skips the feed event entirely.
 
 **Subscribe** (`feeds-request`, no `triggeredBy`): every source uses `getData()`, which may emit `data-update` after
 refresh — intentional; the server debounce merges rapid multi-source updates.
@@ -98,5 +98,5 @@ yarn lint
 
 ## Tests still to add (P4)
 
-`FeedManager.test.ts` and `DataSourceRegistry.test.ts` cover registration, composition, and maintenance. Still missing:
+`FeedComposer.test.ts` and `DataSourceRegistry.test.ts` cover registration, composition, and maintenance. Still missing:
 `Server` protocol/debounce (in `@repo/apollo-ws`). Cron scheduling lives in `@repo/chronos`.

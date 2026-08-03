@@ -1,4 +1,4 @@
-import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistry, FeedComposer } from '@repo/feeds'
 import {
   BathroomFloorHeatingStateSource,
   BathroomFloorTempReadingSource,
@@ -36,7 +36,7 @@ import { addBathroomFloorTempFeed, addBathroomTempFeed, addBedroomTempFeed, addL
 import { addLightsFeed } from './lights'
 
 export const initKnxFeeds = async (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> => {
   await dataSources.add('bathroomHeatingState', BathroomHeatingStateSource)

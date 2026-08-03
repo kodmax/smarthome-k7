@@ -8,7 +8,7 @@ Feed framework for `apps/service` — data sources, cache, registry, and feed co
 ```
 DataSourceRegistry.add(id, SourceClass)   ← creates DataSource, per-source cron, nightly maintenance
         ↓
-FeedManager.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source feeds
+FeedComposer.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source feeds
         ↓
 FeedEvents (feed / data-update / push / error / command / feeds-request / feeds-refresh)
         ↓
@@ -25,7 +25,7 @@ Exports from `src/index.ts`:
 | Export                   | Role                                                                    |
 | ------------------------ | ----------------------------------------------------------------------- |
 | `DataSourceRegistry`     | Register source classes, cron + maintenance, `getByIds()`               |
-| `FeedManager`            | Compose feeds from ready-made `DataSource` instances                    |
+| `FeedComposer`           | Compose feeds from ready-made `DataSource` instances                    |
 | `DataSource`             | Fetch, push, cache, commands, cron                                      |
 | `FeedEvents`             | Shared event bus (service passes one instance to WS + registry + feeds) |
 | `FSCache` / `RedisCache` | Persistent or volatile cache backends                                   |
@@ -50,7 +50,7 @@ const dataSources = new DataSourceRegistry<DataSourceRegistryType>({
   observeDataSourceRefresh,
 })
 
-const feeds = new FeedManager(feedEvents, { logger, onError })
+const feeds = new FeedComposer(feedEvents, { logger, onError })
 
 await dataSources.add('weather', WeatherSource)
 await feeds.addFeed('weather', dataSources.getByIds(['weather']), ({ weather }) => weather)

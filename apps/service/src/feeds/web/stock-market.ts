@@ -1,4 +1,4 @@
-import { DataSourceRegistry, FeedManager } from '@repo/feeds'
+import { DataSourceRegistry, FeedComposer } from '@repo/feeds'
 import { StockMarketFeed, TickerData } from '@repo/types'
 import { YahooTickerData } from '@/data-sources/stock-market/yahoo/types'
 import { DataSourceRegistryType } from '@/data-sources'
@@ -6,7 +6,7 @@ import { NasdaqTickerData } from '@/data-sources/stock-market/nasdaq/types'
 import { tickerList } from '@/data-sources/stock-market/tickerList'
 
 export const addStockMarketFeed = (
-  feeds: FeedManager,
+  feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
 ): Promise<void> =>
   feeds.addFeed(

@@ -1,6 +1,6 @@
 import type { Logger } from '@repo/logger'
 import type { CacheEntry } from '../Cache'
-import { FeedEvents } from '../FeedManager'
+import { FeedEvents } from '../FeedComposer'
 import type {
   DataSourceCtor,
   DataSourceParams,
@@ -9,7 +9,7 @@ import type {
   DataSourceRefreshObserver,
 } from './types'
 
-type DSCT<S> = S extends DataSourceCtor<infer T, infer TCache> ? T : never
+type DSCT<S> = S extends DataSourceCtor<infer T, infer _TCache> ? T : never
 
 type DSM<S extends Record<string, DataSourceCtor<unknown, unknown>>> = {
   [K in keyof S]: DSCT<S[K]>

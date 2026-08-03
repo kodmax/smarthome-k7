@@ -70,7 +70,7 @@ yarn workspace service dev
 
 ```
 apps/service
-    ├── @repo/feeds        DataSourceRegistry + FeedManager + cache
+    ├── @repo/feeds        DataSourceRegistry + FeedComposer + cache
     ├── @repo/apollo-ws    WebSocket :3678
     ├── @repo/knx-schema
     ├── @repo/db
@@ -81,7 +81,7 @@ apps/service
               └── apps/mcp (Cursor)
 ```
 
-The backend registers data sources in `DataSourceRegistry`, composes feeds in `FeedManager`, and pushes updates over
+The backend registers data sources in `DataSourceRegistry`, composes feeds in `FeedComposer`, and pushes updates over
 WebSocket. The frontend subscribes to topics via `@repo/feed-client`. [`apps/mcp`](apps/mcp) exposes the same data (and
 light control) to Cursor via MCP tools.
 
