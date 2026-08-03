@@ -628,4 +628,83 @@ describe('getFeedData', () => {
 
     await expect(feeds.getFeedData('missing-feed')).rejects.toThrow('Feed <missing-feed> not registered.')
   })
+
+  it('coalesces concurrent getFeedData calls into one composition', async () => {
+    const { vent, feeds, cache } = createCompositionFeeds()
+
+    let resolveFetch!: (value: { value: number }) => void
+    const fetchData = vi.fn(
+      () =>
+        new Promise<{ value: number }>(resolve => {
+          resolveFetch = resolve
+        }),
+    )
+
+    await feeds.addFeed(
+      'coalesce-feed',
+      {
+        src: await createDataSource(
+          cache,
+          vent,
+          createTestSourceClass({ id: 'coalesce-src', isVolatile: true, fetchData }),
+        ),
+      },
+      ({ src }) => src,
+    )
+
+    const resultsPromise = Promise.all([
+      feeds.getFeedData('coalesce-feed'),
+      feeds.getFeedData('coalesce-feed'),
+      feeds.getFeedData('coalesce-feed'),
+    ])
+
+    await vi.waitFor(() => expect(fetchData).toHaveBeenCalledOnce())
+
+    resolveFetch({ value: 99 })
+
+    const results = await resultsPromise
+
+    expect(results).toEqual([{ value: 99 }, { value: 99 }, { value: 99 }])
+    expect(results[0]).toBe(results[1])
+    expect(results[0]).toBe(results[2])
+  })
+
+  it('shares rejection across concurrent getFeedData calls', async () => {
+    const { feeds } = createCompositionFeeds()
+
+    const results = await Promise.allSettled([
+      feeds.getFeedData('missing-feed'),
+      feeds.getFeedData('missing-feed'),
+      feeds.getFeedData('missing-feed'),
+    ])
+
+    expect(results).toEqual([
+      { status: 'rejected', reason: expect.objectContaining({ message: 'Feed <missing-feed> not registered.' }) },
+      { status: 'rejected', reason: expect.objectContaining({ message: 'Feed <missing-feed> not registered.' }) },
+      { status: 'rejected', reason: expect.objectContaining({ message: 'Feed <missing-feed> not registered.' }) },
+    ])
+  })
+
+  it('runs a new composition after the in-flight one completes', async () => {
+    const { vent, feeds, cache } = createCompositionFeeds()
+
+    const fetchData = vi.fn(async () => ({ value: 1 }))
+
+    await feeds.addFeed(
+      'sequential-feed',
+      {
+        src: await createDataSource(
+          cache,
+          vent,
+          createTestSourceClass({ id: 'sequential-src', isVolatile: true, fetchData }),
+        ),
+      },
+      ({ src }) => src,
+    )
+
+    await feeds.getFeedData('sequential-feed')
+    await feeds.getFeedData('sequential-feed')
+
+    expect(fetchData).toHaveBeenCalledTimes(2)
+  })
 })

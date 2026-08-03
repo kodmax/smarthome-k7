@@ -7,6 +7,7 @@ export type { DataSourceDataTypes, FeedsOptions } from './types'
 export class FeedComposer {
   private sourcesById = new Map<string, SourceRegistration>()
   private feeds: Map<string, Feed> = new Map()
+  private getFeedDataInFlight = new Map<string, Promise<unknown>>()
 
   public constructor(
     private feedEvents: FeedEvents,
@@ -127,7 +128,28 @@ export class FeedComposer {
     }
   }
 
-  public async getFeedData(feedId: string): Promise<unknown> {
+  public getFeedData(feedId: string): Promise<unknown> {
+    const existing = this.getFeedDataInFlight.get(feedId)
+    if (existing !== undefined) {
+      return existing
+    }
+
+    const composition = this.runGetFeedData(feedId)
+    this.getFeedDataInFlight.set(feedId, composition)
+    void composition
+      .finally(() => {
+        if (this.getFeedDataInFlight.get(feedId) === composition) {
+          this.getFeedDataInFlight.delete(feedId)
+        }
+      })
+      .catch(() => {
+        // Rejection is handled by callers awaiting `composition`.
+      })
+
+    return composition
+  }
+
+  private async runGetFeedData(feedId: string): Promise<unknown> {
     const content = await this.composeFeedContent(feedId)
     if (content === null) {
       throw new Error(`Feed <${feedId}> has no content.`)

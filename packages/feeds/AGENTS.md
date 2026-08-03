@@ -60,7 +60,9 @@ skips the feed event entirely.
 refresh — intentional; the server debounce merges rapid multi-source updates.
 
 **In-process read** (`getFeedData(feedId)`): composes and returns the same payload as the `feed` event / WebSocket
-`FEED <id> <json>`, without emitting `feed`. Uses the same subscribe path as `feeds-request`.
+`FEED <id> <json>`, without emitting `feed`. Uses the same subscribe path as `feeds-request`. Concurrent calls for the
+same `feedId` (e.g. multiple clients GET-ing after a WS change event) share one in-flight composition and receive the
+same result.
 
 ## Intentional behavior — do not "fix"
 
