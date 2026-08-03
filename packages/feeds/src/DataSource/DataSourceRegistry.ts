@@ -3,9 +3,11 @@ import { DataSourceNotFound } from './Errors'
 import { DataSourceFromCtor, DataSourceRefreshObserver, DefinitionFromCtor, RegistryBaseType } from './types'
 import { Cache } from '../Cache'
 import { FeedEvents } from '../FeedManager'
-import { Logger } from '@repo/logger'
-import { ErrorHandler } from '../notifyError'
+import { Logger, readScopedLogLevel } from '@repo/logger'
+import { ErrorHandler, notifyError } from '../notifyError'
 import { DataSourceDefinition } from './DataSourceDefinition'
+import { Chronos } from '@repo/chronos'
+import { DuplicateDataSourceIdError } from '../FeedManager/Errors'
 
 type DataSourceRegistryParams = {
   cache: Cache
@@ -20,6 +22,7 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
   private definitions: Map<keyof T, DataSourceDefinition<unknown, unknown>> = new Map()
   private dataSources: Map<keyof T, DataSource<unknown, unknown>> = new Map()
 
+  private chronos: Chronos
   private cache: Cache
   private feedEvents: FeedEvents
   private logger: Logger
@@ -34,9 +37,16 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
       onError: this.onError,
       observeDataSourceRefresh: this.observeDataSourceRefresh,
     } = params)
+    this.chronos = new Chronos(
+      params.logger.child({ component: 'data-source-cron' }, { level: readScopedLogLevel('data-source-cron') }),
+    )
   }
 
   async add<K extends keyof T>(id: K, ctor: T[K]): Promise<void> {
+    if (this.definitions.has(id)) {
+      throw new DuplicateDataSourceIdError(id as string)
+    }
+
     const [definition, ds] = await DataSource.fromClassWithDefinition(
       ctor,
       this.cache,
@@ -45,7 +55,24 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
       this.onError,
       this.observeDataSourceRefresh,
     )
-    this.logger.info({ id }, 'Data source registered')
+
+    const sourceId = ds.getId()
+    const cron = ds.getCron()
+    if (cron) {
+      this.chronos.addJob(cron, sourceId, async () => {
+        try {
+          this.logger.info({ sourceId, cron }, 'Data source scheduled refresh')
+          await ds.getData(true)
+        } catch (e) {
+          notifyError(this.logger, this.onError, 'warn', 'Crontab data source update error', e, {
+            sourceId,
+          })
+          throw e
+        }
+      })
+    }
+
+    this.logger.info({ id, cron }, 'Data source registered')
     this.definitions.set(id, definition)
     this.dataSources.set(id, ds)
   }

@@ -238,7 +238,11 @@ export class FeedManager {
   ): Promise<void> {
     const sources: FeedSources = new Map()
     for (const contentName of Object.keys(dataSources)) {
-      sources.set(contentName, dataSources[contentName])
+      const ds = dataSources[contentName]
+      const sourceId = ds.getId()
+
+      this.sourcesById.set(sourceId, { sourceClass: null, dataSource: ds })
+      sources.set(contentName, ds)
     }
 
     this.feeds.set(feedId, {

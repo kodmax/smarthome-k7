@@ -27,7 +27,7 @@ export type FeedSources = Map<string, DataSource<unknown>>
 export type FeedCb = (content: Record<string, unknown>) => unknown
 
 export type SourceRegistration = {
-  sourceClass: AnyDataSourceDefinitionClass
+  sourceClass: AnyDataSourceDefinitionClass | null
   dataSource: DS
 }
 
