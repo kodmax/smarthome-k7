@@ -54,7 +54,7 @@ function createTestSourceClass<T>(options: {
   getData?: () => Promise<T>
   isVolatile?: boolean
   onInit?: (ctx: { push: (content?: T) => void }) => void
-  handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
+  handleCommand?: (command: string, args: string) => void | Promise<void>
   maintenance?: () => void | Promise<void>
 }): DataSourceDefinitionCtor<T> {
   return class TestSource extends DataSourceDefinition<T> {
@@ -63,8 +63,8 @@ function createTestSourceClass<T>(options: {
       options.onInit?.({ push: content => this.push(content) })
     }
 
-    public async handleCommand(command: string, args: string, recentContent?: T): Promise<void> {
-      await options.handleCommand?.(command, args, recentContent)
+    public async handleCommand(command: string, args: string): Promise<void> {
+      await options.handleCommand?.(command, args)
     }
 
     public getId(): string {
@@ -411,6 +411,37 @@ describe('Feeds composition', () => {
       expect(getDataTrigger).not.toHaveBeenCalled()
       expect(getDataSibling).not.toHaveBeenCalled()
       expect(feedEvents[0]).toEqual({ jobAds: { value: 42 }, mySkills: { value: 200 } })
+    })
+
+    it('skips feed when trigger source has no recent content', async () => {
+      const { vent, feeds, cache } = createCompositionFeeds()
+
+      const TriggerSource = createTestSourceClass({
+        id: 'empty-trigger',
+        isVolatile: true,
+      })
+      const SiblingSource = createTestSourceClass({
+        id: 'sibling',
+        isVolatile: true,
+        getData: vi.fn(async () => ({ value: 99 })),
+      })
+
+      await feeds.addFeed(
+        'skip-on-null',
+        {
+          trigger: await createDataSource(cache, vent, TriggerSource),
+          sibling: await createDataSource(cache, vent, SiblingSource),
+        },
+        content => content,
+      )
+
+      const feedEvents: unknown[] = []
+      vent.on('feed', (_id, value) => feedEvents.push(value))
+
+      vent.emit('data-update', 'empty-trigger')
+      await waitForFeedIdle(vent, 'skip-on-null')
+
+      expect(feedEvents).toHaveLength(0)
     })
 
     it('does not skip feed when only a non-trigger source lacks recent content', async () => {

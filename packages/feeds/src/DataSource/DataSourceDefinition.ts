@@ -7,7 +7,7 @@ export abstract class DataSourceDefinition<T, TCache = T> {
   ) {}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public handleCommand(_command: string, _args: string, _recentContent?: T): Promise<void> {
+  public handleCommand(_command: string, _args: string): Promise<void> {
     return Promise.resolve()
   }
 

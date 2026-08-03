@@ -1,5 +1,5 @@
 import type { DataSourceDataTypes, Feed, FeedSources, FeedsOptions, SourceRegistration } from './types'
-import { NoRecentContent, AnyDataSource } from '../DataSource'
+import { AnyDataSource } from '../DataSource'
 import { FeedEvents } from './FeedEvents'
 import { notifyError } from '../notifyError'
 
@@ -103,6 +103,14 @@ export class FeedManager {
     return contents
   }
 
+  private findSourceKey(feed: Feed, sourceId: string): string | undefined {
+    for (const [key, src] of feed.sources) {
+      if (src.getId() === sourceId) {
+        return key
+      }
+    }
+  }
+
   private async refresh(feedId: string): Promise<void> {
     const feed = this.feeds.get(feedId)
     if (feed === undefined) {
@@ -115,11 +123,6 @@ export class FeedManager {
       this.options.logger.debug({ feedId }, 'Feed update successful')
       this.feedEvents.emit('feed', feedId, content)
     } catch (e) {
-      if (e instanceof NoRecentContent) {
-        this.options.logger.info({ feedId, skipReason: e.message }, 'Feed update skipped')
-        return
-      }
-
       notifyError(this.options.logger, this.options.onError, 'warn', 'Feed callback error', e, { feedId })
     }
   }
@@ -131,7 +134,17 @@ export class FeedManager {
     }
 
     try {
-      const content = feed.cb(await this.getData(feed, triggeredBy))
+      const data = await this.getData(feed, triggeredBy)
+
+      if (triggeredBy !== undefined) {
+        const triggerKey = this.findSourceKey(feed, triggeredBy)
+        if (triggerKey !== undefined && data[triggerKey] === null) {
+          this.options.logger.info({ feedId, skipReason: 'No recent content' }, 'Feed update skipped')
+          return
+        }
+      }
+
+      const content = feed.cb(data)
 
       this.options.logger.debug(
         { feedId, ...(triggeredBy !== undefined ? { triggeredBy } : {}) },
@@ -139,11 +152,6 @@ export class FeedManager {
       )
       this.feedEvents.emit('feed', feedId, content)
     } catch (e) {
-      if (e instanceof NoRecentContent) {
-        this.options.logger.info({ feedId, skipReason: e.message }, 'Feed update skipped')
-        return
-      }
-
       notifyError(this.options.logger, this.options.onError, 'warn', 'Feed callback error', e, { feedId, triggeredBy })
     }
   }

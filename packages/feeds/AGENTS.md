@@ -45,7 +45,8 @@ composition pass.
 uses `getRecentContent()` (push already wrote to cache before emitting `data-update`; KNX volatile cache stays warm in
 RAM). Other sources in the same feed use `ensureContent()` — read from cache when available, otherwise fetch without
 emitting another `data-update`. Do **not** use `getRecentContent()` for all sources (regression from 28fb434): siblings
-without cache would throw `NoRecentContent` and skip the feed event entirely.
+without cache would return `null` from `getRecentContent()`; if the **trigger** source has no cache, `FeedManager` skips
+the feed event entirely.
 
 **Subscribe** (`feeds-request`, no `triggeredBy`): every source uses `getData()`, which may emit `data-update` after
 refresh — intentional; the server debounce merges rapid multi-source updates.

@@ -1,6 +1,5 @@
 import type { Logger } from '@repo/logger'
 import type { Cache, CacheEntry } from '../Cache'
-import { NoRecentContent } from './Errors'
 import { FeedEvents } from '../FeedManager'
 import { notifyError, type ErrorHandler } from '../notifyError'
 import { DataSourceDefinitionCtor, DataSourceRefreshObserver } from './types'
@@ -87,17 +86,7 @@ class DataSource<T, TCache = T> {
   }
 
   public async handleCommand(command: string, args: string): Promise<void> {
-    let recentContent: T | undefined
-
-    try {
-      recentContent = await this.getRecentContent()
-    } catch (e) {
-      if (!(e instanceof NoRecentContent)) {
-        throw e
-      }
-    }
-
-    await this.definition.handleCommand(command, args, recentContent)
+    await this.definition.handleCommand(command, args)
   }
 
   public getCron(): string | undefined {
@@ -134,10 +123,10 @@ class DataSource<T, TCache = T> {
     return this.definition.getId()
   }
 
-  public async getRecentContent(): Promise<T> {
+  public async getRecentContent(): Promise<T | null> {
     const snapshot = await this.cacheEntry.getSnapshot()
     if (snapshot === null) {
-      throw new NoRecentContent()
+      return null
     }
 
     return this.definition.composeContent(snapshot.getContent())

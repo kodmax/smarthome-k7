@@ -5,7 +5,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FeedEvents } from '../FeedManager'
 import { FSCache } from '../Cache'
 import { DataSource } from './DataSource'
-import { NoRecentContent } from './Errors'
 import { createSilentLogger } from '@repo/logger'
 import { noopErrorHandler } from '../notifyError'
 import { DataSourceDefinitionCtor, SourceMetricType } from './types'
@@ -20,12 +19,12 @@ function createTestSourceClass<T, TCache = T>(options: {
   isVolatile?: boolean
   getSourceMetricType?: () => SourceMetricType
   isMetricsEnabled?: () => boolean
-  handleCommand?: (command: string, args: string, recentContent?: T) => void | Promise<void>
+  handleCommand?: (command: string, args: string) => void | Promise<void>
   maintenance?: () => void | Promise<void>
 }): DataSourceDefinitionCtor<T, TCache> {
   return class TestSource extends DataSourceDefinition<T, TCache> {
-    public async handleCommand(command: string, args: string, recentContent?: T): Promise<void> {
-      await options.handleCommand?.(command, args, recentContent)
+    public async handleCommand(command: string, args: string): Promise<void> {
+      await options.handleCommand?.(command, args)
     }
 
     public getId(): string {
@@ -209,10 +208,10 @@ describe('DataSource', () => {
     await expect(dataSource.getRecentContent()).resolves.toEqual({ value: 123 })
   })
 
-  it('throws NoRecentContent when cache is empty', async () => {
+  it('returns null when cache is empty', async () => {
     const { dataSource } = await createDataSource(createTestSourceClass({ id: 'empty' }))
 
-    await expect(dataSource.getRecentContent()).rejects.toThrow(NoRecentContent)
+    await expect(dataSource.getRecentContent()).resolves.toBeNull()
   })
 
   it('calls composeContent on cache hit without calling getData again', async () => {
@@ -275,37 +274,6 @@ describe('DataSource', () => {
 
     expect(updates).toEqual(['notify-src'])
     await expect(dataSource.getRecentContent()).resolves.toEqual({ value: 1 })
-  })
-
-  it('passes recent content to handleCommand when cache has data', async () => {
-    const handleCommand = vi.fn()
-    const { dataSource } = await createDataSource(
-      createTestSourceClass({
-        id: 'cmd-src',
-        isVolatile: true,
-        handleCommand,
-      }),
-    )
-
-    await dataSource.push({ value: 42 })
-    await dataSource.handleCommand('set', '1')
-
-    expect(handleCommand).toHaveBeenCalledWith('set', '1', { value: 42 })
-  })
-
-  it('passes undefined recent content to handleCommand when cache is empty', async () => {
-    const handleCommand = vi.fn()
-    const { dataSource } = await createDataSource(
-      createTestSourceClass({
-        id: 'cmd-empty',
-        isVolatile: true,
-        handleCommand,
-      }),
-    )
-
-    await dataSource.handleCommand('set', '1')
-
-    expect(handleCommand).toHaveBeenCalledWith('set', '1', undefined)
   })
 
   it('calls definition maintenance', async () => {
