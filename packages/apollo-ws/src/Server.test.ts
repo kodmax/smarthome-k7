@@ -3,8 +3,9 @@ import WebSocket from 'ws'
 import { createCaptureLogger } from '@repo/logger'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Server } from './Server'
-import { noopErrorHandler } from './notifyError'
 import { FeedEvents } from '@repo/feeds'
+
+const noopOnError = (): void => void 0
 
 function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -36,7 +37,7 @@ describe('Server', () => {
     capture = createCaptureLogger()
     port = await getFreePort()
     feedEvents = new FeedEvents()
-    await Server.listen({ port, logger: capture.logger, onError: noopErrorHandler, feedEvents }, async instance => {
+    await Server.listen({ port, logger: capture.logger, onError: noopOnError, feedEvents }, async instance => {
       server = instance
     })
 

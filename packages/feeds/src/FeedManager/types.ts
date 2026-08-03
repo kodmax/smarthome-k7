@@ -1,5 +1,5 @@
 import { DataSource, AnyDataSource } from '../DataSource'
-import type { ErrorHandler } from '../notifyError'
+import type { ErrorHandler } from '../DataSource/types'
 import type { Logger } from '@repo/logger'
 
 export type DS = DataSource<unknown>

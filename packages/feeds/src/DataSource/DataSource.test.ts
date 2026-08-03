@@ -2,13 +2,14 @@ import { mkdtempSync, rmSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { FeedEvents } from '../FeedManager'
+import { FeedEvents, FeedManager } from '../FeedManager'
 import { FSCache } from '../Cache'
 import { DataSource } from './DataSource'
 import { createSilentLogger } from '@repo/logger'
-import { noopErrorHandler } from '../notifyError'
 import { DataSourceDefinitionCtor, SourceMetricType } from './types'
 import { DataSourceDefinition } from './DataSourceDefinition'
+
+const noopOnError = (): void => void 0
 
 function createTestSourceClass<T, TCache = T>(options: {
   id: string
@@ -79,7 +80,7 @@ describe('DataSource', () => {
 
   async function createDataSource<T, TCache = T>(
     SourceClass: DataSourceDefinitionCtor<T, TCache>,
-    onError = noopErrorHandler,
+    onError = noopOnError,
     observeDataSourceRefresh?: Parameters<typeof DataSource.fromClass>[5],
   ) {
     const cacheDir = mkdtempSync(join(tmpdir(), 'ds-'))
@@ -241,9 +242,9 @@ describe('DataSource', () => {
     let pushWithoutContent: () => void = () => {}
 
     class NotifySource extends DataSourceDefinition<{ value: number }> {
-      public constructor(push: (content?: { value: number }) => void, reportError: (e: Error) => void) {
-        super(push, reportError)
-        pushWithoutContent = () => push()
+      public constructor(feedEvents: FeedEvents) {
+        super(feedEvents)
+        pushWithoutContent = () => this.push()
       }
 
       public getId(): string {
@@ -263,7 +264,9 @@ describe('DataSource', () => {
     cacheDirs.push(cacheDir)
     const vent = new FeedEvents()
     const cache = new FSCache(cacheDir)
-    const dataSource = await DataSource.fromClass(NotifySource, cache, vent, createSilentLogger(), noopErrorHandler)
+    const dataSource = await DataSource.fromClass(NotifySource, cache, vent, createSilentLogger(), noopOnError)
+    const feeds = new FeedManager(vent, { logger: createSilentLogger(), onError: noopOnError })
+    await feeds.addFeed('notify', { src: dataSource }, ({ src }) => src)
 
     vent.on('data-update', sourceId => updates.push(sourceId))
     await dataSource.getData()
@@ -369,7 +372,7 @@ describe('DataSource', () => {
         getSourceMetricType: () => 'api',
         getData,
       }),
-      noopErrorHandler,
+      noopOnError,
       observeDataSourceRefresh,
     )
 
@@ -388,7 +391,7 @@ describe('DataSource', () => {
         isMetricsEnabled: () => false,
         getData,
       }),
-      noopErrorHandler,
+      noopOnError,
       observeDataSourceRefresh,
     )
 
@@ -414,14 +417,14 @@ describe('DataSource', () => {
     expect(onError).toHaveBeenCalledWith(failure, 'Data source update error')
   })
 
-  it('calls onError from reportError callback', async () => {
+  it('emits error event from reportError', async () => {
     const onError = vi.fn()
     const failure = new Error('push failed')
 
     class PushFailSource extends DataSourceDefinition<{ value: number }> {
-      public constructor(push: (content?: { value: number }) => void, reportError: (e: Error) => void) {
-        super(push, reportError)
-        queueMicrotask(() => reportError(failure))
+      public constructor(feedEvents: FeedEvents) {
+        super(feedEvents)
+        queueMicrotask(() => this.reportError(failure))
       }
 
       public getId(): string {
@@ -437,7 +440,15 @@ describe('DataSource', () => {
       }
     }
 
-    await createDataSource(PushFailSource, onError)
+    const vent = new FeedEvents()
+    vent.on('error', (_sourceId, error, context) => {
+      onError(error, context)
+    })
+
+    const cacheDir = mkdtempSync(join(tmpdir(), 'ds-'))
+    cacheDirs.push(cacheDir)
+    const cache = new FSCache(cacheDir)
+    await DataSource.fromClass(PushFailSource, cache, vent, createSilentLogger(), noopOnError)
     await new Promise<void>(resolve => queueMicrotask(() => resolve()))
 
     expect(onError).toHaveBeenCalledWith(failure, 'Push data source update error')

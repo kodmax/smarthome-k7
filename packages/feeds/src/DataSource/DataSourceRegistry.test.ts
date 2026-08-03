@@ -7,7 +7,8 @@ import { FSCache } from '../Cache'
 import { DataSourceDefinition, DataSourceDefinitionCtor } from './DataSourceDefinition'
 import { DataSourceRegistry } from './DataSourceRegistry'
 import { createSilentLogger } from '@repo/logger'
-import { noopErrorHandler } from '../notifyError'
+
+const noopOnError = (): void => void 0
 
 function createTestSourceClass(options: {
   id: string
@@ -53,7 +54,7 @@ describe('DataSourceRegistry', () => {
       cache: new FSCache(cacheDir),
       feedEvents: new FeedEvents(),
       logger: createSilentLogger(),
-      onError: noopErrorHandler,
+      onError: noopOnError,
       observeDataSourceRefresh: async (_metricType, _sourceId, fn) => fn(),
     })
   }

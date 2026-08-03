@@ -1,7 +1,6 @@
 import type { DataSourceDataTypes, Feed, FeedSources, FeedsOptions, SourceRegistration } from './types'
 import { AnyDataSource } from '../DataSource'
 import { FeedEvents } from './FeedEvents'
-import { notifyError } from '../notifyError'
 
 export type { DataSourceDataTypes, FeedsOptions } from './types'
 
@@ -17,7 +16,8 @@ export class FeedManager {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.feed(id).catch(e => {
-            notifyError(this.options.logger, this.options.onError, 'warn', 'Feed request error', e, { feedId: id })
+            this.options.logger.warn({ err: e, feedId: id }, 'Feed request error')
+            this.options.onError(e, 'Feed request error')
           })
         }
       }
@@ -27,7 +27,8 @@ export class FeedManager {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
           this.refresh(id).catch(e => {
-            notifyError(this.options.logger, this.options.onError, 'warn', 'Feed refresh error', e, { feedId: id })
+            this.options.logger.warn({ err: e, feedId: id }, 'Feed refresh error')
+            this.options.onError(e, 'Feed refresh error')
           })
         }
       }
@@ -40,13 +41,21 @@ export class FeedManager {
             this.options.logger.debug({ feedId: feed.feedId, sourceId }, 'Refreshing feed due to source update')
             await this.feed(feed.feedId, sourceId)
           } catch (e) {
-            notifyError(this.options.logger, this.options.onError, 'warn', 'Feed update error', e, {
-              feedId: feed.feedId,
-              sourceId,
-            })
+            this.options.logger.warn({ err: e, feedId: feed.feedId, sourceId }, 'Feed update error')
+            this.options.onError(e, 'Feed update error')
           }
         }
       }
+    })
+
+    this.feedEvents.on('push', (sourceId, content) => {
+      const registration = this.sourcesById.get(sourceId)
+      if (registration === undefined) {
+        this.options.logger.debug({ sourceId }, 'Push ignored: unknown source')
+        return
+      }
+
+      void registration.dataSource.push(content)
     })
 
     this.feedEvents.on('command', async ev => {
@@ -59,10 +68,11 @@ export class FeedManager {
       try {
         await registration.dataSource.handleCommand(ev.name, ev.args)
       } catch (e) {
-        notifyError(this.options.logger, this.options.onError, 'warn', 'Data source command execution error', e, {
-          sourceId: ev.sourceId,
-          commandName: ev.name,
-        })
+        this.options.logger.warn(
+          { err: e, sourceId: ev.sourceId, commandName: ev.name },
+          'Data source command execution error',
+        )
+        this.options.onError(e, 'Data source command execution error')
       }
     })
   }
@@ -123,7 +133,8 @@ export class FeedManager {
       this.options.logger.debug({ feedId }, 'Feed update successful')
       this.feedEvents.emit('feed', feedId, content)
     } catch (e) {
-      notifyError(this.options.logger, this.options.onError, 'warn', 'Feed callback error', e, { feedId })
+      this.options.logger.warn({ err: e, feedId }, 'Feed callback error')
+      this.options.onError(e, 'Feed callback error')
     }
   }
 
@@ -152,7 +163,8 @@ export class FeedManager {
       )
       this.feedEvents.emit('feed', feedId, content)
     } catch (e) {
-      notifyError(this.options.logger, this.options.onError, 'warn', 'Feed callback error', e, { feedId, triggeredBy })
+      this.options.logger.warn({ err: e, feedId, triggeredBy }, 'Feed callback error')
+      this.options.onError(e, 'Feed callback error')
     }
   }
 

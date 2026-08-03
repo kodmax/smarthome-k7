@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSourceDefinition, FeedEvents } from '@repo/feeds'
 import { knxSchema } from '@repo/knx-schema'
 import { DPT_ActiveEnergy, DPT_StartStop, KnxReading, type KnxLink } from 'js-knx'
 import { Inject } from '@/di'
@@ -12,8 +12,8 @@ export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> 
   protected readonly start: DPT_StartStop
   protected readonly stop: DPT_StartStop
 
-  public constructor(push: (content?: KnxReading<number>) => void, reportError: (e: Error) => void) {
-    super(push, reportError)
+  public constructor(feedEvents: FeedEvents) {
+    super(feedEvents)
 
     this.intermediateReading = this.knx.group(knxSchema.home.energy.consumption.meter)
     this.reset = this.knx.group(knxSchema.home.energy.consumption.meterReset)

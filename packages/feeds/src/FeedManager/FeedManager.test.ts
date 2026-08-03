@@ -7,7 +7,8 @@ import { FSCache } from '../Cache'
 import { FeedManager } from './FeedManager'
 import { DataSource, DataSourceDefinition, DataSourceDefinitionCtor } from '../DataSource'
 import { createSilentLogger } from '@repo/logger'
-import { noopErrorHandler } from '../notifyError'
+
+const noopOnError = (): void => void 0
 
 function waitForDataUpdate(vent: FeedEvents, sourceId: string): Promise<void> {
   return new Promise(resolve => {
@@ -58,8 +59,8 @@ function createTestSourceClass<T>(options: {
   maintenance?: () => void | Promise<void>
 }): DataSourceDefinitionCtor<T> {
   return class TestSource extends DataSourceDefinition<T> {
-    public constructor(push: (content?: T) => void, reportError: (e: Error) => void) {
-      super(push, reportError)
+    public constructor(feedEvents: FeedEvents) {
+      super(feedEvents)
       options.onInit?.({ push: content => this.push(content) })
     }
 
@@ -90,7 +91,7 @@ function createTestSourceClass<T>(options: {
 }
 
 async function createDataSource<T>(cache: FSCache, vent: FeedEvents, SourceClass: DataSourceDefinitionCtor<T>) {
-  return DataSource.fromClass(SourceClass, cache, vent, createSilentLogger(), noopErrorHandler)
+  return DataSource.fromClass(SourceClass, cache, vent, createSilentLogger(), noopOnError)
 }
 
 describe('Feeds data source registration', () => {
@@ -102,7 +103,7 @@ describe('Feeds data source registration', () => {
     }
   })
 
-  function createFeeds(onError = noopErrorHandler) {
+  function createFeeds(onError = noopOnError) {
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
 
@@ -147,7 +148,7 @@ describe('Feeds data source registration', () => {
     const cache = new FSCache(cacheDir)
     const feeds = new FeedManager(vent, {
       logger: createSilentLogger(),
-      onError: noopErrorHandler,
+      onError: noopOnError,
     })
 
     const src = await createDataSource(
@@ -221,7 +222,7 @@ describe('Feeds composition', () => {
 
     const feeds = new FeedManager(vent, {
       logger: createSilentLogger(),
-      onError: noopErrorHandler,
+      onError: noopOnError,
     })
 
     return { vent, feeds, cache }
@@ -536,7 +537,7 @@ describe('Feeds composition', () => {
     const cache = new FSCache(cacheDir)
     const feeds = new FeedManager(vent, {
       logger: createSilentLogger(),
-      onError: noopErrorHandler,
+      onError: noopOnError,
     })
 
     const getDataA = vi.fn(async () => ({ value: 1 }))

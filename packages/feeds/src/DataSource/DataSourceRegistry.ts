@@ -4,7 +4,7 @@ import { DataSourceFromCtor, DataSourceRefreshObserver, DefinitionFromCtor, Regi
 import { Cache } from '../Cache'
 import { FeedEvents } from '../FeedManager'
 import { Logger, readScopedLogLevel } from '@repo/logger'
-import { ErrorHandler, notifyError } from '../notifyError'
+import { ErrorHandler } from './types'
 import { DataSourceDefinition } from './DataSourceDefinition'
 import { Chronos } from '@repo/chronos'
 
@@ -55,7 +55,8 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
         await ds.maintenance()
         this.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source maintenance completed')
       } catch (e) {
-        notifyError(this.logger, this.onError, 'warn', 'Data source maintenance error', e, { sourceId })
+        this.logger.warn({ err: e, sourceId }, 'Data source maintenance error')
+        this.onError(e, 'Data source maintenance error')
       }
     }
   }
@@ -86,9 +87,8 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
           this.logger.info({ sourceId, cron }, 'Data source scheduled refresh')
           await ds.getData(true)
         } catch (e) {
-          notifyError(this.logger, this.onError, 'warn', 'Crontab data source update error', e, {
-            sourceId,
-          })
+          this.logger.warn({ err: e, sourceId }, 'Crontab data source update error')
+          this.onError(e, 'Crontab data source update error')
           throw e
         }
       })

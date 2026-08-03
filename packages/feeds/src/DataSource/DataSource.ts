@@ -1,7 +1,7 @@
 import type { Logger } from '@repo/logger'
 import type { Cache, CacheEntry } from '../Cache'
 import { FeedEvents } from '../FeedManager'
-import { notifyError, type ErrorHandler } from '../notifyError'
+import type { ErrorHandler } from './types'
 import { DataSourceDefinitionCtor, DataSourceRefreshObserver } from './types'
 import { DataSourceDefinition } from './DataSourceDefinition'
 
@@ -37,24 +37,13 @@ class DataSource<T, TCache = T> {
     onError: ErrorHandler,
     observeDataSourceRefresh?: DataSourceRefreshObserver,
   ): Promise<DataSource<T, TCache>> {
-    // eslint-disable-next-line prefer-const -- forward ref: push callback needs dataSource before assignment
-    let dataSource!: DataSource<T, TCache>
-    let sourceId = ''
-
-    const definition = new sourceClass(
-      content => dataSource.push(content),
-      e => {
-        notifyError(logger, onError, 'warn', 'Push data source update error', e, { sourceId })
-      },
-    )
-    sourceId = definition.getId()
+    const definition = new sourceClass(vent)
 
     const cacheEntry = await cache.getEntry<TCache>(definition.isVolatile() ? undefined : definition.getId(), {
       ttlMs: definition.getCacheTTL(),
     })
-    dataSource = new DataSource(definition, cacheEntry, vent, logger, onError, observeDataSourceRefresh)
 
-    return dataSource
+    return new DataSource(definition, cacheEntry, vent, logger, onError, observeDataSourceRefresh)
   }
 
   public static async fromClassWithDefinition<T, TCache = T>(
@@ -65,22 +54,12 @@ class DataSource<T, TCache = T> {
     onError: ErrorHandler,
     observeDataSourceRefresh?: DataSourceRefreshObserver,
   ): Promise<[DataSourceDefinition<T, TCache>, DataSource<T, TCache>]> {
-    // eslint-disable-next-line prefer-const -- forward ref: push callback needs dataSource before assignment
-    let dataSource!: DataSource<T, TCache>
-    let sourceId = ''
-
-    const definition = new sourceClass(
-      content => dataSource.push(content),
-      e => {
-        notifyError(logger, onError, 'warn', 'Push data source update error', e, { sourceId })
-      },
-    )
-    sourceId = definition.getId()
+    const definition = new sourceClass(vent)
 
     const cacheEntry = await cache.getEntry<TCache>(definition.isVolatile() ? undefined : definition.getId(), {
       ttlMs: definition.getCacheTTL(),
     })
-    dataSource = new DataSource(definition, cacheEntry, vent, logger, onError, observeDataSourceRefresh)
+    const dataSource = new DataSource(definition, cacheEntry, vent, logger, onError, observeDataSourceRefresh)
 
     return [definition, dataSource]
   }
@@ -190,7 +169,8 @@ class DataSource<T, TCache = T> {
           this.updating = void 0
         })
         .catch(e => {
-          notifyError(this.logger, this.onError, 'warn', 'Data source update error', e, { sourceId })
+          this.logger.warn({ err: e, sourceId }, 'Data source update error')
+          this.onError(e, 'Data source update error')
           this.updating = void 0
           reject(e)
         })

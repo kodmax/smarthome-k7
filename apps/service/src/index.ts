@@ -45,6 +45,12 @@ const main = async () => {
   }
 
   const feedEvents = new FeedEvents()
+
+  feedEvents.on('error', (sourceId, error, context) => {
+    rootLogger.child({ component: 'data-source' }).warn({ err: error, sourceId }, context)
+    reportProductionError(error, context)
+  })
+
   const cache = cacheBackend === 'fs' ? new FSCache(config.cache.dir) : new RedisCache(getDependency('redis'))
 
   const dataSources = new DataSourceRegistry<DataSourceRegistryType>({

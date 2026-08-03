@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSourceDefinition, FeedEvents } from '@repo/feeds'
 import { TransmissionFeed } from '@repo/types'
 import { Transmission3 } from '@repo/transmission'
 import { Inject } from '@/di'
@@ -11,8 +11,8 @@ export class TransmissionSource extends DataSourceDefinition<TransmissionFeed> {
   private transmission: Transmission3
   private pollTimer: ReturnType<typeof setTimeout> | undefined
 
-  constructor(push: (content?: TransmissionFeed) => void, reportError: (e: Error) => void) {
-    super(push, reportError)
+  constructor(feedEvents: FeedEvents) {
+    super(feedEvents)
 
     this.transmission = new Transmission3(this.config.transmission)
   }

@@ -2,8 +2,9 @@ import { WebSocket, WebSocketServer } from 'ws'
 import { Socket } from 'net'
 import type { Logger } from '@repo/logger'
 import { formatCommandArgsForLog } from './formatCommandArgsForLog'
-import { notifyError, type ErrorHandler } from './notifyError'
 import { FeedEvents, DataSourceCommand } from '@repo/feeds'
+
+export type ErrorHandler = (error: unknown, context: string) => void
 
 export type ApolloWebSocketOptions = {
   /**
@@ -108,7 +109,8 @@ export class Server {
     }
 
     Promise.all(outbox).catch(e => {
-      notifyError(this.options.logger, this.options.onError, 'warn', 'Feed broadcast error', e, { feedId: id })
+      this.options.logger.warn({ err: e, feedId: id }, 'Feed broadcast error')
+      this.options.onError(e, 'Feed broadcast error')
     })
   }
 
@@ -166,7 +168,8 @@ export class Server {
       this.clients.add(client)
       this.feedEvents.emit('clients-changed', this.clients.size)
       ws.on('error', e => {
-        notifyError(this.options.logger, this.options.onError, 'warn', 'Client socket error', e, { clientIp: ip })
+        this.options.logger.warn({ err: e, clientIp: ip }, 'Client socket error')
+        this.options.onError(e, 'Client socket error')
       })
 
       ws.on('close', () => {
@@ -186,14 +189,11 @@ export class Server {
       })
 
       server.on('error', e => {
-        notifyError(
-          this.options.logger,
-          this.options.onError,
-          'fatal',
+        this.options.logger.fatal(
+          { err: e, port: this.options.port },
           'Apollo WebSocket Server network port bind error',
-          e,
-          { port: this.options.port },
         )
+        this.options.onError(e, 'Apollo WebSocket Server network port bind error')
         reject(e)
       })
     })

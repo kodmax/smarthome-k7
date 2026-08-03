@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSourceDefinition, FeedEvents } from '@repo/feeds'
 import { homeLights, homeLightsById } from '@repo/knx-schema'
 import { LightsFeed } from '@repo/types'
 import { DPT_Generic_B1, DPT_Switch, KnxReading, type KnxLink } from 'js-knx'
@@ -12,8 +12,8 @@ export class HomeLightsSource extends DataSourceDefinition<LightsFeed> {
   private readonly statuses = new Map<string, DPT_Generic_B1>()
   private readonly readings: Partial<Record<string, KnxReading<number>>> = {}
 
-  public constructor(push: (content?: LightsFeed) => void, reportError: (e: Error) => void) {
-    super(push, reportError)
+  public constructor(feedEvents: FeedEvents) {
+    super(feedEvents)
 
     for (const circuit of homeLights) {
       this.sets.set(circuit.id, this.knx.group(circuit.set))

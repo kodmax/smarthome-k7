@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSourceDefinition, FeedEvents } from '@repo/feeds'
 import type { DataPointAbstract, DatapointConstructor, KnxReading, KnxLink } from 'js-knx'
 import { Inject } from '@/di'
 
@@ -15,8 +15,8 @@ export abstract class KnxPushReadingSource<
 
   protected readonly dp: InstanceType<D>
 
-  public constructor(push: (content?: KnxReading<number>) => void, reportError: (e: Error) => void) {
-    super(push, reportError)
+  public constructor(feedEvents: FeedEvents) {
+    super(feedEvents)
 
     this.dp = this.knx.group(this.getGroupDef()) as InstanceType<D>
     this.dp.addWriteListener(reading => {

@@ -1,3 +1,4 @@
+import { FeedEvents } from '../FeedManager'
 import { DataSource } from './DataSource'
 import { type DataSourceDefinition } from './DataSourceDefinition'
 
@@ -7,9 +8,10 @@ export type DataSourceCommand = {
   args: string
 }
 
+export type ErrorHandler = (error: unknown, context: string) => void
+
 export type DataSourceDefinitionCtor<T = unknown, TCache = T> = new (
-  push: (content?: T) => void | Promise<void>,
-  reportError: (e: Error) => void,
+  feedEvents: FeedEvents,
 ) => DataSourceDefinition<T, TCache>
 
 export type DefinitionFromCtor<T extends DataSourceDefinitionCtor<unknown, unknown>> = InstanceType<T>

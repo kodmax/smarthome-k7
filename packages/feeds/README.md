@@ -10,7 +10,7 @@ DataSourceRegistry.add(id, SourceClass)   ← creates DataSource, per-source cro
         ↓
 FeedManager.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source feeds
         ↓
-FeedEvents (feed / data-update / command / feeds-request / feeds-refresh)
+FeedEvents (feed / data-update / push / error / command / feeds-request / feeds-refresh)
         ↓
 @repo/apollo-ws Server   ← debounce + FEED <id> <json> broadcast
 ```
@@ -34,6 +34,12 @@ Exports from `src/index.ts`:
 
 ```ts
 const feedEvents = new FeedEvents()
+
+feedEvents.on('error', (sourceId, error, context) => {
+  logger.child({ component: 'data-source' }).warn({ err: error, sourceId }, context)
+  onError(error, context)
+})
+
 const cache = new FSCache(config.cache.dir)
 
 const dataSources = new DataSourceRegistry<DataSourceRegistryType>({

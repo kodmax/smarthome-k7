@@ -27,13 +27,24 @@ Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `DataSourceRegistry
 Create one instance in service and pass it to `Server.listen()`, `DataSourceRegistry`, and `FeedManager`. Pass Pino
 `Logger` via options for operational logging.
 
-| Event           | Payload             | When                                                  |
-| --------------- | ------------------- | ----------------------------------------------------- |
-| `feed`          | `feedId`, `value`   | Feed composed successfully                            |
-| `data-update`   | `sourceId`          | Source cache changed after push, fetch, or cron       |
-| `command`       | `DataSourceCommand` | WS client command routed to push sources              |
-| `feeds-request` | `feedIds[]`         | Client subscribe — compose feed, refresh all sources  |
-| `feeds-refresh` | `feedIds`           | Client refresh — force `getData(true)` on all sources |
+| Event           | Payload                        | When                                                         |
+| --------------- | ------------------------------ | ------------------------------------------------------------ |
+| `feed`          | `feedId`, `value`              | Feed composed successfully                                   |
+| `data-update`   | `sourceId`                     | Source cache changed after push, fetch, or cron              |
+| `push`          | `sourceId`, `content?`         | Definition requests cache update (handled by FeedManager)    |
+| `error`         | `sourceId`, `error`, `context` | Data source definition error (handled in service entrypoint) |
+| `command`       | `DataSourceCommand`            | WS client command routed to push sources                     |
+| `feeds-request` | `feedIds[]`                    | Client subscribe — compose feed, refresh all sources         |
+| `feeds-refresh` | `feedIds`                      | Client refresh — force `getData(true)` on all sources        |
+
+### When to use events vs `onError`
+
+| Mechanism                         | When                                                                                                                                                                                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FeedEvents` (`push`, `error`)    | **Async entry points** — callbacks invoked by the event loop (KNX writes, timers, etc.) where the handler runs with a **fresh call stack** and cannot reach infrastructure through the original wiring chain. |
+| `onError` (injected from service) | **In-process async flow** — errors in `FeedManager`, `DataSource`, `DataSourceRegistry` while feeds infrastructure is already on the stack; log + `onError` inline at catch site.                             |
+
+Do **not** route all feeds errors through `FeedEvents` — the event bus is not an error bus.
 
 ## How feeds are composed (two paths)
 

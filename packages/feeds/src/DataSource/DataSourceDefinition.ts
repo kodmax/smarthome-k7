@@ -1,10 +1,16 @@
+import { FeedEvents } from '../FeedManager'
 import { type SourceMetricType } from './types'
 
 export abstract class DataSourceDefinition<T, TCache = T> {
-  public constructor(
-    protected readonly push: (content?: T) => void | Promise<void>,
-    protected readonly reportError: (e: Error) => void,
-  ) {}
+  public constructor(protected readonly feedEvents: FeedEvents) {}
+
+  protected push(content?: T): void {
+    this.feedEvents.emit('push', this.getId(), content)
+  }
+
+  protected reportError(error: Error, context = 'Push data source update error'): void {
+    this.feedEvents.emit('error', this.getId(), error, context)
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public handleCommand(_command: string, _args: string): Promise<void> {
