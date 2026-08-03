@@ -2,9 +2,7 @@ import { WebSocket, WebSocketServer } from 'ws'
 import { Socket } from 'net'
 import type { Logger } from '@repo/logger'
 import { formatCommandArgsForLog } from './formatCommandArgsForLog'
-import { FeedEvents, DataSourceCommand } from '@repo/feeds'
-
-export type ErrorHandler = (error: unknown, context: string) => void
+import { FeedEvents, DataSourceCommand, type ErrorHandler } from '@repo/feeds'
 
 export type ApolloWebSocketOptions = {
   /**

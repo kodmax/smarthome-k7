@@ -28,14 +28,14 @@ Incoming client messages emit on `feedEvents` (`feeds-request`, `feeds-refresh`,
 
 ## Scripts
 
-| Script            | Description                    |
-| ----------------- | ------------------------------ |
-| `build`           | `tsc` → `dist/` (JS + `.d.ts`) |
-| `test`            | Vitest                         |
-| `lint` / `format` | ESLint / Prettier              |
+| Script            | Description                                   |
+| ----------------- | --------------------------------------------- |
+| `build`           | `rm -rf dist && tsc` → `dist/` (JS + `.d.ts`) |
+| `test`            | Vitest                                        |
+| `lint` / `format` | ESLint / Prettier                             |
 
 Agent notes: [`AGENTS.md`](./AGENTS.md).
 
 ## Stack
 
-TypeScript, `ws`, Bun (bundling in service).
+TypeScript, `ws`. Service bundles with esbuild; this package ships compiled JS only.

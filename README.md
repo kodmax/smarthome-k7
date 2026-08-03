@@ -31,7 +31,7 @@ WebSocket.
 
 - Node.js
 - Yarn 1.x (`packageManager`: yarn@1.22.22)
-- Bun (bundling in `apps/service` and `packages/apollo-ws`)
+- Bun (bundling in `apps/service`)
 
 ## Quick start
 

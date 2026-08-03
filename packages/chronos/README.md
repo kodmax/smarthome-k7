@@ -24,7 +24,7 @@ Jobs that are still running when the next tick fires are skipped (no overlap).
 ## Consumers
 
 - [`@repo/cron-scripts`](../cron-scripts) — KNX scheduled jobs via `initKnxCronJobs()`
-- [`@repo/apollo-ws`](../apollo-ws) — cron-based data source refresh in `DataSource`
+- [`@repo/feeds`](../feeds) — cron-based data source refresh in `DataSourceRegistry`
 
 ## Scripts
 

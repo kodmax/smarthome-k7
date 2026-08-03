@@ -91,7 +91,7 @@ refresh — intentional; the server debounce merges rapid multi-source updates.
 ## Scripts
 
 ```sh
-yarn build   # tsc → dist/ (+ .d.ts)
+yarn build   # rm -rf dist && tsc → dist/ (+ .d.ts)
 yarn test    # vitest
 yarn lint
 ```

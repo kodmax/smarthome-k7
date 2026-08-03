@@ -60,11 +60,11 @@ Shutdown: `dataSources.close()` stops Chronos jobs (wired in `apps/service/src/g
 
 ## Scripts
 
-| Script            | Description                    |
-| ----------------- | ------------------------------ |
-| `build`           | `tsc` → `dist/` (JS + `.d.ts`) |
-| `test`            | Vitest                         |
-| `lint` / `format` | ESLint / Prettier              |
+| Script            | Description                                   |
+| ----------------- | --------------------------------------------- |
+| `build`           | `rm -rf dist && tsc` → `dist/` (JS + `.d.ts`) |
+| `test`            | Vitest                                        |
+| `lint` / `format` | ESLint / Prettier                             |
 
 Agent notes: [`AGENTS.md`](./AGENTS.md). Cron scheduling uses [`@repo/chronos`](../chronos).
 

@@ -11,7 +11,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\"",
@@ -25,7 +25,6 @@
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
-    "@repo/logger": "*",
     "@repo/typescript-config": "*",
     "@types/node": "^17.0.35",
     "eslint": "^8.57.0",

@@ -32,7 +32,7 @@ Shutdown order in `apps/service/src/graceful-shutdown.ts`: KNX cron → `dataSou
 ## Scripts
 
 ```sh
-yarn build   # tsc → dist/
+yarn build   # rm -rf dist && tsc → dist/
 yarn test    # vitest (Server protocol)
 yarn lint
 ```
