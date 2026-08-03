@@ -23,8 +23,8 @@ const feedEvents = new FeedEvents()
 const apollo = await Server.listen({ feedEvents, logger, onError })
 ```
 
-Incoming client messages emit on `feedEvents` (`feeds-request`, `feeds-refresh`, `command`). Outgoing updates listen on
-`feed` (1 s debounce per topic).
+Incoming client messages emit on `feedEvents` (`feeds-request`, `command`). Outgoing updates listen on `feed` (1 s
+debounce per topic).
 
 ## Scripts
 

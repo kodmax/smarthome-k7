@@ -10,7 +10,7 @@ DataSourceRegistry.add(id, SourceClass)   ← creates DataSource, per-source cro
         ↓
 FeedComposer.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source feeds
         ↓
-FeedEvents (feed / data-update / push / error / command / feeds-request / feeds-refresh)
+FeedEvents (feed / data-update / push / error / command / feeds-request)
         ↓
 @repo/apollo-ws Server   ← debounce + FEED <id> <json> broadcast
 ```
@@ -22,13 +22,13 @@ infrastructure only.
 
 Exports from `src/index.ts`:
 
-| Export                   | Role                                                                    |
-| ------------------------ | ----------------------------------------------------------------------- |
-| `DataSourceRegistry`     | Register source classes, cron + maintenance, `getByIds()`               |
-| `FeedComposer`           | Compose feeds from ready-made `DataSource` instances                    |
-| `DataSource`             | Fetch, push, cache, commands, cron                                      |
-| `FeedEvents`             | Shared event bus (service passes one instance to WS + registry + feeds) |
-| `FSCache` / `RedisCache` | Persistent or volatile cache backends                                   |
+| Export                   | Role                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------ |
+| `DataSourceRegistry`     | Register source classes, cron + maintenance, `getByIds()`                                  |
+| `FeedComposer`           | Compose feeds from ready-made `DataSource` instances; `getFeedData()` for in-process reads |
+| `DataSource`             | Fetch, push, cache, commands, cron                                                         |
+| `FeedEvents`             | Shared event bus (service passes one instance to WS + registry + feeds)                    |
+| `FSCache` / `RedisCache` | Persistent or volatile cache backends                                                      |
 
 ## Usage (in service)
 
@@ -54,6 +54,8 @@ const feeds = new FeedComposer(feedEvents, { logger, onError })
 
 await dataSources.add('weather', WeatherSource)
 await feeds.addFeed('weather', dataSources.getByIds(['weather']), ({ weather }) => weather)
+
+const payload = await feeds.getFeedData('weather') // same object as FEED weather <json> over WebSocket
 ```
 
 Shutdown: `dataSources.close()` stops Chronos jobs (wired in `apps/service/src/graceful-shutdown.ts`).

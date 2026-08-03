@@ -6,7 +6,7 @@ handles the wire protocol and client lifecycle.
 ## Responsibilities
 
 - Accept WebSocket connections
-- Parse client messages → emit on shared `FeedEvents` (`feeds-request`, `feeds-refresh`, `command`)
+- Parse client messages → emit on shared `FeedEvents` (`feeds-request`, `command`)
 - Listen for `feed` events → debounce 1 s per topic → broadcast `FEED <id> <json>`
 - `Server.close()` — clear debounce timers, close connections
 

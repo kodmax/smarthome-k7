@@ -540,36 +540,92 @@ describe('Feeds composition', () => {
       expect(feedEvents[0]).toEqual({ warm: { value: 1 }, cold: { value: 99 } })
     })
   })
+})
 
-  it('refresh forces script on all sources', async () => {
+describe('getFeedData', () => {
+  const cacheDirs: string[] = []
+
+  afterEach(() => {
+    for (const dir of cacheDirs.splice(0)) {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  function createCompositionFeeds() {
     const vent = new FeedEvents()
     const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
     cacheDirs.push(cacheDir)
     const cache = new FSCache(cacheDir)
+
     const feeds = new FeedComposer(vent, {
       logger: createSilentLogger(),
       onError: noopOnError,
     })
 
-    const getDataA = vi.fn(async () => ({ value: 1 }))
-    const getDataB = vi.fn(async () => ({ value: 2 }))
+    return { vent, feeds, cache }
+  }
+
+  it('returns the same payload as the feed event on subscribe', async () => {
+    const { vent, feeds, cache } = createCompositionFeeds()
+
+    let pushSrc: (content: { value: number }) => void = () => {}
+    const Source = createTestSourceClass({
+      id: 'get-feed-src',
+      isVolatile: true,
+      getCacheTTL: () => FRESH_CACHE_TTL_MS,
+      onInit: ({ push }) => {
+        pushSrc = push
+      },
+    })
+
+    await feeds.addFeed('get-feed', { src: await createDataSource(cache, vent, Source) }, ({ src }) => ({
+      reading: src.value,
+    }))
+
+    const sourceReady = waitForDataUpdate(vent, 'get-feed-src')
+    pushSrc({ value: 42 })
+    await sourceReady
+    await waitForFeedIdle(vent, 'get-feed')
+
+    const feedEvents: unknown[] = []
+    vent.on('feed', (_id, value) => feedEvents.push(value))
+
+    vent.emit('feeds-request', ['get-feed'])
+    await waitForFeedIdle(vent, 'get-feed')
+
+    const fromEvent = feedEvents.at(-1)
+    const fromGetFeedData = await feeds.getFeedData('get-feed')
+
+    expect(fromGetFeedData).toEqual(fromEvent)
+    expect(fromGetFeedData).toEqual({ reading: 42 })
+  })
+
+  it('matches the WebSocket JSON payload shape', async () => {
+    const { vent, feeds, cache } = createCompositionFeeds()
 
     await feeds.addFeed(
-      'refresh-a-feed',
-      { a: await createDataSource(cache, vent, createTestSourceClass({ id: 'refresh-a', fetchData: getDataA })) },
-      content => content,
-    )
-    await feeds.addFeed(
-      'refresh-b-feed',
-      { b: await createDataSource(cache, vent, createTestSourceClass({ id: 'refresh-b', fetchData: getDataB })) },
-      content => content,
+      'ws-feed',
+      {
+        src: await createDataSource(
+          cache,
+          vent,
+          createTestSourceClass({ id: 'ws-src', fetchData: async () => ({ value: 7 }) }),
+        ),
+      },
+      ({ src }) => src,
     )
 
-    const refreshDone = Promise.all([waitForDataUpdate(vent, 'refresh-a'), waitForDataUpdate(vent, 'refresh-b')])
-    vent.emit('feeds-refresh', ['refresh-a-feed', 'refresh-b-feed'])
-    await refreshDone
+    await waitForFeedIdle(vent, 'ws-feed')
 
-    expect(getDataA).toHaveBeenCalledTimes(1)
-    expect(getDataB).toHaveBeenCalledTimes(1)
+    const data = await feeds.getFeedData('ws-feed')
+    const wsPayload = JSON.parse(JSON.stringify(data))
+
+    expect(wsPayload).toEqual({ value: 7 })
+  })
+
+  it('throws for an unknown feed id', async () => {
+    const { feeds } = createCompositionFeeds()
+
+    await expect(feeds.getFeedData('missing-feed')).rejects.toThrow('Feed <missing-feed> not registered.')
   })
 })

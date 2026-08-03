@@ -134,11 +134,6 @@ export class Server {
 
           this.options.logger.info({ clientIp: ip, feedIds: params }, 'Client subscribed')
           this.feedEvents.emit('feeds-request', params)
-        } else if (cmd === 'refresh') {
-          const feeds = new Set<string>(params)
-
-          this.options.logger.info({ clientIp: ip, feedIds: [...feeds] }, 'Client requested refresh')
-          this.feedEvents.emit('feeds-refresh', feeds.values())
         } else if (cmd === 'command') {
           const [sourceId, name, ...args] = params
           const argsText = args.join(' ')

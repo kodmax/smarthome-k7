@@ -3,7 +3,7 @@ import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { EyeOff, Undo2 } from 'lucide-react'
 import { NewsIcon, SettingsIcon } from '@repo/assets'
 import { designTokens } from '@repo/design-tokens'
-import { refreshFeeds, useCommand, useFeed } from '@repo/feed-client'
+import { useCommand, useFeed } from '@repo/feed-client'
 import { BaseCard, ApolloCardAction, useZoom } from '@repo/apollo-card'
 import {
   ApolloDataTable,
@@ -28,10 +28,6 @@ export const News: FC<Record<string, never>> = () => {
 
   const read = useCommand('news', 'read')
   const unread = useCommand('news', 'unread')
-
-  const onZoom = useCallback(() => {
-    refreshFeeds(['news'])
-  }, [])
 
   const onOpenArticle = useCallback(
     (uid: string) => {
@@ -73,7 +69,6 @@ export const News: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={NewsIcon}
       height={6}
-      onZoom={onZoom}
       zoomActions={
         <ApolloCardAction title={t.dashboard.common.editPreferences} onClick={onEditPreferences} Icon={SettingsIcon} />
       }

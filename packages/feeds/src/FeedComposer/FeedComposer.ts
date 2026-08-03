@@ -15,7 +15,7 @@ export class FeedComposer {
     this.feedEvents.on('feeds-request', feedsIds => {
       for (const id of feedsIds) {
         if (this.feeds.has(id)) {
-          this.feed(id).catch(e => {
+          this.publishFeed(id).catch(e => {
             this.options.logger.warn({ err: e, feedId: id }, 'Feed request error')
             this.options.onError(e, 'Feed request error')
           })
@@ -23,27 +23,18 @@ export class FeedComposer {
       }
     })
 
-    this.feedEvents.on('feeds-refresh', feedsIds => {
-      for (const id of feedsIds) {
-        if (this.feeds.has(id)) {
-          this.refresh(id).catch(e => {
-            this.options.logger.warn({ err: e, feedId: id }, 'Feed refresh error')
-            this.options.onError(e, 'Feed refresh error')
-          })
-        }
-      }
-    })
-
     this.feedEvents.addListener('data-update', async (sourceId: string) => {
       for (const feed of this.feeds.values()) {
-        if (Array.from(feed.sources.values()).find(source => source.getId() === sourceId)) {
-          try {
-            this.options.logger.debug({ feedId: feed.feedId, sourceId }, 'Refreshing feed due to source update')
-            await this.feed(feed.feedId, sourceId)
-          } catch (e) {
-            this.options.logger.warn({ err: e, feedId: feed.feedId, sourceId }, 'Feed update error')
-            this.options.onError(e, 'Feed update error')
-          }
+        if (this.findSourceKey(feed, sourceId) === undefined) {
+          continue
+        }
+
+        try {
+          this.options.logger.debug({ feedId: feed.feedId, sourceId }, 'Refreshing feed due to source update')
+          await this.publishFeed(feed.feedId, sourceId)
+        } catch (e) {
+          this.options.logger.warn({ err: e, feedId: feed.feedId, sourceId }, 'Feed update error')
+          this.options.onError(e, 'Feed update error')
         }
       }
     })
@@ -79,73 +70,48 @@ export class FeedComposer {
     return src.ensureContent()
   }
 
-  private async getData(feed: Feed, triggeredBy?: string): Promise<Record<string, unknown>> {
-    const contents: Record<string, unknown> = {}
-
-    await Promise.all(
-      Array.from([...feed.sources.entries()]).map(async ([srcName, src]) => {
-        contents[srcName] = await this.getSourceContent(src, triggeredBy)
-      }),
+  private async collectSourceContents(
+    feed: Feed,
+    read: (src: SourceRegistration['dataSource']) => Promise<unknown>,
+  ): Promise<Record<string, unknown>> {
+    const entries = await Promise.all(
+      [...feed.sources.entries()].map(async ([srcName, src]) => [srcName, await read(src)] as const),
     )
 
-    return contents
-  }
-
-  private async refreshData(feed: Feed): Promise<Record<string, unknown>> {
-    const contents: Record<string, unknown> = {}
-
-    await Promise.all(
-      Array.from([...feed.sources.entries()]).map(async ([srcName, src]) => {
-        contents[srcName] = await src.getData(true)
-      }),
-    )
-
-    return contents
+    return Object.fromEntries(entries)
   }
 
   private findSourceKey(feed: Feed, sourceId: string): string | undefined {
-    for (const [key, src] of feed.sources) {
-      if (src.getId() === sourceId) {
-        return key
+    return [...feed.sources.entries()].find(([, src]) => src.getId() === sourceId)?.[0]
+  }
+
+  private async composeFeedContent(feedId: string, triggeredBy?: string): Promise<unknown | null> {
+    const feed = this.feeds.get(feedId)
+    if (feed === undefined) {
+      throw new Error(`Feed <${feedId}> not registered.`)
+    }
+
+    const data = await this.collectSourceContents(feed, src => this.getSourceContent(src, triggeredBy))
+
+    if (triggeredBy !== undefined) {
+      const triggerKey = this.findSourceKey(feed, triggeredBy)
+      if (triggerKey !== undefined && data[triggerKey] === null) {
+        return null
       }
     }
+
+    return feed.cb(data)
   }
 
-  private async refresh(feedId: string): Promise<void> {
-    const feed = this.feeds.get(feedId)
-    if (feed === undefined) {
-      throw new Error(`Feed <${feedId}> not registered.`)
-    }
-
+  private async publishFeed(feedId: string, triggeredBy?: string): Promise<void> {
     try {
-      const content = feed.cb(await this.refreshData(feed))
-
-      this.options.logger.debug({ feedId }, 'Feed update successful')
-      this.feedEvents.emit('feed', feedId, content)
-    } catch (e) {
-      this.options.logger.warn({ err: e, feedId }, 'Feed callback error')
-      this.options.onError(e, 'Feed callback error')
-    }
-  }
-
-  private async feed(feedId: string, triggeredBy?: string): Promise<void> {
-    const feed = this.feeds.get(feedId)
-    if (feed === undefined) {
-      throw new Error(`Feed <${feedId}> not registered.`)
-    }
-
-    try {
-      const data = await this.getData(feed, triggeredBy)
-
-      if (triggeredBy !== undefined) {
-        const triggerKey = this.findSourceKey(feed, triggeredBy)
-        if (triggerKey !== undefined && data[triggerKey] === null) {
+      const content = await this.composeFeedContent(feedId, triggeredBy)
+      if (content === null) {
+        if (triggeredBy !== undefined) {
           this.options.logger.info({ feedId, skipReason: 'No recent content' }, 'Feed update skipped')
-          return
         }
+        return
       }
-
-      const content = feed.cb(data)
 
       this.options.logger.debug(
         { feedId, ...(triggeredBy !== undefined ? { triggeredBy } : {}) },
@@ -153,9 +119,21 @@ export class FeedComposer {
       )
       this.feedEvents.emit('feed', feedId, content)
     } catch (e) {
-      this.options.logger.warn({ err: e, feedId, triggeredBy }, 'Feed callback error')
+      this.options.logger.warn(
+        { err: e, feedId, ...(triggeredBy !== undefined ? { triggeredBy } : {}) },
+        'Feed callback error',
+      )
       this.options.onError(e, 'Feed callback error')
     }
+  }
+
+  public async getFeedData(feedId: string): Promise<unknown> {
+    const content = await this.composeFeedContent(feedId)
+    if (content === null) {
+      throw new Error(`Feed <${feedId}> has no content.`)
+    }
+
+    return content
   }
 
   public async addFeed<R, S extends Record<string, AnyDataSource>>(

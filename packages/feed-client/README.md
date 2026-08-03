@@ -4,11 +4,10 @@ React client library for the Apollo WebSocket protocol — feed subscriptions an
 
 ## API
 
-| Export                 | Description                                              |
-| ---------------------- | -------------------------------------------------------- |
-| `useFeed(topic)`       | Hook — subscribes to a topic, returns the latest payload |
-| `useCommand()`         | Sends a command to a data source                         |
-| `refreshFeeds(topics)` | Forces a refresh of selected feeds                       |
+| Export           | Description                                              |
+| ---------------- | -------------------------------------------------------- |
+| `useFeed(topic)` | Hook — subscribes to a topic, returns the latest payload |
+| `useCommand()`   | Sends a command to a data source                         |
 
 Default WebSocket URL: same host and scheme as the page (`ws(s)://<host>/ws`, overridable via `VITE_WEBSOCKET_URL`).
 

@@ -47,12 +47,6 @@ export class WSClient {
     this.topics.add(topic)
   }
 
-  refresh(feeds: string[]): void {
-    if (this.ws.readyState === this.ws.OPEN) {
-      this.ws.send(`refresh ${feeds.join(' ')}`)
-    }
-  }
-
   command(command: Command): void {
     const commandText = `command ${command.sourceId} ${command.name} ${command.args}`
 

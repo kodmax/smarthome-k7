@@ -14,7 +14,7 @@ DataSourceRegistry.add(id, SourceClass)
     → cache (volatile RAM or persistent JSON / Redis)
     → data-update event
 FeedComposer.addFeed(feedId, getByIds([...]), cb)
-    → feed event
+    → feed event (or getFeedData for in-process read)
 Server (@repo/apollo-ws, debounce 1 s)
     → WebSocket clients
 ```
@@ -33,8 +33,7 @@ Create one instance in service and pass it to `Server.listen()`, `DataSourceRegi
 | `data-update`   | `sourceId`                     | Source cache changed after push, fetch, or cron       |
 | `error`         | `sourceId`, `error`, `context` | Data source error (handled in service entrypoint)     |
 | `command`       | `DataSourceCommand`            | WS client command routed to push sources              |
-| `feeds-request` | `feedIds[]`                    | Client subscribe — compose feed, refresh all sources  |
-| `feeds-refresh` | `feedIds`                      | Client refresh — force `getData(true)` on all sources |
+| `feeds-request` | `feedIds[]`                    | Client subscribe — compose feed from source cache/TTL |
 
 ### When to use events vs `onError`
 
@@ -47,9 +46,8 @@ Do **not** route all feeds errors through `FeedEvents` — the event bus is not 
 
 ## How feeds are composed (two paths)
 
-**Client subscribe / refresh** (`feeds-request`, `feeds-refresh`): every source in the feed gets `getData()` (or
-`getData(true)` on refresh). Sources finish at different times; each success emits `data-update` and may trigger another
-composition pass.
+**Client subscribe** (`feeds-request`): every source in the feed gets `getData()`. Sources finish at different times;
+each success emits `data-update` and may trigger another composition pass.
 
 **Push / cron** (`data-update` handler): `feed(feedId, sourceId)` runs with `triggeredBy` set. The **trigger** source
 uses `getRecentContent()` (push already wrote to cache before emitting `data-update`; KNX volatile cache stays warm in
@@ -60,6 +58,9 @@ skips the feed event entirely.
 
 **Subscribe** (`feeds-request`, no `triggeredBy`): every source uses `getData()`, which may emit `data-update` after
 refresh — intentional; the server debounce merges rapid multi-source updates.
+
+**In-process read** (`getFeedData(feedId)`): composes and returns the same payload as the `feed` event / WebSocket
+`FEED <id> <json>`, without emitting `feed`. Uses the same subscribe path as `feeds-request`.
 
 ## Intentional behavior — do not "fix"
 

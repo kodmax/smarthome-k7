@@ -1,7 +1,7 @@
 import { TableBody } from '@mui/material'
-import { type FC, useCallback } from 'react'
+import { type FC } from 'react'
 import { EnergyIcon } from '@repo/assets'
-import { refreshFeeds, useFeed } from '@repo/feed-client'
+import { useFeed } from '@repo/feed-client'
 import { BaseCard, useZoom } from '@repo/apollo-card'
 import { ApolloDataTable, KnxReading, Reading, TablePlaceholder } from '@/card-components'
 import { EnergyFeed } from '@repo/types'
@@ -15,10 +15,6 @@ export const Energy: FC<Record<string, never>> = () => {
   const { t } = useTranslations()
   const labels = t.dashboard.energy
   const hintExplanations = t.dashboard.hintExplanations
-
-  const onZoom = useCallback(() => {
-    refreshFeeds(['energy', 'home.power-draw', 'home.energy-consumption.today'])
-  }, [])
 
   if (feed === undefined) {
     return (
@@ -42,7 +38,6 @@ export const Energy: FC<Record<string, never>> = () => {
       cardId='energy'
       title={labels.title}
       icon={EnergyIcon}
-      onZoom={onZoom}
       headingInfo={
         shouldShowHighDrawHint(feed.instant.reading.value) ? (
           <CardHeadingHints>

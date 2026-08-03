@@ -37,8 +37,4 @@ const sendCommand: (sourceId: string, name: string, args?: string) => void = (so
   wsClient.command({ sourceId, name, args: args ?? '' })
 }
 
-const refreshFeeds = (feeds: string[]): void => {
-  wsClient.refresh(feeds)
-}
-
-export { subscribe, sendCommand, refreshFeeds }
+export { subscribe, sendCommand }

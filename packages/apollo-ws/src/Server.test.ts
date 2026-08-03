@@ -60,16 +60,6 @@ describe('Server', () => {
     expect(requested[0]).toEqual(['feed-a', 'feed-b'])
   })
 
-  it('parses refresh and emits feeds-refresh', async () => {
-    const refreshed: string[][] = []
-    feedEvents.on('feeds-refresh', feedIds => refreshed.push([...feedIds]))
-
-    ws.send('refresh weather job-ads')
-
-    await vi.waitFor(() => expect(refreshed).toHaveLength(1))
-    expect(refreshed[0]).toEqual(['weather', 'job-ads'])
-  })
-
   it('parses command and emits command with joined args', async () => {
     const commands: Array<{ sourceId: string; name: string; args: string }> = []
     feedEvents.on('command', command => commands.push(command))

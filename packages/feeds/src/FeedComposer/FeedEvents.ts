@@ -8,7 +8,6 @@ export type FeedEventMap = {
   command: [command: DataSourceCommand]
   'clients-changed': [count: number]
   'feeds-request': [feedIds: string[]]
-  'feeds-refresh': [feedIds: Iterable<string>]
 }
 
 type EventKey = keyof FeedEventMap
