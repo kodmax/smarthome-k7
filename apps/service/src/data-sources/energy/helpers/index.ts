@@ -1,7 +1,7 @@
 export { avgDailyConsumption } from './avgDailyConsumption'
 export { dayStart } from './dayStart'
 export { daysBetweenReadings } from './daysBetweenReadings'
-export { energyRates } from './energyRates'
+export { getEnergyRatesAt } from './getEnergyRatesAt'
 export { getEndReading } from './getEndReading'
 export { getFirstReadingSince } from './getFirstReadingSince'
 export { getLatestReading } from './getLatestReading'

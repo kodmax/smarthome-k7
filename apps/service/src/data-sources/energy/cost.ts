@@ -1,15 +1,15 @@
 import { DataSourceDefinition, CacheAgeUnit } from '@repo/feeds'
+import { EnergyRates } from '@repo/types'
 import DateTime from '../../DateTime'
 import { Inject } from '@/di'
 import type { Pool } from 'mariadb'
-import { avgDailyConsumption, dayStart, energyRates, getEndReading, getFirstReadingSince } from './helpers'
+import { avgDailyConsumption, dayStart, getEndReading, getEnergyRatesAt, getFirstReadingSince } from './helpers'
 
 const AVG_PERIOD_DAYS = 30
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type EnergyCost = {
   datetime: string
-  rates: typeof energyRates
+  rates: EnergyRates
   avg: number
 }
 
@@ -50,11 +50,15 @@ export class EnergyCostSource extends DataSourceDefinition<EnergyCost> {
 
       const end = await getEndReading(conn, today, yesterday)
       const avg = +Number(avgDailyConsumption(start, end).toFixed(0))
+      const rates = await getEnergyRatesAt(conn, today)
+
+      if (!rates) {
+        throw new Error(`No energy rates found effective at ${today}`)
+      }
 
       return {
-        // bill: Number((+cost.distribution + +cost.energy) * +avg).toFixed(2),
         datetime: today,
-        rates: energyRates,
+        rates,
         avg,
       }
     } finally {
