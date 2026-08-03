@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import DateTime from '../../DateTime'
 import { Inject } from '@/di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
@@ -8,29 +8,30 @@ import type { config as AppConfig } from '../../config'
 import type { Pool } from 'mariadb'
 import { parseAirQuality, parseAllergens, parseForecast, parseHourly, parseInstant } from './parsers'
 
-export class WeatherSource extends DataSourceDefinition<WeatherFeed> {
+export class WeatherSource extends DataSource<WeatherFeed> {
   @Inject('db')
   declare private db: Pool
 
   @Inject('config')
   declare private config: typeof AppConfig
-  getId() {
+
+  static getId() {
     return 'weather'
   }
 
-  getCron() {
+  static getCron() {
     return '*/15 * * * *'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.MINUTE * 15
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'scraper' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const { long, lat } = this.config.geoLocation
     const [forecast, instant, allergens, hourly, aq] = await Promise.all([
       parseForecast(),

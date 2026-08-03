@@ -1,11 +1,10 @@
 import { DataSource } from './DataSource'
 import { DataSourceNotFound, DuplicateDataSourceIdError } from './Errors'
-import { DataSourceFromCtor, DataSourceRefreshObserver, DefinitionFromCtor, RegistryBaseType } from './types'
+import { DataSourceFromCtor, DataSourceRefreshObserver, RegistryBaseType } from './types'
 import { Cache } from '../Cache'
 import { FeedEvents } from '../FeedManager'
 import { Logger, readScopedLogLevel } from '@repo/logger'
 import { ErrorHandler } from './types'
-import { DataSourceDefinition } from './DataSourceDefinition'
 import { Chronos } from '@repo/chronos'
 
 const DATA_SOURCES_MAINTENANCE_CRON = '0 3 * * *'
@@ -20,7 +19,6 @@ type DataSourceRegistryParams = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class DataSourceRegistry<T extends RegistryBaseType> {
-  private definitions: Map<keyof T, DataSourceDefinition<unknown, unknown>> = new Map()
   private dataSources: Map<keyof T, DataSource<unknown, unknown>> = new Map()
 
   private chronos: Chronos
@@ -66,22 +64,25 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
   }
 
   async add<K extends keyof T>(id: K, ctor: T[K]): Promise<void> {
-    if (this.definitions.has(id)) {
+    if (this.dataSources.has(id)) {
       throw new DuplicateDataSourceIdError(id as string)
     }
 
-    const [definition, ds] = await DataSource.fromClassWithDefinition(
-      ctor,
-      this.cache,
-      this.feedEvents,
-      this.logger,
-      this.onError,
-      this.observeDataSourceRefresh,
-    )
+    const cacheEntry = await this.cache.getEntry(ctor.isVolatile() ? undefined : ctor.getId(), {
+      ttlMs: ctor.getCacheTTL(),
+    })
 
-    const sourceId = ds.getId()
-    const cron = ds.getCron()
-    if (cron) {
+    const ds = new ctor({
+      feedEvents: this.feedEvents,
+      cacheEntry,
+      logger: this.logger,
+      onError: this.onError,
+      observeDataSourceRefresh: this.observeDataSourceRefresh,
+    })
+
+    const cron = ctor.getCron()
+    if (cron !== undefined) {
+      const sourceId = ds.getId()
       this.chronos.addJob(cron, sourceId, async () => {
         try {
           this.logger.info({ sourceId, cron }, 'Data source scheduled refresh')
@@ -95,17 +96,7 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
     }
 
     this.logger.info({ id, cron }, 'Data source registered')
-    this.definitions.set(id, definition)
     this.dataSources.set(id, ds)
-  }
-
-  getDefinition<K extends keyof T>(id: K): DefinitionFromCtor<T[K]> {
-    const definition = this.definitions.get(id)
-    if (definition === undefined) {
-      throw new DataSourceNotFound()
-    }
-
-    return definition as DefinitionFromCtor<T[K]>
   }
 
   get<K extends keyof T>(id: K): DataSourceFromCtor<T[K]> {

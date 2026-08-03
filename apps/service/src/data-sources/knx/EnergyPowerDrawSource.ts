@@ -3,7 +3,7 @@ import { DPT_Value_Power } from 'js-knx'
 import { KnxPushReadingSource, knxPushCacheTtl } from './KnxPushReadingSource'
 
 export class EnergyPowerDrawSource extends KnxPushReadingSource<typeof DPT_Value_Power> {
-  protected getSourceId(): string {
+  static getId(): string {
     return 'home.power-draw'
   }
 
@@ -11,7 +11,7 @@ export class EnergyPowerDrawSource extends KnxPushReadingSource<typeof DPT_Value
     return knxSchema.home.energy.powerDraw
   }
 
-  protected getCacheTtlValue(): number {
+  static getCacheTTL(): number {
     return knxPushCacheTtl.energy
   }
 }

@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { JobAd, JobMarketInsightCachedFeed, JobMarketInsightFeed } from '@repo/types'
 import type { Pool } from 'mariadb'
 import DateTime from '@/DateTime'
@@ -13,27 +13,27 @@ import { persistDailyJobMarketInsightSnapshot } from './persistDailyJobMarketIns
 
 const COMPARISON_WINDOW_DAYS = 1 // TODO: revert to 7 after verifying change metrics
 
-export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsightFeed, JobMarketInsightCachedFeed> {
+export class JobMarketInsightSource extends DataSource<JobMarketInsightFeed, JobMarketInsightCachedFeed> {
   @Inject('db')
   declare private db: Pool
 
-  getId() {
+  static getId() {
     return 'job-market-insight'
   }
 
-  getCron() {
+  static getCron() {
     return '0 * * * *'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.HOUR * 4
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'api' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const allAds = new Map<string, JobAd>()
 
     addAllAds(allAds, await jjit())
@@ -48,7 +48,7 @@ export class JobMarketInsightSource extends DataSourceDefinition<JobMarketInsigh
     return metrics
   }
 
-  async composeContent(cached: JobMarketInsightCachedFeed): Promise<JobMarketInsightFeed> {
+  protected async composeContent(cached: JobMarketInsightCachedFeed): Promise<JobMarketInsightFeed> {
     const baselineAt = DateTime.shift(-COMPARISON_WINDOW_DAYS, DateTime.DAY).getDateTime()
     const previous = await loadJobMarketInsightSnapshotAtOrBefore(this.db, baselineAt)
 

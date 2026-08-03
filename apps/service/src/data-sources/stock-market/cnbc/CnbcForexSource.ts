@@ -1,25 +1,25 @@
-import { DataSourceDefinition, CacheAgeUnit } from '@repo/feeds'
+import { DataSource, CacheAgeUnit } from '@repo/feeds'
 import { getForexRates } from './getForexRates'
 import { CnbcForexData } from './types'
 
-export class CnbcForexSource extends DataSourceDefinition<CnbcForexData> {
-  getId() {
+export class CnbcForexSource extends DataSource<CnbcForexData> {
+  static getId() {
     return 'cnbc-forex'
   }
 
-  getCron() {
+  static getCron() {
     return '*/5 * * * *'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.HOUR * 24
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'scraper' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     return getForexRates()
   }
 }

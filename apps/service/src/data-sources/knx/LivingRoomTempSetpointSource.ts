@@ -3,7 +3,7 @@ import { DPT_Value_Temp } from 'js-knx'
 import { KnxPushReadingSource, knxPushCacheTtl } from './KnxPushReadingSource'
 
 export class LivingRoomTempSetpointSource extends KnxPushReadingSource<typeof DPT_Value_Temp> {
-  protected getSourceId(): string {
+  static getId(): string {
     return 'temp.livingroom.setpoint'
   }
 
@@ -11,7 +11,7 @@ export class LivingRoomTempSetpointSource extends KnxPushReadingSource<typeof DP
     return knxSchema.home.temp.livingRoom.setpoint
   }
 
-  protected getCacheTtlValue(): number {
+  static getCacheTTL(): number {
     return knxPushCacheTtl.temp
   }
 }

@@ -3,7 +3,7 @@ import { DPT_Value_Humidity } from 'js-knx'
 import { KnxPushReadingSource, knxPushCacheTtl } from './KnxPushReadingSource'
 
 export class HumidityReadingSource extends KnxPushReadingSource<typeof DPT_Value_Humidity> {
-  protected getSourceId(): string {
+  static getId(): string {
     return 'home.air-quality.humidity'
   }
 
@@ -11,7 +11,7 @@ export class HumidityReadingSource extends KnxPushReadingSource<typeof DPT_Value
     return knxSchema.home.airQuality.humidity.reading
   }
 
-  protected getCacheTtlValue(): number {
+  static getCacheTTL(): number {
     return knxPushCacheTtl.airQuality
   }
 }

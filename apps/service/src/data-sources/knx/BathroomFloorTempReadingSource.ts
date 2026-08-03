@@ -3,7 +3,7 @@ import { DPT_Value_Temp } from 'js-knx'
 import { KnxPushReadingSource, knxPushCacheTtl } from './KnxPushReadingSource'
 
 export class BathroomFloorTempReadingSource extends KnxPushReadingSource<typeof DPT_Value_Temp> {
-  protected getSourceId(): string {
+  static getId(): string {
     return 'temp.bathroom-floor'
   }
 
@@ -11,7 +11,7 @@ export class BathroomFloorTempReadingSource extends KnxPushReadingSource<typeof 
     return knxSchema.home.temp.bathroomFloor.reading
   }
 
-  protected getCacheTtlValue(): number {
+  static getCacheTTL(): number {
     return knxPushCacheTtl.temp
   }
 }

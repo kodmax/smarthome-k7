@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import DateTime from '../DateTime'
 import { Inject } from '@/di'
 import type { Pool } from 'mariadb'
@@ -8,26 +8,27 @@ import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { INTEREST_RATES, InterestRateData, InterestRatesFeed } from '@repo/types'
 import { parseNbpRatesFromDocument, parseWiborFromHtml } from './interest-rates/parse'
 
-export class InterestRatesSource extends DataSourceDefinition<InterestRatesFeed> {
+export class InterestRatesSource extends DataSource<InterestRatesFeed> {
   @Inject('db')
   declare private db: Pool
-  getId() {
+
+  static getId() {
     return 'interest-rates'
   }
 
-  getCron() {
+  static getCron() {
     return '5 11,17 * * 1-5'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.HOUR * 12
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'scraper' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const wiborUrl = 'https://www.bankier.pl/mieszkaniowe/stopy-procentowe/wibor'
     const wiborDocument = await observeHttpFetch(wiborUrl, 'html', () =>
       fetchDocument(wiborUrl, { accept: 'text/html' }),

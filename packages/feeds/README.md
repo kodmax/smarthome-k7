@@ -22,13 +22,13 @@ infrastructure only.
 
 Exports from `src/index.ts`:
 
-| Export                                | Role                                                                    |
-| ------------------------------------- | ----------------------------------------------------------------------- |
-| `DataSourceRegistry`                  | Register source classes, cron + maintenance, `getByIds()`               |
-| `FeedManager`                         | Compose feeds from ready-made `DataSource` instances                    |
-| `DataSource` / `DataSourceDefinition` | Fetch, push, cache, commands                                            |
-| `FeedEvents`                          | Shared event bus (service passes one instance to WS + registry + feeds) |
-| `FSCache` / `RedisCache`              | Persistent or volatile cache backends                                   |
+| Export                   | Role                                                                    |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `DataSourceRegistry`     | Register source classes, cron + maintenance, `getByIds()`               |
+| `FeedManager`            | Compose feeds from ready-made `DataSource` instances                    |
+| `DataSource`             | Fetch, push, cache, commands, cron                                      |
+| `FeedEvents`             | Shared event bus (service passes one instance to WS + registry + feeds) |
+| `FSCache` / `RedisCache` | Persistent or volatile cache backends                                   |
 
 ## Usage (in service)
 

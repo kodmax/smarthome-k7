@@ -1,31 +1,31 @@
-import { DataSourceDefinition, CacheAgeUnit } from '@repo/feeds'
+import { DataSource, CacheAgeUnit } from '@repo/feeds'
 import DateTime from '../DateTime'
 import { Inject } from '../di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { Co2HistoryRecord } from '@repo/types'
 import type { Pool } from 'mariadb'
 
-export class Co2HourlySource extends DataSourceDefinition<{ date: string; today: Co2HistoryRecord[] }> {
+export class Co2HourlySource extends DataSource<{ date: string; today: Co2HistoryRecord[] }> {
   @Inject('db')
   declare private db: Pool
 
-  getId() {
+  static getId() {
     return 'co2-hourly'
   }
 
-  getCron() {
+  static getCron() {
     return '1 * * * *'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.MINUTE * 5
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'db' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const conn = await this.db.getConnection()
     try {
       return {

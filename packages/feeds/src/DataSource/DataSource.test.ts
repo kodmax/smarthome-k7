@@ -6,8 +6,7 @@ import { FeedEvents, FeedManager } from '../FeedManager'
 import { FSCache } from '../Cache'
 import { DataSource } from './DataSource'
 import { createSilentLogger } from '@repo/logger'
-import { DataSourceDefinitionCtor, SourceMetricType } from './types'
-import { DataSourceDefinition } from './DataSourceDefinition'
+import { DataSourceCtor, DataSourceParams, SourceMetricType, DataSourceRefreshObserver } from './types'
 
 const noopOnError = (): void => void 0
 
@@ -15,50 +14,50 @@ function createTestSourceClass<T, TCache = T>(options: {
   id: string
   getCacheTTL?: () => number
   isCacheValid?: (cached: TCache) => boolean
-  getData?: () => Promise<TCache>
+  fetchData?: () => Promise<TCache>
   composeContent?: (cached: TCache) => Promise<T>
   isVolatile?: boolean
   getSourceMetricType?: () => SourceMetricType
   isMetricsEnabled?: () => boolean
   handleCommand?: (command: string, args: string) => void | Promise<void>
   maintenance?: () => void | Promise<void>
-}): DataSourceDefinitionCtor<T, TCache> {
-  return class TestSource extends DataSourceDefinition<T, TCache> {
+}): DataSourceCtor<T, TCache> {
+  class TestSource extends DataSource<T, TCache> {
+    public static getId(): string {
+      return options.id
+    }
+
+    public static getCacheTTL(): number {
+      return options.getCacheTTL?.() ?? 0
+    }
+
+    public static isVolatile(): boolean {
+      return options.isVolatile ?? false
+    }
+
     public async handleCommand(command: string, args: string): Promise<void> {
       await options.handleCommand?.(command, args)
     }
 
-    public getId(): string {
-      return options.id
-    }
-
-    public getCacheTTL(): number {
-      return options.getCacheTTL?.() ?? 0
-    }
-
-    public isCacheValid(cached: TCache): boolean {
+    protected isCacheValid(cached: TCache): boolean {
       return options.isCacheValid?.(cached) ?? true
     }
 
-    public async getData(): Promise<TCache> {
-      return options.getData !== undefined ? await options.getData() : ({ value: 1 } as TCache)
+    protected async fetchData(): Promise<TCache> {
+      return options.fetchData !== undefined ? await options.fetchData() : ({ value: 1 } as TCache)
     }
 
-    public async composeContent(cached: TCache): Promise<T> {
+    protected async composeContent(cached: TCache): Promise<T> {
       return options.composeContent !== undefined
         ? await options.composeContent(cached)
         : await super.composeContent(cached)
     }
 
-    public isVolatile(): boolean {
-      return options.isVolatile ?? false
-    }
-
-    public getSourceMetricType(): SourceMetricType {
+    protected getSourceMetricType(): SourceMetricType {
       return options.getSourceMetricType?.() ?? 'other'
     }
 
-    public isMetricsEnabled(): boolean {
+    protected isMetricsEnabled(): boolean {
       return options.isMetricsEnabled?.() ?? true
     }
 
@@ -66,6 +65,8 @@ function createTestSourceClass<T, TCache = T>(options: {
       await options.maintenance?.()
     }
   }
+
+  return TestSource
 }
 
 describe('DataSource', () => {
@@ -79,23 +80,25 @@ describe('DataSource', () => {
   })
 
   async function createDataSource<T, TCache = T>(
-    SourceClass: DataSourceDefinitionCtor<T, TCache>,
+    SourceClass: DataSourceCtor<T, TCache>,
     onError = noopOnError,
-    observeDataSourceRefresh?: Parameters<typeof DataSource.fromClass>[5],
+    observeDataSourceRefresh?: DataSourceRefreshObserver,
   ) {
     const cacheDir = mkdtempSync(join(tmpdir(), 'ds-'))
     cacheDirs.push(cacheDir)
 
     const vent = new FeedEvents()
     const cache = new FSCache(cacheDir)
-    const dataSource = await DataSource.fromClass(
-      SourceClass,
-      cache,
-      vent,
-      createSilentLogger(),
+    const cacheEntry = await cache.getEntry(SourceClass.isVolatile() ? undefined : SourceClass.getId(), {
+      ttlMs: SourceClass.getCacheTTL(),
+    })
+    const dataSource = new SourceClass({
+      feedEvents: vent,
+      cacheEntry,
+      logger: createSilentLogger(),
       onError,
       observeDataSourceRefresh,
-    )
+    })
 
     return {
       dataSource,
@@ -104,70 +107,70 @@ describe('DataSource', () => {
   }
 
   it('returns cached content on cache hit without calling script', async () => {
-    const getData = vi.fn(async () => ({ value: 99 }))
+    const fetchData = vi.fn(async () => ({ value: 99 }))
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'cache-hit',
         getCacheTTL: () => Number.MAX_SAFE_INTEGER,
-        getData,
+        fetchData,
       }),
     )
 
     await dataSource.getData()
-    getData.mockClear()
+    fetchData.mockClear()
 
     await expect(dataSource.getData()).resolves.toEqual({ value: 99 })
-    expect(getData).not.toHaveBeenCalled()
+    expect(fetchData).not.toHaveBeenCalled()
   })
 
   it('refetches after cache TTL expires', async () => {
     vi.useFakeTimers()
 
-    const getData = vi.fn().mockResolvedValueOnce({ value: 1 }).mockResolvedValueOnce({ value: 2 })
+    const fetchData = vi.fn().mockResolvedValueOnce({ value: 1 }).mockResolvedValueOnce({ value: 2 })
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'ttl-expire',
         getCacheTTL: () => 1000,
-        getData,
+        fetchData,
       }),
     )
 
     await expect(dataSource.getData()).resolves.toEqual({ value: 1 })
-    expect(getData).toHaveBeenCalledTimes(1)
+    expect(fetchData).toHaveBeenCalledTimes(1)
 
     await vi.advanceTimersByTimeAsync(1001)
 
     await expect(dataSource.getData()).resolves.toEqual({ value: 2 })
-    expect(getData).toHaveBeenCalledTimes(2)
+    expect(fetchData).toHaveBeenCalledTimes(2)
 
     vi.useRealTimers()
   })
 
   it('calls script on cache miss and on force refresh', async () => {
-    const getData = vi.fn(async () => ({ value: 42 }))
+    const fetchData = vi.fn(async () => ({ value: 42 }))
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'cache-miss',
-        getData,
+        fetchData,
       }),
     )
 
     await expect(dataSource.getData()).resolves.toEqual({ value: 42 })
-    expect(getData).toHaveBeenCalledTimes(1)
+    expect(fetchData).toHaveBeenCalledTimes(1)
 
-    getData.mockClear()
+    fetchData.mockClear()
     await dataSource.getData()
-    expect(getData).toHaveBeenCalledTimes(1)
+    expect(fetchData).toHaveBeenCalledTimes(1)
 
-    getData.mockClear()
+    fetchData.mockClear()
     await expect(dataSource.getData(true)).resolves.toEqual({ value: 42 })
-    expect(getData).toHaveBeenCalledTimes(1)
+    expect(fetchData).toHaveBeenCalledTimes(1)
   })
 
   it('deduplicates concurrent getData() calls', async () => {
     vi.useFakeTimers()
 
-    const getData = vi.fn(
+    const fetchData = vi.fn(
       () =>
         new Promise<{ value: number }>(resolve => {
           setTimeout(() => resolve({ value: 7 }), 50)
@@ -176,14 +179,14 @@ describe('DataSource', () => {
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'dedup',
-        getData,
+        fetchData,
       }),
     )
 
     const first = dataSource.getData()
     const second = dataSource.getData()
 
-    expect(getData).toHaveBeenCalledTimes(1)
+    expect(fetchData).toHaveBeenCalledTimes(1)
 
     await vi.advanceTimersByTimeAsync(50)
     await expect(first).resolves.toEqual({ value: 7 })
@@ -215,24 +218,24 @@ describe('DataSource', () => {
     await expect(dataSource.getRecentContent()).resolves.toBeNull()
   })
 
-  it('calls composeContent on cache hit without calling getData again', async () => {
-    const getData = vi.fn(async () => ({ value: 5 }))
+  it('calls composeContent on cache hit without calling fetchData again', async () => {
+    const fetchData = vi.fn(async () => ({ value: 5 }))
     const composeContent = vi.fn(async (cached: { value: number }) => ({ value: cached.value, meta: 'fresh' }))
     const { dataSource } = await createDataSource(
       createTestSourceClass<{ value: number; meta: string }, { value: number }>({
         id: 'compose-hit',
         getCacheTTL: () => Number.MAX_SAFE_INTEGER,
-        getData,
+        fetchData,
         composeContent,
       }),
     )
 
     await dataSource.getData()
-    getData.mockClear()
+    fetchData.mockClear()
     composeContent.mockClear()
 
     await expect(dataSource.getData()).resolves.toEqual({ value: 5, meta: 'fresh' })
-    expect(getData).not.toHaveBeenCalled()
+    expect(fetchData).not.toHaveBeenCalled()
     expect(composeContent).toHaveBeenCalledTimes(1)
     expect(composeContent).toHaveBeenCalledWith({ value: 5 })
   })
@@ -241,21 +244,23 @@ describe('DataSource', () => {
     const updates: string[] = []
     let pushWithoutContent: () => void = () => {}
 
-    class NotifySource extends DataSourceDefinition<{ value: number }> {
-      public constructor(feedEvents: FeedEvents) {
-        super(feedEvents)
-        pushWithoutContent = () => this.push()
-      }
-
-      public getId(): string {
+    class NotifySource extends DataSource<{ value: number }> {
+      public static getId(): string {
         return 'notify-src'
       }
 
-      public getCacheTTL(): number {
+      public static getCacheTTL(): number {
         return Number.MAX_SAFE_INTEGER
       }
 
-      public async getData(): Promise<{ value: number }> {
+      public constructor(params: DataSourceParams<{ value: number }>) {
+        super(params)
+        pushWithoutContent = () => {
+          void this.push()
+        }
+      }
+
+      protected async fetchData(): Promise<{ value: number }> {
         return { value: 1 }
       }
     }
@@ -264,7 +269,13 @@ describe('DataSource', () => {
     cacheDirs.push(cacheDir)
     const vent = new FeedEvents()
     const cache = new FSCache(cacheDir)
-    const dataSource = await DataSource.fromClass(NotifySource, cache, vent, createSilentLogger(), noopOnError)
+    const cacheEntry = await cache.getEntry(NotifySource.getId(), { ttlMs: NotifySource.getCacheTTL() })
+    const dataSource = new NotifySource({
+      feedEvents: vent,
+      cacheEntry,
+      logger: createSilentLogger(),
+      onError: noopOnError,
+    })
     const feeds = new FeedManager(vent, { logger: createSilentLogger(), onError: noopOnError })
     await feeds.addFeed('notify', { src: dataSource }, ({ src }) => src)
 
@@ -279,7 +290,7 @@ describe('DataSource', () => {
     await expect(dataSource.getRecentContent()).resolves.toEqual({ value: 1 })
   })
 
-  it('calls definition maintenance', async () => {
+  it('calls maintenance hook', async () => {
     const maintenance = vi.fn(async () => {})
     const { dataSource } = await createDataSource(
       createTestSourceClass({
@@ -300,50 +311,50 @@ describe('DataSource', () => {
   })
 
   it('ensureContent returns cached content without calling script', async () => {
-    const getData = vi.fn(async () => ({ value: 11 }))
+    const fetchData = vi.fn(async () => ({ value: 11 }))
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'ensure-hit',
         getCacheTTL: () => Number.MAX_SAFE_INTEGER,
-        getData,
+        fetchData,
       }),
     )
 
     await dataSource.getData()
-    getData.mockClear()
+    fetchData.mockClear()
 
     await expect(dataSource.ensureContent()).resolves.toEqual({ value: 11 })
-    expect(getData).not.toHaveBeenCalled()
+    expect(fetchData).not.toHaveBeenCalled()
   })
 
   it('ensureContent fetches and writes cache when snapshot is missing', async () => {
-    const getData = vi.fn(async () => ({ value: 22 }))
+    const fetchData = vi.fn(async () => ({ value: 22 }))
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'ensure-miss',
-        getData,
+        fetchData,
       }),
     )
 
     await expect(dataSource.ensureContent()).resolves.toEqual({ value: 22 })
-    expect(getData).toHaveBeenCalledTimes(1)
+    expect(fetchData).toHaveBeenCalledTimes(1)
     await expect(dataSource.getRecentContent()).resolves.toEqual({ value: 22 })
   })
 
   it('ensureContent does not emit data-update on fetch', async () => {
     const updates: string[] = []
-    const getData = vi.fn(async () => ({ value: 33 }))
+    const fetchData = vi.fn(async () => ({ value: 33 }))
     const { dataSource, vent } = await createDataSource(
       createTestSourceClass({
         id: 'ensure-silent',
-        getData,
+        fetchData,
       }),
     )
 
     vent.on('data-update', sourceId => updates.push(sourceId))
 
     await expect(dataSource.ensureContent()).resolves.toEqual({ value: 33 })
-    expect(getData).toHaveBeenCalledTimes(1)
+    expect(fetchData).toHaveBeenCalledTimes(1)
     expect(updates).toEqual([])
   })
 
@@ -352,7 +363,7 @@ describe('DataSource', () => {
     const { dataSource, vent } = await createDataSource(
       createTestSourceClass({
         id: 'getdata-emit',
-        getData: async () => ({ value: 44 }),
+        fetchData: async () => ({ value: 44 }),
       }),
     )
 
@@ -364,13 +375,13 @@ describe('DataSource', () => {
   })
 
   it('calls observeDataSourceRefresh when metrics are enabled', async () => {
-    const getData = vi.fn(async () => ({ value: 1 }))
+    const fetchData = vi.fn(async () => ({ value: 1 }))
     const observeDataSourceRefresh = vi.fn(async (_metricType, _sourceId, fn) => fn())
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'metrics-src',
         getSourceMetricType: () => 'api',
-        getData,
+        fetchData,
       }),
       noopOnError,
       observeDataSourceRefresh,
@@ -379,17 +390,17 @@ describe('DataSource', () => {
     await expect(dataSource.getData()).resolves.toEqual({ value: 1 })
     expect(observeDataSourceRefresh).toHaveBeenCalledOnce()
     expect(observeDataSourceRefresh).toHaveBeenCalledWith('api', 'metrics-src', expect.any(Function))
-    expect(getData).toHaveBeenCalledOnce()
+    expect(fetchData).toHaveBeenCalledOnce()
   })
 
   it('skips observeDataSourceRefresh when metrics are disabled', async () => {
-    const getData = vi.fn(async () => ({ value: 1 }))
+    const fetchData = vi.fn(async () => ({ value: 1 }))
     const observeDataSourceRefresh = vi.fn(async (_metricType, _sourceId, fn) => fn())
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'no-metrics-src',
         isMetricsEnabled: () => false,
-        getData,
+        fetchData,
       }),
       noopOnError,
       observeDataSourceRefresh,
@@ -397,7 +408,7 @@ describe('DataSource', () => {
 
     await expect(dataSource.getData()).resolves.toEqual({ value: 1 })
     expect(observeDataSourceRefresh).not.toHaveBeenCalled()
-    expect(getData).toHaveBeenCalledOnce()
+    expect(fetchData).toHaveBeenCalledOnce()
   })
 
   it('calls onError when getData fails', async () => {
@@ -406,7 +417,7 @@ describe('DataSource', () => {
     const { dataSource } = await createDataSource(
       createTestSourceClass({
         id: 'getdata-fail',
-        getData: async () => {
+        fetchData: async () => {
           throw failure
         },
       }),
@@ -421,21 +432,21 @@ describe('DataSource', () => {
     const onError = vi.fn()
     const failure = new Error('push failed')
 
-    class PushFailSource extends DataSourceDefinition<{ value: number }> {
-      public constructor(feedEvents: FeedEvents) {
-        super(feedEvents)
-        queueMicrotask(() => this.reportError(failure))
-      }
-
-      public getId(): string {
+    class PushFailSource extends DataSource<{ value: number }> {
+      public static getId(): string {
         return 'push-fail'
       }
 
-      public getCacheTTL(): number {
+      public static getCacheTTL(): number {
         return 0
       }
 
-      public async getData(): Promise<{ value: number }> {
+      public constructor(params: DataSourceParams<{ value: number }>) {
+        super(params)
+        queueMicrotask(() => this.reportError(failure))
+      }
+
+      protected async fetchData(): Promise<{ value: number }> {
         return { value: 1 }
       }
     }
@@ -448,7 +459,13 @@ describe('DataSource', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'ds-'))
     cacheDirs.push(cacheDir)
     const cache = new FSCache(cacheDir)
-    await DataSource.fromClass(PushFailSource, cache, vent, createSilentLogger(), noopOnError)
+    const cacheEntry = await cache.getEntry(PushFailSource.getId(), { ttlMs: PushFailSource.getCacheTTL() })
+    new PushFailSource({
+      feedEvents: vent,
+      cacheEntry,
+      logger: createSilentLogger(),
+      onError: noopOnError,
+    })
     await new Promise<void>(resolve => queueMicrotask(() => resolve()))
 
     expect(onError).toHaveBeenCalledWith(failure, 'Push data source update error')

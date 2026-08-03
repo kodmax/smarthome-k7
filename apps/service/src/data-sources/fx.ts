@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { fetchDocument } from '@/fetch'
 import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
@@ -13,26 +13,27 @@ const fetchInvestingRate = async (url: string) => {
   return getTextContent(document.body, '.text-2xl[data-test=instrument-price-last]')
 }
 
-export class FxSource extends DataSourceDefinition<FXFeed> {
+export class FxSource extends DataSource<FXFeed> {
   @Inject('db')
   declare private db: Pool
-  getId() {
+
+  static getId() {
     return 'fx'
   }
 
-  getCron() {
+  static getCron() {
     return '0 */3 * * *'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.HOUR
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'scraper' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const [eur, usd, chf, gbp, uah, rub] = await Promise.all([
       fetchInvestingRate('https://pl.investing.com/currencies/eur-pln'),
       fetchInvestingRate('https://pl.investing.com/currencies/usd-pln'),

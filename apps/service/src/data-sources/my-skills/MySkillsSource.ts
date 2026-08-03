@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { MySkillsFeed } from '@repo/types'
 import type { Pool } from 'mariadb'
 import { Inject } from '@/di'
@@ -13,7 +13,7 @@ import {
 
 type MySkillsCachedFeed = Record<string, never>
 
-export class MySkillsSource extends DataSourceDefinition<MySkillsFeed, MySkillsCachedFeed> {
+export class MySkillsSource extends DataSource<MySkillsFeed, MySkillsCachedFeed> {
   @Inject('db')
   declare private db: Pool
 
@@ -28,23 +28,23 @@ export class MySkillsSource extends DataSourceDefinition<MySkillsFeed, MySkillsC
     }
   }
 
-  getId() {
+  static getId() {
     return 'my-skills'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.HOUR * 4
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'db' as const
   }
 
-  async getData(): Promise<MySkillsCachedFeed> {
+  protected async fetchData(): Promise<MySkillsCachedFeed> {
     return {}
   }
 
-  async composeContent(): Promise<MySkillsFeed> {
+  protected async composeContent(): Promise<MySkillsFeed> {
     return this.loadSkillsFromDb()
   }
 
@@ -77,7 +77,7 @@ export class MySkillsSource extends DataSourceDefinition<MySkillsFeed, MySkillsC
     }
 
     await this.upsertSkillLevel(parsed)
-    this.push()
+    void this.push()
   }
 
   private async commandSetSkillComment(args: string): Promise<void> {
@@ -88,7 +88,7 @@ export class MySkillsSource extends DataSourceDefinition<MySkillsFeed, MySkillsC
 
     const updated = await this.updateSkillComment(parsed.id, normalizeSkillComment(parsed.comment))
     if (updated) {
-      this.push()
+      void this.push()
     }
   }
 

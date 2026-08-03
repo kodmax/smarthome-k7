@@ -1,26 +1,26 @@
-import { DataSourceDefinition, CacheAgeUnit } from '@repo/feeds'
+import { DataSource, CacheAgeUnit } from '@repo/feeds'
 import { getTickerData, sleep } from './src'
 import { tickerList } from '../tickerList'
 import { YahooTickerData } from './types'
 
-export class YahooMarketDataSource extends DataSourceDefinition<YahooTickerData[]> {
-  getId() {
+export class YahooMarketDataSource extends DataSource<YahooTickerData[]> {
+  static getId() {
     return 'yahoo-stock-market'
   }
 
-  getCron() {
+  static getCron() {
     return '5 10 * * Mon-Fri'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.HOUR * 24
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'api' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const yahooTickerData: YahooTickerData[] = []
     for (const ticker of tickerList) {
       yahooTickerData.push(await getTickerData(ticker))

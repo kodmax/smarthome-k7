@@ -1,10 +1,10 @@
-import { CacheAgeUnit, DataSourceDefinition, FeedEvents } from '@repo/feeds'
+import { CacheAgeUnit, DataSource, type DataSourceParams } from '@repo/feeds'
 import { homeLights, homeLightsById } from '@repo/knx-schema'
 import { LightsFeed } from '@repo/types'
 import { DPT_Generic_B1, DPT_Switch, KnxReading, type KnxLink } from 'js-knx'
 import { Inject } from '@/di'
 
-export class HomeLightsSource extends DataSourceDefinition<LightsFeed> {
+export class HomeLightsSource extends DataSource<LightsFeed> {
   @Inject('knx')
   declare private readonly knx: KnxLink
 
@@ -12,8 +12,8 @@ export class HomeLightsSource extends DataSourceDefinition<LightsFeed> {
   private readonly statuses = new Map<string, DPT_Generic_B1>()
   private readonly readings: Partial<Record<string, KnxReading<number>>> = {}
 
-  public constructor(feedEvents: FeedEvents) {
-    super(feedEvents)
+  public constructor(params: DataSourceParams<LightsFeed>) {
+    super(params)
 
     for (const circuit of homeLights) {
       this.sets.set(circuit.id, this.knx.group(circuit.set))
@@ -22,7 +22,7 @@ export class HomeLightsSource extends DataSourceDefinition<LightsFeed> {
       this.statuses.set(circuit.id, status)
       status.addWriteListener(reading => {
         this.readings[circuit.id] = reading
-        this.push(this.buildFeed())
+        void this.push(this.buildFeed())
       })
     }
   }
@@ -37,23 +37,23 @@ export class HomeLightsSource extends DataSourceDefinition<LightsFeed> {
     }
   }
 
-  public getId(): string {
+  static getId(): string {
     return 'lights'
   }
 
-  public isVolatile(): boolean {
+  static isVolatile(): boolean {
     return true
   }
 
-  public getCacheTTL(): number {
+  static getCacheTTL(): number {
     return CacheAgeUnit.HOUR
   }
 
-  public getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'knx' as const
   }
 
-  public async getData(): Promise<LightsFeed> {
+  protected async fetchData(): Promise<LightsFeed> {
     for (const circuit of homeLights) {
       const status = this.statuses.get(circuit.id)
       if (status === undefined) {

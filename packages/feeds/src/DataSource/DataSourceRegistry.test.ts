@@ -4,26 +4,27 @@ import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FeedEvents } from '../FeedManager'
 import { FSCache } from '../Cache'
-import { DataSourceDefinition, DataSourceDefinitionCtor } from './DataSourceDefinition'
+import { DataSource } from './DataSource'
 import { DataSourceRegistry } from './DataSourceRegistry'
 import { createSilentLogger } from '@repo/logger'
+import { DataSourceCtor } from './types'
 
 const noopOnError = (): void => void 0
 
 function createTestSourceClass(options: {
   id: string
   maintenance?: () => void | Promise<void>
-}): DataSourceDefinitionCtor<{ value: number }> {
-  return class TestSource extends DataSourceDefinition<{ value: number }> {
-    public getId(): string {
+}): DataSourceCtor<{ value: number }> {
+  class TestSource extends DataSource<{ value: number }> {
+    public static getId(): string {
       return options.id
     }
 
-    public getCacheTTL(): number {
+    public static getCacheTTL(): number {
       return 0
     }
 
-    public async getData(): Promise<{ value: number }> {
+    protected async fetchData(): Promise<{ value: number }> {
       return { value: 1 }
     }
 
@@ -31,6 +32,8 @@ function createTestSourceClass(options: {
       await options.maintenance?.()
     }
   }
+
+  return TestSource
 }
 
 describe('DataSourceRegistry', () => {

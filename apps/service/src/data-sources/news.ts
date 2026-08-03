@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { Inject } from '@/di'
 import { fetchDocument } from '@/fetch'
 import { observeHttpFetch } from '@/prometheus/httpMetrics'
@@ -13,7 +13,7 @@ const META_RETENTION_DAYS = 30
 const FEED_URL =
   'https://news.google.com/topics/CAAqHAgKIhZDQklTQ2pvSWJHOWpZV3hmZGpJb0FBUAE/sections/CAQiTkNCSVNORG9JYkc5allXeGZkakpDRUd4dlkyRnNYM1l5WDNObFkzUnBiMjV5Q2hJSUwyMHZNRGd4YlY5NkNnb0lMMjB2TURneGJWOG9BQSowCAAqLAgKIiZDQklTRmpvSWJHOWpZV3hmZGpKNkNnb0lMMjB2TURneGJWOG9BQVABUAE?hl=pl&gl=PL&ceid=PL%3Apl'
 
-export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
+export class NewsSource extends DataSource<NewsFeed, NewsCachedFeed> {
   @Inject('db')
   declare private db: Pool
 
@@ -33,43 +33,43 @@ export class NewsSource extends DataSourceDefinition<NewsFeed, NewsCachedFeed> {
 
   private async commandRead(itemUid: string): Promise<void> {
     await this.markMeta(itemUid, 'read', true)
-    this.push()
+    void this.push()
   }
 
   private async commandUnread(itemUid: string): Promise<void> {
     await this.unmarkMeta(itemUid, 'read')
-    this.push()
+    void this.push()
   }
 
-  getId() {
+  static getId() {
     return 'news'
   }
 
-  getCron() {
+  static getCron() {
     return '*/15 * * * *'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.MINUTE * 5
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'scraper' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     return {
       articles: await this.fetchArticles(),
     }
   }
 
-  async composeContent(cached: NewsCachedFeed): Promise<NewsFeed> {
+  protected async composeContent(cached: NewsCachedFeed): Promise<NewsFeed> {
     return {
       articles: await this.withMetaState(cached.articles),
     }
   }
 
-  async maintenance() {
+  public async maintenance() {
     const conn = await this.db.getConnection()
     try {
       await observeDbQuery('delete', 'meta', () =>

@@ -5,7 +5,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FeedEvents } from './FeedEvents'
 import { FSCache } from '../Cache'
 import { FeedManager } from './FeedManager'
-import { DataSource, DataSourceDefinition, DataSourceDefinitionCtor } from '../DataSource'
+import { DataSource, DataSourceCtor, DataSourceParams } from '../DataSource'
+import type { CacheEntry } from '../Cache'
 import { createSilentLogger } from '@repo/logger'
 
 const noopOnError = (): void => void 0
@@ -52,46 +53,56 @@ async function waitForFeedIdle(vent: FeedEvents, feedId: string): Promise<void> 
 function createTestSourceClass<T>(options: {
   id: string
   getCacheTTL?: () => number
-  getData?: () => Promise<T>
+  fetchData?: () => Promise<T>
   isVolatile?: boolean
   onInit?: (ctx: { push: (content?: T) => void }) => void
   handleCommand?: (command: string, args: string) => void | Promise<void>
   maintenance?: () => void | Promise<void>
-}): DataSourceDefinitionCtor<T> {
-  return class TestSource extends DataSourceDefinition<T> {
-    public constructor(feedEvents: FeedEvents) {
-      super(feedEvents)
-      options.onInit?.({ push: content => this.push(content) })
+}): DataSourceCtor<T> {
+  class TestSource extends DataSource<T> {
+    public static getId(): string {
+      return options.id
+    }
+
+    public static getCacheTTL(): number {
+      return options.getCacheTTL?.() ?? 0
+    }
+
+    public static isVolatile(): boolean {
+      return options.isVolatile ?? false
+    }
+
+    public constructor(params: DataSourceParams<T>) {
+      super(params)
+      options.onInit?.({ push: content => void this.push(content) })
     }
 
     public async handleCommand(command: string, args: string): Promise<void> {
       await options.handleCommand?.(command, args)
     }
 
-    public getId(): string {
-      return options.id
-    }
-
-    public getCacheTTL(): number {
-      return options.getCacheTTL?.() ?? 0
-    }
-
-    public async getData(): Promise<T> {
-      return options.getData !== undefined ? await options.getData() : ({ value: 1 } as T)
-    }
-
-    public isVolatile(): boolean {
-      return options.isVolatile ?? false
+    protected async fetchData(): Promise<T> {
+      return options.fetchData !== undefined ? await options.fetchData() : ({ value: 1 } as T)
     }
 
     public async maintenance(): Promise<void> {
       await options.maintenance?.()
     }
   }
+
+  return TestSource
 }
 
-async function createDataSource<T>(cache: FSCache, vent: FeedEvents, SourceClass: DataSourceDefinitionCtor<T>) {
-  return DataSource.fromClass(SourceClass, cache, vent, createSilentLogger(), noopOnError)
+async function createDataSource<T>(cache: FSCache, vent: FeedEvents, SourceClass: DataSourceCtor<T>) {
+  const cacheEntry = await cache.getEntry(SourceClass.isVolatile() ? undefined : SourceClass.getId(), {
+    ttlMs: SourceClass.getCacheTTL(),
+  })
+  return new SourceClass({
+    feedEvents: vent,
+    cacheEntry: cacheEntry as CacheEntry<T>,
+    logger: createSilentLogger(),
+    onError: noopOnError,
+  })
 }
 
 describe('Feeds data source registration', () => {
@@ -240,7 +251,7 @@ describe('Feeds composition', () => {
         id: 'source-a',
         isVolatile: true,
         getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        getData: getDataA,
+        fetchData: getDataA,
         onInit: ({ push }) => {
           pushA = push
         },
@@ -249,7 +260,7 @@ describe('Feeds composition', () => {
         id: 'source-b',
         isVolatile: true,
         getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        getData: getDataB,
+        fetchData: getDataB,
         onInit: ({ push }) => {
           pushB = push
         },
@@ -298,7 +309,7 @@ describe('Feeds composition', () => {
       const ColdSource = createTestSourceClass({
         id: 'cold',
         isVolatile: true,
-        getData: getDataCold,
+        fetchData: getDataCold,
       })
 
       await feeds.addFeed(
@@ -331,13 +342,13 @@ describe('Feeds composition', () => {
       const SourceA = createTestSourceClass({
         id: 'source-a',
         isVolatile: true,
-        getData: getDataA,
+        fetchData: getDataA,
       })
       const SourceB = createTestSourceClass({
         id: 'source-b',
         isVolatile: true,
         getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        getData: getDataB,
+        fetchData: getDataB,
         onInit: ({ push }) => {
           pushB = push
         },
@@ -372,7 +383,7 @@ describe('Feeds composition', () => {
         id: 'job-ads',
         isVolatile: true,
         getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        getData: getDataTrigger,
+        fetchData: getDataTrigger,
         onInit: ({ push }) => {
           pushTrigger = push
         },
@@ -380,7 +391,7 @@ describe('Feeds composition', () => {
       const SiblingSource = createTestSourceClass({
         id: 'my-skills',
         isVolatile: true,
-        getData: getDataSibling,
+        fetchData: getDataSibling,
       })
 
       await feeds.addFeed(
@@ -424,7 +435,7 @@ describe('Feeds composition', () => {
       const SiblingSource = createTestSourceClass({
         id: 'sibling',
         isVolatile: true,
-        getData: vi.fn(async () => ({ value: 99 })),
+        fetchData: vi.fn(async () => ({ value: 99 })),
       })
 
       await feeds.addFeed(
@@ -461,7 +472,7 @@ describe('Feeds composition', () => {
       const SiblingSource = createTestSourceClass({
         id: 'no-cache-sibling',
         isVolatile: true,
-        getData: getDataSibling,
+        fetchData: getDataSibling,
       })
 
       await feeds.addFeed(
@@ -501,7 +512,7 @@ describe('Feeds composition', () => {
       const ColdSource = createTestSourceClass({
         id: 'cold',
         isVolatile: true,
-        getData: getDataCold,
+        fetchData: getDataCold,
       })
 
       await feeds.addFeed(
@@ -545,12 +556,12 @@ describe('Feeds composition', () => {
 
     await feeds.addFeed(
       'refresh-a-feed',
-      { a: await createDataSource(cache, vent, createTestSourceClass({ id: 'refresh-a', getData: getDataA })) },
+      { a: await createDataSource(cache, vent, createTestSourceClass({ id: 'refresh-a', fetchData: getDataA })) },
       content => content,
     )
     await feeds.addFeed(
       'refresh-b-feed',
-      { b: await createDataSource(cache, vent, createTestSourceClass({ id: 'refresh-b', getData: getDataB })) },
+      { b: await createDataSource(cache, vent, createTestSourceClass({ id: 'refresh-b', fetchData: getDataB })) },
       content => content,
     )
 

@@ -3,7 +3,7 @@ import { DPT_Alarm } from 'js-knx'
 import { KnxPushReadingSource, knxPushCacheTtl } from './KnxPushReadingSource'
 
 export class Co2AlertSource extends KnxPushReadingSource<typeof DPT_Alarm> {
-  protected getSourceId(): string {
+  static getId(): string {
     return 'home.air-quality.co2-alert'
   }
 
@@ -11,7 +11,7 @@ export class Co2AlertSource extends KnxPushReadingSource<typeof DPT_Alarm> {
     return knxSchema.home.airQuality.co2.alert
   }
 
-  protected getCacheTtlValue(): number {
+  static getCacheTTL(): number {
     return knxPushCacheTtl.airQuality
   }
 }

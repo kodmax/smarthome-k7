@@ -1,1 +1,1 @@
-export { WeatherSource } from './data-source'
+export { WeatherSource } from './WeatherSource'

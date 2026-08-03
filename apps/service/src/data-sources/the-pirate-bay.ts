@@ -1,37 +1,37 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { Torrent } from '@repo/types'
 import { fetchJSON } from '@/fetch'
 import { observeHttpFetch } from '@/prometheus/httpMetrics'
 
-export class TorrentSource extends DataSourceDefinition<Torrent[]> {
+export class TorrentSource extends DataSource<Torrent[]> {
   private query = ''
 
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'search':
         this.query = args
-        this.push(await this.getData())
+        void this.push(await this.fetchData())
         return
     }
   }
 
-  public getId(): string {
+  static getId(): string {
     return 'torrents'
   }
 
-  public getCron(): string {
+  static getCron(): string {
     return '0 3 * * *'
   }
 
-  public getCacheTTL(): number {
+  static getCacheTTL(): number {
     return CacheAgeUnit.HOUR * 12
   }
 
-  public getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'api' as const
   }
 
-  public async getData(): Promise<Torrent[]> {
+  protected async fetchData(): Promise<Torrent[]> {
     const url =
       this.query !== ''
         ? `https://apibay.org/q.php?q=${encodeURIComponent(this.query)}&cat=207`

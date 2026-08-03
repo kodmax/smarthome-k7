@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import DateTime from '../../DateTime'
 import { Inject } from '@/di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
@@ -6,30 +6,31 @@ import type { Pool } from 'mariadb'
 import { EnergyHourConsumption } from '@repo/types'
 import { dayStart, getStartOfDayReading, METER_TOTAL_READING } from './helpers'
 
-export class EnergyHourlySource extends DataSourceDefinition<{
+export class EnergyHourlySource extends DataSource<{
   date: string
   bars: EnergyHourConsumption[]
   startOfDayValue: number
 }> {
   @Inject('db')
   declare private db: Pool
-  getId() {
+
+  static getId() {
     return 'energy-hourly'
   }
 
-  getCron() {
+  static getCron() {
     return '1 * * * *'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.MINUTE * 5
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'db' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const conn = await this.db.getConnection()
     try {
       const today = DateTime.now().getDate()

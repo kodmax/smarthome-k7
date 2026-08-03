@@ -1,18 +1,18 @@
-import { CacheAgeUnit, DataSourceDefinition, FeedEvents } from '@repo/feeds'
+import { CacheAgeUnit, DataSource, type DataSourceParams } from '@repo/feeds'
 import { TransmissionFeed } from '@repo/types'
 import { Transmission3 } from '@repo/transmission'
 import { Inject } from '@/di'
 import type { config as AppConfig } from '@/config'
 
-export class TransmissionSource extends DataSourceDefinition<TransmissionFeed> {
+export class TransmissionSource extends DataSource<TransmissionFeed> {
   @Inject('config')
   declare private config: typeof AppConfig
 
   private transmission: Transmission3
   private pollTimer: ReturnType<typeof setTimeout> | undefined
 
-  constructor(feedEvents: FeedEvents) {
-    super(feedEvents)
+  public constructor(params: DataSourceParams<TransmissionFeed>) {
+    super(params)
 
     this.transmission = new Transmission3(this.config.transmission)
   }
@@ -40,8 +40,8 @@ export class TransmissionSource extends DataSourceDefinition<TransmissionFeed> {
 
   private async pollOnce(): Promise<void> {
     try {
-      const data = await this.getData()
-      this.push(data)
+      const data = await this.fetchData()
+      void this.push(data)
 
       if (data.sessionStats.torrentCount > 0) {
         this.pollTimer = setTimeout(() => {
@@ -54,27 +54,27 @@ export class TransmissionSource extends DataSourceDefinition<TransmissionFeed> {
     }
   }
 
-  public getId(): string {
+  static getId(): string {
     return 'transmission'
   }
 
-  public getCron(): string {
+  static getCron(): string {
     return '* * * * *'
   }
 
-  public getCacheTTL(): number {
+  static getCacheTTL(): number {
     return CacheAgeUnit.MINUTE
   }
 
-  public getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'other' as const
   }
 
-  public isMetricsEnabled(): boolean {
+  protected isMetricsEnabled(): boolean {
     return false
   }
 
-  public async getData(): Promise<TransmissionFeed> {
+  protected async fetchData(): Promise<TransmissionFeed> {
     const stats = await this.transmission.getSessionStats()
 
     return {

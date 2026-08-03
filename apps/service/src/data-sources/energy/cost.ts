@@ -1,4 +1,4 @@
-import { DataSourceDefinition, CacheAgeUnit } from '@repo/feeds'
+import { DataSource, CacheAgeUnit } from '@repo/feeds'
 import { EnergyRates } from '@repo/types'
 import DateTime from '../../DateTime'
 import { Inject } from '@/di'
@@ -13,30 +13,31 @@ type EnergyCost = {
   avg: number
 }
 
-export class EnergyCostSource extends DataSourceDefinition<EnergyCost> {
+export class EnergyCostSource extends DataSource<EnergyCost> {
   @Inject('db')
   declare private db: Pool
-  getId() {
+
+  static getId() {
     return 'energy-cost'
   }
 
-  getCron() {
+  static getCron() {
     return '0 0 * * *'
   }
 
-  isCacheValid(cached: EnergyCost) {
+  protected isCacheValid(cached: EnergyCost) {
     return cached.datetime === DateTime.now().getDate()
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.DAY
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'db' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const conn = await this.db.getConnection()
     try {
       const today = DateTime.now().getDate()

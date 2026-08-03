@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import DateTime from '../DateTime'
 import { Inject } from '@/di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
@@ -29,30 +29,31 @@ const readingToHistory: Record<string, keyof TempHistory> = {
   bathroom_temp: 'bathroom',
 }
 
-export class IndoorTempHistorySource extends DataSourceDefinition<TempHistory> {
+export class IndoorTempHistorySource extends DataSource<TempHistory> {
   @Inject('db')
   declare private db: Pool
-  getId() {
+
+  static getId() {
     return 'indoor-temp-history'
   }
 
-  getCron() {
+  static getCron() {
     return '*/5 * * * *'
   }
 
-  isVolatile() {
+  static isVolatile() {
     return true
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.MINUTE * 5
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'db' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const conn = await this.db.getConnection()
     try {
       const history = (await observeDbQuery('select', 'readings', () =>

@@ -1,4 +1,4 @@
-export { CnbcMarketIndicesSource } from './data-source'
-export { CnbcForexSource } from './forex-data-source'
+export { CnbcMarketIndicesSource } from './CnbcMarketIndicesSource'
+export { CnbcForexSource } from './CnbcForexSource'
 export { getMarketIndexQuotes } from './getMarketIndexQuotes'
 export { parseMarketIndexQuoteFromDocument } from './parseMarketIndexQuote'

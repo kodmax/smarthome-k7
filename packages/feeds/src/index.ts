@@ -1,9 +1,9 @@
 export {
-  DataSourceDefinition,
-  DataSourceDefinitionCtor,
-  AnyDataSourceDefinitionClass,
-  DataSourceRegistry,
   DataSource,
+  DataSourceCtor,
+  AnyDataSourceCtor,
+  DataSourceRegistry,
+  type DataSourceParams,
   type SourceMetricType,
   type DataSourceRefreshObserver,
   type DataSourceCommand,

@@ -1,9 +1,9 @@
-import { CacheAgeUnit, DataSourceDefinition, FeedEvents } from '@repo/feeds'
+import { CacheAgeUnit, DataSource, type DataSourceParams } from '@repo/feeds'
 import { knxSchema } from '@repo/knx-schema'
 import { DPT_ActiveEnergy, DPT_StartStop, KnxReading, type KnxLink } from 'js-knx'
 import { Inject } from '@/di'
 
-export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> {
+export class EnergyMeterSource extends DataSource<KnxReading<number>> {
   @Inject('knx')
   declare private readonly knx: KnxLink
 
@@ -12,15 +12,15 @@ export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> 
   protected readonly start: DPT_StartStop
   protected readonly stop: DPT_StartStop
 
-  public constructor(feedEvents: FeedEvents) {
-    super(feedEvents)
+  public constructor(params: DataSourceParams<KnxReading<number>>) {
+    super(params)
 
     this.intermediateReading = this.knx.group(knxSchema.home.energy.consumption.meter)
     this.reset = this.knx.group(knxSchema.home.energy.consumption.meterReset)
     this.start = this.knx.group(knxSchema.home.energy.consumption.meterStart)
     this.stop = this.knx.group(knxSchema.home.energy.consumption.meterStop)
     this.intermediateReading.onValue(reading => {
-      this.push(reading)
+      void this.push(reading)
     })
   }
 
@@ -47,23 +47,23 @@ export class EnergyMeterSource extends DataSourceDefinition<KnxReading<number>> 
     }
   }
 
-  getId() {
+  static getId() {
     return 'energy.meter'
   }
 
-  isVolatile() {
+  static isVolatile() {
     return true
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.SECOND * 3
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'knx' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     return await this.intermediateReading.read()
   }
 }

@@ -48,16 +48,6 @@ export class FeedManager {
       }
     })
 
-    this.feedEvents.on('push', (sourceId, content) => {
-      const registration = this.sourcesById.get(sourceId)
-      if (registration === undefined) {
-        this.options.logger.debug({ sourceId }, 'Push ignored: unknown source')
-        return
-      }
-
-      void registration.dataSource.push(content)
-    })
-
     this.feedEvents.on('command', async ev => {
       const registration = this.sourcesById.get(ev.sourceId)
       if (registration === undefined) {

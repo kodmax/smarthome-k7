@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { Inject } from '@/di'
 import type { Pool } from 'mariadb'
@@ -46,7 +46,7 @@ type MetaRow = {
   last_update_timestamp?: Date | string
 }
 
-export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedFeed> {
+export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
   @Inject('db')
   declare private db: Pool
 
@@ -130,23 +130,23 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     })
   }
 
-  getId() {
+  static getId() {
     return 'job-ads'
   }
 
-  getCron() {
+  static getCron() {
     return '0 * * * *'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.HOUR * 4
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'api' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const allAds = new Map<string, JobAd>()
 
     addAds(allAds, await jjit())
@@ -160,7 +160,7 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     }
   }
 
-  async composeContent(cached: JobAdsCachedFeed): Promise<JobAdsFeed> {
+  protected async composeContent(cached: JobAdsCachedFeed): Promise<JobAdsFeed> {
     const salaryRange = computeJobAdsSalaryRange(cached.ads)
     const acceptableSalary = await loadAcceptableSalary(this.db)
     const adsWithMeta = await this.attachMeta(cached.ads)
@@ -172,7 +172,7 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
     }
   }
 
-  async maintenance() {
+  public async maintenance() {
     const conn = await this.db.getConnection()
     try {
       await observeDbQuery('delete', 'meta', () =>
@@ -189,7 +189,7 @@ export class JobAdsSource extends DataSourceDefinition<JobAdsFeed, JobAdsCachedF
       const noResponseArchived = await this.markStaleNoResponseAsArchived(conn)
       const rejectedArchived = await this.markStaleRejectedAsArchived(conn)
       if (appliedChanged || noResponseArchived || rejectedArchived) {
-        this.push()
+        void this.push()
       }
     } finally {
       conn.release()

@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import DateTime from '../DateTime'
 import { Inject } from '@/di'
 import type { Pool } from 'mariadb'
@@ -8,26 +8,27 @@ import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { getTextContent } from '@/utils/get-text-context'
 import { FuelPricesFeed } from '@repo/types'
 
-export class FuelSource extends DataSourceDefinition<FuelPricesFeed> {
+export class FuelSource extends DataSource<FuelPricesFeed> {
   @Inject('db')
   declare private db: Pool
-  getId() {
+
+  static getId() {
     return 'fossil-fuels'
   }
 
-  getCron() {
+  static getCron() {
     return '0 10 * * *'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.HOUR * 24
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'scraper' as const
   }
 
-  async getData() {
+  protected async fetchData() {
     const url = 'https://www.autocentrum.pl/paliwa/ceny-paliw/mazowieckie/'
     const document = await observeHttpFetch(url, 'html', () => fetchDocument(url))
 

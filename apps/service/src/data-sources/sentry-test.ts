@@ -1,31 +1,31 @@
-import { DataSourceDefinition } from '@repo/feeds'
+import { DataSource } from '@repo/feeds'
 
 type SentryTestData = Record<string, never>
 
-export class SentryTestSource extends DataSourceDefinition<SentryTestData> {
+export class SentryTestSource extends DataSource<SentryTestData> {
   public async handleCommand(command: string): Promise<void> {
     if (command === 'throw') {
       throw new Error('Sentry test error (appearance settings, service)')
     }
   }
 
-  getId() {
+  static getId() {
     return 'sentry-test'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return 0
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'other' as const
   }
 
-  isMetricsEnabled() {
+  protected isMetricsEnabled() {
     return false
   }
 
-  async getData() {
+  protected async fetchData() {
     return {}
   }
 }

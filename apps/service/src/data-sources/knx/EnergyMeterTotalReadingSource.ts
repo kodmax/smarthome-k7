@@ -3,7 +3,7 @@ import { DPT_ActiveEnergy } from 'js-knx'
 import { KnxPushReadingSource, knxPushCacheTtl } from './KnxPushReadingSource'
 
 export class EnergyMeterTotalReadingSource extends KnxPushReadingSource<typeof DPT_ActiveEnergy> {
-  protected getSourceId(): string {
+  static getId(): string {
     return 'home.energy-consumption.meter-total-reading'
   }
 
@@ -11,7 +11,7 @@ export class EnergyMeterTotalReadingSource extends KnxPushReadingSource<typeof D
     return knxSchema.home.energy.consumption.meterTotalReading
   }
 
-  protected getCacheTtlValue(): number {
+  static getCacheTTL(): number {
     return knxPushCacheTtl.energy
   }
 }

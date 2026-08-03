@@ -1,4 +1,4 @@
-import { CacheAgeUnit, DataSourceDefinition } from '@repo/feeds'
+import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { type CvCachedFeed, type CvFeed } from '@repo/types'
 import type OpenAI from 'openai'
 import type { Pool } from 'mariadb'
@@ -17,7 +17,7 @@ import {
 } from './documentRecord'
 import { extractPdfText } from './extractPdfText'
 
-export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
+export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
   @Inject('db')
   declare private db: Pool
 
@@ -27,31 +27,37 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
       case 'upload':
-        if (await this.commandUpload(args)) {
-          await this.touchCvTextModifiedAt()
-          this.push()
-        }
+        await this.upload(args)
         break
     }
   }
 
-  getId() {
+  public async upload(args: string): Promise<void> {
+    if (!(await this.uploadPdf(args))) {
+      return
+    }
+
+    await this.touchCvTextModifiedAt()
+    void this.push()
+  }
+
+  static getId() {
     return 'cv'
   }
 
-  getCacheTTL() {
+  static getCacheTTL() {
     return CacheAgeUnit.HOUR * 4
   }
 
-  getSourceMetricType() {
+  protected getSourceMetricType() {
     return 'db' as const
   }
 
-  async getData(): Promise<CvCachedFeed> {
+  protected async fetchData(): Promise<CvCachedFeed> {
     return {}
   }
 
-  async composeContent(): Promise<CvFeed> {
+  protected async composeContent(): Promise<CvFeed> {
     return this.loadCvFromDb()
   }
 
@@ -107,7 +113,7 @@ export class CvSource extends DataSourceDefinition<CvFeed, CvCachedFeed> {
     }
   }
 
-  private async commandUpload(args: string): Promise<boolean> {
+  private async uploadPdf(args: string): Promise<boolean> {
     const parsed = parseUploadCommandArgs(args)
     if (parsed === null) {
       return false

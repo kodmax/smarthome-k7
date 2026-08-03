@@ -1,6 +1,7 @@
+import type { Logger } from '@repo/logger'
+import type { CacheEntry } from '../Cache'
 import { FeedEvents } from '../FeedManager'
 import { DataSource } from './DataSource'
-import { type DataSourceDefinition } from './DataSourceDefinition'
 
 export type DataSourceCommand = {
   sourceId: string
@@ -10,23 +11,32 @@ export type DataSourceCommand = {
 
 export type ErrorHandler = (error: unknown, context: string) => void
 
-export type DataSourceDefinitionCtor<T = unknown, TCache = T> = new (
-  feedEvents: FeedEvents,
-) => DataSourceDefinition<T, TCache>
+export type DataSourceParams<TCache = unknown> = {
+  feedEvents: FeedEvents
+  cacheEntry: CacheEntry<TCache>
+  logger: Logger
+  onError: ErrorHandler
+  observeDataSourceRefresh?: DataSourceRefreshObserver
+}
 
-export type DefinitionFromCtor<T extends DataSourceDefinitionCtor<unknown, unknown>> = InstanceType<T>
+export type DataSourceCtor<T = unknown, TCache = T> = {
+  new (params: DataSourceParams<TCache>): DataSource<T, TCache>
+  getId(): string
+  getCacheTTL(): number
+  getCron(): string | undefined
+  isVolatile(): boolean
+}
 
-export type DataSourceFromCtor<T extends DataSourceDefinitionCtor<unknown, unknown>> =
-  InstanceType<T> extends DataSourceDefinition<infer TValue, infer TCache> ? DataSource<TValue, TCache> : never
+export type DataSourceFromCtor<T extends DataSourceCtor<unknown, unknown>> = InstanceType<T>
 
-export type DataSourceValueFromCtor<T extends DataSourceDefinitionCtor<unknown, unknown>> =
-  T extends DataSourceDefinitionCtor<infer TValue, unknown> ? TValue : never
+export type DataSourceValueFromCtor<T extends DataSourceCtor<unknown, unknown>> =
+  T extends DataSourceCtor<infer TValue, unknown> ? TValue : never
 
-export type DataSourceCacheFromCtor<T extends DataSourceDefinitionCtor<unknown, unknown>> =
-  T extends DataSourceDefinitionCtor<unknown, infer TCache> ? TCache : never
+export type DataSourceCacheFromCtor<T extends DataSourceCtor<unknown, unknown>> =
+  T extends DataSourceCtor<unknown, infer TCache> ? TCache : never
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyDataSourceDefinitionClass = DataSourceDefinitionCtor<any, any>
+export type AnyDataSourceCtor = DataSourceCtor<any, any>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyDataSource = DataSource<any, any>
@@ -40,7 +50,7 @@ export type DataSourceRefreshObserver = <T>(
 ) => Promise<T>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RegistryBaseType = Record<string, DataSourceDefinitionCtor<any, any>>
+export type RegistryBaseType = Record<string, DataSourceCtor<any, any>>
 
 export type DataSourcesByIds<R extends RegistryBaseType, K extends readonly (keyof R)[]> = {
   [P in K[number]]: DataSource<DataSourceValueFromCtor<R[P]>, DataSourceCacheFromCtor<R[P]>>

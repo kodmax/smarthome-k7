@@ -27,22 +27,21 @@ Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `DataSourceRegistry
 Create one instance in service and pass it to `Server.listen()`, `DataSourceRegistry`, and `FeedManager`. Pass Pino
 `Logger` via options for operational logging.
 
-| Event           | Payload                        | When                                                         |
-| --------------- | ------------------------------ | ------------------------------------------------------------ |
-| `feed`          | `feedId`, `value`              | Feed composed successfully                                   |
-| `data-update`   | `sourceId`                     | Source cache changed after push, fetch, or cron              |
-| `push`          | `sourceId`, `content?`         | Definition requests cache update (handled by FeedManager)    |
-| `error`         | `sourceId`, `error`, `context` | Data source definition error (handled in service entrypoint) |
-| `command`       | `DataSourceCommand`            | WS client command routed to push sources                     |
-| `feeds-request` | `feedIds[]`                    | Client subscribe — compose feed, refresh all sources         |
-| `feeds-refresh` | `feedIds`                      | Client refresh — force `getData(true)` on all sources        |
+| Event           | Payload                        | When                                                  |
+| --------------- | ------------------------------ | ----------------------------------------------------- |
+| `feed`          | `feedId`, `value`              | Feed composed successfully                            |
+| `data-update`   | `sourceId`                     | Source cache changed after push, fetch, or cron       |
+| `error`         | `sourceId`, `error`, `context` | Data source error (handled in service entrypoint)     |
+| `command`       | `DataSourceCommand`            | WS client command routed to push sources              |
+| `feeds-request` | `feedIds[]`                    | Client subscribe — compose feed, refresh all sources  |
+| `feeds-refresh` | `feedIds`                      | Client refresh — force `getData(true)` on all sources |
 
 ### When to use events vs `onError`
 
-| Mechanism                         | When                                                                                                                                                                                                          |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FeedEvents` (`push`, `error`)    | **Async entry points** — callbacks invoked by the event loop (KNX writes, timers, etc.) where the handler runs with a **fresh call stack** and cannot reach infrastructure through the original wiring chain. |
-| `onError` (injected from service) | **In-process async flow** — errors in `FeedManager`, `DataSource`, `DataSourceRegistry` while feeds infrastructure is already on the stack; log + `onError` inline at catch site.                             |
+| Mechanism                         | When                                                                                                                                                                              |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FeedEvents` (`error`)            | **Async entry points** — KNX callbacks, timers, etc. where `reportError` emits on the event bus.                                                                                  |
+| `onError` (injected from service) | **In-process async flow** — errors in `FeedManager`, `DataSource`, `DataSourceRegistry` while feeds infrastructure is already on the stack; log + `onError` inline at catch site. |
 
 Do **not** route all feeds errors through `FeedEvents` — the event bus is not an error bus.
 
@@ -78,7 +77,8 @@ refresh — intentional; the server debounce merges rapid multi-source updates.
 
 ## Feed conventions
 
-- Register data sources via `dataSources.add(id, SourceClass)` in `apps/service`.
+- Register data sources via `dataSources.add(id, SourceClass)` in `apps/service`. Each source class declares
+  `static getId()`, `static getCacheTTL()`, and optionally overrides `static isVolatile()` (default `false`).
 - Compose feeds via `feeds.addFeed(feedId, dataSources.getByIds([...]), cb)` — callback is required.
 - `addFeed` is fully typed: callback receives `DataSourceDataTypes<S>`. Internally stored as `FeedCb`
   (`Record<string, unknown>` → `unknown`) because feeds live in a homogeneous `Map`.

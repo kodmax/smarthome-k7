@@ -3,7 +3,7 @@ import { DPT_State } from 'js-knx'
 import { KnxPushReadingSource, knxPushCacheTtl } from './KnxPushReadingSource'
 
 export class BedroomHeatingStateSource extends KnxPushReadingSource<typeof DPT_State> {
-  protected getSourceId(): string {
+  static getId(): string {
     return 'home.heating.bedroom.water-heating'
   }
 
@@ -11,7 +11,7 @@ export class BedroomHeatingStateSource extends KnxPushReadingSource<typeof DPT_S
     return knxSchema.home.heating.bedroom.waterHeating
   }
 
-  protected getCacheTtlValue(): number {
+  static getCacheTTL(): number {
     return knxPushCacheTtl.heating
   }
 }
