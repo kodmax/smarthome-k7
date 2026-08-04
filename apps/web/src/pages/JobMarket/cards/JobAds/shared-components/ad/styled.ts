@@ -9,6 +9,8 @@ export const JobTitleCell = styled(ApolloTableCell)({
   textOverflow: 'clip',
   whiteSpace: 'normal',
   maxWidth: '100%',
+  minWidth: 0,
+  width: 'auto',
 })
 
 export const JobTitleContent = styled('span')({
@@ -28,14 +30,17 @@ export const JobTitleText = styled('span')({
 })
 
 export const Salary = styled(ApolloTableCell)({
-  width: '80px',
+  width: '100px',
+  maxWidth: '100px',
   padding: 0,
   borderBottom: 'none',
   textAlign: 'right',
+  overflow: 'hidden',
 })
 
 export const MonthlySalaryRangeCell = styled(Salary)(({ theme }) => ({
   width: '128px',
+  maxWidth: '128px',
   [theme.breakpoints.down('sm')]: {
     display: 'none',
   },

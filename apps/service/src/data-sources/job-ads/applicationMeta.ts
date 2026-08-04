@@ -20,6 +20,7 @@ const ARCHIVE_REASONS = new Set<JobAdArchiveReason>([
   'not-interested',
   'unmet-requirements',
   'stack-mismatch',
+  'weak-match',
   'no-response',
   'rejected',
   'withdrawn',

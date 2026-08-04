@@ -25,6 +25,7 @@ describe('applyArchiveReasonOptions', () => {
       'not-interested',
       'unmet-requirements',
       'stack-mismatch',
+      'weak-match',
     ])
   })
 

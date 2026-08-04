@@ -3,7 +3,8 @@ import { FC, useCallback, useMemo, useState } from 'react'
 import { TableEmptyMessage } from '@/card-components'
 import { useCommand } from '@repo/feed-client'
 import { useTranslations } from '@/i18n'
-import { type JobAdsFilter, filterJobAdsByCategory } from '../../jobAdsFilter'
+import { type JobAdsFilter, filterJobAdsByCategory, groupArchivedJobAdsByReason } from '../../jobAdsFilter'
+import { JobAdsArchivedAdList } from './JobAdsArchivedAdList'
 import type { ChangeApplicationStatePayload } from './JobAdsEditAdList/Ad/AdExpandedEditorRow/ApplicationStatusEditor'
 import { JobAdsEditAdList } from './JobAdsEditAdList'
 
@@ -23,6 +24,10 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter }) => {
   const analyzeCvMatch = useCommand('job-ads', 'analyze-cv-match')
 
   const filteredAds = useMemo(() => filterJobAdsByCategory(ads ?? [], filter), [ads, filter])
+  const archivedGroups = useMemo(
+    () => (filter === 'archived' ? groupArchivedJobAdsByReason(filteredAds) : null),
+    [filter, filteredAds],
+  )
 
   const onChangeApplicationState = useCallback(
     ({ id, applyStatus, archiveReason, comment }: ChangeApplicationStatePayload) => {
@@ -47,7 +52,18 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter }) => {
     return <TableEmptyMessage>{t.dashboard.common.emptyMessage}</TableEmptyMessage>
   }
 
-  return (
+  return filter === 'archived' && archivedGroups !== null ? (
+    <JobAdsArchivedAdList
+      groups={archivedGroups}
+      zoom={zoom}
+      expandedAdId={expandedAdId}
+      onToggleExpand={onToggleExpand}
+      onChangeApplicationState={onChangeApplicationState}
+      onFav={fav}
+      onUnfav={unfav}
+      onAnalyzeCvMatch={analyzeCvMatch}
+    />
+  ) : (
     <JobAdsEditAdList
       ads={filteredAds}
       zoom={zoom}

@@ -374,6 +374,7 @@ export const en: Translations = {
         'not-interested': 'Not interested',
         'unmet-requirements': 'Unmet requirements',
         'stack-mismatch': 'Stack mismatch',
+        'weak-match': 'Weak match',
         'no-response': 'No response',
         rejected: 'Rejected',
         withdrawn: 'Withdrawn',

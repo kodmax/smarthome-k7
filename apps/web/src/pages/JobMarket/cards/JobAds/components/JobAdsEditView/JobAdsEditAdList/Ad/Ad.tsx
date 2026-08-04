@@ -23,7 +23,19 @@ export const Ad: FC<{
   onFav: (id: string) => void
   onUnfav: (id: string) => void
   onAnalyzeCvMatch: (id: string) => void
-}> = ({ ad, zoom, editMode, expanded, onToggleExpand, onChangeApplicationState, onFav, onUnfav, onAnalyzeCvMatch }) => {
+  showApplyStatusIndicator?: boolean
+}> = ({
+  ad,
+  zoom,
+  editMode,
+  expanded,
+  onToggleExpand,
+  onChangeApplicationState,
+  onFav,
+  onUnfav,
+  onAnalyzeCvMatch,
+  showApplyStatusIndicator = true,
+}) => {
   const columnCount = zoom ? 4 : 2
 
   return (
@@ -34,7 +46,7 @@ export const Ad: FC<{
           <JobTitleContent>
             <PublishedTodayTag publishedAt={ad.content.publishedAt} />
             <AdTitleText ad={ad} />
-            <AdTitleTrailing ad={ad} zoom={zoom}>
+            <AdTitleTrailing ad={ad} zoom={zoom} showApplyStatusIndicator={showApplyStatusIndicator}>
               <EditApplicationButton
                 visible={zoom && editMode}
                 expanded={expanded}

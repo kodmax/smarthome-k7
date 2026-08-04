@@ -374,6 +374,7 @@ export const ru: Translations = {
         'not-interested': 'Не интересует',
         'unmet-requirements': 'Невыполненные требования',
         'stack-mismatch': 'Не мой стек',
+        'weak-match': 'Слабое соответствие',
         'no-response': 'Нет ответа',
         rejected: 'Отказ',
         withdrawn: 'Отозван',

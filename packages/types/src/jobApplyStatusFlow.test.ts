@@ -28,6 +28,7 @@ describe('jobApplyStatusFlow', () => {
       { to: 'archived', archiveReason: 'not-interested' },
       { to: 'archived', archiveReason: 'unmet-requirements' },
       { to: 'archived', archiveReason: 'stack-mismatch' },
+      { to: 'archived', archiveReason: 'weak-match' },
     ])
   })
 

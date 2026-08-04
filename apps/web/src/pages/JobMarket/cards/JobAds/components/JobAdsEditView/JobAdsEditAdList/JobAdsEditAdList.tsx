@@ -17,6 +17,7 @@ type Props = {
   onFav?: (id: string) => void
   onUnfav?: (id: string) => void
   onAnalyzeCvMatch?: (id: string) => void
+  showApplyStatusIndicator?: boolean
 }
 
 export const JobAdsEditAdList: FC<Props> = ({
@@ -28,9 +29,18 @@ export const JobAdsEditAdList: FC<Props> = ({
   onFav,
   onUnfav,
   onAnalyzeCvMatch,
+  showApplyStatusIndicator = true,
 }) => {
   return (
-    <ApolloDataTable style={{ fontSize: cardTableFontSize, tableLayout: 'fixed', width: '100%' }}>
+    <ApolloDataTable
+      style={{
+        fontSize: cardTableFontSize,
+        tableLayout: 'fixed',
+        width: '100%',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
       <TableBody>
         {ads.map(ad => (
           <Ad
@@ -44,6 +54,7 @@ export const JobAdsEditAdList: FC<Props> = ({
             onFav={onFav ?? (() => undefined)}
             onUnfav={onUnfav ?? (() => undefined)}
             onAnalyzeCvMatch={onAnalyzeCvMatch ?? (() => undefined)}
+            showApplyStatusIndicator={showApplyStatusIndicator}
           />
         ))}
       </TableBody>

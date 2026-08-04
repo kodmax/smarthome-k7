@@ -340,6 +340,7 @@ export type Translations = {
         'not-interested': string
         'unmet-requirements': string
         'stack-mismatch': string
+        'weak-match': string
         'no-response': string
         rejected: string
         withdrawn: string

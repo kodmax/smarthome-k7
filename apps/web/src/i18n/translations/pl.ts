@@ -374,6 +374,7 @@ export const pl: Translations = {
         'not-interested': 'Nie interesuje mnie',
         'unmet-requirements': 'Niespełnione wymagania',
         'stack-mismatch': 'Poza stackiem',
+        'weak-match': 'Słabe dopasowanie',
         'no-response': 'Brak odpowiedzi',
         rejected: 'Odrzucone',
         withdrawn: 'Rozmyśliłem się',

@@ -7,22 +7,27 @@ import { MatchAnalysisIndicator } from './MatchAnalysisIndicator'
 import { trailingGroupStyle } from './trailingGroupStyle'
 import { WorkplaceTypeIndicator } from './WorkplaceTypeIndicator'
 
-function hasAdTitleTrailingContent(ad: Pick<JobAdsFeedItem, 'meta' | 'matchAnalysis'>, zoom: boolean): boolean {
+function hasAdTitleTrailingContent(
+  ad: Pick<JobAdsFeedItem, 'meta' | 'matchAnalysis'>,
+  zoom: boolean,
+  showApplyStatusIndicator: boolean,
+): boolean {
   if (zoom) {
     return true
   }
 
-  return (
-    ad.meta.fav || ad.meta.application.status !== 'pending-review' || isJobAdApplied(ad) || ad.matchAnalysis !== null
-  )
+  const showsStatusIndicator = showApplyStatusIndicator && ad.meta.application.status !== 'pending-review'
+
+  return ad.meta.fav || showsStatusIndicator || isJobAdApplied(ad) || ad.matchAnalysis !== null
 }
 
 export const AdTitleTrailing: FC<{
   ad: JobAdsFeedItem
   zoom: boolean
+  showApplyStatusIndicator?: boolean
   children?: ReactNode
-}> = ({ ad, zoom, children }) => {
-  if (!hasAdTitleTrailingContent(ad, zoom)) {
+}> = ({ ad, zoom, showApplyStatusIndicator = true, children }) => {
+  if (!hasAdTitleTrailingContent(ad, zoom, showApplyStatusIndicator)) {
     return null
   }
 
@@ -31,7 +36,7 @@ export const AdTitleTrailing: FC<{
       {zoom ? <WorkplaceTypeIndicator workplaceType={ad.content.workplaceType} /> : null}
       <JobFavIndicator fav={ad.meta.fav} />
       <AppliedIndicator ad={ad} />
-      <ApplyStatusIndicator ad={ad} />
+      {showApplyStatusIndicator ? <ApplyStatusIndicator ad={ad} /> : null}
       <MatchAnalysisIndicator ad={ad} />
       {children}
     </span>

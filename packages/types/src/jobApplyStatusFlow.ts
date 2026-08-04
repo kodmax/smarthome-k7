@@ -4,6 +4,7 @@ export type JobAdArchiveReason =
   | 'not-interested'
   | 'unmet-requirements'
   | 'stack-mismatch'
+  | 'weak-match'
   | 'no-response'
   | 'rejected'
   | 'withdrawn'
@@ -20,6 +21,7 @@ const PRE_APPLICATION_ARCHIVE_REASONS = [
   'not-interested',
   'unmet-requirements',
   'stack-mismatch',
+  'weak-match',
 ] as const satisfies readonly JobAdArchiveReason[]
 
 const POST_APPLICATION_ARCHIVE_REASONS = ['rejected', 'withdrawn'] as const satisfies readonly JobAdArchiveReason[]
@@ -49,6 +51,7 @@ const UNARCHIVE_TARGETS: Record<JobAdArchiveReason, readonly JobApplyStatus[]> =
   'not-interested': ['pending-review', 'consider'],
   'unmet-requirements': ['pending-review', 'consider'],
   'stack-mismatch': ['pending-review', 'consider'],
+  'weak-match': ['pending-review', 'consider'],
   'no-response': ['interview'],
   rejected: [],
   withdrawn: [],
