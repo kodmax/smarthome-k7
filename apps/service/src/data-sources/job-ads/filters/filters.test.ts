@@ -36,7 +36,13 @@ const adWithStatus = (
   matchAnalysis: null,
   meta: {
     ...emptyJobAdMeta(),
-    application: jobAdApplicationFromMeta({ applyStatus: status, comment: null, appliedAt: null, rejectedAt: null }),
+    application: jobAdApplicationFromMeta({
+      applyStatus: status,
+      archiveReason: status === 'archived' ? 'rejected' : null,
+      comment: null,
+      appliedAt: null,
+      rejectedAt: null,
+    }),
   },
 })
 
@@ -74,38 +80,34 @@ describe('isSalaryAboveThreshold', () => {
 })
 
 describe('shouldFilterJobAdBySalary', () => {
-  it('exempts interview and offer', () => {
+  it('exempts interview', () => {
     expect(shouldFilterJobAdBySalary('interview')).toBe(false)
-    expect(shouldFilterJobAdBySalary('offer')).toBe(false)
   })
 
   it('filters other statuses', () => {
-    expect(shouldFilterJobAdBySalary('not-applied')).toBe(true)
-    expect(shouldFilterJobAdBySalary('rejected')).toBe(true)
+    expect(shouldFilterJobAdBySalary('pending-review')).toBe(true)
+    expect(shouldFilterJobAdBySalary('archived')).toBe(true)
     expect(shouldFilterJobAdBySalary('applied')).toBe(true)
   })
 })
 
 describe('filterJobAdsByAcceptableSalary', () => {
   it('returns all ads when threshold is null', () => {
-    const ads = [adWithStatus('not-applied', { from: 10_000, to: 12_000 })]
+    const ads = [adWithStatus('pending-review', { from: 10_000, to: 12_000 })]
     expect(filterJobAdsByAcceptableSalary(ads, null)).toEqual(ads)
   })
 
-  it('keeps interview and offer regardless of salary', () => {
-    const ads = [
-      adWithStatus('interview', { from: 10_000, to: 12_000 }),
-      adWithStatus('offer', { from: 10_000, to: 12_000 }),
-    ]
+  it('keeps interview regardless of salary', () => {
+    const ads = [adWithStatus('interview', { from: 10_000, to: 12_000 })]
     expect(filterJobAdsByAcceptableSalary(ads, 20_000)).toEqual(ads)
   })
 
-  it('filters not-applied and rejected below threshold', () => {
-    const below = adWithStatus('not-applied', { from: 10_000, to: 12_000 })
-    const rejected = adWithStatus('rejected', { from: 10_000, to: 12_000 })
-    const above = adWithStatus('not-applied', { from: 26_000, to: 30_000 })
+  it('filters pending-review and archived below threshold', () => {
+    const below = adWithStatus('pending-review', { from: 10_000, to: 12_000 })
+    const archived = adWithStatus('archived', { from: 10_000, to: 12_000 })
+    const above = adWithStatus('pending-review', { from: 26_000, to: 30_000 })
 
-    expect(filterJobAdsByAcceptableSalary([below, rejected, above], 20_000)).toEqual([above])
+    expect(filterJobAdsByAcceptableSalary([below, archived, above], 20_000)).toEqual([above])
   })
 })
 

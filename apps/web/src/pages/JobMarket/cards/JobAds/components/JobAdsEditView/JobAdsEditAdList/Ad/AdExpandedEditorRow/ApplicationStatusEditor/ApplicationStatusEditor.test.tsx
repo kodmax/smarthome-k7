@@ -44,6 +44,7 @@ describe('ApplicationStatusEditor', () => {
           meta: {
             application: {
               status: 'archived',
+              archiveReason: 'rejected',
               appliedAt: '2026-07-07T20:59:24.000Z',
               rejectedAt: '2026-07-20T06:27:50.000Z',
               statusChangedAt: '2026-07-22T20:55:49.000Z',
@@ -188,7 +189,7 @@ describe('ApplicationStatusEditor', () => {
         ad={jobAd({
           id: '4',
           title: 'Role',
-          meta: { application: { status: 'not-applied', statusChangedAt: null } },
+          meta: { application: { status: 'pending-review', statusChangedAt: null } },
         })}
         onSave={vi.fn()}
         onFav={vi.fn()}
@@ -203,7 +204,7 @@ describe('ApplicationStatusEditor', () => {
   it('reveals edit controls after clicking change status', () => {
     renderWithTheme(
       <ApplicationStatusEditor
-        ad={jobAd({ id: '3', title: 'Role', meta: { application: { status: 'not-applied' } } })}
+        ad={jobAd({ id: '3', title: 'Role', meta: { application: { status: 'pending-review' } } })}
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
@@ -239,10 +240,13 @@ describe('ApplicationStatusEditor', () => {
     fireEvent.change(screen.getByLabelText('Komentarz'), { target: { value: 'Second follow-up sent' } })
     fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
 
-    expect(onSave).toHaveBeenCalledWith('no-response', 'Second follow-up sent')
+    expect(onSave).toHaveBeenCalledWith({
+      applyStatus: 'no-response',
+      comment: 'Second follow-up sent',
+    })
   })
 
-  it('does not list the current status in next status options', () => {
+  it('does not list the current status or archive reasons in next status options', () => {
     renderWithTheme(
       <ApplicationStatusEditor
         ad={jobAd({ id: '15', title: 'Role', meta: { application: { status: 'no-response' } } })}
@@ -257,16 +261,63 @@ describe('ApplicationStatusEditor', () => {
     fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Nowy status' }))
 
     expect(screen.queryByRole('option', { name: 'Brak odpowiedzi' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Odrzucone' })).not.toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Zarchiwizowane' })).toBeInTheDocument()
   })
 
-  it('allows comment-only editing for archived ads', () => {
+  it('requires archive reason when archiving', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({ id: '17', title: 'Role', meta: { application: { status: 'no-response' } } })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Nowy status' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Zarchiwizowane' }))
+
+    expect(screen.getByLabelText('Powód archiwizacji')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Zapisz' })).toBeDisabled()
+  })
+
+  it('submits archived status with selected archive reason', () => {
+    const onSave = vi.fn()
+
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({ id: '18', title: 'Role', meta: { application: { status: 'no-response' } } })}
+        onSave={onSave}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Nowy status' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Zarchiwizowane' }))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Powód archiwizacji' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Odrzucone' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
+
+    expect(onSave).toHaveBeenCalledWith({
+      applyStatus: 'archived',
+      archiveReason: 'rejected',
+      comment: '',
+    })
+  })
+
+  it('allows comment-only editing and unarchive options for archived ads', () => {
     renderWithTheme(
       <ApplicationStatusEditor
         ad={jobAd({
           id: '16',
           title: 'Role',
-          meta: { application: { status: 'archived', comment: 'Old note' } },
+          meta: { application: { status: 'archived', archiveReason: 'not-interested', comment: 'Old note' } },
         })}
         onSave={vi.fn()}
         onFav={vi.fn()}
@@ -277,7 +328,7 @@ describe('ApplicationStatusEditor', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
 
-    expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Nowy status')).toBeInTheDocument()
     expect(screen.getByLabelText('Komentarz')).toHaveValue('Old note')
   })
 
@@ -286,7 +337,7 @@ describe('ApplicationStatusEditor', () => {
 
     renderWithTheme(
       <ApplicationStatusEditor
-        ad={jobAd({ id: '3', title: 'Role', meta: { application: { status: 'not-applied' } } })}
+        ad={jobAd({ id: '3', title: 'Role', meta: { application: { status: 'pending-review' } } })}
         onSave={onSave}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
@@ -300,7 +351,10 @@ describe('ApplicationStatusEditor', () => {
     fireEvent.change(screen.getByLabelText('Komentarz'), { target: { value: '  CV sent  ' } })
     fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
 
-    expect(onSave).toHaveBeenCalledWith('applied', 'CV sent')
+    expect(onSave).toHaveBeenCalledWith({
+      applyStatus: 'applied',
+      comment: 'CV sent',
+    })
   })
 
   it('disables check cv match for theprotocol ads', () => {

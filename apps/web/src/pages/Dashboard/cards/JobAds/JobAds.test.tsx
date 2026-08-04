@@ -29,9 +29,13 @@ describe('JobAds', () => {
   it('renders dashboard-visible job ads from the feed', () => {
     mockedUseFeed.mockReturnValue(
       jobAdsFeed(
-        jobAd({ id: '1', title: 'Open Role', meta: { application: { status: 'not-applied' } } }),
+        jobAd({ id: '1', title: 'Open Role', meta: { application: { status: 'pending-review' } } }),
         jobAd({ id: '2', title: 'Applied Role', meta: { application: { status: 'applied' } } }),
-        jobAd({ id: '3', title: 'Rejected Role', meta: { application: { status: 'rejected' } } }),
+        jobAd({
+          id: '3',
+          title: 'Archived Role',
+          meta: { application: { status: 'archived', archiveReason: 'rejected' } },
+        }),
       ),
     )
 
@@ -39,7 +43,7 @@ describe('JobAds', () => {
 
     expect(screen.getByText('Open Role')).toBeInTheDocument()
     expect(screen.getByText('Applied Role')).toBeInTheDocument()
-    expect(screen.queryByText('Rejected Role')).not.toBeInTheDocument()
+    expect(screen.queryByText('Archived Role')).not.toBeInTheDocument()
   })
 
   it('shows abbreviated applied days for applied job ads', () => {

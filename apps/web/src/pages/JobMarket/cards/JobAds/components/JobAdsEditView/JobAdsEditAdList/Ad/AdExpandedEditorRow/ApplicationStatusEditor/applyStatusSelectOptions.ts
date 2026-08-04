@@ -1,5 +1,12 @@
-import { JobApplyStatus, availableTargetApplyStatuses } from '@repo/types'
+import { availableArchiveReasons, availableTargetStatuses, JobAdArchiveReason, JobApplyStatus } from '@repo/types'
 
-export function applyStatusTargetOptions(current: JobApplyStatus): JobApplyStatus[] {
-  return [...availableTargetApplyStatuses(current)]
+export function applyStatusTargetStatuses(
+  currentStatus: JobApplyStatus,
+  archiveReason: JobAdArchiveReason | null,
+): JobApplyStatus[] {
+  return availableTargetStatuses(currentStatus, archiveReason)
+}
+
+export function applyArchiveReasonOptions(currentStatus: JobApplyStatus): JobAdArchiveReason[] {
+  return availableArchiveReasons(currentStatus)
 }

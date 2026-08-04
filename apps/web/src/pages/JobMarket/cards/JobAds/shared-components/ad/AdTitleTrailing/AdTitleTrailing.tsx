@@ -12,7 +12,9 @@ function hasAdTitleTrailingContent(ad: Pick<JobAdsFeedItem, 'meta' | 'matchAnaly
     return true
   }
 
-  return ad.meta.fav || ad.meta.application.status !== 'not-applied' || isJobAdApplied(ad) || ad.matchAnalysis !== null
+  return (
+    ad.meta.fav || ad.meta.application.status !== 'pending-review' || isJobAdApplied(ad) || ad.matchAnalysis !== null
+  )
 }
 
 export const AdTitleTrailing: FC<{

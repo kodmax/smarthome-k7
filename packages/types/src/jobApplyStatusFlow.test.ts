@@ -1,147 +1,98 @@
 import { describe, expect, it } from 'vitest'
 import {
-  availableTargetApplyStatuses,
+  availableArchiveReasons,
+  availableTargetStatuses,
+  availableTransitions,
+  availableUnarchiveTargets,
   canTransition,
-  HIDDEN_APPLY_STATUS_ORDER,
-  isHiddenApplyStatus,
-  isTerminalApplyStatus,
-  TERMINAL_APPLY_STATUS_ORDER,
+  isArchivedApplyStatus,
 } from './jobApplyStatusFlow'
 
 describe('jobApplyStatusFlow', () => {
   it('allows self-transition for comment-only updates', () => {
-    expect(canTransition('applied', 'applied')).toBe(true)
+    expect(canTransition('applied', 'applied', null, null)).toBe(true)
+    expect(canTransition('archived', 'archived', 'rejected', 'rejected')).toBe(true)
   })
 
-  it('allows not-applied to applied, consider, not-interested, unmet-requirements, and stack-mismatch', () => {
-    expect(canTransition('not-applied', 'applied')).toBe(true)
-    expect(canTransition('not-applied', 'consider')).toBe(true)
-    expect(canTransition('not-applied', 'not-interested')).toBe(true)
-    expect(canTransition('not-applied', 'unmet-requirements')).toBe(true)
-    expect(canTransition('not-applied', 'stack-mismatch')).toBe(true)
-    expect(canTransition('not-applied', 'withdrawn')).toBe(false)
+  it('allows pending-review forward transitions', () => {
+    expect(canTransition('pending-review', 'consider', null, null)).toBe(true)
+    expect(canTransition('pending-review', 'applied', null, null)).toBe(true)
+    expect(canTransition('pending-review', 'archived', null, 'not-interested')).toBe(true)
+    expect(canTransition('pending-review', 'archived', null, 'stack-mismatch')).toBe(true)
+    expect(canTransition('pending-review', 'interview', null, null)).toBe(false)
   })
 
-  it('allows consider to the same targets as not-applied', () => {
-    expect(availableTargetApplyStatuses('consider')).toEqual([
-      'applied',
-      'not-interested',
-      'unmet-requirements',
-      'stack-mismatch',
+  it('allows consider to applied and pre-application archive reasons', () => {
+    expect(availableTransitions('consider', null)).toEqual([
+      { to: 'applied' },
+      { to: 'archived', archiveReason: 'not-interested' },
+      { to: 'archived', archiveReason: 'unmet-requirements' },
+      { to: 'archived', archiveReason: 'stack-mismatch' },
     ])
-    expect(canTransition('consider', 'applied')).toBe(true)
-    expect(canTransition('consider', 'not-applied')).toBe(false)
   })
 
-  it('allows not-interested to not-applied, applied, unmet-requirements, stack-mismatch, and archived', () => {
-    expect(canTransition('not-interested', 'not-applied')).toBe(true)
-    expect(canTransition('not-interested', 'applied')).toBe(true)
-    expect(canTransition('not-interested', 'unmet-requirements')).toBe(true)
-    expect(canTransition('not-interested', 'stack-mismatch')).toBe(true)
-    expect(canTransition('not-interested', 'archived')).toBe(true)
-  })
-
-  it('allows applied follow-up statuses', () => {
-    expect(availableTargetApplyStatuses('applied')).toEqual([
-      'rejected',
-      'no-response',
-      'interview',
-      'withdrawn',
-      'unmet-requirements',
+  it('allows applied follow-up statuses and post-application archive reasons', () => {
+    expect(availableTransitions('applied', null)).toEqual([
+      { to: 'no-response' },
+      { to: 'interview' },
+      { to: 'archived', archiveReason: 'rejected' },
+      { to: 'archived', archiveReason: 'withdrawn' },
     ])
-    expect(canTransition('applied', 'unmet-requirements')).toBe(true)
   })
 
-  it('allows the same follow-up statuses from no-response as from applied, except no-response itself', () => {
-    expect(availableTargetApplyStatuses('no-response')).toEqual([
-      'rejected',
-      'interview',
-      'withdrawn',
-      'unmet-requirements',
-      'archived',
+  it('allows no-response to interview and archive reasons including no-response', () => {
+    expect(availableTransitions('no-response', null)).toEqual([
+      { to: 'interview' },
+      { to: 'archived', archiveReason: 'rejected' },
+      { to: 'archived', archiveReason: 'withdrawn' },
+      { to: 'archived', archiveReason: 'no-response' },
     ])
-    expect(canTransition('no-response', 'interview')).toBe(true)
-    expect(canTransition('no-response', 'rejected')).toBe(true)
-    expect(canTransition('no-response', 'archived')).toBe(true)
-    expect(canTransition('no-response', 'no-response')).toBe(true)
   })
 
-  it('never lists the current status as a target option', () => {
-    expect(availableTargetApplyStatuses('applied')).not.toContain('applied')
-    expect(availableTargetApplyStatuses('no-response')).not.toContain('no-response')
+  it('allows interview archive reasons including offer-accepted', () => {
+    expect(availableArchiveReasons('interview')).toEqual(['rejected', 'withdrawn', 'offer-accepted'])
+    expect(canTransition('interview', 'archived', null, 'offer-accepted')).toBe(true)
+    expect(canTransition('interview', 'applied', null, null)).toBe(false)
   })
 
-  it('allows interview and offer follow-up statuses', () => {
-    expect(availableTargetApplyStatuses('interview')).toEqual(['rejected', 'withdrawn', 'offer'])
-    expect(availableTargetApplyStatuses('offer')).toEqual(['offer-accepted', 'withdrawn'])
+  it('lists unarchive targets by archive reason', () => {
+    expect(availableUnarchiveTargets('not-interested')).toEqual(['pending-review', 'consider'])
+    expect(availableUnarchiveTargets('no-response')).toEqual(['interview'])
+    expect(availableUnarchiveTargets('rejected')).toEqual([])
+    expect(availableUnarchiveTargets('offer-accepted')).toEqual([])
   })
 
-  it('lists terminal statuses in order', () => {
-    expect(TERMINAL_APPLY_STATUS_ORDER).toEqual([
-      'rejected',
-      'offer-accepted',
-      'withdrawn',
-      'stack-mismatch',
-      'archived',
-    ])
-    expect(TERMINAL_APPLY_STATUS_ORDER.every(isTerminalApplyStatus)).toBe(true)
-    expect(isTerminalApplyStatus('no-response')).toBe(false)
-    expect(isTerminalApplyStatus('unmet-requirements')).toBe(false)
-    expect(isTerminalApplyStatus('archived')).toBe(true)
+  it('allows unarchive transitions from archived', () => {
+    expect(canTransition('archived', 'pending-review', 'not-interested', null)).toBe(true)
+    expect(canTransition('archived', 'interview', 'no-response', null)).toBe(true)
+    expect(canTransition('archived', 'applied', 'rejected', null)).toBe(false)
   })
 
-  it('lists hidden statuses in order', () => {
-    expect(HIDDEN_APPLY_STATUS_ORDER).toEqual([
-      'rejected',
-      'offer-accepted',
-      'withdrawn',
-      'stack-mismatch',
-      'archived',
-      'not-interested',
-      'no-response',
-      'unmet-requirements',
-    ])
-    expect(HIDDEN_APPLY_STATUS_ORDER.every(isHiddenApplyStatus)).toBe(true)
+  it('requires archive reason when transitioning to archived', () => {
+    expect(canTransition('applied', 'archived', null, null)).toBe(false)
+    expect(canTransition('applied', 'archived', null, 'rejected')).toBe(true)
   })
 
-  it('marks non-hidden statuses as visible', () => {
-    expect(isHiddenApplyStatus('applied')).toBe(false)
-    expect(isHiddenApplyStatus('interview')).toBe(false)
-    expect(isHiddenApplyStatus('not-applied')).toBe(false)
-    expect(isHiddenApplyStatus('consider')).toBe(false)
-    expect(isHiddenApplyStatus('unmet-requirements')).toBe(true)
+  it('clears archive reason when leaving archived', () => {
+    expect(canTransition('archived', 'consider', 'not-interested', null)).toBe(true)
+    expect(canTransition('archived', 'consider', 'not-interested', 'not-interested')).toBe(false)
   })
 
-  it('allows transitions from unmet-requirements', () => {
-    expect(availableTargetApplyStatuses('unmet-requirements')).toEqual([
-      'not-applied',
-      'applied',
-      'stack-mismatch',
-      'archived',
-    ])
-    expect(canTransition('unmet-requirements', 'not-applied')).toBe(true)
-    expect(canTransition('unmet-requirements', 'applied')).toBe(true)
-    expect(canTransition('unmet-requirements', 'stack-mismatch')).toBe(true)
-    expect(canTransition('unmet-requirements', 'archived')).toBe(true)
+  it('marks archived as archived apply status', () => {
+    expect(isArchivedApplyStatus('archived')).toBe(true)
+    expect(isArchivedApplyStatus('applied')).toBe(false)
   })
 
-  it('blocks transitions from stack-mismatch except to archived', () => {
-    expect(availableTargetApplyStatuses('stack-mismatch')).toEqual(['archived'])
-    expect(canTransition('stack-mismatch', 'archived')).toBe(true)
-    expect(canTransition('stack-mismatch', 'not-applied')).toBe(false)
+  it('lists target statuses for pending-review including archived', () => {
+    expect(availableTargetStatuses('pending-review', null)).toEqual(['consider', 'applied', 'archived'])
   })
 
-  it('allows transition to archived from terminal statuses', () => {
-    expect(canTransition('rejected', 'archived')).toBe(true)
-    expect(canTransition('offer-accepted', 'archived')).toBe(true)
-    expect(canTransition('withdrawn', 'archived')).toBe(true)
-    expect(canTransition('stack-mismatch', 'archived')).toBe(true)
+  it('lists only archived as target from interview', () => {
+    expect(availableTargetStatuses('interview', null)).toEqual(['archived'])
   })
 
-  it('blocks other transitions from terminal statuses', () => {
-    expect(canTransition('offer-accepted', 'withdrawn')).toBe(false)
-    expect(canTransition('rejected', 'applied')).toBe(false)
-    expect(canTransition('archived', 'applied')).toBe(false)
-    expect(canTransition('no-response', 'archived')).toBe(true)
+  it('lists unarchive targets as target statuses from archived', () => {
+    expect(availableTargetStatuses('archived', 'not-interested')).toEqual(['pending-review', 'consider'])
+    expect(availableTargetStatuses('archived', null)).toEqual([])
   })
 })

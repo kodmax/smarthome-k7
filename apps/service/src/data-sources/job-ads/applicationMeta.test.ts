@@ -13,6 +13,7 @@ describe('applicationMeta', () => {
 
     expect(applyStatusChange(emptyApplicationMeta(), { applyStatus: 'applied' }, now)).toEqual({
       applyStatus: 'applied',
+      archiveReason: null,
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
       rejectedAt: null,
@@ -22,6 +23,7 @@ describe('applicationMeta', () => {
       applyStatusChange(
         {
           applyStatus: 'applied',
+          archiveReason: null,
           comment: null,
           appliedAt: '2026-07-19T12:00:00.000Z',
           rejectedAt: null,
@@ -31,28 +33,31 @@ describe('applicationMeta', () => {
       ),
     ).toEqual({
       applyStatus: 'interview',
+      archiveReason: null,
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
       rejectedAt: null,
     })
   })
 
-  it('sets rejectedAt on transition to rejected and preserves it on comment-only updates', () => {
+  it('sets rejectedAt when archiving with rejected and preserves it on comment-only updates', () => {
     const now = new Date('2026-07-19T12:00:00.000Z')
 
     expect(
       applyStatusChange(
         {
           applyStatus: 'applied',
+          archiveReason: null,
           comment: null,
           appliedAt: '2026-07-18T12:00:00.000Z',
           rejectedAt: null,
         },
-        { applyStatus: 'rejected' },
+        { applyStatus: 'archived', archiveReason: 'rejected' },
         now,
       ),
     ).toEqual({
-      applyStatus: 'rejected',
+      applyStatus: 'archived',
+      archiveReason: 'rejected',
       comment: null,
       appliedAt: '2026-07-18T12:00:00.000Z',
       rejectedAt: '2026-07-19T12:00:00.000Z',
@@ -61,16 +66,18 @@ describe('applicationMeta', () => {
     expect(
       applyStatusChange(
         {
-          applyStatus: 'rejected',
+          applyStatus: 'archived',
+          archiveReason: 'rejected',
           comment: null,
           appliedAt: '2026-07-18T12:00:00.000Z',
           rejectedAt: '2026-07-19T12:00:00.000Z',
         },
-        { applyStatus: 'rejected', comment: 'No fit' },
+        { applyStatus: 'archived', archiveReason: 'rejected', comment: 'No fit' },
         new Date('2026-07-20T12:00:00.000Z'),
       ),
     ).toEqual({
-      applyStatus: 'rejected',
+      applyStatus: 'archived',
+      archiveReason: 'rejected',
       comment: 'No fit',
       appliedAt: '2026-07-18T12:00:00.000Z',
       rejectedAt: '2026-07-19T12:00:00.000Z',
@@ -82,6 +89,7 @@ describe('applicationMeta', () => {
       applyStatusChange(
         {
           applyStatus: 'applied',
+          archiveReason: null,
           comment: null,
           appliedAt: '2026-07-19T12:00:00.000Z',
           rejectedAt: null,
@@ -90,6 +98,7 @@ describe('applicationMeta', () => {
       ),
     ).toEqual({
       applyStatus: 'applied',
+      archiveReason: null,
       comment: 'Follow-up sent',
       appliedAt: '2026-07-19T12:00:00.000Z',
       rejectedAt: null,
@@ -97,10 +106,11 @@ describe('applicationMeta', () => {
   })
 
   it('rejects invalid transitions', () => {
-    expect(applyStatusChange(emptyApplicationMeta(), { applyStatus: 'offer-accepted' })).toBeNull()
+    expect(applyStatusChange(emptyApplicationMeta(), { applyStatus: 'interview' })).toBeNull()
+    expect(applyStatusChange(emptyApplicationMeta(), { applyStatus: 'archived', archiveReason: 'rejected' })).toBeNull()
   })
 
-  it('allows transition from not-applied to consider', () => {
+  it('allows transition from pending-review to consider', () => {
     expect(
       applyStatusChange(emptyApplicationMeta(), {
         applyStatus: 'consider',
@@ -108,41 +118,25 @@ describe('applicationMeta', () => {
       }),
     ).toEqual({
       applyStatus: 'consider',
+      archiveReason: null,
       comment: 'Salary too low',
       appliedAt: null,
       rejectedAt: null,
     })
   })
 
-  it('allows transition from not-applied to unmet-requirements', () => {
+  it('allows transition from pending-review to archived with pre-application reason', () => {
     expect(
       applyStatusChange(emptyApplicationMeta(), {
-        applyStatus: 'unmet-requirements',
+        applyStatus: 'archived',
+        archiveReason: 'unmet-requirements',
         comment: 'React',
       }),
     ).toEqual({
-      applyStatus: 'unmet-requirements',
+      applyStatus: 'archived',
+      archiveReason: 'unmet-requirements',
       comment: 'React',
       appliedAt: null,
-      rejectedAt: null,
-    })
-  })
-
-  it('allows transition from applied to unmet-requirements', () => {
-    expect(
-      applyStatusChange(
-        {
-          applyStatus: 'applied',
-          comment: 'Sent CV',
-          appliedAt: '2026-07-19T12:00:00.000Z',
-          rejectedAt: null,
-        },
-        { applyStatus: 'unmet-requirements', comment: 'Missing Kubernetes' },
-      ),
-    ).toEqual({
-      applyStatus: 'unmet-requirements',
-      comment: 'Missing Kubernetes',
-      appliedAt: '2026-07-19T12:00:00.000Z',
       rejectedAt: null,
     })
   })
@@ -152,6 +146,7 @@ describe('applicationMeta', () => {
       applyStatusChange(
         {
           applyStatus: 'applied',
+          archiveReason: null,
           comment: 'Old note',
           appliedAt: '2026-07-19T12:00:00.000Z',
           rejectedAt: null,
@@ -160,86 +155,87 @@ describe('applicationMeta', () => {
       ),
     ).toEqual({
       applyStatus: 'interview',
+      archiveReason: null,
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
       rejectedAt: null,
     })
   })
 
-  it('clears comment on comment-only update with empty string', () => {
+  it('clears comment and archiveReason when unarchiving', () => {
     expect(
       applyStatusChange(
         {
-          applyStatus: 'applied',
-          comment: 'Old note',
-          appliedAt: '2026-07-19T12:00:00.000Z',
-          rejectedAt: null,
-        },
-        { applyStatus: 'applied', comment: '' },
-      ),
-    ).toEqual({
-      applyStatus: 'applied',
-      comment: null,
-      appliedAt: '2026-07-19T12:00:00.000Z',
-      rejectedAt: null,
-    })
-  })
-
-  it('allows transition from not-interested to archived', () => {
-    expect(
-      applyStatusChange(
-        {
-          applyStatus: 'not-interested',
+          applyStatus: 'archived',
+          archiveReason: 'not-interested',
           comment: 'Not for me',
           appliedAt: null,
           rejectedAt: null,
         },
-        { applyStatus: 'archived' },
-        new Date('2026-07-22T20:55:49.000Z'),
+        { applyStatus: 'consider' },
       ),
     ).toEqual({
-      applyStatus: 'archived',
+      applyStatus: 'consider',
+      archiveReason: null,
       comment: null,
       appliedAt: null,
       rejectedAt: null,
     })
   })
 
-  it('ignores legacy statusChangedAt field in stored application meta', () => {
+  it('allows interview to archived with offer-accepted', () => {
     expect(
-      parseApplicationMeta({
-        applyStatus: 'not-interested',
-        comment: 'Not for me',
-        appliedAt: null,
-        statusChangedAt: '2026-07-19T15:00:00.000Z',
-      }),
+      applyStatusChange(
+        {
+          applyStatus: 'interview',
+          archiveReason: null,
+          comment: null,
+          appliedAt: '2026-07-18T12:00:00.000Z',
+          rejectedAt: null,
+        },
+        { applyStatus: 'archived', archiveReason: 'offer-accepted' },
+      ),
     ).toEqual({
-      applyStatus: 'not-interested',
-      comment: 'Not for me',
-      appliedAt: null,
+      applyStatus: 'archived',
+      archiveReason: 'offer-accepted',
+      comment: null,
+      appliedAt: '2026-07-18T12:00:00.000Z',
       rejectedAt: null,
     })
   })
 
-  it('parses rejectedAt from stored application meta', () => {
+  it('parses application meta with archiveReason', () => {
     expect(
       parseApplicationMeta({
-        applyStatus: 'rejected',
+        applyStatus: 'archived',
+        archiveReason: 'rejected',
         comment: null,
         appliedAt: '2026-07-18T12:00:00.000Z',
         rejectedAt: '2026-07-19T12:00:00.000Z',
       }),
     ).toEqual({
-      applyStatus: 'rejected',
+      applyStatus: 'archived',
+      archiveReason: 'rejected',
       comment: null,
       appliedAt: '2026-07-18T12:00:00.000Z',
       rejectedAt: '2026-07-19T12:00:00.000Z',
     })
   })
 
+  it('rejects archived meta without archiveReason', () => {
+    expect(
+      parseApplicationMeta({
+        applyStatus: 'archived',
+        comment: null,
+        appliedAt: null,
+        rejectedAt: null,
+      }),
+    ).toBeNull()
+  })
+
   it('derives statusChangedAt from meta row timestamp', () => {
-    expect(resolveStatusChangedAt('not-interested', '2026-07-19T15:00:00.000Z')).toBe('2026-07-19T15:00:00.000Z')
-    expect(resolveStatusChangedAt('not-applied', '2026-07-19T15:00:00.000Z')).toBeNull()
+    expect(resolveStatusChangedAt('consider', '2026-07-19T15:00:00.000Z')).toBe('2026-07-19T15:00:00.000Z')
+    expect(resolveStatusChangedAt('pending-review', '2026-07-19T15:00:00.000Z')).toBeNull()
     expect(resolveStatusChangedAt('applied', undefined)).toBeNull()
   })
 
@@ -250,6 +246,16 @@ describe('applicationMeta', () => {
       id: 'jj-1',
       applyStatus: 'applied',
       comment: 'CV sent',
+    })
+
+    expect(
+      parseChangeStateCommandArgs(
+        JSON.stringify({ id: 'jj-2', applyStatus: 'archived', archiveReason: 'not-interested' }),
+      ),
+    ).toEqual({
+      id: 'jj-2',
+      applyStatus: 'archived',
+      archiveReason: 'not-interested',
     })
   })
 })

@@ -1,4 +1,4 @@
-import { JobApplyStatus } from '@repo/types'
+import { JobAdArchiveReason, JobApplyStatus } from '@repo/types'
 import {
   Archive,
   Ban,
@@ -8,7 +8,6 @@ import {
   ClipboardX,
   Clock,
   CircleX,
-  Handshake,
   MailCheck,
   Unplug,
   XCircle,
@@ -17,33 +16,39 @@ import {
 } from 'lucide-react'
 
 export const APPLY_STATUS_ICONS: Record<JobApplyStatus, LucideIcon> = {
-  'not-applied': CircleDashed,
+  'pending-review': CircleDashed,
   consider: Scale,
   applied: MailCheck,
-  'not-interested': Ban,
-  'unmet-requirements': ClipboardX,
-  'stack-mismatch': Unplug,
-  rejected: XCircle,
   'no-response': Clock,
   interview: Calendar,
-  offer: Handshake,
-  'offer-accepted': CircleCheck,
-  withdrawn: CircleX,
   archived: Archive,
 }
 
 export const APPLY_STATUS_COLORS: Record<JobApplyStatus, string> = {
-  'not-applied': 'var(--mui-palette-text-disabled)',
+  'pending-review': 'var(--mui-palette-text-disabled)',
   consider: 'var(--mui-palette-info-main)',
   applied: 'var(--mui-palette-success-main)',
+  'no-response': 'var(--mui-palette-warning-main)',
+  interview: 'var(--mui-palette-info-main)',
+  archived: 'var(--mui-palette-text-secondary)',
+}
+
+export const ARCHIVE_REASON_ICONS: Record<JobAdArchiveReason, LucideIcon> = {
+  'not-interested': Ban,
+  'unmet-requirements': ClipboardX,
+  'stack-mismatch': Unplug,
+  'no-response': Clock,
+  rejected: XCircle,
+  withdrawn: CircleX,
+  'offer-accepted': CircleCheck,
+}
+
+export const ARCHIVE_REASON_COLORS: Record<JobAdArchiveReason, string> = {
   'not-interested': 'var(--mui-palette-error-main)',
   'unmet-requirements': 'var(--mui-palette-warning-main)',
   'stack-mismatch': 'var(--mui-palette-text-secondary)',
-  rejected: 'var(--mui-palette-error-main)',
   'no-response': 'var(--mui-palette-warning-main)',
-  interview: 'var(--mui-palette-info-main)',
-  offer: 'var(--mui-palette-warning-main)',
-  'offer-accepted': 'var(--mui-palette-success-main)',
+  rejected: 'var(--mui-palette-error-main)',
   withdrawn: 'var(--mui-palette-text-secondary)',
-  archived: 'var(--mui-palette-text-secondary)',
+  'offer-accepted': 'var(--mui-palette-success-main)',
 }

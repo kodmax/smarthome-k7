@@ -35,10 +35,10 @@ describe('JobAds', () => {
     expect(screen.getByText('Frontend Engineer')).toBeInTheDocument()
   })
 
-  it('shows only not-applied ads with the default latest filter', () => {
+  it('shows only pending-review ads with the default filter', () => {
     mockedUseFeed.mockReturnValue(
       jobAdsFeed(
-        jobAd({ id: '1', title: 'Open Role', meta: { application: { status: 'not-applied' } } }),
+        jobAd({ id: '1', title: 'Open Role', meta: { application: { status: 'pending-review' } } }),
         jobAd({ id: '2', title: 'Applied Role', meta: { application: { status: 'applied' } } }),
       ),
     )

@@ -310,22 +310,13 @@ export type Translations = {
       matchAnalysisObservationsSection: string
       matchAnalysisConclusionSection: string
       newApplicationStatus: string
+      newArchiveReason: string
       applicationComment: string
       save: string
       cancel: string
       publishedTodayTag: string
       filters: {
         label: string
-        latest: string
-        consider: string
-        withMatchAnalysis: string
-        inProgress: string
-        notInterested: string
-        stretch: string
-        rejectedNoResponse: string
-        finished: string
-        archived: string
-        applied: string
       }
       acceptableSalary: {
         label: string
@@ -338,19 +329,21 @@ export type Translations = {
         hybrid: string
       }
       applyStatus: {
-        'not-applied': string
+        'pending-review': string
         consider: string
         applied: string
+        'no-response': string
+        interview: string
+        archived: string
+      }
+      archiveReason: {
         'not-interested': string
         'unmet-requirements': string
         'stack-mismatch': string
-        rejected: string
         'no-response': string
-        interview: string
-        offer: string
-        'offer-accepted': string
+        rejected: string
         withdrawn: string
-        archived: string
+        'offer-accepted': string
       }
     }
     news: {

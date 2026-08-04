@@ -23,6 +23,7 @@ import {
   parseApplicationMeta,
   parseChangeStateCommandArgs,
   resolveStatusChangedAt,
+  type ChangeApplyStatusInput,
   type ChangeStateCommandArgs,
 } from './applicationMeta'
 import { isMetaFlagTrue } from './metaFlag'
@@ -37,8 +38,7 @@ const AD_URL_ATTRIBUTE_NAME = 'ad-url'
 const FIRST_PUBLISHED_AT_ATTRIBUTE_NAME = 'first-published-at'
 const PERSISTENT_META_ATTRIBUTE_NAMES = [AD_URL_ATTRIBUTE_NAME, FIRST_PUBLISHED_AT_ATTRIBUTE_NAME] as const
 const STALE_APPLIED_NO_RESPONSE_AFTER_DAYS = 7
-const STALE_NO_RESPONSE_ARCHIVE_AFTER_DAYS = 30
-const STALE_REJECTED_ARCHIVE_AFTER_DAYS = 7
+const STALE_NO_RESPONSE_ARCHIVE_AFTER_DAYS = 14
 
 type MetaRow = {
   item_uid: string
@@ -93,14 +93,12 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
   public async changeState(input: ChangeStateCommandArgs): Promise<void> {
     await this.saveApplicationChange(input.id, {
       applyStatus: input.applyStatus,
+      archiveReason: input.archiveReason,
       comment: input.comment,
     })
   }
 
-  private async saveApplicationChange(
-    itemId: string,
-    input: { applyStatus: JobAdApplicationMeta['applyStatus']; comment?: string },
-  ): Promise<void> {
+  private async saveApplicationChange(itemId: string, input: ChangeApplyStatusInput): Promise<void> {
     const current = await this.loadApplicationMeta(itemId)
     const next = applyStatusChange(current, input)
     if (next === null) {
@@ -184,8 +182,7 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
 
       const appliedChanged = await this.markStaleAppliedAsNoResponse(conn)
       const noResponseArchived = await this.markStaleNoResponseAsArchived(conn)
-      const rejectedArchived = await this.markStaleRejectedAsArchived(conn)
-      if (appliedChanged || noResponseArchived || rejectedArchived) {
+      if (appliedChanged || noResponseArchived) {
         void this.push()
       }
     } finally {
@@ -220,32 +217,12 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     const result = await observeDbQuery('update', 'meta', () =>
       conn.query(
         `update meta
-       set value = json_set(value, '$.applyStatus', 'archived', '$.comment', null)
+       set value = json_set(value, '$.applyStatus', 'archived', '$.archiveReason', 'no-response', '$.comment', null)
        where group_id = ?
          and attribute_name = ?
          and json_unquote(json_extract(value, '$.applyStatus')) = 'no-response'
          and json_extract(value, '$.appliedAt') is not null
          and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
-        [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
-      ),
-    )
-
-    return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
-  }
-
-  private async markStaleRejectedAsArchived(conn: Awaited<ReturnType<Pool['getConnection']>>): Promise<boolean> {
-    const cutoff = new Date()
-    cutoff.setDate(cutoff.getDate() - STALE_REJECTED_ARCHIVE_AFTER_DAYS)
-
-    const result = await observeDbQuery('update', 'meta', () =>
-      conn.query(
-        `update meta
-       set value = json_set(value, '$.applyStatus', 'archived', '$.comment', null)
-       where group_id = ?
-         and attribute_name = ?
-         and json_unquote(json_extract(value, '$.applyStatus')) = 'rejected'
-         and json_extract(value, '$.rejectedAt') is not null
-         and json_unquote(json_extract(value, '$.rejectedAt')) <= ?`,
         [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
       ),
     )

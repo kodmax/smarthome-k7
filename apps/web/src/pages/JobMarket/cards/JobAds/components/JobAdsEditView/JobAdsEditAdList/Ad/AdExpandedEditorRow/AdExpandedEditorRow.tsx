@@ -1,13 +1,14 @@
-import { JobAdsFeedItem, JobApplyStatus } from '@repo/types'
+import { JobAdsFeedItem } from '@repo/types'
 import { FC } from 'react'
 import { designTokens } from '@repo/design-tokens'
 import { ApolloTableCell, ApolloTableRow } from '@/card-components'
 import { ApplicationStatusEditor } from './ApplicationStatusEditor'
+import type { SaveApplicationState } from './ApplicationStatusEditor'
 
 export const AdExpandedEditorRow: FC<{
   ad: JobAdsFeedItem
   columnCount: number
-  onSave: (applyStatus: JobApplyStatus, comment: string) => void
+  onSave: (state: SaveApplicationState) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
   onAnalyzeCvMatch: (id: string) => void

@@ -1,9 +1,10 @@
+import { JobAdsFeedItem } from '@repo/types'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { TableEmptyMessage } from '@/card-components'
 import { useCommand } from '@repo/feed-client'
-import { JobAdsFeedItem, JobApplyStatus } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { type JobAdsFilter, filterJobAdsByCategory } from '../../jobAdsFilter'
+import type { ChangeApplicationStatePayload } from './JobAdsEditAdList/Ad/AdExpandedEditorRow/ApplicationStatusEditor'
 import { JobAdsEditAdList } from './JobAdsEditAdList'
 
 type Props = {
@@ -24,8 +25,15 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter }) => {
   const filteredAds = useMemo(() => filterJobAdsByCategory(ads ?? [], filter), [ads, filter])
 
   const onChangeApplicationState = useCallback(
-    (id: string, applyStatus: JobApplyStatus, comment: string) => {
-      changeState(JSON.stringify({ id, applyStatus, comment: comment || undefined }))
+    ({ id, applyStatus, archiveReason, comment }: ChangeApplicationStatePayload) => {
+      changeState(
+        JSON.stringify({
+          id,
+          applyStatus,
+          archiveReason,
+          comment: comment || undefined,
+        }),
+      )
       setExpandedAdId(null)
     },
     [changeState],

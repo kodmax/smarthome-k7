@@ -1,70 +1,42 @@
 import { describe, expect, it } from 'vitest'
-import { applyStatusTargetOptions } from './applyStatusSelectOptions'
+import { applyArchiveReasonOptions, applyStatusTargetStatuses } from './applyStatusSelectOptions'
 
-describe('applyStatusTargetOptions', () => {
-  it('returns only archived for terminal statuses that can be archived', () => {
-    expect(applyStatusTargetOptions('rejected')).toEqual(['archived'])
-    expect(applyStatusTargetOptions('stack-mismatch')).toEqual(['archived'])
-    expect(applyStatusTargetOptions('offer-accepted')).toEqual(['archived'])
-    expect(applyStatusTargetOptions('withdrawn')).toEqual(['archived'])
-    expect(applyStatusTargetOptions('archived')).toEqual([])
+describe('applyStatusTargetStatuses', () => {
+  it('returns pre-application statuses and archived from pending-review', () => {
+    expect(applyStatusTargetStatuses('pending-review', null)).toEqual(['consider', 'applied', 'archived'])
   })
 
-  it('returns reset transitions from not-interested', () => {
-    expect(applyStatusTargetOptions('not-interested')).toEqual([
-      'not-applied',
-      'applied',
-      'unmet-requirements',
-      'stack-mismatch',
-      'archived',
-    ])
+  it('returns applied follow-up statuses and archived', () => {
+    expect(applyStatusTargetStatuses('applied', null)).toEqual(['no-response', 'interview', 'archived'])
   })
 
-  it('returns follow-up transitions from unmet-requirements', () => {
-    expect(applyStatusTargetOptions('unmet-requirements')).toEqual([
-      'not-applied',
-      'applied',
-      'stack-mismatch',
-      'archived',
-    ])
+  it('returns only archived from interview', () => {
+    expect(applyStatusTargetStatuses('interview', null)).toEqual(['archived'])
   })
 
-  it('includes consider first, then pre-application targets from not-applied', () => {
-    expect(applyStatusTargetOptions('not-applied')).toEqual([
-      'consider',
-      'applied',
+  it('returns unarchive targets from archived', () => {
+    expect(applyStatusTargetStatuses('archived', 'not-interested')).toEqual(['pending-review', 'consider'])
+  })
+})
+
+describe('applyArchiveReasonOptions', () => {
+  it('returns pre-application archive reasons from pending-review', () => {
+    expect(applyArchiveReasonOptions('pending-review')).toEqual([
       'not-interested',
       'unmet-requirements',
       'stack-mismatch',
     ])
   })
 
-  it('returns the same follow-up transitions from consider as from not-applied', () => {
-    expect(applyStatusTargetOptions('consider')).toEqual([
-      'applied',
-      'not-interested',
-      'unmet-requirements',
-      'stack-mismatch',
-    ])
+  it('returns post-application archive reasons from applied', () => {
+    expect(applyArchiveReasonOptions('applied')).toEqual(['rejected', 'withdrawn'])
   })
 
-  it('returns only allowed transitions', () => {
-    expect(applyStatusTargetOptions('applied')).toEqual([
-      'rejected',
-      'no-response',
-      'interview',
-      'withdrawn',
-      'unmet-requirements',
-    ])
+  it('returns archive reasons including no-response from no-response status', () => {
+    expect(applyArchiveReasonOptions('no-response')).toEqual(['rejected', 'withdrawn', 'no-response'])
   })
 
-  it('returns the same follow-up transitions from no-response as from applied, plus archived', () => {
-    expect(applyStatusTargetOptions('no-response')).toEqual([
-      'rejected',
-      'interview',
-      'withdrawn',
-      'unmet-requirements',
-      'archived',
-    ])
+  it('returns interview archive reasons including offer-accepted', () => {
+    expect(applyArchiveReasonOptions('interview')).toEqual(['rejected', 'withdrawn', 'offer-accepted'])
   })
 })

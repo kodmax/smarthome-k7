@@ -14,22 +14,37 @@ export const ApplyStatusIndicator: FC<{ ad: Pick<JobAdsFeedItem, 'meta'> }> = ({
   const application = ad.meta.application
 
   const tooltip = useMemo(() => {
-    const statusLabel = labels.applyStatus[application.status]
+    const statusLabel =
+      application.status === 'archived' && application.archiveReason !== null
+        ? labels.archiveReason[application.archiveReason]
+        : labels.applyStatus[application.status]
     const contentLines = application.comment ? [statusLabel, application.comment] : [statusLabel]
 
     return formatApplicationTooltip(application.appliedAt, locale, contentLines)
-  }, [application.appliedAt, application.comment, application.status, labels.applyStatus, locale])
+  }, [
+    application.appliedAt,
+    application.archiveReason,
+    application.comment,
+    application.status,
+    labels.applyStatus,
+    labels.archiveReason,
+    locale,
+  ])
 
-  if (application.status === 'not-applied') {
+  if (application.status === 'pending-review') {
     return null
   }
 
   const appliedDaysShort = application.status === 'applied' ? formatAppliedDaysShort(application.appliedAt) : null
+  const ariaLabel =
+    application.status === 'archived' && application.archiveReason !== null
+      ? labels.archiveReason[application.archiveReason]
+      : labels.applyStatus[application.status]
 
   return (
     <Tooltip title={tooltip}>
       <span
-        aria-label={labels.applyStatus[application.status]}
+        aria-label={ariaLabel}
         style={{
           verticalAlign: 'middle',
           display: 'inline-flex',
@@ -39,7 +54,7 @@ export const ApplyStatusIndicator: FC<{ ad: Pick<JobAdsFeedItem, 'meta'> }> = ({
           lineHeight: 1,
         }}
       >
-        <ApplyStatusIcon status={application.status} />
+        <ApplyStatusIcon status={application.status} archiveReason={application.archiveReason} />
         {appliedDaysShort !== null ? (
           <span style={{ color: 'var(--mui-palette-text-secondary)', fontSize: 'inherit' }}>{appliedDaysShort}</span>
         ) : null}

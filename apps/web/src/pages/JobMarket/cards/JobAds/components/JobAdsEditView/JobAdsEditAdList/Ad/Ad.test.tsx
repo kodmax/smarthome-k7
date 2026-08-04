@@ -1,4 +1,5 @@
-import { type JobAdsFeedItem, type JobApplyStatus } from '@repo/types'
+import { type JobAdsFeedItem } from '@repo/types'
+import type { ChangeApplicationStatePayload } from './AdExpandedEditorRow/ApplicationStatusEditor'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
@@ -12,7 +13,7 @@ function renderAd(
   zoom: boolean,
   editMode = false,
   expanded = false,
-  onChangeApplicationState: (id: string, applyStatus: JobApplyStatus, comment: string) => void = noop,
+  onChangeApplicationState: (payload: ChangeApplicationStatePayload) => void = noop,
   onToggleExpand: () => void = noop,
 ) {
   return renderInTableBody(
@@ -190,7 +191,7 @@ describe('Ad', () => {
         title: 'Open Role',
         meta: {
           application: {
-            status: 'not-applied',
+            status: 'pending-review',
             appliedAt: null,
           },
         },
@@ -240,10 +241,10 @@ describe('Ad', () => {
   })
 
   it('does not save without selecting a new status', () => {
-    const onChangeApplicationState = vi.fn<(id: string, applyStatus: JobApplyStatus, comment: string) => void>()
+    const onChangeApplicationState = vi.fn<(payload: ChangeApplicationStatePayload) => void>()
 
     renderAd(
-      jobAd({ id: '6', title: 'Save Role', meta: { application: { status: 'not-applied' } } }),
+      jobAd({ id: '6', title: 'Save Role', meta: { application: { status: 'pending-review' } } }),
       true,
       true,
       true,

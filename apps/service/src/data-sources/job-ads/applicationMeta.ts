@@ -1,25 +1,35 @@
-import { DEFAULT_JOB_APPLY_STATUS, JobAdApplicationMeta, JobApplyStatus, canTransition } from '@repo/types'
+import {
+  DEFAULT_JOB_APPLY_STATUS,
+  JobAdApplicationMeta,
+  JobAdArchiveReason,
+  JobApplyStatus,
+  canTransition,
+} from '@repo/types'
 import { captureInvalidInput } from '@/sentry'
 
 const APPLY_STATUSES = new Set<JobApplyStatus>([
-  'not-applied',
+  'pending-review',
   'consider',
   'applied',
+  'no-response',
+  'interview',
+  'archived',
+])
+
+const ARCHIVE_REASONS = new Set<JobAdArchiveReason>([
   'not-interested',
   'unmet-requirements',
   'stack-mismatch',
-  'rejected',
   'no-response',
-  'interview',
-  'offer',
-  'offer-accepted',
+  'rejected',
   'withdrawn',
-  'archived',
+  'offer-accepted',
 ])
 
 export function emptyApplicationMeta(): JobAdApplicationMeta {
   return {
     applyStatus: DEFAULT_JOB_APPLY_STATUS,
+    archiveReason: null,
     comment: null,
     appliedAt: null,
     rejectedAt: null,
@@ -28,6 +38,10 @@ export function emptyApplicationMeta(): JobAdApplicationMeta {
 
 export function isJobApplyStatus(value: unknown): value is JobApplyStatus {
   return typeof value === 'string' && APPLY_STATUSES.has(value as JobApplyStatus)
+}
+
+export function isJobAdArchiveReason(value: unknown): value is JobAdArchiveReason {
+  return typeof value === 'string' && ARCHIVE_REASONS.has(value as JobAdArchiveReason)
 }
 
 function parseOptionalTimestamp(value: unknown): string | null {
@@ -46,6 +60,22 @@ function parseOptionalComment(value: unknown): string | null {
   return typeof value === 'string' ? value : null
 }
 
+function parseArchiveReason(value: unknown): JobAdArchiveReason | null {
+  if (value === null || value === undefined) {
+    return null
+  }
+
+  return isJobAdArchiveReason(value) ? value : null
+}
+
+function isArchiveReasonConsistent(applyStatus: JobApplyStatus, archiveReason: JobAdArchiveReason | null): boolean {
+  if (applyStatus === 'archived') {
+    return archiveReason !== null
+  }
+
+  return archiveReason === null
+}
+
 export function parseApplicationMeta(value: unknown): JobAdApplicationMeta | null {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
     captureInvalidInput('job-ads: invalid application meta shape', value)
@@ -58,8 +88,20 @@ export function parseApplicationMeta(value: unknown): JobAdApplicationMeta | nul
     return null
   }
 
+  const archiveReason = parseArchiveReason(record.archiveReason)
+  if (record.archiveReason !== undefined && record.archiveReason !== null && archiveReason === null) {
+    captureInvalidInput('job-ads: invalid application meta archiveReason', value)
+    return null
+  }
+
+  if (!isArchiveReasonConsistent(record.applyStatus, archiveReason)) {
+    captureInvalidInput('job-ads: inconsistent application meta archiveReason', value)
+    return null
+  }
+
   return {
     applyStatus: record.applyStatus,
+    archiveReason,
     comment: parseOptionalComment(record.comment),
     appliedAt: parseOptionalTimestamp(record.appliedAt),
     rejectedAt: parseOptionalTimestamp(record.rejectedAt),
@@ -78,7 +120,7 @@ export function resolveStatusChangedAt(
   applyStatus: JobApplyStatus,
   lastUpdateTimestamp?: Date | string,
 ): string | null {
-  if (applyStatus === 'not-applied' || lastUpdateTimestamp === undefined) {
+  if (applyStatus === 'pending-review' || lastUpdateTimestamp === undefined) {
     return null
   }
 
@@ -87,6 +129,7 @@ export function resolveStatusChangedAt(
 
 export type ChangeApplyStatusInput = {
   applyStatus: JobApplyStatus
+  archiveReason?: JobAdArchiveReason
   comment?: string
 }
 
@@ -96,8 +139,13 @@ export function applyStatusChange(
   now: Date = new Date(),
 ): JobAdApplicationMeta | null {
   const { applyStatus: to, comment } = input
+  const resolvedToArchiveReason = to === 'archived' ? (input.archiveReason ?? null) : null
 
   if (to === current.applyStatus) {
+    if (to === 'archived' && resolvedToArchiveReason !== null && resolvedToArchiveReason !== current.archiveReason) {
+      return null
+    }
+
     if (comment === undefined) {
       return current
     }
@@ -108,15 +156,26 @@ export function applyStatusChange(
     }
   }
 
-  if (!canTransition(current.applyStatus, to)) {
+  if (!canTransition(current.applyStatus, to, current.archiveReason, resolvedToArchiveReason)) {
     return null
   }
 
+  const isUnarchive = current.applyStatus === 'archived' && to !== 'archived'
+  const nextArchiveReason = to === 'archived' ? resolvedToArchiveReason : null
+
   const next: JobAdApplicationMeta = {
     applyStatus: to,
-    comment: comment !== undefined ? comment || null : null,
+    archiveReason: nextArchiveReason,
+    comment: isUnarchive ? null : comment !== undefined ? comment || null : null,
     appliedAt: current.appliedAt,
-    rejectedAt: to === 'rejected' ? (current.rejectedAt ?? now.toISOString()) : null,
+    rejectedAt:
+      to === 'archived' && resolvedToArchiveReason === 'rejected'
+        ? (current.rejectedAt ?? now.toISOString())
+        : isUnarchive
+          ? current.rejectedAt
+          : to !== 'archived'
+            ? null
+            : current.rejectedAt,
   }
 
   if (to === 'applied' && next.appliedAt === null) {
@@ -129,6 +188,7 @@ export function applyStatusChange(
 export type ChangeStateCommandArgs = {
   id: string
   applyStatus: JobApplyStatus
+  archiveReason?: JobAdArchiveReason
   comment?: string
 }
 
@@ -145,9 +205,25 @@ export function parseChangeStateCommandArgs(args: string): ChangeStateCommandArg
       return null
     }
 
+    if (parsed.archiveReason !== undefined && !isJobAdArchiveReason(parsed.archiveReason)) {
+      captureInvalidInput('job-ads: invalid change-state command archiveReason', args)
+      return null
+    }
+
+    if (parsed.applyStatus === 'archived' && parsed.archiveReason === undefined) {
+      captureInvalidInput('job-ads: missing archiveReason for archived status', args)
+      return null
+    }
+
+    if (parsed.applyStatus !== 'archived' && parsed.archiveReason !== undefined) {
+      captureInvalidInput('job-ads: unexpected archiveReason for non-archived status', args)
+      return null
+    }
+
     return {
       id: parsed.id,
       applyStatus: parsed.applyStatus,
+      archiveReason: parsed.archiveReason,
       comment: parsed.comment,
     }
   } catch (cause) {

@@ -331,13 +331,14 @@ export type SalaryRange = {
   to: number
 }
 
-export type { JobApplyStatus } from './jobApplyStatusFlow'
+export type { JobApplyStatus, JobAdArchiveReason } from './jobApplyStatusFlow'
 export { DEFAULT_JOB_APPLY_STATUS } from './jobApplyStatusFlow'
-import type { JobApplyStatus } from './jobApplyStatusFlow'
+import type { JobAdArchiveReason, JobApplyStatus } from './jobApplyStatusFlow'
 import { DEFAULT_JOB_APPLY_STATUS } from './jobApplyStatusFlow'
 
 export type JobAdApplicationMeta = {
   applyStatus: JobApplyStatus
+  archiveReason: JobAdArchiveReason | null
   comment: string | null
   appliedAt: string | null
   rejectedAt: string | null
@@ -345,6 +346,7 @@ export type JobAdApplicationMeta = {
 
 export type JobAdApplication = {
   status: JobApplyStatus
+  archiveReason: JobAdArchiveReason | null
   comment: string | null
   appliedAt: string | null
   rejectedAt: string | null
@@ -480,6 +482,7 @@ export type CvCachedFeed = Record<string, never>
 export function emptyJobAdApplication(): JobAdApplication {
   return {
     status: DEFAULT_JOB_APPLY_STATUS,
+    archiveReason: null,
     comment: null,
     appliedAt: null,
     rejectedAt: null,
@@ -501,6 +504,7 @@ export function jobAdApplicationFromMeta(
 ): JobAdApplication {
   return {
     status: meta.applyStatus,
+    archiveReason: meta.archiveReason,
     comment: meta.comment,
     appliedAt: meta.appliedAt,
     rejectedAt: meta.rejectedAt,
@@ -511,6 +515,7 @@ export function jobAdApplicationFromMeta(
 export function jobAdApplicationMetaFromApplication(application: JobAdApplication): JobAdApplicationMeta {
   return {
     applyStatus: application.status,
+    archiveReason: application.archiveReason,
     comment: application.comment,
     appliedAt: application.appliedAt,
     rejectedAt: application.rejectedAt,

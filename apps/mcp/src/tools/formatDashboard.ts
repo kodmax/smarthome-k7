@@ -12,7 +12,7 @@ import type {
   TransmissionFeed,
   WeatherFeed,
 } from '@repo/types'
-import { isHiddenApplyStatus, isJobAdApplied } from '@repo/types'
+import { isArchivedApplyStatus, isJobAdApplied } from '@repo/types'
 import type { FeedStore } from '../feeds/FeedStore.js'
 import { DASHBOARD_FEED_IDS, type DashboardFeedId } from '../feeds/dashboardFeeds.js'
 import { getTopTitles } from '../torrents/getTopTitles.js'
@@ -155,7 +155,7 @@ export function formatNews(feed: NewsFeed): string {
 }
 
 export function formatJobAds(feed: JobAdsFeed, visibleOnly = true): string {
-  const ads = visibleOnly ? feed.ads.filter(ad => !isHiddenApplyStatus(ad.meta.application.status)) : feed.ads
+  const ads = visibleOnly ? feed.ads.filter(ad => !isArchivedApplyStatus(ad.meta.application.status)) : feed.ads
 
   if (ads.length === 0) {
     return visibleOnly ? 'Brak aktywnych ofert (wszystkie zakończone lub brak ogłoszeń)' : 'Brak ofert'

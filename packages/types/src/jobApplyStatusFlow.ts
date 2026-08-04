@@ -1,95 +1,150 @@
-export type JobApplyStatus =
-  | 'not-applied'
-  | 'consider'
-  | 'applied'
+export type JobApplyStatus = 'pending-review' | 'consider' | 'applied' | 'no-response' | 'interview' | 'archived'
+
+export type JobAdArchiveReason =
   | 'not-interested'
   | 'unmet-requirements'
   | 'stack-mismatch'
-  | 'rejected'
   | 'no-response'
-  | 'interview'
-  | 'offer'
-  | 'offer-accepted'
+  | 'rejected'
   | 'withdrawn'
-  | 'archived'
+  | 'offer-accepted'
 
-export const DEFAULT_JOB_APPLY_STATUS: JobApplyStatus = 'not-applied'
+export const DEFAULT_JOB_APPLY_STATUS: JobApplyStatus = 'pending-review'
 
-export const TERMINAL_APPLY_STATUS_ORDER = [
+export type ApplyStatusTransition = {
+  to: JobApplyStatus
+  archiveReason?: JobAdArchiveReason
+}
+
+const PRE_APPLICATION_ARCHIVE_REASONS = [
+  'not-interested',
+  'unmet-requirements',
+  'stack-mismatch',
+] as const satisfies readonly JobAdArchiveReason[]
+
+const POST_APPLICATION_ARCHIVE_REASONS = ['rejected', 'withdrawn'] as const satisfies readonly JobAdArchiveReason[]
+
+const NO_RESPONSE_ARCHIVE_REASONS = [
   'rejected',
+  'withdrawn',
+  'no-response',
+] as const satisfies readonly JobAdArchiveReason[]
+
+const INTERVIEW_ARCHIVE_REASONS = [
+  'rejected',
+  'withdrawn',
   'offer-accepted',
-  'withdrawn',
-  'stack-mismatch',
-  'archived',
-] as const satisfies readonly JobApplyStatus[]
+] as const satisfies readonly JobAdArchiveReason[]
 
-export const HIDDEN_APPLY_STATUS_ORDER = [
-  ...TERMINAL_APPLY_STATUS_ORDER,
-  'not-interested',
-  'no-response',
-  'unmet-requirements',
-] as const satisfies readonly JobApplyStatus[]
-
-const TERMINAL_APPLY_STATUSES = new Set<JobApplyStatus>(TERMINAL_APPLY_STATUS_ORDER)
-const HIDDEN_APPLY_STATUSES = new Set<JobApplyStatus>(HIDDEN_APPLY_STATUS_ORDER)
-
-const APPLIED_FOLLOW_UP_STATUSES = [
-  'rejected',
-  'no-response',
-  'interview',
-  'withdrawn',
-  'unmet-requirements',
-] as const satisfies readonly JobApplyStatus[]
-
-const NO_RESPONSE_FOLLOW_UP_STATUSES = [
-  'rejected',
-  'interview',
-  'withdrawn',
-  'unmet-requirements',
-  'archived',
-] as const satisfies readonly JobApplyStatus[]
-
-const PRE_APPLICATION_TARGETS = [
-  'applied',
-  'not-interested',
-  'unmet-requirements',
-  'stack-mismatch',
-] as const satisfies readonly JobApplyStatus[]
-
-const ARCHIVE_TRANSITION = ['archived'] as const satisfies readonly JobApplyStatus[]
-
-const TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
-  'not-applied': ['consider', ...PRE_APPLICATION_TARGETS],
-  consider: PRE_APPLICATION_TARGETS,
-  applied: APPLIED_FOLLOW_UP_STATUSES,
-  'not-interested': ['not-applied', 'applied', 'unmet-requirements', 'stack-mismatch', 'archived'],
-  'unmet-requirements': ['not-applied', 'applied', 'stack-mismatch', 'archived'],
-  'stack-mismatch': ARCHIVE_TRANSITION,
-  rejected: ARCHIVE_TRANSITION,
-  'no-response': NO_RESPONSE_FOLLOW_UP_STATUSES,
-  interview: ['rejected', 'withdrawn', 'offer'],
-  offer: ['offer-accepted', 'withdrawn'],
-  'offer-accepted': ARCHIVE_TRANSITION,
-  withdrawn: ARCHIVE_TRANSITION,
+const STATUS_TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
+  'pending-review': ['consider', 'applied'],
+  consider: ['applied'],
+  applied: ['no-response', 'interview'],
+  'no-response': ['interview'],
+  interview: [],
   archived: [],
 }
 
-export function canTransition(from: JobApplyStatus, to: JobApplyStatus): boolean {
+const UNARCHIVE_TARGETS: Record<JobAdArchiveReason, readonly JobApplyStatus[]> = {
+  'not-interested': ['pending-review', 'consider'],
+  'unmet-requirements': ['pending-review', 'consider'],
+  'stack-mismatch': ['pending-review', 'consider'],
+  'no-response': ['interview'],
+  rejected: [],
+  withdrawn: [],
+  'offer-accepted': [],
+}
+
+export function isArchivedApplyStatus(status: JobApplyStatus): boolean {
+  return status === 'archived'
+}
+
+export function availableArchiveReasons(from: JobApplyStatus): JobAdArchiveReason[] {
+  switch (from) {
+    case 'pending-review':
+    case 'consider':
+      return [...PRE_APPLICATION_ARCHIVE_REASONS]
+    case 'applied':
+      return [...POST_APPLICATION_ARCHIVE_REASONS]
+    case 'no-response':
+      return [...NO_RESPONSE_ARCHIVE_REASONS]
+    case 'interview':
+      return [...INTERVIEW_ARCHIVE_REASONS]
+    default:
+      return []
+  }
+}
+
+export function availableUnarchiveTargets(archiveReason: JobAdArchiveReason): JobApplyStatus[] {
+  return [...UNARCHIVE_TARGETS[archiveReason]]
+}
+
+export function canTransition(
+  from: JobApplyStatus,
+  to: JobApplyStatus,
+  fromArchiveReason: JobAdArchiveReason | null,
+  toArchiveReason: JobAdArchiveReason | null,
+): boolean {
   if (from === to) {
-    return true
+    if (from === 'archived') {
+      return fromArchiveReason === toArchiveReason
+    }
+
+    return toArchiveReason === null
   }
 
-  return TRANSITIONS[from].includes(to)
+  if (to === 'archived') {
+    return toArchiveReason !== null && availableArchiveReasons(from).includes(toArchiveReason)
+  }
+
+  if (from === 'archived') {
+    return (
+      fromArchiveReason !== null &&
+      toArchiveReason === null &&
+      availableUnarchiveTargets(fromArchiveReason).includes(to)
+    )
+  }
+
+  return toArchiveReason === null && STATUS_TRANSITIONS[from].includes(to)
 }
 
-export function availableTargetApplyStatuses(from: JobApplyStatus): JobApplyStatus[] {
-  return TRANSITIONS[from].filter(status => status !== from)
+export function availableTargetStatuses(
+  from: JobApplyStatus,
+  archiveReason: JobAdArchiveReason | null,
+): JobApplyStatus[] {
+  if (from === 'archived') {
+    if (archiveReason === null) {
+      return []
+    }
+
+    return availableUnarchiveTargets(archiveReason)
+  }
+
+  const forward = [...STATUS_TRANSITIONS[from]]
+  if (availableArchiveReasons(from).length > 0) {
+    forward.push('archived')
+  }
+
+  return forward
 }
 
-export function isTerminalApplyStatus(status: JobApplyStatus): boolean {
-  return TERMINAL_APPLY_STATUSES.has(status)
-}
+export function availableTransitions(
+  from: JobApplyStatus,
+  archiveReason: JobAdArchiveReason | null,
+): ApplyStatusTransition[] {
+  if (from === 'archived') {
+    if (archiveReason === null) {
+      return []
+    }
 
-export function isHiddenApplyStatus(status: JobApplyStatus): boolean {
-  return HIDDEN_APPLY_STATUSES.has(status)
+    return availableUnarchiveTargets(archiveReason).map(to => ({ to }))
+  }
+
+  const forward = STATUS_TRANSITIONS[from].map(to => ({ to }))
+  const archive = availableArchiveReasons(from).map(reason => ({
+    to: 'archived' as const,
+    archiveReason: reason,
+  }))
+
+  return [...forward, ...archive]
 }

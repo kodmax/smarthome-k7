@@ -3,14 +3,14 @@ import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { filterVisibleJobAds, isJobAdVisibleInNormalView } from './visibleJobAds'
 
 describe('visibleJobAds', () => {
-  it('shows not-applied, consider, applied, interview and offer ads', () => {
-    expect(
-      isJobAdVisibleInNormalView(jobAd({ id: '1', title: 'Open', meta: { application: { status: 'not-applied' } } })),
-    ).toBe(true)
+  it('shows pending-review, consider, applied and interview ads', () => {
     expect(
       isJobAdVisibleInNormalView(
-        jobAd({ id: '2', title: 'Considering', meta: { application: { status: 'consider' } } }),
+        jobAd({ id: '1', title: 'Open', meta: { application: { status: 'pending-review' } } }),
       ),
+    ).toBe(true)
+    expect(
+      isJobAdVisibleInNormalView(jobAd({ id: '2', title: 'Consider', meta: { application: { status: 'consider' } } })),
     ).toBe(true)
     expect(
       isJobAdVisibleInNormalView(jobAd({ id: '3', title: 'Applied', meta: { application: { status: 'applied' } } })),
@@ -21,23 +21,23 @@ describe('visibleJobAds', () => {
       ),
     ).toBe(true)
     expect(
-      isJobAdVisibleInNormalView(jobAd({ id: '5', title: 'Offer', meta: { application: { status: 'offer' } } })),
-    ).toBe(true)
+      isJobAdVisibleInNormalView(
+        jobAd({ id: '5', title: 'No response', meta: { application: { status: 'no-response' } } }),
+      ),
+    ).toBe(false)
     expect(
-      isJobAdVisibleInNormalView(jobAd({ id: '6', title: 'Rejected', meta: { application: { status: 'rejected' } } })),
+      isJobAdVisibleInNormalView(
+        jobAd({ id: '6', title: 'Archived', meta: { application: { status: 'archived', archiveReason: 'rejected' } } }),
+      ),
     ).toBe(false)
   })
 
-  it('filters visible ads from a list while preserving feed order', () => {
-    expect(
-      filterVisibleJobAds([
-        jobAd({ id: '1', title: 'Open', meta: { application: { status: 'not-applied' } } }),
-        jobAd({ id: '2', title: 'Rejected', meta: { application: { status: 'rejected' } } }),
-        jobAd({ id: '3', title: 'Considering', meta: { application: { status: 'consider' } } }),
-        jobAd({ id: '4', title: 'Applied', meta: { application: { status: 'applied' } } }),
-        jobAd({ id: '5', title: 'Interview', meta: { application: { status: 'interview' } } }),
-        jobAd({ id: '6', title: 'Offer', meta: { application: { status: 'offer' } } }),
-      ]).map(ad => ad.content.id),
-    ).toEqual(['1', '3', '4', '5', '6'])
+  it('filters visible ads', () => {
+    const ads = [
+      jobAd({ id: '1', title: 'Open', meta: { application: { status: 'pending-review' } } }),
+      jobAd({ id: '2', title: 'Archived', meta: { application: { status: 'archived', archiveReason: 'rejected' } } }),
+    ]
+
+    expect(filterVisibleJobAds(ads).map(ad => ad.content.id)).toEqual(['1'])
   })
 })

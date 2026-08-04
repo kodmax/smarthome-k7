@@ -10,31 +10,18 @@ type Props = {
 
 export const JobAdsFilterSelect: FC<Props> = ({ value, onChange }) => {
   const { t } = useTranslations()
-  const labels = t.dashboard.jobAds.filters
+  const labels = t.dashboard.jobAds
 
   const handleChange = (event: SelectChangeEvent<JobAdsFilter>) => {
     onChange(event.target.value as JobAdsFilter)
   }
 
-  const filterLabels: Record<JobAdsFilter, string> = {
-    latest: labels.latest,
-    consider: labels.consider,
-    'with-match-analysis': labels.withMatchAnalysis,
-    'in-progress': labels.inProgress,
-    'not-interested': labels.notInterested,
-    stretch: labels.stretch,
-    'rejected-no-response': labels.rejectedNoResponse,
-    finished: labels.finished,
-    archived: labels.archived,
-    applied: labels.applied,
-  }
-
   return (
     <FormControl size='small' sx={{ minWidth: 168 }}>
-      <Select value={value} onChange={handleChange} aria-label={labels.label}>
+      <Select value={value} onChange={handleChange} aria-label={labels.filters.label}>
         {JOB_ADS_FILTER_ORDER.map(filter => (
           <MenuItem key={filter} value={filter}>
-            {filterLabels[filter]}
+            {labels.applyStatus[filter]}
           </MenuItem>
         ))}
       </Select>

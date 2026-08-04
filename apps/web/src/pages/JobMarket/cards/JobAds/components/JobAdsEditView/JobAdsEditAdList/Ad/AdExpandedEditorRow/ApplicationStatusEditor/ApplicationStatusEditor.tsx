@@ -13,7 +13,7 @@ import {
 import { AiSparklesIcon, FavStarIcon, LoaderIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
 import { toSkillId } from '@repo/common'
-import { JobAdsFeedItem, JobApplyStatus, MySkillsFeed } from '@repo/types'
+import { JobAdArchiveReason, JobAdsFeedItem, JobApplyStatus, MySkillsFeed } from '@repo/types'
 import { designTokens } from '@repo/design-tokens'
 import { Star } from 'lucide-react'
 import { FC, useEffect, useMemo, useState, type CSSProperties, type SyntheticEvent } from 'react'
@@ -21,18 +21,28 @@ import { TagGroup } from '@/card-components'
 import { CvPreviewDialog } from '@/pages/JobMarket/cards/Cv/CvPreviewDialog'
 import { useLocale, useTranslations } from '@/i18n'
 import { ApplyStatusIcon } from '../../../../../../shared-components'
-import { applyStatusTargetOptions } from './applyStatusSelectOptions'
+import { applyArchiveReasonOptions, applyStatusTargetStatuses } from './applyStatusSelectOptions'
 import { formatAppliedDaysAgo, formatNotApplicable } from './formatAppliedDaysAgo'
 import { RequiredSkillTag } from './RequiredSkillTag'
 import { useCvMatchAnalysis } from './useCvMatchAnalysis'
 
 const favIconSize = designTokens.icon.sizeMd
 const actionButtonIconSize = 16
-const emptyNextStatus = ''
+const emptySelection = ''
+
+export type SaveApplicationState = {
+  applyStatus: JobApplyStatus
+  archiveReason?: JobAdArchiveReason
+  comment: string
+}
+
+export type ChangeApplicationStatePayload = SaveApplicationState & {
+  id: string
+}
 
 export const ApplicationStatusEditor: FC<{
   ad: JobAdsFeedItem
-  onSave: (applyStatus: JobApplyStatus, comment: string) => void
+  onSave: (state: SaveApplicationState) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
   onAnalyzeCvMatch: (id: string) => void
@@ -41,6 +51,7 @@ export const ApplicationStatusEditor: FC<{
   const { locale } = useLocale()
   const labels = t.dashboard.jobAds
   const currentStatus = ad.meta.application.status
+  const currentArchiveReason = ad.meta.application.archiveReason
   const rejectedAt = ad.meta.application.rejectedAt
   const showRejectionDate = rejectedAt !== null
   const appliedDaysAgo = formatAppliedDaysAgo(ad.meta.application.appliedAt, locale)
@@ -48,12 +59,20 @@ export const ApplicationStatusEditor: FC<{
   const notApplicable = formatNotApplicable(locale)
   const savedComment = ad.meta.application.comment ?? ''
   const [isChangingStatus, setIsChangingStatus] = useState(false)
-  const [nextStatus, setNextStatus] = useState<JobApplyStatus | typeof emptyNextStatus>(emptyNextStatus)
+  const [nextStatus, setNextStatus] = useState<JobApplyStatus | typeof emptySelection>(emptySelection)
+  const [nextArchiveReason, setNextArchiveReason] = useState<JobAdArchiveReason | typeof emptySelection>(emptySelection)
   const [comment, setComment] = useState(savedComment)
   const [menuPaperStyle, setMenuPaperStyle] = useState<CSSProperties>()
-  const targetStatusOptions = useMemo(() => applyStatusTargetOptions(currentStatus), [currentStatus])
-  const hasStatusOptions = targetStatusOptions.length > 0
-  const canSubmit = nextStatus !== emptyNextStatus || comment.trim() !== savedComment.trim()
+  const targetStatuses = useMemo(
+    () => applyStatusTargetStatuses(currentStatus, currentArchiveReason),
+    [currentArchiveReason, currentStatus],
+  )
+  const archiveReasonOptions = useMemo(() => applyArchiveReasonOptions(currentStatus), [currentStatus])
+  const hasStatusOptions = targetStatuses.length > 0
+  const showArchiveReasonSelect = nextStatus === 'archived'
+  const hasValidStatusSelection =
+    nextStatus !== emptySelection && (nextStatus !== 'archived' || nextArchiveReason !== emptySelection)
+  const canSubmit = hasValidStatusSelection || comment.trim() !== savedComment.trim()
   const canAnalyzeCvMatch = ad.content.origin !== 'theprotocol' && !ad.meta.isCurrentCVUsed
   const {
     analyzing: analyzingCvMatch,
@@ -86,20 +105,35 @@ export const ApplicationStatusEditor: FC<{
     [menuPaperStyle],
   )
 
+  const currentStatusLabel =
+    currentStatus === 'archived' && currentArchiveReason !== null
+      ? labels.archiveReason[currentArchiveReason]
+      : labels.applyStatus[currentStatus]
+
   useEffect(() => {
     setIsChangingStatus(false)
-    setNextStatus(emptyNextStatus)
+    setNextStatus(emptySelection)
+    setNextArchiveReason(emptySelection)
     setComment(savedComment)
-  }, [ad.content.id, currentStatus, savedComment])
+  }, [ad.content.id, currentArchiveReason, currentStatus, savedComment])
 
   const handleOpenEditor = () => {
     setComment(savedComment)
-    setNextStatus(emptyNextStatus)
+    setNextStatus(emptySelection)
+    setNextArchiveReason(emptySelection)
     setIsChangingStatus(true)
   }
 
-  const handleNextStatusChange = (event: SelectChangeEvent<JobApplyStatus | typeof emptyNextStatus>) => {
-    setNextStatus(event.target.value as JobApplyStatus)
+  const handleNextStatusChange = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value as JobApplyStatus | typeof emptySelection
+    setNextStatus(value)
+    if (value !== 'archived') {
+      setNextArchiveReason(emptySelection)
+    }
+  }
+
+  const handleNextArchiveReasonChange = (event: SelectChangeEvent<string>) => {
+    setNextArchiveReason(event.target.value as JobAdArchiveReason)
   }
 
   const handleStatusSelectOpen = (event: SyntheticEvent) => {
@@ -112,13 +146,38 @@ export const ApplicationStatusEditor: FC<{
       return
     }
 
-    const applyStatus = nextStatus !== emptyNextStatus ? nextStatus : currentStatus
-    onSave(applyStatus, comment.trim())
+    if (nextStatus !== emptySelection) {
+      if (nextStatus === 'archived') {
+        if (nextArchiveReason === emptySelection) {
+          return
+        }
+
+        onSave({
+          applyStatus: 'archived',
+          archiveReason: nextArchiveReason,
+          comment: comment.trim(),
+        })
+        return
+      }
+
+      onSave({
+        applyStatus: nextStatus,
+        comment: comment.trim(),
+      })
+      return
+    }
+
+    onSave({
+      applyStatus: currentStatus,
+      archiveReason: currentArchiveReason ?? undefined,
+      comment: comment.trim(),
+    })
   }
 
   const handleCancelChange = () => {
     setIsChangingStatus(false)
-    setNextStatus(emptyNextStatus)
+    setNextStatus(emptySelection)
+    setNextArchiveReason(emptySelection)
     setComment(savedComment)
   }
 
@@ -168,8 +227,10 @@ export const ApplicationStatusEditor: FC<{
                 {labels.currentApplicationStatus}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: `${designTokens.space[1]}px` }}>
-                {currentStatus !== 'not-applied' ? <ApplyStatusIcon status={currentStatus} /> : null}
-                <Typography>{labels.applyStatus[currentStatus]}</Typography>
+                {currentStatus !== 'pending-review' ? (
+                  <ApplyStatusIcon status={currentStatus} archiveReason={currentArchiveReason} />
+                ) : null}
+                <Typography>{currentStatusLabel}</Typography>
               </Box>
             </Box>
             <Box>
@@ -235,7 +296,7 @@ export const ApplicationStatusEditor: FC<{
                 <InputLabel id={`job-next-status-${ad.content.id}`} shrink>
                   {labels.newApplicationStatus}
                 </InputLabel>
-                <Select<JobApplyStatus | typeof emptyNextStatus>
+                <Select<string>
                   labelId={`job-next-status-${ad.content.id}`}
                   value={nextStatus}
                   label={labels.newApplicationStatus}
@@ -244,9 +305,40 @@ export const ApplicationStatusEditor: FC<{
                   onOpen={handleStatusSelectOpen}
                   MenuProps={statusSelectMenuProps}
                 >
-                  {targetStatusOptions.map(status => (
+                  {targetStatuses.map(status => (
                     <MenuItem key={status} value={status}>
                       {labels.applyStatus[status]}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : null}
+
+            {showArchiveReasonSelect ? (
+              <FormControl
+                size='small'
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline legend': {
+                    maxWidth: '100%',
+                  },
+                }}
+              >
+                <InputLabel id={`job-archive-reason-${ad.content.id}`} shrink>
+                  {labels.newArchiveReason}
+                </InputLabel>
+                <Select<string>
+                  labelId={`job-archive-reason-${ad.content.id}`}
+                  value={nextArchiveReason}
+                  label={labels.newArchiveReason}
+                  displayEmpty
+                  onChange={handleNextArchiveReasonChange}
+                  onOpen={handleStatusSelectOpen}
+                  MenuProps={statusSelectMenuProps}
+                >
+                  {archiveReasonOptions.map(reason => (
+                    <MenuItem key={reason} value={reason}>
+                      {labels.archiveReason[reason]}
                     </MenuItem>
                   ))}
                 </Select>
