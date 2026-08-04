@@ -167,7 +167,7 @@ describe('applicationMeta', () => {
       applyStatusChange(
         {
           applyStatus: 'archived',
-          archiveReason: 'not-interested',
+          archiveReason: 'other',
           comment: 'Not for me',
           appliedAt: null,
           rejectedAt: null,
@@ -181,6 +181,42 @@ describe('applicationMeta', () => {
       appliedAt: null,
       rejectedAt: null,
     })
+  })
+
+  it('allows pre-application rearchive while staying archived', () => {
+    expect(
+      applyStatusChange(
+        {
+          applyStatus: 'archived',
+          archiveReason: 'other',
+          comment: 'Old note',
+          appliedAt: null,
+          rejectedAt: null,
+        },
+        { applyStatus: 'archived', archiveReason: 'weak-match', comment: 'Low match' },
+      ),
+    ).toEqual({
+      applyStatus: 'archived',
+      archiveReason: 'weak-match',
+      comment: 'Low match',
+      appliedAt: null,
+      rejectedAt: null,
+    })
+  })
+
+  it('rejects rearchive outside pre-application reasons', () => {
+    expect(
+      applyStatusChange(
+        {
+          applyStatus: 'archived',
+          archiveReason: 'rejected',
+          comment: null,
+          appliedAt: '2026-07-18T12:00:00.000Z',
+          rejectedAt: '2026-07-19T12:00:00.000Z',
+        },
+        { applyStatus: 'archived', archiveReason: 'withdrawn' },
+      ),
+    ).toBeNull()
   })
 
   it('allows interview to archived with offer-accepted', () => {
@@ -233,6 +269,24 @@ describe('applicationMeta', () => {
     ).toBeNull()
   })
 
+  it('maps legacy not-interested archive reason to other', () => {
+    expect(
+      parseApplicationMeta({
+        applyStatus: 'archived',
+        archiveReason: 'not-interested',
+        comment: null,
+        appliedAt: null,
+        rejectedAt: null,
+      }),
+    ).toEqual({
+      applyStatus: 'archived',
+      archiveReason: 'other',
+      comment: null,
+      appliedAt: null,
+      rejectedAt: null,
+    })
+  })
+
   it('derives statusChangedAt from meta row timestamp', () => {
     expect(resolveStatusChangedAt('consider', '2026-07-19T15:00:00.000Z')).toBe('2026-07-19T15:00:00.000Z')
     expect(resolveStatusChangedAt('pending-review', '2026-07-19T15:00:00.000Z')).toBeNull()
@@ -249,13 +303,11 @@ describe('applicationMeta', () => {
     })
 
     expect(
-      parseChangeStateCommandArgs(
-        JSON.stringify({ id: 'jj-2', applyStatus: 'archived', archiveReason: 'not-interested' }),
-      ),
+      parseChangeStateCommandArgs(JSON.stringify({ id: 'jj-2', applyStatus: 'archived', archiveReason: 'other' })),
     ).toEqual({
       id: 'jj-2',
       applyStatus: 'archived',
-      archiveReason: 'not-interested',
+      archiveReason: 'other',
     })
   })
 })

@@ -1,5 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { renderWithTheme } from '@/test/test-utils'
 import { JobAdsArchivedAdList } from './JobAdsArchivedAdList'
@@ -12,7 +12,7 @@ describe('JobAdsArchivedAdList', () => {
       <JobAdsArchivedAdList
         groups={[
           {
-            archiveReason: 'not-interested',
+            archiveReason: 'other',
             ads: [jobAd({ id: '1', title: 'Skipped Role' })],
           },
           {
@@ -27,20 +27,23 @@ describe('JobAdsArchivedAdList', () => {
       />,
     )
 
-    expect(screen.getByRole('button', { name: /Nie interesuje mnie/i })).toHaveTextContent('(1)')
+    expect(screen.getByRole('button', { name: /Inny/i })).toHaveTextContent('(1)')
     expect(screen.getByRole('button', { name: /Odrzucone/i })).toHaveTextContent('(2)')
-    expect(screen.getByText('Skipped Role')).toBeInTheDocument()
-    expect(screen.getByText('Rejected Role A')).toBeInTheDocument()
-    expect(screen.getByText('Rejected Role B')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Inny/i })).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByRole('button', { name: /Odrzucone/i })).toHaveAttribute('aria-expanded', 'false')
   })
 
-  it('collapses a section when its summary is clicked', () => {
+  it('opens default archive groups and keeps the rest collapsed', () => {
     renderWithTheme(
       <JobAdsArchivedAdList
         groups={[
           {
-            archiveReason: 'withdrawn',
-            ads: [jobAd({ id: '4', title: 'Withdrawn Role' })],
+            archiveReason: 'unmet-requirements',
+            ads: [jobAd({ id: '1', title: 'Unmet Role' })],
+          },
+          {
+            archiveReason: 'other',
+            ads: [jobAd({ id: '2', title: 'Skipped Role' })],
           },
         ]}
         zoom={true}
@@ -50,10 +53,31 @@ describe('JobAdsArchivedAdList', () => {
       />,
     )
 
-    const summary = screen.getByRole('button', { name: /Rozmyśliłem się/i })
+    expect(screen.getByRole('button', { name: /Niespełnione wymagania/i })).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('button', { name: /Inny/i })).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByText('Unmet Role')).toBeInTheDocument()
+  })
+
+  it('collapses a section when its summary is clicked', () => {
+    renderWithTheme(
+      <JobAdsArchivedAdList
+        groups={[
+          {
+            archiveReason: 'no-response',
+            ads: [jobAd({ id: '4', title: 'No Response Role' })],
+          },
+        ]}
+        zoom={true}
+        onFav={noop}
+        onUnfav={noop}
+        onAnalyzeCvMatch={noop}
+      />,
+    )
+
+    const summary = screen.getByRole('button', { name: /Brak odpowiedzi/i })
 
     expect(summary).toHaveAttribute('aria-expanded', 'true')
-    expect(screen.getByText('Withdrawn Role')).toBeInTheDocument()
+    expect(screen.getByText('No Response Role')).toBeInTheDocument()
 
     fireEvent.click(summary)
 

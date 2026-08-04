@@ -371,10 +371,12 @@ export const en: Translations = {
         archived: 'Archived',
       },
       archiveReason: {
-        'not-interested': 'Not interested',
+        other: 'Other',
+        'company-excluded': 'Excluded company',
         'unmet-requirements': 'Unmet requirements',
         'stack-mismatch': 'Stack mismatch',
         'weak-match': 'Weak match',
+        'manager-track': 'Management track',
         'no-response': 'No response',
         rejected: 'Rejected',
         withdrawn: 'Withdrawn',

@@ -3,7 +3,7 @@ import { designTokens } from '@repo/design-tokens'
 import { ChevronDown } from 'lucide-react'
 import { FC } from 'react'
 import { useTranslations } from '@/i18n'
-import type { ArchivedJobAdsGroup } from '../../../jobAdsFilter'
+import { isDefaultExpandedArchivedGroup, type ArchivedJobAdsGroup } from '../../../jobAdsFilter'
 import { ApplyStatusIcon } from '../../../shared-components'
 import type { ChangeApplicationStatePayload } from '../JobAdsEditAdList/Ad/AdExpandedEditorRow/ApplicationStatusEditor'
 import { JobAdsEditAdList } from '../JobAdsEditAdList'
@@ -40,7 +40,7 @@ export const JobAdsArchivedAdList: FC<Props> = ({
       {groups.map(group => (
         <Accordion
           key={group.archiveReason}
-          defaultExpanded
+          defaultExpanded={isDefaultExpandedArchivedGroup(group.archiveReason)}
           disableGutters
           elevation={0}
           sx={{

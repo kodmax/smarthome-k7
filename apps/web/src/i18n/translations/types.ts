@@ -337,10 +337,12 @@ export type Translations = {
         archived: string
       }
       archiveReason: {
-        'not-interested': string
+        other: string
+        'company-excluded': string
         'unmet-requirements': string
         'stack-mismatch': string
         'weak-match': string
+        'manager-track': string
         'no-response': string
         rejected: string
         withdrawn: string

@@ -1,16 +1,18 @@
 import { JobAdArchiveReason, JobApplyStatus } from '@repo/types'
 import {
   Archive,
-  Ban,
+  Building2,
   Calendar,
   CircleCheck,
   CircleDashed,
   ClipboardX,
   Clock,
   CircleX,
+  Ellipsis,
   Gauge,
   MailCheck,
   Unplug,
+  Users,
   XCircle,
   Scale,
   type LucideIcon,
@@ -35,10 +37,12 @@ export const APPLY_STATUS_COLORS: Record<JobApplyStatus, string> = {
 }
 
 export const ARCHIVE_REASON_ICONS: Record<JobAdArchiveReason, LucideIcon> = {
-  'not-interested': Ban,
+  other: Ellipsis,
+  'company-excluded': Building2,
   'unmet-requirements': ClipboardX,
   'stack-mismatch': Unplug,
   'weak-match': Gauge,
+  'manager-track': Users,
   'no-response': Clock,
   rejected: XCircle,
   withdrawn: CircleX,
@@ -46,10 +50,12 @@ export const ARCHIVE_REASON_ICONS: Record<JobAdArchiveReason, LucideIcon> = {
 }
 
 export const ARCHIVE_REASON_COLORS: Record<JobAdArchiveReason, string> = {
-  'not-interested': 'var(--mui-palette-error-main)',
+  other: 'var(--mui-palette-text-secondary)',
+  'company-excluded': 'var(--mui-palette-error-main)',
   'unmet-requirements': 'var(--mui-palette-warning-main)',
   'stack-mismatch': 'var(--mui-palette-text-secondary)',
   'weak-match': 'var(--mui-palette-warning-main)',
+  'manager-track': 'var(--mui-palette-text-secondary)',
   'no-response': 'var(--mui-palette-warning-main)',
   rejected: 'var(--mui-palette-error-main)',
   withdrawn: 'var(--mui-palette-text-secondary)',

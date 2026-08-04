@@ -24,13 +24,13 @@ describe('JobAdsEditView archived filter', () => {
           jobAd({
             id: '2',
             title: 'Not Interested Role',
-            meta: { application: { status: 'archived', archiveReason: 'not-interested' } },
+            meta: { application: { status: 'archived', archiveReason: 'other' } },
           }),
         ]}
       />,
     )
 
-    expect(screen.getByRole('button', { name: /Nie interesuje mnie/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Inny/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Odrzucone/i })).toBeInTheDocument()
     expect(screen.getByText('Rejected Role')).toBeInTheDocument()
     expect(screen.getByText('Not Interested Role')).toBeInTheDocument()

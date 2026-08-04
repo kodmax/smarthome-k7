@@ -67,7 +67,10 @@ export const ApplicationStatusEditor: FC<{
     () => applyStatusTargetStatuses(currentStatus, currentArchiveReason),
     [currentArchiveReason, currentStatus],
   )
-  const archiveReasonOptions = useMemo(() => applyArchiveReasonOptions(currentStatus), [currentStatus])
+  const archiveReasonOptions = useMemo(
+    () => applyArchiveReasonOptions(currentStatus, currentArchiveReason),
+    [currentArchiveReason, currentStatus],
+  )
   const hasStatusOptions = targetStatuses.length > 0
   const showArchiveReasonSelect = nextStatus === 'archived'
   const hasValidStatusSelection =

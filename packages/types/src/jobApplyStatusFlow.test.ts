@@ -17,7 +17,7 @@ describe('jobApplyStatusFlow', () => {
   it('allows pending-review forward transitions', () => {
     expect(canTransition('pending-review', 'consider', null, null)).toBe(true)
     expect(canTransition('pending-review', 'applied', null, null)).toBe(true)
-    expect(canTransition('pending-review', 'archived', null, 'not-interested')).toBe(true)
+    expect(canTransition('pending-review', 'archived', null, 'other')).toBe(true)
     expect(canTransition('pending-review', 'archived', null, 'stack-mismatch')).toBe(true)
     expect(canTransition('pending-review', 'interview', null, null)).toBe(false)
   })
@@ -25,10 +25,12 @@ describe('jobApplyStatusFlow', () => {
   it('allows consider to applied and pre-application archive reasons', () => {
     expect(availableTransitions('consider', null)).toEqual([
       { to: 'applied' },
-      { to: 'archived', archiveReason: 'not-interested' },
+      { to: 'archived', archiveReason: 'other' },
       { to: 'archived', archiveReason: 'unmet-requirements' },
       { to: 'archived', archiveReason: 'stack-mismatch' },
       { to: 'archived', archiveReason: 'weak-match' },
+      { to: 'archived', archiveReason: 'manager-track' },
+      { to: 'archived', archiveReason: 'company-excluded' },
     ])
   })
 
@@ -57,14 +59,14 @@ describe('jobApplyStatusFlow', () => {
   })
 
   it('lists unarchive targets by archive reason', () => {
-    expect(availableUnarchiveTargets('not-interested')).toEqual(['pending-review', 'consider'])
+    expect(availableUnarchiveTargets('other')).toEqual(['pending-review', 'consider'])
     expect(availableUnarchiveTargets('no-response')).toEqual(['interview'])
     expect(availableUnarchiveTargets('rejected')).toEqual([])
     expect(availableUnarchiveTargets('offer-accepted')).toEqual([])
   })
 
   it('allows unarchive transitions from archived', () => {
-    expect(canTransition('archived', 'pending-review', 'not-interested', null)).toBe(true)
+    expect(canTransition('archived', 'pending-review', 'other', null)).toBe(true)
     expect(canTransition('archived', 'interview', 'no-response', null)).toBe(true)
     expect(canTransition('archived', 'applied', 'rejected', null)).toBe(false)
   })
@@ -75,8 +77,8 @@ describe('jobApplyStatusFlow', () => {
   })
 
   it('clears archive reason when leaving archived', () => {
-    expect(canTransition('archived', 'consider', 'not-interested', null)).toBe(true)
-    expect(canTransition('archived', 'consider', 'not-interested', 'not-interested')).toBe(false)
+    expect(canTransition('archived', 'consider', 'other', null)).toBe(true)
+    expect(canTransition('archived', 'consider', 'other', 'other')).toBe(false)
   })
 
   it('marks archived as archived apply status', () => {
@@ -93,7 +95,25 @@ describe('jobApplyStatusFlow', () => {
   })
 
   it('lists unarchive targets as target statuses from archived', () => {
-    expect(availableTargetStatuses('archived', 'not-interested')).toEqual(['pending-review', 'consider'])
+    expect(availableTargetStatuses('archived', 'other')).toEqual(['pending-review', 'consider', 'archived'])
+    expect(availableTargetStatuses('archived', 'no-response')).toEqual(['interview'])
+    expect(availableTargetStatuses('archived', 'rejected')).toEqual([])
     expect(availableTargetStatuses('archived', null)).toEqual([])
+  })
+
+  it('allows pre-application rearchive within archived status', () => {
+    expect(canTransition('archived', 'archived', 'other', 'weak-match')).toBe(true)
+    expect(canTransition('archived', 'archived', 'other', 'rejected')).toBe(false)
+    expect(canTransition('archived', 'archived', 'rejected', 'withdrawn')).toBe(false)
+    expect(availableTransitions('archived', 'stack-mismatch')).toEqual([
+      { to: 'pending-review' },
+      { to: 'consider' },
+      { to: 'archived', archiveReason: 'other' },
+      { to: 'archived', archiveReason: 'unmet-requirements' },
+      { to: 'archived', archiveReason: 'stack-mismatch' },
+      { to: 'archived', archiveReason: 'weak-match' },
+      { to: 'archived', archiveReason: 'manager-track' },
+      { to: 'archived', archiveReason: 'company-excluded' },
+    ])
   })
 })

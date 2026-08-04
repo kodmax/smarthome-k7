@@ -1,15 +1,26 @@
 import { JobAdArchiveReason, JobAdsFeedItem } from '@repo/types'
 
 export const JOB_AD_ARCHIVE_REASON_ORDER = [
-  'not-interested',
   'unmet-requirements',
-  'stack-mismatch',
   'no-response',
+  'other',
+  'weak-match',
+  'manager-track',
+  'stack-mismatch',
+  'company-excluded',
   'rejected',
   'withdrawn',
   'offer-accepted',
-  'weak-match',
 ] as const satisfies readonly JobAdArchiveReason[]
+
+export const DEFAULT_EXPANDED_ARCHIVED_GROUPS = [
+  'unmet-requirements',
+  'no-response',
+] as const satisfies readonly JobAdArchiveReason[]
+
+export function isDefaultExpandedArchivedGroup(archiveReason: JobAdArchiveReason): boolean {
+  return (DEFAULT_EXPANDED_ARCHIVED_GROUPS as readonly JobAdArchiveReason[]).includes(archiveReason)
+}
 
 export type ArchivedJobAdsGroup = {
   archiveReason: JobAdArchiveReason

@@ -317,7 +317,7 @@ describe('ApplicationStatusEditor', () => {
         ad={jobAd({
           id: '16',
           title: 'Role',
-          meta: { application: { status: 'archived', archiveReason: 'not-interested', comment: 'Old note' } },
+          meta: { application: { status: 'archived', archiveReason: 'other', comment: 'Old note' } },
         })}
         onSave={vi.fn()}
         onFav={vi.fn()}
@@ -330,6 +330,58 @@ describe('ApplicationStatusEditor', () => {
 
     expect(screen.getByLabelText('Nowy status')).toBeInTheDocument()
     expect(screen.getByLabelText('Komentarz')).toHaveValue('Old note')
+  })
+
+  it('allows rearchiving pre-application archived ads with a new archive reason', () => {
+    const onSave = vi.fn()
+
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '17',
+          title: 'Role',
+          meta: { application: { status: 'archived', archiveReason: 'other' } },
+        })}
+        onSave={onSave}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Nowy status' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Zarchiwizowane' }))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Powód archiwizacji' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Słabe dopasowanie' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
+
+    expect(onSave).toHaveBeenCalledWith({
+      applyStatus: 'archived',
+      archiveReason: 'weak-match',
+      comment: '',
+    })
+  })
+
+  it('does not offer status changes for post-application archived ads without unarchive targets', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: '18',
+          title: 'Role',
+          meta: { application: { status: 'archived', archiveReason: 'rejected' } },
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
+
+    expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Komentarz')).toBeInTheDocument()
   })
 
   it('submits the selected status and trimmed comment', () => {

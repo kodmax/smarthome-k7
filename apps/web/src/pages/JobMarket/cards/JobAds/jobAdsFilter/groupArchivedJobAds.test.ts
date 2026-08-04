@@ -13,7 +13,7 @@ describe('groupArchivedJobAdsByReason', () => {
       jobAd({
         id: '2',
         title: 'Not Interested Role',
-        meta: { application: { status: 'archived', archiveReason: 'not-interested' } },
+        meta: { application: { status: 'archived', archiveReason: 'other' } },
       }),
       jobAd({
         id: '3',
@@ -24,7 +24,7 @@ describe('groupArchivedJobAdsByReason', () => {
 
     expect(groupArchivedJobAdsByReason(ads)).toEqual([
       {
-        archiveReason: 'not-interested',
+        archiveReason: 'other',
         ads: [ads[1]],
       },
       {

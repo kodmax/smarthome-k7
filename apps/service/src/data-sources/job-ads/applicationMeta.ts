@@ -17,10 +17,12 @@ const APPLY_STATUSES = new Set<JobApplyStatus>([
 ])
 
 const ARCHIVE_REASONS = new Set<JobAdArchiveReason>([
-  'not-interested',
+  'other',
+  'company-excluded',
   'unmet-requirements',
   'stack-mismatch',
   'weak-match',
+  'manager-track',
   'no-response',
   'rejected',
   'withdrawn',
@@ -64,6 +66,10 @@ function parseOptionalComment(value: unknown): string | null {
 function parseArchiveReason(value: unknown): JobAdArchiveReason | null {
   if (value === null || value === undefined) {
     return null
+  }
+
+  if (value === 'not-interested') {
+    return 'other'
   }
 
   return isJobAdArchiveReason(value) ? value : null
@@ -144,7 +150,15 @@ export function applyStatusChange(
 
   if (to === current.applyStatus) {
     if (to === 'archived' && resolvedToArchiveReason !== null && resolvedToArchiveReason !== current.archiveReason) {
-      return null
+      if (!canTransition(current.applyStatus, to, current.archiveReason, resolvedToArchiveReason)) {
+        return null
+      }
+
+      return {
+        ...current,
+        archiveReason: resolvedToArchiveReason,
+        comment: comment !== undefined ? comment || null : current.comment,
+      }
     }
 
     if (comment === undefined) {
