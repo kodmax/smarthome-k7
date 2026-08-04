@@ -1,6 +1,6 @@
 import type OpenAI from 'openai'
 
-const CV_EXTRACTION_MODEL = 'gpt-5.6-terra'
+const CV_EXTRACTION_MODEL = 'gpt-5.6-sol'
 
 const CV_EXTRACTION_PROMPT = `
 Extract all visible text from this PDF document.
