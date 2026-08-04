@@ -366,7 +366,6 @@ export const pl: Translations = {
         'pending-review': 'Do przejrzenia',
         consider: 'Do rozważenia',
         applied: 'Zaaplikowane',
-        'no-response': 'Brak odpowiedzi',
         interview: 'Rozmowa',
         archived: 'Zarchiwizowane',
       },

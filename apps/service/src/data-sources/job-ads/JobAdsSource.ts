@@ -37,8 +37,7 @@ const FAV_ATTRIBUTE_NAME = 'fav'
 const AD_URL_ATTRIBUTE_NAME = 'ad-url'
 const FIRST_PUBLISHED_AT_ATTRIBUTE_NAME = 'first-published-at'
 const PERSISTENT_META_ATTRIBUTE_NAMES = [AD_URL_ATTRIBUTE_NAME, FIRST_PUBLISHED_AT_ATTRIBUTE_NAME] as const
-const STALE_APPLIED_NO_RESPONSE_AFTER_DAYS = 7
-const STALE_NO_RESPONSE_ARCHIVE_AFTER_DAYS = 14
+const STALE_APPLIED_ARCHIVE_AFTER_DAYS = 7
 
 type MetaRow = {
   item_uid: string
@@ -180,9 +179,8 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
         ),
       )
 
-      const appliedChanged = await this.markStaleAppliedAsNoResponse(conn)
-      const noResponseArchived = await this.markStaleNoResponseAsArchived(conn)
-      if (appliedChanged || noResponseArchived) {
+      const appliedArchived = await this.markStaleAppliedAsArchivedNoResponse(conn)
+      if (appliedArchived) {
         void this.push()
       }
     } finally {
@@ -190,29 +188,11 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     }
   }
 
-  private async markStaleAppliedAsNoResponse(conn: Awaited<ReturnType<Pool['getConnection']>>): Promise<boolean> {
+  private async markStaleAppliedAsArchivedNoResponse(
+    conn: Awaited<ReturnType<Pool['getConnection']>>,
+  ): Promise<boolean> {
     const cutoff = new Date()
-    cutoff.setDate(cutoff.getDate() - STALE_APPLIED_NO_RESPONSE_AFTER_DAYS)
-
-    const result = await observeDbQuery('update', 'meta', () =>
-      conn.query(
-        `update meta
-       set value = json_set(value, '$.applyStatus', 'no-response', '$.comment', null)
-       where group_id = ?
-         and attribute_name = ?
-         and json_unquote(json_extract(value, '$.applyStatus')) = 'applied'
-         and json_extract(value, '$.appliedAt') is not null
-         and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
-        [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],
-      ),
-    )
-
-    return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
-  }
-
-  private async markStaleNoResponseAsArchived(conn: Awaited<ReturnType<Pool['getConnection']>>): Promise<boolean> {
-    const cutoff = new Date()
-    cutoff.setDate(cutoff.getDate() - STALE_NO_RESPONSE_ARCHIVE_AFTER_DAYS)
+    cutoff.setDate(cutoff.getDate() - STALE_APPLIED_ARCHIVE_AFTER_DAYS)
 
     const result = await observeDbQuery('update', 'meta', () =>
       conn.query(
@@ -220,7 +200,7 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
        set value = json_set(value, '$.applyStatus', 'archived', '$.archiveReason', 'no-response', '$.comment', null)
        where group_id = ?
          and attribute_name = ?
-         and json_unquote(json_extract(value, '$.applyStatus')) = 'no-response'
+         and json_unquote(json_extract(value, '$.applyStatus')) = 'applied'
          and json_extract(value, '$.appliedAt') is not null
          and json_unquote(json_extract(value, '$.appliedAt')) <= ?`,
         [this.getId(), APPLICATION_ATTRIBUTE_NAME, cutoff.toISOString()],

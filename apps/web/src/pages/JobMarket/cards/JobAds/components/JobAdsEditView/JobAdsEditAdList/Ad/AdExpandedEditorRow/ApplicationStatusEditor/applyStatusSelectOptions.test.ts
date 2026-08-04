@@ -7,7 +7,7 @@ describe('applyStatusTargetStatuses', () => {
   })
 
   it('returns applied follow-up statuses and archived', () => {
-    expect(applyStatusTargetStatuses('applied', null)).toEqual(['no-response', 'interview', 'archived'])
+    expect(applyStatusTargetStatuses('applied', null)).toEqual(['interview', 'archived'])
   })
 
   it('returns only archived from interview', () => {
@@ -34,11 +34,7 @@ describe('applyArchiveReasonOptions', () => {
   })
 
   it('returns post-application archive reasons from applied', () => {
-    expect(applyArchiveReasonOptions('applied')).toEqual(['rejected', 'withdrawn'])
-  })
-
-  it('returns archive reasons including no-response from no-response status', () => {
-    expect(applyArchiveReasonOptions('no-response')).toEqual(['rejected', 'withdrawn', 'no-response'])
+    expect(applyArchiveReasonOptions('applied')).toEqual(['rejected', 'withdrawn', 'no-response'])
   })
 
   it('returns interview archive reasons including offer-accepted', () => {

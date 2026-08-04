@@ -1,4 +1,4 @@
-export type JobApplyStatus = 'pending-review' | 'consider' | 'applied' | 'no-response' | 'interview' | 'archived'
+export type JobApplyStatus = 'pending-review' | 'consider' | 'applied' | 'interview' | 'archived'
 
 export type JobAdArchiveReason =
   | 'other'
@@ -28,9 +28,7 @@ const PRE_APPLICATION_ARCHIVE_REASONS = [
   'company-excluded',
 ] as const satisfies readonly JobAdArchiveReason[]
 
-const POST_APPLICATION_ARCHIVE_REASONS = ['rejected', 'withdrawn'] as const satisfies readonly JobAdArchiveReason[]
-
-const NO_RESPONSE_ARCHIVE_REASONS = [
+const POST_APPLICATION_ARCHIVE_REASONS = [
   'rejected',
   'withdrawn',
   'no-response',
@@ -45,8 +43,7 @@ const INTERVIEW_ARCHIVE_REASONS = [
 const STATUS_TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
   'pending-review': ['consider', 'applied'],
   consider: ['applied'],
-  applied: ['no-response', 'interview'],
-  'no-response': ['interview'],
+  applied: ['interview'],
   interview: [],
   archived: [],
 }
@@ -75,8 +72,6 @@ export function availableArchiveReasons(from: JobApplyStatus): JobAdArchiveReaso
       return [...PRE_APPLICATION_ARCHIVE_REASONS]
     case 'applied':
       return [...POST_APPLICATION_ARCHIVE_REASONS]
-    case 'no-response':
-      return [...NO_RESPONSE_ARCHIVE_REASONS]
     case 'interview':
       return [...INTERVIEW_ARCHIVE_REASONS]
     default:

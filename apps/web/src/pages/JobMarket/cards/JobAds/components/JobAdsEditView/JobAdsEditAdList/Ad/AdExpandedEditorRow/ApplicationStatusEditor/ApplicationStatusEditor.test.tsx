@@ -227,7 +227,7 @@ describe('ApplicationStatusEditor', () => {
         ad={jobAd({
           id: '14',
           title: 'Role',
-          meta: { application: { status: 'no-response', comment: 'Follow-up sent' } },
+          meta: { application: { status: 'applied', comment: 'Follow-up sent' } },
         })}
         onSave={onSave}
         onFav={vi.fn()}
@@ -241,15 +241,15 @@ describe('ApplicationStatusEditor', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
 
     expect(onSave).toHaveBeenCalledWith({
-      applyStatus: 'no-response',
+      applyStatus: 'applied',
       comment: 'Second follow-up sent',
     })
   })
 
-  it('does not list the current status or archive reasons in next status options', () => {
+  it('does not list the current status in next status options', () => {
     renderWithTheme(
       <ApplicationStatusEditor
-        ad={jobAd({ id: '15', title: 'Role', meta: { application: { status: 'no-response' } } })}
+        ad={jobAd({ id: '15', title: 'Role', meta: { application: { status: 'applied' } } })}
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
@@ -260,15 +260,15 @@ describe('ApplicationStatusEditor', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
     fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Nowy status' }))
 
-    expect(screen.queryByRole('option', { name: 'Brak odpowiedzi' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('option', { name: 'Odrzucone' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Zaaplikowane' })).not.toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Rozmowa' })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Zarchiwizowane' })).toBeInTheDocument()
   })
 
   it('requires archive reason when archiving', () => {
     renderWithTheme(
       <ApplicationStatusEditor
-        ad={jobAd({ id: '17', title: 'Role', meta: { application: { status: 'no-response' } } })}
+        ad={jobAd({ id: '17', title: 'Role', meta: { application: { status: 'applied' } } })}
         onSave={vi.fn()}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
@@ -289,7 +289,7 @@ describe('ApplicationStatusEditor', () => {
 
     renderWithTheme(
       <ApplicationStatusEditor
-        ad={jobAd({ id: '18', title: 'Role', meta: { application: { status: 'no-response' } } })}
+        ad={jobAd({ id: '18', title: 'Role', meta: { application: { status: 'applied' } } })}
         onSave={onSave}
         onFav={vi.fn()}
         onUnfav={vi.fn()}

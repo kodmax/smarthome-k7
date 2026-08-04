@@ -332,7 +332,6 @@ export type Translations = {
         'pending-review': string
         consider: string
         applied: string
-        'no-response': string
         interview: string
         archived: string
       }

@@ -4,7 +4,6 @@ export const JOB_ADS_FILTER_ORDER = [
   'pending-review',
   'consider',
   'applied',
-  'no-response',
   'interview',
   'archived',
 ] as const satisfies readonly JobApplyStatus[]

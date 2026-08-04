@@ -366,7 +366,6 @@ export const ru: Translations = {
         'pending-review': 'На просмотр',
         consider: 'На рассмотрении',
         applied: 'Отклик отправлен',
-        'no-response': 'Нет ответа',
         interview: 'Собеседование',
         archived: 'В архиве',
       },

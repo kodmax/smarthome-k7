@@ -36,15 +36,6 @@ describe('jobApplyStatusFlow', () => {
 
   it('allows applied follow-up statuses and post-application archive reasons', () => {
     expect(availableTransitions('applied', null)).toEqual([
-      { to: 'no-response' },
-      { to: 'interview' },
-      { to: 'archived', archiveReason: 'rejected' },
-      { to: 'archived', archiveReason: 'withdrawn' },
-    ])
-  })
-
-  it('allows no-response to interview and archive reasons including no-response', () => {
-    expect(availableTransitions('no-response', null)).toEqual([
       { to: 'interview' },
       { to: 'archived', archiveReason: 'rejected' },
       { to: 'archived', archiveReason: 'withdrawn' },
@@ -74,6 +65,7 @@ describe('jobApplyStatusFlow', () => {
   it('requires archive reason when transitioning to archived', () => {
     expect(canTransition('applied', 'archived', null, null)).toBe(false)
     expect(canTransition('applied', 'archived', null, 'rejected')).toBe(true)
+    expect(canTransition('applied', 'archived', null, 'no-response')).toBe(true)
   })
 
   it('clears archive reason when leaving archived', () => {

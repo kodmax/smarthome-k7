@@ -7,14 +7,7 @@ import {
 } from '@repo/types'
 import { captureInvalidInput } from '@/sentry'
 
-const APPLY_STATUSES = new Set<JobApplyStatus>([
-  'pending-review',
-  'consider',
-  'applied',
-  'no-response',
-  'interview',
-  'archived',
-])
+const APPLY_STATUSES = new Set<JobApplyStatus>(['pending-review', 'consider', 'applied', 'interview', 'archived'])
 
 const ARCHIVE_REASONS = new Set<JobAdArchiveReason>([
   'other',

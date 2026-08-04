@@ -22,7 +22,11 @@ describe('visibleJobAds', () => {
     ).toBe(true)
     expect(
       isJobAdVisibleInNormalView(
-        jobAd({ id: '5', title: 'No response', meta: { application: { status: 'no-response' } } }),
+        jobAd({
+          id: '5',
+          title: 'Archived no response',
+          meta: { application: { status: 'archived', archiveReason: 'no-response' } },
+        }),
       ),
     ).toBe(false)
     expect(

@@ -366,7 +366,6 @@ export const en: Translations = {
         'pending-review': 'To review',
         consider: 'To consider',
         applied: 'Applied',
-        'no-response': 'No response',
         interview: 'Interview',
         archived: 'Archived',
       },

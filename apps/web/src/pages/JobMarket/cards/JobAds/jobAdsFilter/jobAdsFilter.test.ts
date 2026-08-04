@@ -8,7 +8,6 @@ describe('jobAdsFilter', () => {
       jobAd({ id: '1', title: 'New', meta: { application: { status: 'pending-review' } } }),
       jobAd({ id: '2', title: 'Applied', meta: { application: { status: 'applied' } } }),
       jobAd({ id: '3', title: 'Consider', meta: { application: { status: 'consider' } } }),
-      jobAd({ id: '4', title: 'No response', meta: { application: { status: 'no-response' } } }),
       jobAd({ id: '5', title: 'Interview', meta: { application: { status: 'interview' } } }),
       jobAd({
         id: '6',
@@ -20,7 +19,6 @@ describe('jobAdsFilter', () => {
     expect(filterJobAdsByCategory(ads, 'pending-review').map(ad => ad.content.id)).toEqual(['1'])
     expect(filterJobAdsByCategory(ads, 'applied').map(ad => ad.content.id)).toEqual(['2'])
     expect(filterJobAdsByCategory(ads, 'consider').map(ad => ad.content.id)).toEqual(['3'])
-    expect(filterJobAdsByCategory(ads, 'no-response').map(ad => ad.content.id)).toEqual(['4'])
     expect(filterJobAdsByCategory(ads, 'interview').map(ad => ad.content.id)).toEqual(['5'])
     expect(filterJobAdsByCategory(ads, 'archived').map(ad => ad.content.id)).toEqual(['6'])
   })
