@@ -305,10 +305,26 @@ export type TemperatureData = {
 }
 
 export type SalaryUnit = 'Year' | 'Month' | 'Day' | 'Hour'
-export type ContractType = 'permanent' | 'b2b' | 'uod' | 'mandate_contract' | 'any' | 'contract' | 'internship'
+export type ContractType =
+  | 'permanent'
+  | 'b2b'
+  | 'uod'
+  | 'mandate_contract'
+  | 'any'
+  | 'contract'
+  | 'internship'
+  | 'intern'
 
 export type WorkplaceType = 'office' | 'remote' | 'hybrid'
-export type EmploymentType = 'permanent' | 'b2b' | 'uod' | 'mandate_contract' | 'any' | 'contract' | 'internship'
+export type EmploymentType =
+  | 'permanent'
+  | 'b2b'
+  | 'uod'
+  | 'mandate_contract'
+  | 'any'
+  | 'contract'
+  | 'internship'
+  | 'intern'
 
 export type SalaryRange = {
   from: number

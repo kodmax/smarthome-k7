@@ -82,6 +82,12 @@ describe('getMonthlySalaryAfterTax', () => {
         getMonthlySalaryAfterTax('permanent', 'Month', 50_000, 67_000),
       )
     })
+
+    it('converts intern like permanent', () => {
+      expect(getMonthlySalaryAfterTax('intern', 'Month', 50_000, 67_000)).toEqual(
+        getMonthlySalaryAfterTax('permanent', 'Month', 50_000, 67_000),
+      )
+    })
   })
 
   it('throws for unknown contract type', () => {

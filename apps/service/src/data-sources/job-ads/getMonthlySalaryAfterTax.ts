@@ -16,6 +16,7 @@ export const getMonthlySalaryAfterTax = (
   switch (contractType) {
     case 'permanent':
     case 'internship':
+    case 'intern':
       return {
         from: Math.round((from * unitMultiplier[unit] * 0.6) / 12),
         to: Math.round((to * unitMultiplier[unit] * 0.6) / 12),
