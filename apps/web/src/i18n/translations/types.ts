@@ -183,10 +183,12 @@ export type Translations = {
     hintExplanations: {
       energyHighDraw: { line1: string }
       hotBedroom: { line1: string }
+      coldBedroom: { line1: string }
       strongWind: { line1: string }
       hotOutdoor: { line1: string }
       highUv: { line1: string }
       frost: { line1: string }
+      poorOutdoorAir: { line1: string }
       hourlyRain: { line1: string }
       hourlySnow: { line1: string }
       hourlyHail: { line1: string }
@@ -242,6 +244,7 @@ export type Translations = {
       bedroom: string
       bathroom: string
       hotBedroom: string
+      coldBedroom: string
     }
     weather: {
       title: string
@@ -256,6 +259,7 @@ export type Translations = {
       hotOutdoor: string
       highUv: string
       frost: string
+      poorOutdoorAir: string
       beaufortScale: readonly [
         string,
         string,

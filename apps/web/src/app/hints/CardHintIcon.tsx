@@ -32,7 +32,12 @@ export const CardHintIcon: FC<CardHintIconProps> = ({ Icon, variant, title, desc
   }
 
   return (
-    <IconButton size='small' aria-label={title} onClick={handleClick} sx={{ p: 0.25, flex: '0 0 auto' }}>
+    <IconButton
+      size='small'
+      aria-label={title}
+      onClick={handleClick}
+      sx={{ p: 0.25, flex: '0 0 auto', overflow: 'visible' }}
+    >
       <Icon {...iconProps} />
     </IconButton>
   )

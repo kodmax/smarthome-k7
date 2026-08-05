@@ -1,14 +1,13 @@
 import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import { AirVentIcon, FanIcon, HeaterIcon, HeatingIcon, NightIcon, SunIcon, TemperatureIcon } from '@repo/assets'
+import { AirVentIcon, HeaterIcon, HeatingIcon, NightIcon, SunIcon, TemperatureIcon } from '@repo/assets'
 import { ApolloDataTable, KnxReading, KnxStateIcon } from '@/card-components'
 import { BaseCard, useZoom } from '@repo/apollo-card'
-import { useFeed } from '@repo/feed-client'
 import type { LucideIcon } from 'lucide-react'
-import { HomeTempFeedData, TemperatureData } from '@repo/types'
+import { TemperatureData } from '@repo/types'
 import { useTranslations } from '@/i18n'
-import { CardHeadingHints, CardHintIcon, formatHintLine } from '@/app/hints'
-import { shouldShowHotBedroomHint } from './Temperature/hotBedroomHint'
+import { CardHeadingHints, CardHintIcon } from '@/app/hints'
+import { useBedroomTemperatureHints } from './Temperature/useBedroomTemperatureHints'
 
 const icons: Record<string, LucideIcon> = {
   FrostProtection: AirVentIcon,
@@ -19,11 +18,9 @@ const icons: Record<string, LucideIcon> = {
 
 export const Temperature: FC<Record<string, never>> = () => {
   const zoom = useZoom('indoor-temp')
-  const bedroomFeed = useFeed<HomeTempFeedData>('home.temp.bedroom')
+  const hints = useBedroomTemperatureHints()
   const { t } = useTranslations()
   const labels = t.dashboard.temperature
-  const hintExplanations = t.dashboard.hintExplanations
-  const bedroomTemp = bedroomFeed?.reading.value
 
   return (
     <BaseCard
@@ -31,14 +28,17 @@ export const Temperature: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={TemperatureIcon}
       headingInfo={
-        shouldShowHotBedroomHint(bedroomTemp) ? (
+        hints.length > 0 ? (
           <CardHeadingHints>
-            <CardHintIcon
-              Icon={FanIcon}
-              variant='info'
-              title={labels.hotBedroom}
-              description={formatHintLine(hintExplanations.hotBedroom.line1, Number(bedroomTemp), 1)}
-            />
+            {hints.map(hint => (
+              <CardHintIcon
+                key={hint.key}
+                Icon={hint.Icon}
+                variant={hint.variant}
+                title={hint.title}
+                description={hint.description}
+              />
+            ))}
           </CardHeadingHints>
         ) : undefined
       }

@@ -189,6 +189,9 @@ export const pl: Translations = {
       hotBedroom: {
         line1: 'Temperatura w sypialni wynosi {value}°C.',
       },
+      coldBedroom: {
+        line1: 'Temperatura w sypialni wynosi {value}°C.',
+      },
       strongWind: {
         line1: 'Prędkość wiatru wynosi {value} m/s.',
       },
@@ -200,6 +203,9 @@ export const pl: Translations = {
       },
       frost: {
         line1: 'Temperatura na zewnątrz wynosi {value}°C.',
+      },
+      poorOutdoorAir: {
+        line1: 'AQI na zewnątrz wynosi {value}.',
       },
       hourlyRain: {
         line1: 'Prawdopodobieństwo opadów wynosi do {value}%.',
@@ -276,6 +282,7 @@ export const pl: Translations = {
       bedroom: 'Sypialnia',
       bathroom: 'Łazienka',
       hotBedroom: 'Wysoka temperatura w sypialni',
+      coldBedroom: 'Niska temperatura w sypialni',
     },
     weather: {
       title: 'Pogoda',
@@ -290,6 +297,7 @@ export const pl: Translations = {
       hotOutdoor: 'Wysoka temperatura na zewnątrz',
       highUv: 'Wysoki indeks UV',
       frost: 'Mróz',
+      poorOutdoorAir: 'Słaba jakość powietrza na zewnątrz',
       beaufortScale: [
         'Cisza, flauta',
         'Powiew',

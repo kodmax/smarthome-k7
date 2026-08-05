@@ -1,6 +1,6 @@
 import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import { CoolingIcon, ThermometerSunIcon, UVIcon, WeatherIcon as WeatherCardIcon, WindIcon } from '@repo/assets'
+import { WeatherIcon as WeatherCardIcon } from '@repo/assets'
 import { ApolloDataTable, HoursBars, Reading, TablePlaceholder } from '@/card-components'
 import { BaseCard, useZoom } from '@repo/apollo-card'
 import { designTokens } from '@repo/design-tokens'
@@ -9,23 +9,18 @@ import { getPosition, getMoonPosition } from 'suncalc'
 import { useFeed } from '@repo/feed-client'
 import { WeatherFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
-import { CardHeadingHints, CardHintIcon, formatHintLine } from '@/app/hints'
+import { CardHeadingHints, CardHintIcon } from '@/app/hints'
 import { beaufortLevelLabel, beaufortScaleFromMetersPerSecond } from './beaufort'
 import { optimalHumidityRange } from './optimalHumidityRange'
 import { sunTimes } from './sunTimes'
-import {
-  shouldShowFrostHint,
-  shouldShowHighUvHint,
-  shouldShowHotOutdoorHint,
-  shouldShowStrongWindHint,
-} from './weatherHints'
+import { useCurrentWeatherHints } from './useCurrentWeatherHints'
 
 export const Weather: FC<Record<string, never>> = () => {
   const zoom = useZoom('current-weather')
   const feed = useFeed<WeatherFeed>('weather')
+  const hints = useCurrentWeatherHints()
   const { t } = useTranslations()
   const labels = t.dashboard.weather
-  const hintExplanations = t.dashboard.hintExplanations
 
   if (feed === undefined) {
     return (
@@ -43,51 +38,23 @@ export const Weather: FC<Record<string, never>> = () => {
   const windMaxSpeed = feed.instant.wind.maxSpeed
   const windSpeed = feed.instant.wind.speed
 
-  const showStrongWind = shouldShowStrongWindHint(feed.instant.wind.speed)
-  const showHotOutdoor = shouldShowHotOutdoorHint(feed.instant.temp)
-  const showHighUv = shouldShowHighUvHint(feed.instant.uv)
-  const showFrost = shouldShowFrostHint(feed.instant.temp)
-
   return (
     <BaseCard
       cardId='current-weather'
       title={labels.title}
       icon={WeatherCardIcon}
       headingInfo={
-        showStrongWind || showHotOutdoor || showHighUv || showFrost ? (
+        hints.length > 0 ? (
           <CardHeadingHints>
-            {showStrongWind ? (
+            {hints.map(hint => (
               <CardHintIcon
-                Icon={WindIcon}
-                variant='info'
-                title={labels.strongWind}
-                description={formatHintLine(hintExplanations.strongWind.line1, windSpeed, 0)}
+                key={hint.key}
+                Icon={hint.Icon}
+                variant={hint.variant}
+                title={hint.title}
+                description={hint.description}
               />
-            ) : null}
-            {showHotOutdoor ? (
-              <CardHintIcon
-                Icon={ThermometerSunIcon}
-                variant='warning'
-                title={labels.hotOutdoor}
-                description={formatHintLine(hintExplanations.hotOutdoor.line1, Number(feed.instant.temp), 0)}
-              />
-            ) : null}
-            {showHighUv ? (
-              <CardHintIcon
-                Icon={UVIcon}
-                variant='warning'
-                title={labels.highUv}
-                description={formatHintLine(hintExplanations.highUv.line1, feed.instant.uv, 1)}
-              />
-            ) : null}
-            {showFrost ? (
-              <CardHintIcon
-                Icon={CoolingIcon}
-                variant='info'
-                title={labels.frost}
-                description={formatHintLine(hintExplanations.frost.line1, Number(feed.instant.temp), 0)}
-              />
-            ) : null}
+            ))}
           </CardHeadingHints>
         ) : undefined
       }

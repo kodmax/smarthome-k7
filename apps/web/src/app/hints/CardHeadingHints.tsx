@@ -10,5 +10,5 @@ export const CardHeadingHints: FC<{ children: ReactNode }> = ({ children }) => {
     return null
   }
 
-  return <Box sx={{ display: 'flex', alignItems: 'center', gap: space[1] }}>{items}</Box>
+  return <Box sx={{ display: 'flex', alignItems: 'center', gap: space[1], overflow: 'visible' }}>{items}</Box>
 }

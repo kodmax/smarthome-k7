@@ -36,7 +36,7 @@ export const ApolloCardHeader = styled(Box, {
   boxSizing: 'border-box',
   height: zoom ? undefined : apolloCardHeaderHeight,
   minHeight: apolloCardHeaderHeight,
-  overflow: 'hidden',
+  overflow: 'visible',
   padding: '12px 12px 12px 16px',
   paddingBottom: designTokens.space[2],
   borderBottom: `${designTokens.borderWidth.hairline}px solid ${theme.vars.palette.cardHeaderBorder.main}`,
@@ -76,7 +76,7 @@ export const ApolloCardHeadingInfo = styled(Box)(({ theme }) => ({
   flex: '0 0 auto',
   flexShrink: 0,
   minWidth: 0,
-  overflow: 'hidden',
+  overflow: 'visible',
   display: 'flex',
   alignItems: 'center',
   '& > span': {

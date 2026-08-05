@@ -3,11 +3,15 @@ export const CALM_WIND_MAX_MS = 2
 
 export const HOT_OUTDOOR_MIN_C = 28
 export const BEDROOM_HOT_MIN_C = HOT_OUTDOOR_MIN_C
+export const BEDROOM_COLD_MAX_C = 20
 
 export const HIGH_UV_MIN = 7
 export const LOW_UV_MAX = 3
 
 export const FROST_MAX_C = 0
+export const VENTILATION_MIN_OUTDOOR_TEMP_C = 4
+export const VENTILATION_MAX_WIND_MS = 14
+export const VENTILATION_MAX_OUTDOOR_AQI = 100
 
 export const HOURLY_LOOKAHEAD = 3
 export const PRECIP_CHANCE_MIN_PERCENT = 51

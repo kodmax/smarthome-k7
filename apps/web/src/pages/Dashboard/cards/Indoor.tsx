@@ -1,6 +1,6 @@
 import { TableBody } from '@mui/material'
 import { type FC } from 'react'
-import { AirQualityIcon, AirVentIcon, AlertIcon } from '@repo/assets'
+import { AirQualityIcon, AlertIcon } from '@repo/assets'
 
 import { ApolloDataTable, KnxReading, KnxStateIcon, Reading, TablePlaceholder } from '@/card-components'
 import { BaseCard } from '@repo/apollo-card'
@@ -8,17 +8,15 @@ import { useFeed } from '@repo/feed-client'
 import { Co2Data, WeatherFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { CardHeadingHints, CardHintIcon } from '@/app/hints'
-import { shouldShowVentilateHint } from './Indoor/ventilateDecision'
-import { useVentilateDecision } from './Indoor/useVentilateDecision'
+import { useIndoorAirHints } from './Indoor/useIndoorAirHints'
 import { optimalHumidityRange } from './Weather/optimalHumidityRange'
 import { sunTimes } from './Weather/sunTimes'
 
 export const Indoor: FC<Record<string, never>> = () => {
   const feed = useFeed<WeatherFeed>('weather')
-  const ventilate = useVentilateDecision()
+  const hints = useIndoorAirHints()
   const { t } = useTranslations()
   const labels = t.dashboard.indoor
-  const hintExplanations = t.dashboard.hintExplanations
 
   if (feed === undefined) {
     return (
@@ -29,8 +27,6 @@ export const Indoor: FC<Record<string, never>> = () => {
   }
 
   const sun = sunTimes(feed)
-  const showVentilate = shouldShowVentilateHint(ventilate.verdict)
-  const ventilateReasonKey = ventilate.reasonKey as keyof typeof hintExplanations.ventilate
 
   return (
     <BaseCard
@@ -38,14 +34,17 @@ export const Indoor: FC<Record<string, never>> = () => {
       title={labels.title}
       icon={AirQualityIcon}
       headingInfo={
-        showVentilate ? (
+        hints.length > 0 ? (
           <CardHeadingHints>
-            <CardHintIcon
-              Icon={AirVentIcon}
-              variant='info'
-              title={labels.ventilate[ventilate.reasonKey]}
-              description={hintExplanations.ventilate[ventilateReasonKey]}
-            />
+            {hints.map(hint => (
+              <CardHintIcon
+                key={hint.key}
+                Icon={hint.Icon}
+                variant={hint.variant}
+                title={hint.title}
+                description={hint.description}
+              />
+            ))}
           </CardHeadingHints>
         ) : undefined
       }

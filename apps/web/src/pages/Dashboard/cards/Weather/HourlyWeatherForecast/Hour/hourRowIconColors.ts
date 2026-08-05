@@ -1,5 +1,5 @@
 import { CALM_WIND_MAX_MS, HIGH_UV_MIN, LOW_PRECIP_CHANCE_PERCENT, LOW_UV_MAX } from '@/app/hints/hintShowThresholds'
-import { shouldShowStrongWindHint } from '../../weatherHints'
+import { STRONG_WIND_MIN_MS } from '@/app/hints/hintShowThresholds'
 
 const MUTED_ICON_COLOR = 'var(--mui-palette-text-secondary)'
 const ERROR_ICON_COLOR = 'var(--mui-palette-error-main)'
@@ -17,7 +17,7 @@ export const sunIconColor = (uv: number): string | undefined => {
 
 export const windIconColor = (speedMs: number): string => {
   if (speedMs <= CALM_WIND_MAX_MS) return MUTED_ICON_COLOR
-  if (shouldShowStrongWindHint(speedMs)) return ERROR_ICON_COLOR
+  if (speedMs >= STRONG_WIND_MIN_MS) return ERROR_ICON_COLOR
   return AIR_ICON_COLOR
 }
 

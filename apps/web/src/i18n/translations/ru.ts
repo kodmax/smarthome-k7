@@ -189,6 +189,9 @@ export const ru: Translations = {
       hotBedroom: {
         line1: 'Температура в спальне составляет {value}°C.',
       },
+      coldBedroom: {
+        line1: 'Температура в спальне составляет {value}°C.',
+      },
       strongWind: {
         line1: 'Скорость ветра составляет {value} м/с.',
       },
@@ -200,6 +203,9 @@ export const ru: Translations = {
       },
       frost: {
         line1: 'Температура на улице составляет {value}°C.',
+      },
+      poorOutdoorAir: {
+        line1: 'AQI на улице составляет {value}.',
       },
       hourlyRain: {
         line1: 'Вероятность осадков достигает {value}%.',
@@ -276,6 +282,7 @@ export const ru: Translations = {
       bedroom: 'Спальня',
       bathroom: 'Ванная',
       hotBedroom: 'Высокая температура в спальне',
+      coldBedroom: 'Низкая температура в спальне',
     },
     weather: {
       title: 'Погода',
@@ -290,6 +297,7 @@ export const ru: Translations = {
       hotOutdoor: 'Высокая температура на улице',
       highUv: 'Высокий индекс УФ',
       frost: 'Мороз',
+      poorOutdoorAir: 'Плохое качество воздуха на улице',
       beaufortScale: [
         'Штиль',
         'Тихий ветер',
