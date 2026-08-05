@@ -3,7 +3,8 @@ import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FeedEvents, FeedComposer } from '../FeedComposer'
-import { FSCache } from '../Cache'
+import { FSCache, Snapshot } from '../Cache'
+import type { CacheEntry } from '../Cache'
 import { DataSource } from './DataSource'
 import { createSilentLogger } from '@repo/logger'
 import { DataSourceCtor, DataSourceParams, SourceMetricType, DataSourceRefreshObserver } from './types'
@@ -144,6 +145,34 @@ describe('DataSource', () => {
     expect(fetchData).toHaveBeenCalledTimes(2)
 
     vi.useRealTimers()
+  })
+
+  it('uses a single snapshot read on cache hit', async () => {
+    const fetchData = vi.fn(async () => ({ value: 2 }))
+    const snapshot = new Snapshot({ timestamp: Date.now(), content: { value: 1 } })
+    const getSnapshot = vi.fn(async () => (getSnapshot.mock.calls.length % 2 === 1 ? snapshot : null))
+
+    const cacheEntry: CacheEntry<{ value: number }> = {
+      write: vi.fn(async data => data),
+      getSnapshot,
+    }
+
+    const vent = new FeedEvents()
+    const SourceClass = createTestSourceClass({
+      id: 'snapshot-race',
+      getCacheTTL: () => 60_000,
+      fetchData,
+    })
+    const dataSource = new SourceClass({
+      feedEvents: vent,
+      cacheEntry,
+      logger: createSilentLogger(),
+      onError: noopOnError,
+    })
+
+    await expect(dataSource.getData()).resolves.toEqual({ value: 1 })
+    expect(getSnapshot).toHaveBeenCalledTimes(1)
+    expect(fetchData).not.toHaveBeenCalled()
   })
 
   it('calls script on cache miss and on force refresh', async () => {

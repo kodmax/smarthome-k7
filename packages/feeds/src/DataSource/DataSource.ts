@@ -1,5 +1,5 @@
 import type { Logger } from '@repo/logger'
-import type { CacheEntry } from '../Cache'
+import type { CacheEntry, Snapshot } from '../Cache'
 import { FeedEvents } from '../FeedComposer'
 import type {
   DataSourceCtor,
@@ -112,34 +112,37 @@ abstract class DataSource<T, TCache = T> {
   public async getData(forceRefresh = false): Promise<T> {
     if (this.updating) {
       return this.updating
-    } else if (!forceRefresh && this.getCacheTTL() > 0 && (await this.isCacheFresh())) {
-      this.logger.debug({ sourceId: this.getId(), cacheHit: true }, 'Cache hit on data source')
-
-      const snapshot = await this.cacheEntry.getSnapshot()
-      return this.composeContent(snapshot!.getContent())
-    } else {
-      const fetch = this.fetchAndCompose(forceRefresh)
-      const content = await fetch.promise
-
-      if (fetch.initiated) {
-        this.feedEvents.emit('data-update', this.getId())
-      }
-
-      return content
     }
+
+    if (!forceRefresh && this.getCacheTTL() > 0) {
+      const snapshot = await this.getFreshSnapshot()
+      if (snapshot !== null) {
+        this.logger.debug({ sourceId: this.getId(), cacheHit: true }, 'Cache hit on data source')
+        return this.composeContent(snapshot.getContent())
+      }
+    }
+
+    const fetch = this.fetchAndCompose(forceRefresh)
+    const content = await fetch.promise
+
+    if (fetch.initiated) {
+      this.feedEvents.emit('data-update', this.getId())
+    }
+
+    return content
   }
 
-  private async isCacheFresh(): Promise<boolean> {
+  private async getFreshSnapshot(): Promise<Snapshot<TCache> | null> {
     if (this.getCacheTTL() <= 0) {
-      return false
+      return null
     }
 
     const snapshot = await this.cacheEntry.getSnapshot()
     if (snapshot === null) {
-      return false
+      return null
     }
 
-    return this.isCacheValid(snapshot.getContent())
+    return this.isCacheValid(snapshot.getContent()) ? snapshot : null
   }
 
   private fetchAndCompose(forceRefresh = false): { promise: Promise<T>; initiated: boolean } {
