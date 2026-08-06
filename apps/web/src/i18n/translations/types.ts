@@ -355,6 +355,28 @@ export type Translations = {
         withdrawn: string
         'offer-accepted': string
       }
+      addManualJobAd: string
+      addManualJobAdTitle: string
+      addManualJobAdUrl: string
+      addManualJobAdSubmit: string
+      jobTitle: string
+      employmentType: {
+        permanent: string
+        b2b: string
+        label: string
+      }
+      workplaceTypeLabel: string
+      salaryHintPermanent: string
+      salaryHintB2b: string
+      salaryFrom: string
+      salaryTo: string
+      editManualJobAd: string
+      editManualJobAdTitle: string
+      editManualJobAdSubmit: string
+      deleteManualJobAd: string
+      deleteManualJobAdTitle: string
+      deleteManualJobAdConfirm: string
+      deleteManualJobAdHint: string
     }
     news: {
       title: string

@@ -2,6 +2,7 @@ import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { JobAdApplicationMeta, JobAdDocument } from '@repo/types'
 import type { Pool } from 'mariadb'
 import { CV_MATCH_SCOPE } from './cvMatchDocument'
+import { isManualJobAdDocument } from './manual/applyManualJobAdContentUpdate'
 import {
   createJobAdDocument,
   parseJobAdDocument,
@@ -10,6 +11,9 @@ import {
 } from './jobAdDocument'
 
 export const JOB_ADS_RETENTION_DAYS = 90
+export const MANUAL_DELETE_WINDOW_HOURS = 24
+
+export { isManualJobAdDocument } from './manual/applyManualJobAdContentUpdate'
 
 type JobAdRow = {
   id: string
@@ -96,12 +100,11 @@ export async function updateJobAdApplicationMeta(
     return
   }
 
-  const applicationWithTimestamp = withApplicationStatusChangedAt(application)
-  const applicationJson = JSON.stringify(applicationWithTimestamp)
+  const applicationJson = JSON.stringify(withApplicationStatusChangedAt(application))
   await observeDbQuery('update', 'job_ads', () =>
     db.query(
       `update job_ads
-       set data = json_set(data, '$.meta.application', cast(? as json))
+       set data = json_set(data, '$.meta.application', json_extract(?, '$'))
        where id = ?`,
       [applicationJson, id],
     ),
@@ -134,6 +137,97 @@ export async function updateJobAdFav(db: Pool, id: string, fav: boolean): Promis
   await observeDbQuery('update', 'job_ads', () =>
     db.query(`update job_ads set data = json_set(data, '$.meta.fav', ?) where id = ?`, [fav, id]),
   )
+}
+
+export async function insertManualJobAd(db: Pool, document: JobAdDocument): Promise<boolean> {
+  const existingIds = await loadExistingJobAdIds(db, [document.content.id])
+  if (existingIds.has(document.content.id)) {
+    return false
+  }
+
+  await observeDbQuery('insert', 'job_ads', () =>
+    db.query(
+      'insert into job_ads (id, added_at, last_seen, data) values (?, current_timestamp(), current_timestamp(), ?)',
+      [document.content.id, document],
+    ),
+  )
+
+  return true
+}
+
+export async function loadManualJobAdIds(db: Pool): Promise<string[]> {
+  const rows = (await observeDbQuery('select', 'job_ads', () =>
+    db.query(
+      `select id
+       from job_ads
+       where json_unquote(json_extract(data, '$.content.origin')) = 'manual'`,
+    ),
+  )) as Array<{ id: string }>
+
+  return rows.map(row => row.id)
+}
+
+export async function loadJobAdsAddedAtByIds(db: Pool, ids: string[]): Promise<Map<string, string>> {
+  if (ids.length === 0) {
+    return new Map()
+  }
+
+  const rows = (await observeDbQuery('select', 'job_ads', () =>
+    db.query('select id, added_at from job_ads where id in (?)', [ids]),
+  )) as Array<{ id: string; added_at: Date | string }>
+
+  const byId = new Map<string, string>()
+  for (const row of rows) {
+    const addedAt = row.added_at instanceof Date ? row.added_at.toISOString() : new Date(row.added_at).toISOString()
+    byId.set(row.id, addedAt)
+  }
+
+  return byId
+}
+
+export async function updateManualJobAd(db: Pool, document: JobAdDocument): Promise<boolean> {
+  if (!isManualJobAdDocument(document)) {
+    return false
+  }
+
+  const existing = await loadJobAdDocument(db, document.content.id)
+  if (existing === null || !isManualJobAdDocument(existing)) {
+    return false
+  }
+
+  await observeDbQuery('update', 'job_ads', () =>
+    db.query('update job_ads set data = ? where id = ?', [document, document.content.id]),
+  )
+
+  return true
+}
+
+export async function deleteManualJobAd(db: Pool, id: string): Promise<boolean> {
+  const document = await loadJobAdDocument(db, id)
+  if (document === null || !isManualJobAdDocument(document)) {
+    return false
+  }
+
+  const result = await observeDbQuery('delete', 'job_ads', () =>
+    db.query(
+      `delete from job_ads
+       where id = ?
+         and json_unquote(json_extract(data, '$.content.origin')) = 'manual'
+         and added_at >= current_timestamp() - interval ? hour`,
+      [id, MANUAL_DELETE_WINDOW_HOURS],
+    ),
+  )
+
+  const deleted = ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
+  if (!deleted) {
+    return false
+  }
+
+  await observeDbQuery('delete', 'documents', () =>
+    db.query('delete from documents where scope = ? and id = ?', [CV_MATCH_SCOPE, id]),
+  )
+
+  return true
 }
 
 export async function deleteStaleJobAds(db: Pool, retentionDays: number): Promise<number> {

@@ -7,6 +7,7 @@ import { ApplicationStatusEditor } from './ApplicationStatusEditor'
 
 vi.mock('@repo/feed-client', () => ({
   useFeed: vi.fn(),
+  useCommand: vi.fn(() => vi.fn()),
 }))
 
 const mockedUseFeed = vi.mocked(useFeed)
@@ -541,5 +542,48 @@ describe('ApplicationStatusEditor', () => {
 
     expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Zmień stan' })).toBeInTheDocument()
+  })
+
+  it('shows manual refine and delete actions for recent manual ads', () => {
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: 'manual-1',
+          title: 'Manual Role',
+          origin: 'manual',
+          meta: { application: { status: 'pending-review' }, addedAt: new Date().toISOString() },
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Doprecyzuj szczegóły' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Usuń' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Sprawdź dopasowanie' })).not.toBeInTheDocument()
+  })
+
+  it('hides delete action for manual ads older than 24h', () => {
+    const oldAddedAt = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString()
+
+    renderWithTheme(
+      <ApplicationStatusEditor
+        ad={jobAd({
+          id: 'manual-2',
+          title: 'Old Manual Role',
+          origin: 'manual',
+          meta: { application: { status: 'pending-review' }, addedAt: oldAddedAt },
+        })}
+        onSave={vi.fn()}
+        onFav={vi.fn()}
+        onUnfav={vi.fn()}
+        onAnalyzeCvMatch={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Doprecyzuj szczegóły' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Usuń' })).not.toBeInTheDocument()
   })
 })

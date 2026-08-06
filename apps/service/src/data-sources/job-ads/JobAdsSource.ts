@@ -27,13 +27,26 @@ import {
   JOB_ADS_RETENTION_DAYS,
   deleteOrphanCvMatches,
   deleteStaleJobAds,
+  insertManualJobAd,
+  deleteManualJobAd as deleteManualJobAdFromDb,
   loadJobAdAdvertUrl,
   loadJobAdApplicationMeta,
+  loadJobAdsAddedAtByIds,
   loadJobAdsByIds,
+  loadJobAdDocument,
+  loadManualJobAdIds,
   markStaleAppliedAsArchivedNoResponse,
   updateJobAdApplicationMeta,
   updateJobAdFav,
+  updateManualJobAd,
 } from './jobAdsRepository'
+import { applyManualJobAdContentUpdate } from './manual/applyManualJobAdContentUpdate'
+import { buildManualJobAdDocument, parseAddManualJobAdArgs } from './manual/parseAddManualJobAdArgs'
+import {
+  parseDeleteManualJobAdArgs,
+  parseEditManualJobAdArgs,
+  type EditManualJobAdCommandArgs,
+} from './manual/parseEditManualJobAdArgs'
 import { syncJobAdsFromSources } from './syncJobAdsFromSources'
 
 const STALE_APPLIED_ARCHIVE_AFTER_DAYS = 7
@@ -70,6 +83,27 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
       case 'analyze-cv-match':
         await this.analyzeCvMatch(args.trim())
         break
+      case 'add-manual': {
+        const parsed = parseAddManualJobAdArgs(args)
+        if (parsed !== null) {
+          await this.addManualJobAd(parsed)
+        }
+        break
+      }
+      case 'edit-manual': {
+        const parsed = parseEditManualJobAdArgs(args)
+        if (parsed !== null) {
+          await this.editManualJobAd(parsed)
+        }
+        break
+      }
+      case 'delete-manual': {
+        const parsed = parseDeleteManualJobAdArgs(args)
+        if (parsed !== null) {
+          await this.deleteManualJobAd(parsed)
+        }
+        break
+      }
       default:
         return
     }
@@ -116,6 +150,25 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     })
   }
 
+  public async addManualJobAd(input: Parameters<typeof buildManualJobAdDocument>[0]): Promise<void> {
+    const document = buildManualJobAdDocument(input)
+    await insertManualJobAd(this.db, document)
+  }
+
+  public async editManualJobAd(input: EditManualJobAdCommandArgs): Promise<void> {
+    const existing = await loadJobAdDocument(this.db, input.id)
+    if (existing === null) {
+      return
+    }
+
+    const updated = applyManualJobAdContentUpdate(existing, input)
+    await updateManualJobAd(this.db, updated)
+  }
+
+  public async deleteManualJobAd(id: string): Promise<void> {
+    await deleteManualJobAdFromDb(this.db, id)
+  }
+
   static getId() {
     return 'job-ads'
   }
@@ -137,9 +190,12 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
   }
 
   protected async composeContent(cached: JobAdsCachedFeed): Promise<JobAdsFeed> {
-    const documentsById = await loadJobAdsByIds(this.db, cached.listingIds)
+    const manualIds = await loadManualJobAdIds(this.db)
+    const listingIdSet = new Set(cached.listingIds)
+    const allListingIds = [...cached.listingIds, ...manualIds.filter(id => !listingIdSet.has(id))]
+    const documentsById = await loadJobAdsByIds(this.db, allListingIds)
     const documents = dedupeJobAdDocuments(
-      cached.listingIds.flatMap(id => {
+      allListingIds.flatMap(id => {
         const document = documentsById.get(id)
         return document !== undefined ? [document] : []
       }),
@@ -177,6 +233,10 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     }
 
     const ids = documents.map(document => document.content.id)
+    const manualIds = documents
+      .filter(document => document.content.origin === 'manual')
+      .map(document => document.content.id)
+    const addedAtById = await loadJobAdsAddedAtByIds(this.db, manualIds)
     const currentCV = await loadCV(this.db)
     const currentCvTextHash = currentCV?.hash ?? null
     const matchAnalysisById = await loadCvMatchesByAdIds(this.db, ids)
@@ -208,6 +268,7 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
           }),
           fav: meta.fav,
           isCurrentCVUsed,
+          addedAt: content.origin === 'manual' ? (addedAtById.get(content.id) ?? null) : null,
         },
       }
     })

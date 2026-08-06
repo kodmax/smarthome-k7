@@ -24,6 +24,7 @@ import { ApplyStatusIcon } from '../../../../../../shared-components'
 import { applyArchiveReasonOptions, applyStatusTargetStatuses } from './applyStatusSelectOptions'
 import { formatAppliedDaysAgo, formatNotApplicable } from './formatAppliedDaysAgo'
 import { RequiredSkillTag } from './RequiredSkillTag'
+import { ManualJobAdActions } from './ManualJobAdActions'
 import { useCvMatchAnalysis } from './useCvMatchAnalysis'
 
 const favIconSize = designTokens.icon.sizeMd
@@ -77,7 +78,8 @@ export const ApplicationStatusEditor: FC<{
     nextStatus !== emptySelection && (nextStatus !== 'archived' || nextArchiveReason !== emptySelection)
   const canSubmit = hasValidStatusSelection || comment.trim() !== savedComment.trim()
   const isTheProtocolAd = ad.content.origin === 'theprotocol'
-  const canAnalyzeCvMatch = !isTheProtocolAd && !ad.meta.isCurrentCVUsed
+  const isManualAd = ad.content.origin === 'manual'
+  const canAnalyzeCvMatch = !isTheProtocolAd && !isManualAd && !ad.meta.isCurrentCVUsed
   const [theProtocolInfoOpen, setTheProtocolInfoOpen] = useState(false)
   const {
     analyzing: analyzingCvMatch,
@@ -385,6 +387,7 @@ export const ApplicationStatusEditor: FC<{
           </Box>
         ) : (
           <Box sx={{ display: 'flex', gap: `${designTokens.space[1]}px`, flexWrap: 'wrap' }}>
+            {isManualAd ? <ManualJobAdActions ad={ad} /> : null}
             {isTheProtocolAd ? (
               <Button
                 size='small'
@@ -397,7 +400,7 @@ export const ApplicationStatusEditor: FC<{
               >
                 {labels.cvMatchUnavailableTheProtocol}
               </Button>
-            ) : (
+            ) : !isManualAd ? (
               <Button
                 size='small'
                 variant='outlined'
@@ -424,7 +427,7 @@ export const ApplicationStatusEditor: FC<{
               >
                 {labels.checkCvMatch}
               </Button>
-            )}
+            ) : null}
             <Button size='small' variant='outlined' onClick={handleOpenEditor}>
               {labels.changeApplicationStatus}
             </Button>

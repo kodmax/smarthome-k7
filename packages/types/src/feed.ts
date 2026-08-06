@@ -368,6 +368,7 @@ export type JobAdMeta = {
   application: JobAdApplication
   fav: boolean
   isCurrentCVUsed: boolean
+  addedAt?: string | null
 }
 
 export type JobAd = {
@@ -380,7 +381,7 @@ export type JobAd = {
   workplaceType: WorkplaceType
   employmentType: EmploymentType
   monthlySalaryRangeAfterTaxes?: SalaryRange
-  origin: 'jj' | 'nfj' | 'theprotocol'
+  origin: 'jj' | 'nfj' | 'theprotocol' | 'manual'
   publishedAt: string
 }
 

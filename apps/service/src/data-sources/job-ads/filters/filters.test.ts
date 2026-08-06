@@ -81,14 +81,15 @@ describe('isSalaryAboveThreshold', () => {
 })
 
 describe('shouldFilterJobAdBySalary', () => {
-  it('exempts interview', () => {
+  it('exempts active pipeline and archived statuses', () => {
+    expect(shouldFilterJobAdBySalary('consider')).toBe(false)
+    expect(shouldFilterJobAdBySalary('applied')).toBe(false)
     expect(shouldFilterJobAdBySalary('interview')).toBe(false)
+    expect(shouldFilterJobAdBySalary('archived')).toBe(false)
   })
 
-  it('filters other statuses', () => {
+  it('filters pending-review only', () => {
     expect(shouldFilterJobAdBySalary('pending-review')).toBe(true)
-    expect(shouldFilterJobAdBySalary('archived')).toBe(true)
-    expect(shouldFilterJobAdBySalary('applied')).toBe(true)
   })
 })
 
@@ -98,17 +99,34 @@ describe('filterJobAdsByAcceptableSalary', () => {
     expect(filterJobAdsByAcceptableSalary(ads, null)).toEqual(ads)
   })
 
-  it('keeps interview regardless of salary', () => {
-    const ads = [adWithStatus('interview', { from: 10_000, to: 12_000 })]
+  it('keeps pipeline statuses regardless of salary', () => {
+    const lowSalary = { from: 10_000, to: 12_000 }
+    const ads = [
+      adWithStatus('consider', lowSalary),
+      adWithStatus('applied', lowSalary),
+      adWithStatus('interview', lowSalary),
+    ]
+
     expect(filterJobAdsByAcceptableSalary(ads, 20_000)).toEqual(ads)
   })
 
-  it('filters pending-review and archived below threshold', () => {
+  it('keeps pipeline statuses without salary range', () => {
+    const ads = [adWithStatus('consider'), adWithStatus('applied'), adWithStatus('interview')]
+
+    expect(filterJobAdsByAcceptableSalary(ads, 20_000)).toEqual(ads)
+  })
+
+  it('filters pending-review below threshold', () => {
     const below = adWithStatus('pending-review', { from: 10_000, to: 12_000 })
-    const archived = adWithStatus('archived', { from: 10_000, to: 12_000 })
     const above = adWithStatus('pending-review', { from: 26_000, to: 30_000 })
 
-    expect(filterJobAdsByAcceptableSalary([below, archived, above], 20_000)).toEqual([above])
+    expect(filterJobAdsByAcceptableSalary([below, above], 20_000)).toEqual([above])
+  })
+
+  it('keeps archived regardless of salary', () => {
+    const archived = adWithStatus('archived', { from: 10_000, to: 12_000 })
+
+    expect(filterJobAdsByAcceptableSalary([archived], 20_000)).toEqual([archived])
   })
 })
 

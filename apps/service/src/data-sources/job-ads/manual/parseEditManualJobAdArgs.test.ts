@@ -1,0 +1,48 @@
+import { describe, expect, it } from 'vitest'
+import { parseDeleteManualJobAdArgs, parseEditManualJobAdArgs } from './parseEditManualJobAdArgs'
+
+describe('parseEditManualJobAdArgs', () => {
+  it('parses editable fields only', () => {
+    expect(
+      parseEditManualJobAdArgs(
+        JSON.stringify({
+          id: 'manual-1',
+          workplaceType: 'hybrid',
+          employmentType: 'b2b',
+          salaryFrom: 20_000,
+          salaryTo: 25_000,
+        }),
+      ),
+    ).toEqual({
+      id: 'manual-1',
+      workplaceType: 'hybrid',
+      employmentType: 'b2b',
+      salaryFrom: 20_000,
+      salaryTo: 25_000,
+    })
+  })
+
+  it('rejects invalid salary range', () => {
+    expect(
+      parseEditManualJobAdArgs(
+        JSON.stringify({
+          id: 'manual-1',
+          workplaceType: 'hybrid',
+          employmentType: 'b2b',
+          salaryFrom: 30_000,
+          salaryTo: 20_000,
+        }),
+      ),
+    ).toBeNull()
+  })
+})
+
+describe('parseDeleteManualJobAdArgs', () => {
+  it('parses id', () => {
+    expect(parseDeleteManualJobAdArgs(JSON.stringify({ id: 'manual-1' }))).toBe('manual-1')
+  })
+
+  it('rejects empty id', () => {
+    expect(parseDeleteManualJobAdArgs(JSON.stringify({ id: '  ' }))).toBeNull()
+  })
+})

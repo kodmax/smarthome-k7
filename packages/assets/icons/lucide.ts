@@ -38,6 +38,7 @@ import {
   Moon,
   Newspaper,
   PieChart,
+  Plus,
   ShieldCheck,
   SlidersHorizontal,
   Snowflake,
@@ -120,6 +121,7 @@ export const ListIcon = createStyledIcon(List, iconStyles.muted)
 export const FilterIcon = createStyledIcon(Funnel, iconStyles.muted)
 export const FilterOffIcon = createStyledIcon(FunnelX, iconStyles.muted)
 export const SettingsIcon = createStyledIcon(Cog, iconStyles.muted)
+export const PlusIcon = createStyledIcon(Plus, iconStyles.muted)
 export const SunMoonIcon = createStyledIcon(SunMoon, iconStyles.muted)
 export const SecurityIcon = createStyledIcon(ShieldCheck, iconStyles.air)
 export const AlertIcon = createStyledIcon(TriangleAlert, iconStyles.warning)

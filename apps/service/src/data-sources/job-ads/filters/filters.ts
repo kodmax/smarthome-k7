@@ -3,7 +3,7 @@ import { JobAd, JobAdsFeedItem, JobApplyStatus } from '@repo/types'
 export const isHybridOrRemote: (offer: JobAd) => boolean = offer =>
   offer.workplaceType === 'hybrid' || offer.workplaceType === 'remote'
 
-const SALARY_FILTER_EXEMPT_STATUSES = new Set<JobApplyStatus>(['interview'])
+const SALARY_FILTER_EXEMPT_STATUSES = new Set<JobApplyStatus>(['consider', 'applied', 'interview', 'archived'])
 
 export const shouldFilterJobAdBySalary = (status: JobApplyStatus): boolean => !SALARY_FILTER_EXEMPT_STATUSES.has(status)
 
