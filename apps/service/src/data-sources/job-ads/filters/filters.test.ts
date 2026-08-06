@@ -42,6 +42,7 @@ const adWithStatus = (
       comment: null,
       appliedAt: null,
       rejectedAt: null,
+      statusChangedAt: null,
     }),
   },
 })

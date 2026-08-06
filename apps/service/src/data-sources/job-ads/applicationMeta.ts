@@ -29,6 +29,7 @@ export function emptyApplicationMeta(): JobAdApplicationMeta {
     comment: null,
     appliedAt: null,
     rejectedAt: null,
+    statusChangedAt: null,
   }
 }
 
@@ -105,6 +106,7 @@ export function parseApplicationMeta(value: unknown): JobAdApplicationMeta | nul
     comment: parseOptionalComment(record.comment),
     appliedAt: parseOptionalTimestamp(record.appliedAt),
     rejectedAt: parseOptionalTimestamp(record.rejectedAt),
+    statusChangedAt: parseOptionalTimestamp(record.statusChangedAt),
   }
 }
 
@@ -184,6 +186,7 @@ export function applyStatusChange(
           : to !== 'archived'
             ? null
             : current.rejectedAt,
+    statusChangedAt: current.statusChangedAt,
   }
 
   if (to === 'applied' && next.appliedAt === null) {

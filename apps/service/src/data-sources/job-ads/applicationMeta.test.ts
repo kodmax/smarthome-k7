@@ -17,6 +17,7 @@ describe('applicationMeta', () => {
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
       rejectedAt: null,
+      statusChangedAt: null,
     })
 
     expect(
@@ -27,6 +28,7 @@ describe('applicationMeta', () => {
           comment: null,
           appliedAt: '2026-07-19T12:00:00.000Z',
           rejectedAt: null,
+          statusChangedAt: null,
         },
         { applyStatus: 'interview' },
         now,
@@ -37,6 +39,7 @@ describe('applicationMeta', () => {
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
       rejectedAt: null,
+      statusChangedAt: null,
     })
   })
 
@@ -51,6 +54,7 @@ describe('applicationMeta', () => {
           comment: null,
           appliedAt: '2026-07-18T12:00:00.000Z',
           rejectedAt: null,
+          statusChangedAt: null,
         },
         { applyStatus: 'archived', archiveReason: 'rejected' },
         now,
@@ -61,6 +65,7 @@ describe('applicationMeta', () => {
       comment: null,
       appliedAt: '2026-07-18T12:00:00.000Z',
       rejectedAt: '2026-07-19T12:00:00.000Z',
+      statusChangedAt: null,
     })
 
     expect(
@@ -71,6 +76,7 @@ describe('applicationMeta', () => {
           comment: null,
           appliedAt: '2026-07-18T12:00:00.000Z',
           rejectedAt: '2026-07-19T12:00:00.000Z',
+          statusChangedAt: null,
         },
         { applyStatus: 'archived', archiveReason: 'rejected', comment: 'No fit' },
         new Date('2026-07-20T12:00:00.000Z'),
@@ -81,6 +87,7 @@ describe('applicationMeta', () => {
       comment: 'No fit',
       appliedAt: '2026-07-18T12:00:00.000Z',
       rejectedAt: '2026-07-19T12:00:00.000Z',
+      statusChangedAt: null,
     })
   })
 
@@ -93,6 +100,7 @@ describe('applicationMeta', () => {
           comment: null,
           appliedAt: '2026-07-19T12:00:00.000Z',
           rejectedAt: null,
+          statusChangedAt: null,
         },
         { applyStatus: 'applied', comment: 'Follow-up sent' },
       ),
@@ -102,6 +110,7 @@ describe('applicationMeta', () => {
       comment: 'Follow-up sent',
       appliedAt: '2026-07-19T12:00:00.000Z',
       rejectedAt: null,
+      statusChangedAt: null,
     })
   })
 
@@ -122,6 +131,7 @@ describe('applicationMeta', () => {
       comment: 'Salary too low',
       appliedAt: null,
       rejectedAt: null,
+      statusChangedAt: null,
     })
   })
 
@@ -138,6 +148,7 @@ describe('applicationMeta', () => {
       comment: 'React',
       appliedAt: null,
       rejectedAt: null,
+      statusChangedAt: null,
     })
   })
 
@@ -150,6 +161,7 @@ describe('applicationMeta', () => {
           comment: 'Old note',
           appliedAt: '2026-07-19T12:00:00.000Z',
           rejectedAt: null,
+          statusChangedAt: null,
         },
         { applyStatus: 'interview' },
       ),
@@ -159,6 +171,7 @@ describe('applicationMeta', () => {
       comment: null,
       appliedAt: '2026-07-19T12:00:00.000Z',
       rejectedAt: null,
+      statusChangedAt: null,
     })
   })
 
@@ -171,6 +184,7 @@ describe('applicationMeta', () => {
           comment: 'Not for me',
           appliedAt: null,
           rejectedAt: null,
+          statusChangedAt: null,
         },
         { applyStatus: 'consider' },
       ),
@@ -180,6 +194,7 @@ describe('applicationMeta', () => {
       comment: null,
       appliedAt: null,
       rejectedAt: null,
+      statusChangedAt: null,
     })
   })
 
@@ -192,6 +207,7 @@ describe('applicationMeta', () => {
           comment: 'Old note',
           appliedAt: null,
           rejectedAt: null,
+          statusChangedAt: null,
         },
         { applyStatus: 'archived', archiveReason: 'weak-match', comment: 'Low match' },
       ),
@@ -201,6 +217,7 @@ describe('applicationMeta', () => {
       comment: 'Low match',
       appliedAt: null,
       rejectedAt: null,
+      statusChangedAt: null,
     })
   })
 
@@ -213,6 +230,7 @@ describe('applicationMeta', () => {
           comment: null,
           appliedAt: '2026-07-18T12:00:00.000Z',
           rejectedAt: '2026-07-19T12:00:00.000Z',
+          statusChangedAt: null,
         },
         { applyStatus: 'archived', archiveReason: 'withdrawn' },
       ),
@@ -228,6 +246,7 @@ describe('applicationMeta', () => {
           comment: null,
           appliedAt: '2026-07-18T12:00:00.000Z',
           rejectedAt: null,
+          statusChangedAt: null,
         },
         { applyStatus: 'archived', archiveReason: 'offer-accepted' },
       ),
@@ -237,6 +256,7 @@ describe('applicationMeta', () => {
       comment: null,
       appliedAt: '2026-07-18T12:00:00.000Z',
       rejectedAt: null,
+      statusChangedAt: null,
     })
   })
 
@@ -248,6 +268,7 @@ describe('applicationMeta', () => {
         comment: null,
         appliedAt: '2026-07-18T12:00:00.000Z',
         rejectedAt: '2026-07-19T12:00:00.000Z',
+        statusChangedAt: null,
       }),
     ).toEqual({
       applyStatus: 'archived',
@@ -255,6 +276,7 @@ describe('applicationMeta', () => {
       comment: null,
       appliedAt: '2026-07-18T12:00:00.000Z',
       rejectedAt: '2026-07-19T12:00:00.000Z',
+      statusChangedAt: null,
     })
   })
 
@@ -265,6 +287,7 @@ describe('applicationMeta', () => {
         comment: null,
         appliedAt: null,
         rejectedAt: null,
+        statusChangedAt: null,
       }),
     ).toBeNull()
   })
@@ -277,6 +300,7 @@ describe('applicationMeta', () => {
         comment: null,
         appliedAt: null,
         rejectedAt: null,
+        statusChangedAt: null,
       }),
     ).toEqual({
       applyStatus: 'archived',
@@ -284,6 +308,7 @@ describe('applicationMeta', () => {
       comment: null,
       appliedAt: null,
       rejectedAt: null,
+      statusChangedAt: null,
     })
   })
 

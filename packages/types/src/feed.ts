@@ -342,6 +342,7 @@ export type JobAdApplicationMeta = {
   comment: string | null
   appliedAt: string | null
   rejectedAt: string | null
+  statusChangedAt: string | null
 }
 
 export type JobAdApplication = {
@@ -400,8 +401,34 @@ export type JobAdsFeed = {
   acceptableSalary: number | null
 }
 
+export type JobAdStoredMeta = {
+  application: JobAdApplicationMeta
+  fav: boolean
+  firstPublishedAt: string
+}
+
+export type JobAdDocument = {
+  content: JobAd
+  meta: JobAdStoredMeta
+}
+
 export type JobAdsCachedFeed = {
-  ads: JobAd[]
+  listingIds: string[]
+}
+
+export function emptyJobAdStoredMeta(firstPublishedAt: string): JobAdStoredMeta {
+  return {
+    application: {
+      applyStatus: DEFAULT_JOB_APPLY_STATUS,
+      archiveReason: null,
+      comment: null,
+      appliedAt: null,
+      rejectedAt: null,
+      statusChangedAt: null,
+    },
+    fav: false,
+    firstPublishedAt,
+  }
 }
 
 export type JobMarketSalaryDistributionBracket = {
@@ -498,17 +525,14 @@ export function emptyJobAdMeta(): JobAdMeta {
   }
 }
 
-export function jobAdApplicationFromMeta(
-  meta: JobAdApplicationMeta,
-  statusChangedAt: string | null = null,
-): JobAdApplication {
+export function jobAdApplicationFromMeta(meta: JobAdApplicationMeta): JobAdApplication {
   return {
     status: meta.applyStatus,
     archiveReason: meta.archiveReason,
     comment: meta.comment,
     appliedAt: meta.appliedAt,
     rejectedAt: meta.rejectedAt,
-    statusChangedAt,
+    statusChangedAt: meta.statusChangedAt,
   }
 }
 
@@ -519,6 +543,7 @@ export function jobAdApplicationMetaFromApplication(application: JobAdApplicatio
     comment: application.comment,
     appliedAt: application.appliedAt,
     rejectedAt: application.rejectedAt,
+    statusChangedAt: application.statusChangedAt,
   }
 }
 
