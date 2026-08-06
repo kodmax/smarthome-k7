@@ -97,6 +97,16 @@ yarn workspace @repo/db db:migrate
 
 See [`packages/db/README.md`](../packages/db/README.md).
 
+## Docker Compose
+
+Full stack (nginx + service + MariaDB + Redis) for local practice — see root
+[`README.md`](../../README.md#docker-compose-mac--practice).
+
+```sh
+cp .env.docker.example .env.docker
+docker compose -f ../../docker-compose.yml up --build
+```
+
 ## MCP / agent access to MariaDB
 
 Cursor can query the database via [mysql-mcp-server](https://github.com/askdba/mysql-mcp-server) (read-only by default).

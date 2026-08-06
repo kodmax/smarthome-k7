@@ -96,6 +96,56 @@ KNX scheduled tasks (energy logging, clock sync, indoor readings) run inside [`a
 - **Web:** optional `VITE_WEBSOCKET_URL` (defaults to `ws(s)://<host>/ws`; Vite dev proxy forwards to `:3678`).
 - **MCP:** copy `apps/mcp/.env.example` → `.env` (`APOLLO_WS_URL`, optional `APOLLO_WS_CA_FILE`).
 
+## Docker Compose (Mac / practice)
+
+Self-contained stack: **web** (nginx), **service**, **MariaDB**, **Redis**. Database state persists in a named Docker
+volume across image rebuilds (`docker compose down -v` resets it).
+
+```sh
+cp apps/service/.env.docker.example apps/service/.env.docker
+docker compose up --build
+```
+
+Open **http://localhost** — WebSocket uses `ws://localhost/ws` (nginx proxies to service). For UI hot reload, use
+`yarn dev` instead of the `web` container and map service port `3678:3678` if needed.
+
+| Action                      | Database                |
+| --------------------------- | ----------------------- |
+| `docker compose up --build` | unchanged               |
+| `docker compose down`       | unchanged               |
+| `docker compose down -v`    | reset (volumes removed) |
+
+### Docker deps + `yarn dev` (recommended for daily dev)
+
+Run **only MariaDB and Redis** in Docker; **service and web** natively with hot reload:
+
+```sh
+docker compose -f docker-compose.deps.yml up -d
+```
+
+In `apps/service/.env`, point DB and Redis at localhost (see
+[`apps/service/.env.deps.example`](apps/service/.env.deps.example)):
+
+```env
+DB_HOST=127.0.0.1
+DB_USER=apollo
+DB_PASSWORD=apollo
+DB_SCHEMA=apollo
+REDIS_URL=redis://127.0.0.1:6379
+```
+
+Same credentials in `packages/db/.env` as `DB_MIGRATE_*`, then first time:
+
+```sh
+yarn db:migrate
+yarn dev
+```
+
+Vite serves the UI and proxies `/ws` → `localhost:3678` — no extra config. Stop deps:
+`docker compose -f docker-compose.deps.yml down`.
+
+Uses the same `mariadb-data` volume as the full stack, so data survives switching between modes.
+
 ## Tooling
 
 Monorepo built with [Turborepo](https://turbo.build/) and Yarn workspaces. TypeScript, ESLint, and Prettier are

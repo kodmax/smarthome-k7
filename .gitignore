@@ -6,6 +6,8 @@ dist
 dist-ssr
 *.local
 .env
+.env.docker
+**/.env.docker
 .cache
 .cursor/sandbox.json
 .cursor/mysql-mcp.generated.yaml

@@ -1,0 +1,48 @@
+services:
+  mariadb:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: apollo
+      MARIADB_USER: apollo
+      MARIADB_PASSWORD: apollo
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+
+  service:
+    build:
+      context: .
+      dockerfile: apps/service/Dockerfile
+    env_file:
+      - apps/service/.env.docker
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - service-cache:/app/apps/service/.cache
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - '80:80'
+    depends_on:
+      - service
+    restart: unless-stopped
+
+volumes:
+  mariadb-data:
+  service-cache:
