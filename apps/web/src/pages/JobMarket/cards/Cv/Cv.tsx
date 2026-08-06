@@ -6,7 +6,7 @@ import { useCommand, useFeed } from '@repo/feed-client'
 import { type CvFeed } from '@repo/types'
 import { type ChangeEvent, type FC, useRef, useState } from 'react'
 import { useLocale, useTranslations } from '@/i18n'
-import { formatCvModifiedDate, formatCvModifiedTime } from './formatCvModifiedAt'
+import { formatCvModifiedAt } from './formatCvModifiedAt'
 import { readFileAsBase64 } from './readFileAsBase64'
 import { waitForCvFeedUpdate } from './waitForCvFeedUpdate'
 import { CvPreviewDialog } from './CvPreviewDialog'
@@ -45,8 +45,8 @@ export const Cv: FC<Record<string, never>> = () => {
   }
 
   const cv = feed?.cv ?? null
-  const primary = cv !== null ? formatCvModifiedDate(cv.modifiedAt, locale) : '--'
-  const secondary = cv !== null ? formatCvModifiedTime(cv.modifiedAt, locale) : undefined
+  const primary = cv === null ? '--' : ''
+  const secondary = cv !== null ? formatCvModifiedAt(cv.modifiedAt, locale) : undefined
 
   return (
     <>

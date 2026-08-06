@@ -409,7 +409,7 @@ describe('ApplicationStatusEditor', () => {
     })
   })
 
-  it('disables check cv match for theprotocol ads', () => {
+  it('shows theprotocol cv match info instead of analyze button', () => {
     const onAnalyzeCvMatch = vi.fn()
 
     renderWithTheme(
@@ -422,10 +422,15 @@ describe('ApplicationStatusEditor', () => {
       />,
     )
 
-    const button = screen.getByRole('button', { name: 'Sprawdź dopasowanie' })
-    expect(button).toBeDisabled()
+    const button = screen.getByRole('button', { name: 'Dopasowanie niedostępne' })
+    expect(button).toBeEnabled()
+    expect(screen.queryByRole('button', { name: 'Sprawdź dopasowanie' })).not.toBeInTheDocument()
+
     fireEvent.click(button)
+
     expect(onAnalyzeCvMatch).not.toHaveBeenCalled()
+    expect(screen.getByRole('dialog')).toHaveTextContent('Analiza dopasowania niedostępna')
+    expect(screen.getByRole('dialog')).toHaveTextContent('Ta oferta pochodzi z portalu The Protocol.')
   })
 
   it('disables check cv match when analysis is current', () => {

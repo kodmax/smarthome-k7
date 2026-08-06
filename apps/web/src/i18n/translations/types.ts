@@ -303,6 +303,10 @@ export type Translations = {
       requiredSkills: string
       changeApplicationStatus: string
       checkCvMatch: string
+      cvMatchUnavailableTheProtocol: string
+      cvMatchUnavailableTheProtocolTooltip: string
+      cvMatchUnavailableTheProtocolTitle: string
+      cvMatchUnavailableTheProtocolNotice: string
       viewMatchAnalysis: string
       matchAnalysisTitle: string
       matchAnalysisScore: string

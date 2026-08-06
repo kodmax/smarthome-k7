@@ -10,7 +10,7 @@ import {
   Typography,
   type SelectChangeEvent,
 } from '@mui/material'
-import { AiSparklesIcon, FavStarIcon, LoaderIcon } from '@repo/assets'
+import { AiSparklesIcon, FavStarIcon, InfoIcon, LoaderIcon } from '@repo/assets'
 import { useFeed } from '@repo/feed-client'
 import { toSkillId } from '@repo/common'
 import { JobAdArchiveReason, JobAdsFeedItem, JobApplyStatus, MySkillsFeed } from '@repo/types'
@@ -76,7 +76,9 @@ export const ApplicationStatusEditor: FC<{
   const hasValidStatusSelection =
     nextStatus !== emptySelection && (nextStatus !== 'archived' || nextArchiveReason !== emptySelection)
   const canSubmit = hasValidStatusSelection || comment.trim() !== savedComment.trim()
-  const canAnalyzeCvMatch = ad.content.origin !== 'theprotocol' && !ad.meta.isCurrentCVUsed
+  const isTheProtocolAd = ad.content.origin === 'theprotocol'
+  const canAnalyzeCvMatch = !isTheProtocolAd && !ad.meta.isCurrentCVUsed
+  const [theProtocolInfoOpen, setTheProtocolInfoOpen] = useState(false)
   const {
     analyzing: analyzingCvMatch,
     dialogOpen: matchAnalysisDialogOpen,
@@ -383,38 +385,60 @@ export const ApplicationStatusEditor: FC<{
           </Box>
         ) : (
           <Box sx={{ display: 'flex', gap: `${designTokens.space[1]}px`, flexWrap: 'wrap' }}>
-            <Button
-              size='small'
-              variant='outlined'
-              startIcon={
-                analyzingCvMatch ? (
-                  <LoaderIcon
-                    spinning
-                    size={actionButtonIconSize}
-                    strokeWidth={designTokens.icon.strokeWidth}
-                    aria-hidden
-                  />
-                ) : (
-                  <AiSparklesIcon
-                    size={actionButtonIconSize}
-                    strokeWidth={designTokens.icon.strokeWidth}
-                    glow='soft'
-                    aria-hidden
-                  />
-                )
-              }
-              disabled={!canAnalyzeCvMatch || analyzingCvMatch}
-              aria-busy={analyzingCvMatch}
-              onClick={handleAnalyzeCvMatch}
-            >
-              {labels.checkCvMatch}
-            </Button>
+            {isTheProtocolAd ? (
+              <Button
+                size='small'
+                variant='outlined'
+                title={labels.cvMatchUnavailableTheProtocolTooltip}
+                startIcon={
+                  <InfoIcon size={actionButtonIconSize} strokeWidth={designTokens.icon.strokeWidth} aria-hidden />
+                }
+                onClick={() => setTheProtocolInfoOpen(true)}
+              >
+                {labels.cvMatchUnavailableTheProtocol}
+              </Button>
+            ) : (
+              <Button
+                size='small'
+                variant='outlined'
+                startIcon={
+                  analyzingCvMatch ? (
+                    <LoaderIcon
+                      spinning
+                      size={actionButtonIconSize}
+                      strokeWidth={designTokens.icon.strokeWidth}
+                      aria-hidden
+                    />
+                  ) : (
+                    <AiSparklesIcon
+                      size={actionButtonIconSize}
+                      strokeWidth={designTokens.icon.strokeWidth}
+                      glow='soft'
+                      aria-hidden
+                    />
+                  )
+                }
+                disabled={!canAnalyzeCvMatch || analyzingCvMatch}
+                aria-busy={analyzingCvMatch}
+                onClick={handleAnalyzeCvMatch}
+              >
+                {labels.checkCvMatch}
+              </Button>
+            )}
             <Button size='small' variant='outlined' onClick={handleOpenEditor}>
               {labels.changeApplicationStatus}
             </Button>
           </Box>
         )}
       </Box>
+      {isTheProtocolAd ? (
+        <CvPreviewDialog
+          open={theProtocolInfoOpen}
+          onClose={() => setTheProtocolInfoOpen(false)}
+          title={labels.cvMatchUnavailableTheProtocolTitle}
+          text={labels.cvMatchUnavailableTheProtocolNotice}
+        />
+      ) : null}
       {matchAnalysisText !== null && matchAnalysisTitle !== null ? (
         <CvPreviewDialog
           open={matchAnalysisDialogOpen}

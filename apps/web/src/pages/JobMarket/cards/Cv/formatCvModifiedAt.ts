@@ -20,3 +20,13 @@ export function formatCvModifiedTime(modifiedAt: string, locale: AppLocale): str
     minute: '2-digit',
   }).format(new Date(modifiedAt))
 }
+
+export function formatCvModifiedAt(modifiedAt: string, locale: AppLocale): string {
+  return new Intl.DateTimeFormat(LOCALE_TAGS[locale], {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(modifiedAt))
+}
