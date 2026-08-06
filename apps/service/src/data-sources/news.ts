@@ -117,7 +117,7 @@ export class NewsSource extends DataSource<NewsFeed, NewsCachedFeed> {
         where group_id = ${this.getId()}
           and attribute_name = 'read'
           and item_uid in ${this.db(uids)}
-          and value = true
+          and value = ${this.db.json(true)}
       `,
     )
     const readUids = new Set(rows.map(row => row.item_uid))
