@@ -81,6 +81,7 @@ describe('Ad', () => {
     expect(screen.queryByText(/\[hybrid\]/)).not.toBeInTheDocument()
     expect(screen.getByText('20 — 28')).toBeInTheDocument()
     expect(screen.getByText('kPLN')).toBeInTheDocument()
+    expect(screen.getByLabelText('B2B')).toBeInTheDocument()
     expect(screen.getByRole('link')).toHaveAttribute('href', 'https://example.com/job/1')
   })
 

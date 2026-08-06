@@ -5,7 +5,6 @@ import { AppliedIndicator } from './AppliedIndicator'
 import { JobFavIndicator } from './JobFavIndicator'
 import { MatchAnalysisIndicator } from './MatchAnalysisIndicator'
 import { trailingGroupStyle } from './trailingGroupStyle'
-import { WorkplaceTypeIndicator } from './WorkplaceTypeIndicator'
 
 function hasAdTitleTrailingContent(
   ad: Pick<JobAdsFeedItem, 'meta' | 'matchAnalysis'>,
@@ -33,7 +32,6 @@ export const AdTitleTrailing: FC<{
 
   return (
     <span style={trailingGroupStyle}>
-      {zoom ? <WorkplaceTypeIndicator workplaceType={ad.content.workplaceType} /> : null}
       <JobFavIndicator fav={ad.meta.fav} />
       <AppliedIndicator ad={ad} />
       {showApplyStatusIndicator ? <ApplyStatusIndicator ad={ad} /> : null}

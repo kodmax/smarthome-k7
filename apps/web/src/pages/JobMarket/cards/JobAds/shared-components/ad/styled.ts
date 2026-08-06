@@ -39,8 +39,8 @@ export const Salary = styled(ApolloTableCell)({
 })
 
 export const MonthlySalaryRangeCell = styled(Salary)(({ theme }) => ({
-  width: '128px',
-  maxWidth: '128px',
+  width: '168px',
+  maxWidth: '168px',
   [theme.breakpoints.down('sm')]: {
     display: 'none',
   },

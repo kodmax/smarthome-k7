@@ -361,9 +361,15 @@ export type Translations = {
       addManualJobAdSubmit: string
       jobTitle: string
       employmentType: {
+        label: string
         permanent: string
         b2b: string
-        label: string
+        uod: string
+        mandate_contract: string
+        any: string
+        contract: string
+        internship: string
+        intern: string
       }
       workplaceTypeLabel: string
       salaryHintPermanent: string
