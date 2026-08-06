@@ -1,6 +1,6 @@
 import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { JobAd, JobMarketInsightCachedFeed, JobMarketInsightFeed } from '@repo/types'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import DateTime from '@/DateTime'
 import { Inject } from '@/di'
 import { jjit } from '../job-ads/jjit/jjit'
@@ -15,7 +15,7 @@ const COMPARISON_WINDOW_DAYS = 1 // TODO: revert to 7 after verifying change met
 
 export class JobMarketInsightSource extends DataSource<JobMarketInsightFeed, JobMarketInsightCachedFeed> {
   @Inject('db')
-  declare private db: Pool
+  declare private db: Sql
 
   static getId() {
     return 'job-market-insight'

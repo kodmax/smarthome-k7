@@ -10,6 +10,7 @@ const requireEnv = (name: string): string => {
 /** Runtime pool — DB_* from apps/service/.env (not DB_MIGRATE_* used by migrations). */
 export const getDbConfig = () => ({
   host: requireEnv('DB_HOST'),
+  port: Number(process.env.DB_PORT ?? '5432'),
   user: requireEnv('DB_USER'),
   password: requireEnv('DB_PASSWORD'),
   database: requireEnv('DB_SCHEMA'),

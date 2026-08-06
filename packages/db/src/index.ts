@@ -1,1 +1,1 @@
-export { closeDbPool, getDbPool } from './pool'
+export { closeSql, getSql, type Sql } from './pool'

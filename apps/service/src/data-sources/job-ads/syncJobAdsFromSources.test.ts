@@ -1,5 +1,5 @@
 import { JobAd } from '@repo/types'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createJobAdDocument } from './jobAdDocument'
 import * as jobAdsRepository from './jobAdsRepository'
@@ -109,7 +109,7 @@ const sampleTpAd = (): Ad =>
   }) as Ad
 
 describe('syncJobAdsFromSources', () => {
-  const db = {} as Pool
+  const db = {} as Sql
 
   beforeEach(() => {
     vi.restoreAllMocks()

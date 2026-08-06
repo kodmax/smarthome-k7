@@ -1,1 +1,0 @@
--- Irreversible data migration: meta job-ads rows were deleted after merge.

@@ -6,7 +6,7 @@ import { observeHttpFetch } from '@/prometheus/httpMetrics'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { Article, NewsCachedFeed, NewsFeed } from '@repo/types'
 import type { config as AppConfig } from '../config'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 
 const META_RETENTION_DAYS = 30
 
@@ -15,7 +15,7 @@ const FEED_URL =
 
 export class NewsSource extends DataSource<NewsFeed, NewsCachedFeed> {
   @Inject('db')
-  declare private db: Pool
+  declare private db: Sql
 
   @Inject('config')
   declare private config: typeof AppConfig
@@ -70,19 +70,16 @@ export class NewsSource extends DataSource<NewsFeed, NewsCachedFeed> {
   }
 
   public async maintenance() {
-    const conn = await this.db.getConnection()
-    try {
-      await observeDbQuery('delete', 'meta', () =>
-        conn.query(
-          `delete from meta
-         where group_id = ?
-           and last_update_timestamp < current_timestamp() - interval ? day`,
-          [this.getId(), META_RETENTION_DAYS],
-        ),
-      )
-    } finally {
-      conn.release()
-    }
+    await observeDbQuery(
+      'delete',
+      'meta',
+      () =>
+        this.db`
+        delete from meta
+        where group_id = ${this.getId()}
+          and last_update_timestamp < now() - ${`${META_RETENTION_DAYS} days`}::interval
+      `,
+    )
   }
 
   private async fetchArticles(): Promise<NewsCachedFeed['articles']> {
@@ -110,59 +107,52 @@ export class NewsSource extends DataSource<NewsFeed, NewsCachedFeed> {
       return []
     }
 
-    const conn = await this.db.getConnection()
-    try {
-      const uids = articles.map(article => article.uid)
-      const rows = (await observeDbQuery('select', 'meta', () =>
-        conn.query(
-          `select item_uid, attribute_name from meta
-         where group_id = ?
-           and attribute_name = 'read'
-           and item_uid in (?)
-           and value = true`,
-          [this.getId(), uids],
-        ),
-      )) as Array<{ item_uid: string; attribute_name: string }>
-      const readUids = new Set(rows.map(row => row.item_uid))
+    const uids = articles.map(article => article.uid)
+    const rows = await observeDbQuery(
+      'select',
+      'meta',
+      () =>
+        this.db<Array<{ item_uid: string; attribute_name: string }>>`
+        select item_uid, attribute_name from meta
+        where group_id = ${this.getId()}
+          and attribute_name = 'read'
+          and item_uid in ${this.db(uids)}
+          and value = true
+      `,
+    )
+    const readUids = new Set(rows.map(row => row.item_uid))
 
-      return articles.map(article => ({
-        ...article,
-        read: readUids.has(article.uid),
-      }))
-    } finally {
-      conn.release()
-    }
+    return articles.map(article => ({
+      ...article,
+      read: readUids.has(article.uid),
+    }))
   }
 
   private async markMeta(itemUid: string, attributeName: string, value: boolean): Promise<void> {
-    const conn = await this.db.getConnection()
-    try {
-      await observeDbQuery('insert', 'meta', () =>
-        conn.query(
-          `insert into meta (item_uid, attribute_name, group_id, value)
-         values (?, ?, ?, ?)
-         on duplicate key update value = values(value), group_id = values(group_id)`,
-          [itemUid, attributeName, this.getId(), value],
-        ),
-      )
-    } finally {
-      conn.release()
-    }
+    await observeDbQuery(
+      'insert',
+      'meta',
+      () =>
+        this.db`
+        insert into meta (item_uid, attribute_name, group_id, value)
+        values (${itemUid}, ${attributeName}, ${this.getId()}, ${this.db.json(value)})
+        on conflict (item_uid, attribute_name) do update set
+          value = excluded.value,
+          group_id = excluded.group_id
+      `,
+    )
   }
 
   private async unmarkMeta(itemUid: string, attributeName: string): Promise<void> {
-    const conn = await this.db.getConnection()
-    try {
-      await observeDbQuery('delete', 'meta', () =>
-        conn.query(`delete from meta where group_id = ? and item_uid = ? and attribute_name = ?`, [
-          this.getId(),
-          itemUid,
-          attributeName,
-        ]),
-      )
-    } finally {
-      conn.release()
-    }
+    await observeDbQuery(
+      'delete',
+      'meta',
+      () =>
+        this.db`
+        delete from meta
+        where group_id = ${this.getId()} and item_uid = ${itemUid} and attribute_name = ${attributeName}
+      `,
+    )
   }
 
   private digestTitle(title: string): string {

@@ -1,21 +1,34 @@
-import * as mariadb from 'mariadb'
+import postgres from 'postgres'
+import type { Sql } from 'postgres'
 import { getDbConfig } from './config'
 
-let pool: mariadb.Pool | undefined
+let sql: Sql | undefined
 
-export const getDbPool = (): mariadb.Pool => {
-  if (pool === undefined) {
-    pool = mariadb.createPool({ ...getDbConfig() })
+export const getSql = (): Sql => {
+  if (sql === undefined) {
+    const config = getDbConfig()
+    sql = postgres({
+      host: config.host,
+      port: config.port,
+      username: config.user,
+      password: config.password,
+      database: config.database,
+      transform: {
+        undefined: null,
+      },
+    })
   }
 
-  return pool
+  return sql
 }
 
-export const closeDbPool = async (): Promise<void> => {
-  if (pool === undefined) {
+export const closeSql = async (): Promise<void> => {
+  if (sql === undefined) {
     return
   }
 
-  await pool.end()
-  pool = undefined
+  await sql.end()
+  sql = undefined
 }
+
+export type { Sql } from 'postgres'

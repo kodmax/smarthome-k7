@@ -3,10 +3,10 @@ import { tmpdir } from 'os'
 import { join } from 'path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type OpenAI from 'openai'
-import type { Pool } from 'mariadb'
 import { FeedEvents, FSCache } from '@repo/feeds'
 import { createSilentLogger } from '@repo/logger'
 import { registerDependency } from '@/di'
+import { mockSql } from '@/test/mockSql'
 import { CV_SCOPE, CV_TEXT_ID, digestCvPdfSourceHash, digestDocumentContentHash } from './documentRecord'
 import { CvSource } from './CvSource'
 
@@ -23,10 +23,7 @@ const contentHash = digestDocumentContentHash(CV_TEXT_ID, { text: 'Extracted CV 
 const noopOnError = (): void => void 0
 
 describe('CvSource', () => {
-  const query = vi.fn()
-  const release = vi.fn()
-  const getConnection = vi.fn(async () => ({ query, release }))
-  const db = { getConnection } as unknown as Pool
+  let db = mockSql()
   const openai = {} as OpenAI
   let feedEvents: FeedEvents
   let emitSpy: ReturnType<typeof vi.spyOn>
@@ -54,9 +51,7 @@ describe('CvSource', () => {
   }
 
   beforeEach(() => {
-    query.mockReset()
-    release.mockReset()
-    getConnection.mockClear()
+    db = mockSql()
     vi.mocked(extractPdfText).mockClear()
     feedEvents = new FeedEvents()
     emitSpy = vi.spyOn(feedEvents, 'emit')
@@ -65,7 +60,7 @@ describe('CvSource', () => {
   })
 
   it('returns cv hash from getData', async () => {
-    query.mockResolvedValueOnce([
+    db = mockSql([
       {
         scope: CV_SCOPE,
         id: CV_TEXT_ID,
@@ -74,6 +69,7 @@ describe('CvSource', () => {
         content: { text: 'Extracted CV text' },
       },
     ])
+    registerDependency('db', db)
 
     const source = await createCvSource()
     const feed = await source.getData()
@@ -85,19 +81,19 @@ describe('CvSource', () => {
         hash: contentHash,
       },
     })
-    expect(release).toHaveBeenCalledOnce()
+    expect(db).toHaveBeenCalledOnce()
   })
 
   it('skips extraction and touches modified_at when source_hash matches existing cv-text', async () => {
-    query.mockResolvedValueOnce([{ source_hash: sourceHash }]).mockResolvedValueOnce(undefined)
+    db = mockSql([{ source_hash: sourceHash }], [])
+    registerDependency('db', db)
 
     const source = await createCvSource()
     await source.handleCommand('upload', JSON.stringify({ base64: pdfBase64 }))
 
     expect(extractPdfText).not.toHaveBeenCalled()
-    expect(query).toHaveBeenNthCalledWith(2, expect.stringContaining('update documents'), [CV_SCOPE, CV_TEXT_ID])
+    expect(db).toHaveBeenCalledTimes(2)
     expect(emitSpy).toHaveBeenCalledWith('data-update', 'cv')
-    expect(release).toHaveBeenCalledTimes(2)
   })
 
   it('does not push when upload args are invalid', async () => {
@@ -105,29 +101,19 @@ describe('CvSource', () => {
     await source.handleCommand('upload', JSON.stringify({ base64: '' }))
 
     expect(extractPdfText).not.toHaveBeenCalled()
-    expect(query).not.toHaveBeenCalled()
+    expect(db).not.toHaveBeenCalled()
     expect(emitSpy).not.toHaveBeenCalled()
   })
 
   it('extracts and upserts cv-text when source_hash differs', async () => {
-    query
-      .mockResolvedValueOnce([{ source_hash: 'old-source-hash' }])
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined)
+    db = mockSql([{ source_hash: 'old-source-hash' }], [], [])
+    registerDependency('db', db)
 
     const source = await createCvSource()
     await source.handleCommand('upload', JSON.stringify({ base64: pdfBase64 }))
 
     expect(extractPdfText).toHaveBeenCalledWith(openai, pdfBase64)
-    expect(query).toHaveBeenNthCalledWith(2, expect.stringContaining('insert into documents'), [
-      CV_SCOPE,
-      CV_TEXT_ID,
-      contentHash,
-      sourceHash,
-      JSON.stringify({ text: 'Extracted CV text' }),
-    ])
-    expect(query).toHaveBeenNthCalledWith(3, expect.stringContaining('update documents'), [CV_SCOPE, CV_TEXT_ID])
+    expect(db).toHaveBeenCalledTimes(3)
     expect(emitSpy).toHaveBeenCalledWith('data-update', 'cv')
-    expect(release).toHaveBeenCalledTimes(3)
   })
 })

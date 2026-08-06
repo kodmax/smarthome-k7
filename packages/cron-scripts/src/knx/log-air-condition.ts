@@ -1,41 +1,38 @@
 import { knxSchema } from '@repo/knx-schema'
-import { getDbPool } from '@repo/db'
+import { getSql } from '@repo/db'
 import type { Logger } from '@repo/logger'
 import { KnxLink } from 'js-knx'
 
 export async function logAirCondition(knx: KnxLink, logger?: Logger): Promise<void> {
-  const db = await getDbPool().getConnection()
+  const db = getSql()
 
-  try {
-    const schema = knxSchema.home
-    const [bathroomFloorTemp, bedroomTemp, livingroomTemp, bathroomTemp, humidity, dewPoint, co2] = await Promise.all([
-      knx.group(schema.temp.bathroomFloor.reading).read(),
-      knx.group(schema.temp.bedroom.reading).read(),
-      knx.group(schema.temp.livingRoom.reading).read(),
-      knx.group(schema.temp.bathroom.reading).read(),
-      knx.group(schema.airQuality.humidity.reading).read(),
-      knx.group(schema.airQuality.dewPoint.reading).read(),
-      knx.group(schema.airQuality.co2.reading).read(),
-    ])
+  const schema = knxSchema.home
+  const [bathroomFloorTemp, bedroomTemp, livingroomTemp, bathroomTemp, humidity, dewPoint, co2] = await Promise.all([
+    knx.group(schema.temp.bathroomFloor.reading).read(),
+    knx.group(schema.temp.bedroom.reading).read(),
+    knx.group(schema.temp.livingRoom.reading).read(),
+    knx.group(schema.temp.bathroom.reading).read(),
+    knx.group(schema.airQuality.humidity.reading).read(),
+    knx.group(schema.airQuality.dewPoint.reading).read(),
+    knx.group(schema.airQuality.co2.reading).read(),
+  ])
 
-    const timestamp = new Date()
-    const readings: Array<[string, number]> = [
-      ['bathroom_floor_temp', bathroomFloorTemp.value],
-      ['bedroom_temp', bedroomTemp.value],
-      ['livingroom_temp', livingroomTemp.value],
-      ['bathroom_temp', bathroomTemp.value],
-      ['dew_point', dewPoint.value],
-      ['humidity', humidity.value],
-      ['co2', co2.value],
-    ]
+  const timestamp = new Date()
+  const readings: Array<[string, number]> = [
+    ['bathroom_floor_temp', bathroomFloorTemp.value],
+    ['bedroom_temp', bedroomTemp.value],
+    ['livingroom_temp', livingroomTemp.value],
+    ['bathroom_temp', bathroomTemp.value],
+    ['dew_point', dewPoint.value],
+    ['humidity', humidity.value],
+    ['co2', co2.value],
+  ]
 
-    await db.batch(
-      'insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)',
-      readings.map(([reading_name, reading_value]) => [timestamp, reading_name, reading_value]),
-    )
+  await db`
+    insert into readings ${db(
+      readings.map(([reading_name, reading_value]) => ({ timestamp, reading_name, reading_value })),
+    )}
+  `
 
-    logger?.info({ readingCount: readings.length, timestamp: timestamp.toISOString() }, 'Air condition readings logged')
-  } finally {
-    await db.release()
-  }
+  logger?.info({ readingCount: readings.length, timestamp: timestamp.toISOString() }, 'Air condition readings logged')
 }

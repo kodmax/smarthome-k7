@@ -3,7 +3,7 @@ process.setMaxListeners(11)
 import { Server } from '@repo/apollo-ws'
 import { FSCache, RedisCache, FeedComposer, FeedEvents, DataSourceRegistry } from '@repo/feeds'
 import { initKnxCronJobs } from '@repo/cron-scripts'
-import { getDbPool } from '@repo/db'
+import { getSql } from '@repo/db'
 import { createLogger, readScopedLogLevel } from '@repo/logger'
 import { config } from './config'
 import path from 'node:path'
@@ -33,7 +33,7 @@ const main = async () => {
   }
 
   registerDependency('config', config)
-  registerDependency('db', getDbPool())
+  registerDependency('db', getSql())
   registerDependency('openai', initOpenAIClient())
 
   setupGracefulShutdown(rootLogger)

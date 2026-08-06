@@ -1,3 +1,3 @@
-import { getDbPool } from '@repo/db'
+import { getSql } from '@repo/db'
 
-export default getDbPool()
+export default getSql()

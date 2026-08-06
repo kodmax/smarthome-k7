@@ -1,4 +1,4 @@
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { captureInvalidInput, captureProductionError } from '@/sentry'
 
@@ -44,18 +44,19 @@ type PreferenceRow = {
   value: unknown
 }
 
-export async function loadAcceptableSalary(db: Pool): Promise<number | null> {
-  const conn = await db.getConnection()
+export async function loadAcceptableSalary(db: Sql): Promise<number | null> {
   try {
-    const rows = (await observeDbQuery('select', 'preferences', () =>
-      conn.query(
-        `select value
-       from preferences
-       where scope = ?
-         and preference_key = ?`,
-        [JOB_ADS_PREFERENCES_SCOPE, ACCEPTABLE_SALARY_PREFERENCE_KEY],
-      ),
-    )) as PreferenceRow[]
+    const rows = await observeDbQuery(
+      'select',
+      'preferences',
+      () =>
+        db<PreferenceRow[]>`
+        select value
+        from preferences
+        where scope = ${JOB_ADS_PREFERENCES_SCOPE}
+          and preference_key = ${ACCEPTABLE_SALARY_PREFERENCE_KEY}
+      `,
+    )
 
     const row = rows[0]
     if (row === undefined) {
@@ -66,23 +67,18 @@ export async function loadAcceptableSalary(db: Pool): Promise<number | null> {
   } catch (error) {
     captureProductionError(error)
     return null
-  } finally {
-    conn.release()
   }
 }
 
-export async function saveAcceptableSalary(db: Pool, value: number): Promise<void> {
-  const conn = await db.getConnection()
-  try {
-    await observeDbQuery('insert', 'preferences', () =>
-      conn.query(
-        `insert into preferences (scope, preference_key, value)
-       values (?, ?, ?)
-       on duplicate key update value = values(value)`,
-        [JOB_ADS_PREFERENCES_SCOPE, ACCEPTABLE_SALARY_PREFERENCE_KEY, value],
-      ),
-    )
-  } finally {
-    conn.release()
-  }
+export async function saveAcceptableSalary(db: Sql, value: number): Promise<void> {
+  await observeDbQuery(
+    'insert',
+    'preferences',
+    () =>
+      db`
+      insert into preferences (scope, preference_key, value)
+      values (${JOB_ADS_PREFERENCES_SCOPE}, ${ACCEPTABLE_SALARY_PREFERENCE_KEY}, ${db.json(value)})
+      on conflict (scope, preference_key) do update set value = excluded.value
+    `,
+  )
 }

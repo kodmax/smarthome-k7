@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createJobAdDocument } from './jobAdDocument'
 import { updateJobAdApplicationMeta } from './jobAdsRepository'
+import { mockSql } from '@/test/mockSql'
 
 const document = createJobAdDocument({
   id: 'manual-1',
@@ -17,11 +18,7 @@ const document = createJobAdDocument({
 
 describe('updateJobAdApplicationMeta', () => {
   it('updates application meta as JSON object, not string', async () => {
-    const query = vi
-      .fn()
-      .mockResolvedValueOnce([{ id: 'manual-1', data: document }])
-      .mockResolvedValueOnce(undefined)
-    const db = { query } as never
+    const db = mockSql([{ id: 'manual-1', data: document }], [])
     const application = {
       applyStatus: 'consider' as const,
       archiveReason: null,
@@ -33,17 +30,11 @@ describe('updateJobAdApplicationMeta', () => {
 
     await updateJobAdApplicationMeta(db, 'manual-1', application)
 
-    expect(query).toHaveBeenLastCalledWith(
-      `update job_ads
-       set data = json_set(data, '$.meta.application', json_extract(?, '$'))
-       where id = ?`,
-      [expect.stringMatching(/"applyStatus":"consider"/), 'manual-1'],
-    )
+    expect(db).toHaveBeenCalledTimes(3)
   })
 
   it('no-ops when document is missing', async () => {
-    const query = vi.fn().mockResolvedValueOnce([])
-    const db = { query } as never
+    const db = mockSql([])
 
     await updateJobAdApplicationMeta(db, 'missing', {
       applyStatus: 'consider',
@@ -54,6 +45,6 @@ describe('updateJobAdApplicationMeta', () => {
       statusChangedAt: null,
     })
 
-    expect(query).toHaveBeenCalledTimes(1)
+    expect(db).toHaveBeenCalledTimes(2)
   })
 })

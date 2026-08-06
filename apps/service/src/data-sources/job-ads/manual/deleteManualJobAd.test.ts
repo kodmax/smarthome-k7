@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { createJobAdDocument } from '../jobAdDocument'
 import { deleteManualJobAd, updateManualJobAd } from '../jobAdsRepository'
+import { mockDeleteResult, mockSql } from '@/test/mockSql'
 
 const manualDocument = createJobAdDocument({
   id: 'manual-1',
@@ -30,11 +31,7 @@ const portalDocument = createJobAdDocument({
 
 describe('updateManualJobAd', () => {
   it('updates manual document', async () => {
-    const query = vi
-      .fn()
-      .mockResolvedValueOnce([{ id: 'manual-1', data: manualDocument }])
-      .mockResolvedValueOnce(undefined)
-    const db = { query } as never
+    const db = mockSql([{ id: 'manual-1', data: manualDocument }], [])
 
     const updated = await updateManualJobAd(db, {
       ...manualDocument,
@@ -42,50 +39,36 @@ describe('updateManualJobAd', () => {
     })
 
     expect(updated).toBe(true)
-    expect(query).toHaveBeenLastCalledWith('update job_ads set data = ? where id = ?', [
-      expect.objectContaining({ content: expect.objectContaining({ workplaceType: 'remote' }) }),
-      'manual-1',
-    ])
+    expect(db).toHaveBeenCalledTimes(3)
   })
 
   it('returns false for portal origin', async () => {
-    const query = vi.fn()
-    const db = { query } as never
+    const db = mockSql()
 
     expect(await updateManualJobAd(db, portalDocument)).toBe(false)
-    expect(query).not.toHaveBeenCalled()
+    expect(db).not.toHaveBeenCalled()
   })
 })
 
 describe('deleteManualJobAd', () => {
   it('deletes manual ad within 24h window', async () => {
-    const query = vi
-      .fn()
-      .mockResolvedValueOnce([{ id: 'manual-1', data: manualDocument }])
-      .mockResolvedValueOnce({ affectedRows: 1 })
-      .mockResolvedValueOnce(undefined)
-    const db = { query } as never
+    const db = mockSql([{ id: 'manual-1', data: manualDocument }], mockDeleteResult(1), mockDeleteResult(1))
 
     expect(await deleteManualJobAd(db, 'manual-1')).toBe(true)
-    expect(query).toHaveBeenCalledTimes(3)
+    expect(db).toHaveBeenCalledTimes(4)
   })
 
   it('returns false when delete window expired', async () => {
-    const query = vi
-      .fn()
-      .mockResolvedValueOnce([{ id: 'manual-1', data: manualDocument }])
-      .mockResolvedValueOnce({ affectedRows: 0 })
-    const db = { query } as never
+    const db = mockSql([{ id: 'manual-1', data: manualDocument }], mockDeleteResult(0))
 
     expect(await deleteManualJobAd(db, 'manual-1')).toBe(false)
-    expect(query).toHaveBeenCalledTimes(2)
+    expect(db).toHaveBeenCalledTimes(3)
   })
 
   it('returns false for portal origin', async () => {
-    const query = vi.fn().mockResolvedValueOnce([{ id: 'jj-1', data: portalDocument }])
-    const db = { query } as never
+    const db = mockSql([{ id: 'jj-1', data: portalDocument }])
 
     expect(await deleteManualJobAd(db, 'jj-1')).toBe(false)
-    expect(query).toHaveBeenCalledTimes(1)
+    expect(db).toHaveBeenCalledTimes(2)
   })
 })

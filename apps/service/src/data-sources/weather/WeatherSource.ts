@@ -5,12 +5,12 @@ import { observeDbQuery } from '@/prometheus/dbMetrics'
 import * as suncalc from 'suncalc'
 import { WeatherFeed } from '@repo/types'
 import type { config as AppConfig } from '../../config'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { parseAirQuality, parseAllergens, parseForecast, parseHourly, parseInstant } from './parsers'
 
 export class WeatherSource extends DataSource<WeatherFeed> {
   @Inject('db')
-  declare private db: Pool
+  declare private db: Sql
 
   @Inject('config')
   declare private config: typeof AppConfig
@@ -42,54 +42,56 @@ export class WeatherSource extends DataSource<WeatherFeed> {
     ])
 
     const datetime = DateTime.now()
-    const conn = await this.db.getConnection()
-    try {
-      await observeDbQuery('insert', 'readings', () =>
-        conn.query('insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)', [
-          datetime.getDateTime(),
-          'outdoor_temp',
-          instant.temp,
-        ]),
-      )
-      await observeDbQuery('insert', 'readings', () =>
-        conn.query('insert into readings (timestamp, reading_name, reading_value) values (?, ?, ?)', [
-          datetime.getDateTime(),
-          'air_pressure',
-          instant.pressure,
-        ]),
-      )
 
-      const sunTimesResult = suncalc.getTimes(new Date(), lat, long)
-      const sunTimes: WeatherFeed['sunTimes'] = {
-        sunrise: sunTimesResult.sunrise.toISOString(),
-        sunset: sunTimesResult.sunset.toISOString(),
-        dusk: sunTimesResult.dusk.toISOString(),
-        dawn: sunTimesResult.dawn.toISOString(),
-      }
+    await observeDbQuery(
+      'insert',
+      'readings',
+      () =>
+        this.db`
+        insert into readings (timestamp, reading_name, reading_value)
+        values (${datetime.getDateTime()}, 'outdoor_temp', ${instant.temp})
+      `,
+    )
+    await observeDbQuery(
+      'insert',
+      'readings',
+      () =>
+        this.db`
+        insert into readings (timestamp, reading_name, reading_value)
+        values (${datetime.getDateTime()}, 'air_pressure', ${instant.pressure})
+      `,
+    )
 
-      return {
-        outdoorTemp: await observeDbQuery('select', 'readings', () =>
-          conn.query(
-            `select
-              hour(timestamp) as hour,
-              avg(reading_value) as value
-              from readings
-              where timestamp >= ?
-                and reading_name = 'outdoor_temp'
-              group by hour(timestamp)
-              order by hour(timestamp)`,
-            [datetime.getDate()],
-          ),
-        ),
-        sunTimes,
-        allergens,
-        forecast,
-        instant,
-        hourly,
-        aq,
-      }
-    } finally {
-      conn.release()
+    const sunTimesResult = suncalc.getTimes(new Date(), lat, long)
+    const sunTimes: WeatherFeed['sunTimes'] = {
+      sunrise: sunTimesResult.sunrise.toISOString(),
+      sunset: sunTimesResult.sunset.toISOString(),
+      dusk: sunTimesResult.dusk.toISOString(),
+      dawn: sunTimesResult.dawn.toISOString(),
+    }
+
+    return {
+      outdoorTemp: await observeDbQuery(
+        'select',
+        'readings',
+        () =>
+          this.db<Array<{ hour: number; value: string }>>`
+          select
+            extract(hour from timestamp)::int as hour,
+            avg(reading_value)::text as value
+          from readings
+          where timestamp >= ${datetime.getDate()}
+            and reading_name = 'outdoor_temp'
+          group by extract(hour from timestamp)
+          order by extract(hour from timestamp)
+        `,
+      ),
+      sunTimes,
+      allergens,
+      forecast,
+      instant,
+      hourly,
+      aq,
     }
   }
 }

@@ -18,7 +18,7 @@ WebSocket.
 | [`packages/knx-schema`](packages/knx-schema)               | KNX group address map                         |
 | [`packages/cron-scripts`](packages/cron-scripts)           | KNX cron job implementations (run in service) |
 | [`packages/chronos`](packages/chronos)                     | Minute-resolution cron scheduler              |
-| [`packages/db`](packages/db)                               | MariaDB pool + schema migrations              |
+| [`packages/db`](packages/db)                               | PostgreSQL pool + schema migrations           |
 | [`packages/transmission`](packages/transmission)           | Transmission BitTorrent RPC client            |
 | [`packages/cloudflare`](packages/cloudflare)               | Dynamic DNS (Cloudflare API)                  |
 | [`packages/assets`](packages/assets)                       | Lucide icons, weather SVGs, and other media   |
@@ -52,19 +52,19 @@ yarn workspace service dev
 
 ## Root scripts
 
-| Script              | Description                           |
-| ------------------- | ------------------------------------- |
-| `yarn dev`          | Dev mode for all packages             |
-| `yarn build`        | Build all packages (Turbo)            |
-| `yarn test`         | Run tests                             |
-| `yarn lint`         | ESLint                                |
-| `yarn format`       | Prettier (write)                      |
-| `yarn format:check` | Prettier (check only)                 |
-| `yarn verify`       | format + test + lint + build          |
-| `yarn db:migrate`   | Apply MariaDB migrations (`@repo/db`) |
-| `yarn db:rollback`  | Revert last migration                 |
-| `yarn db:status`    | Show migration state                  |
-| `yarn mcp`          | Build MCP + launch Inspector          |
+| Script              | Description                              |
+| ------------------- | ---------------------------------------- |
+| `yarn dev`          | Dev mode for all packages                |
+| `yarn build`        | Build all packages (Turbo)               |
+| `yarn test`         | Run tests                                |
+| `yarn lint`         | ESLint                                   |
+| `yarn format`       | Prettier (write)                         |
+| `yarn format:check` | Prettier (check only)                    |
+| `yarn verify`       | format + test + lint + build             |
+| `yarn db:migrate`   | Apply PostgreSQL migrations (`@repo/db`) |
+| `yarn db:rollback`  | Revert last migration                    |
+| `yarn db:status`    | Show migration state                     |
+| `yarn mcp`          | Build MCP + launch Inspector             |
 
 ## Architecture
 
@@ -98,7 +98,7 @@ KNX scheduled tasks (energy logging, clock sync, indoor readings) run inside [`a
 
 ## Docker Compose (Mac / practice)
 
-Self-contained stack: **web** (nginx), **service**, **MariaDB**, **Redis**. Database state persists in a named Docker
+Self-contained stack: **web** (nginx), **service**, **PostgreSQL**, **Redis**. Database state persists in a named Docker
 volume across image rebuilds (`docker compose down -v` resets it).
 
 ```sh
@@ -117,7 +117,7 @@ Open **http://localhost** — WebSocket uses `ws://localhost/ws` (nginx proxies 
 
 ### Docker deps + `yarn dev` (recommended for daily dev)
 
-Run **only MariaDB and Redis** in Docker; **service and web** natively with hot reload:
+Run **only PostgreSQL and Redis** in Docker; **service and web** natively with hot reload:
 
 ```sh
 docker compose -f docker-compose.deps.yml up -d
@@ -128,9 +128,10 @@ In `apps/service/.env`, point DB and Redis at localhost (see
 
 ```env
 DB_HOST=127.0.0.1
-DB_USER=apollo
-DB_PASSWORD=apollo
-DB_SCHEMA=apollo
+DB_PORT=5432
+DB_USER=smarthome_k7
+DB_PASSWORD=smarthome_k7
+DB_SCHEMA=smarthome_k7
 REDIS_URL=redis://127.0.0.1:6379
 ```
 
@@ -144,7 +145,7 @@ yarn dev
 Vite serves the UI and proxies `/ws` → `localhost:3678` — no extra config. Stop deps:
 `docker compose -f docker-compose.deps.yml down`.
 
-Uses the same `mariadb-data` volume as the full stack, so data survives switching between modes.
+Uses the same `postgres-data` volume as the full stack, so data survives switching between modes.
 
 ## Tooling
 

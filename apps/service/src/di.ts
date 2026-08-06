@@ -1,6 +1,6 @@
 import { createContainer } from '@repo/di'
+import type { Sql } from '@repo/db'
 import type { KnxLink } from 'js-knx'
-import type { Pool } from 'mariadb'
 import type OpenAI from 'openai'
 import type { RedisClientType } from 'redis'
 import type { config as appConfig } from './config'
@@ -10,7 +10,7 @@ import type { config as appConfig } from './config'
  * Add new entries here when introducing a new shared dependency.
  */
 export type Dependencies = {
-  db: Pool
+  db: Sql
   redis: RedisClientType
   config: typeof appConfig
   knx: KnxLink

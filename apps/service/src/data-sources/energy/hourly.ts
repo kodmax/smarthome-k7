@@ -2,7 +2,7 @@ import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import DateTime from '../../DateTime'
 import { Inject } from '@/di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { EnergyHourConsumption } from '@repo/types'
 import { dayStart, getStartOfDayReading, METER_TOTAL_READING } from './helpers'
 
@@ -12,7 +12,7 @@ export class EnergyHourlySource extends DataSource<{
   startOfDayValue: number
 }> {
   @Inject('db')
-  declare private db: Pool
+  declare private db: Sql
 
   static getId() {
     return 'energy-hourly'
@@ -31,37 +31,34 @@ export class EnergyHourlySource extends DataSource<{
   }
 
   protected async fetchData() {
-    const conn = await this.db.getConnection()
-    try {
-      const today = DateTime.now().getDate()
-      const yesterday = DateTime.shift(-1, DateTime.DAY).getDate()
-      const startOfDayValue = await getStartOfDayReading(conn, today, yesterday)
+    const today = DateTime.now().getDate()
+    const yesterday = DateTime.shift(-1, DateTime.DAY).getDate()
+    const startOfDayValue = await getStartOfDayReading(this.db, today, yesterday)
 
-      const bars = await observeDbQuery('select', 'readings', () =>
-        conn.query(
-          `select
-            hour(date_sub(timestamp, interval 1 hour)) as hour,
-            hourly_consumption
-          from (
-            select
-              timestamp,
-              reading_value - lag(reading_value) over (order by timestamp) as hourly_consumption
-            from readings
-            where reading_name = ?
-              and timestamp >= ?
-          ) as deltas
-          where hourly_consumption is not null`,
-          [METER_TOTAL_READING, dayStart(today)],
-        ),
-      )
+    const bars = await observeDbQuery(
+      'select',
+      'readings',
+      () =>
+        this.db<EnergyHourConsumption[]>`
+        select
+          extract(hour from (timestamp - interval '1 hour'))::int as hour,
+          hourly_consumption
+        from (
+          select
+            timestamp,
+            reading_value - lag(reading_value) over (order by timestamp) as hourly_consumption
+          from readings
+          where reading_name = ${METER_TOTAL_READING}
+            and timestamp >= ${dayStart(today)}
+        ) as deltas
+        where hourly_consumption is not null
+      `,
+    )
 
-      return {
-        startOfDayValue,
-        date: today,
-        bars,
-      }
-    } finally {
-      conn.release()
+    return {
+      startOfDayValue,
+      date: today,
+      bars,
     }
   }
 }

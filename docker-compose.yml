@@ -1,15 +1,14 @@
 services:
-  mariadb:
-    image: mariadb:11
+  postgres:
+    image: postgres:16-alpine
     environment:
-      MARIADB_DATABASE: apollo
-      MARIADB_USER: apollo
-      MARIADB_PASSWORD: apollo
-      MARIADB_ROOT_PASSWORD: root
+      POSTGRES_DB: smarthome_k7
+      POSTGRES_USER: smarthome_k7
+      POSTGRES_PASSWORD: smarthome_k7
     volumes:
-      - mariadb-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      test: ['CMD-SHELL', 'pg_isready -U smarthome_k7 -d smarthome_k7']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -25,7 +24,7 @@ services:
     env_file:
       - apps/service/.env.docker
     depends_on:
-      mariadb:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_started
@@ -44,5 +43,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  mariadb-data:
+  postgres-data:
   service-cache:

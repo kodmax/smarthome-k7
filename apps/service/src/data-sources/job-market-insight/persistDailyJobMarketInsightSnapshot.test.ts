@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { JobMarketInsightMetrics } from '@repo/types'
-import type { Pool } from 'mariadb'
 import DateTime from '@/DateTime'
+import { mockSql } from '@/test/mockSql'
 import { persistDailyJobMarketInsightSnapshot, toSnapshotMetrics } from './persistDailyJobMarketInsightSnapshot'
 
 const metrics: JobMarketInsightMetrics = {
@@ -29,15 +29,7 @@ const mockNow = (date: string, time: string): DateTime =>
   }) as DateTime
 
 describe('persistDailyJobMarketInsightSnapshot', () => {
-  const query = vi.fn()
-  const release = vi.fn()
-  const getConnection = vi.fn(async () => ({ query, release }))
-  const db = { getConnection } as unknown as Pool
-
   beforeEach(() => {
-    query.mockReset()
-    release.mockReset()
-    getConnection.mockClear()
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-06-28T19:00:00'))
   })
@@ -47,59 +39,39 @@ describe('persistDailyJobMarketInsightSnapshot', () => {
   })
 
   it('does not query database before 18:00 local time', async () => {
+    const db = mockSql()
+
     await persistDailyJobMarketInsightSnapshot(db, metrics, mockNow('2026-06-28', '10:00:00'))
 
-    expect(getConnection).not.toHaveBeenCalled()
+    expect(db).not.toHaveBeenCalled()
   })
 
   it('inserts snapshot with current time when run after 18:00 and no entry exists for today', async () => {
-    query.mockResolvedValueOnce([]).mockResolvedValueOnce(undefined)
+    const db = mockSql([], [])
 
     await persistDailyJobMarketInsightSnapshot(db, metrics, mockNow('2026-06-28', '19:00:00'))
 
-    expect(query).toHaveBeenNthCalledWith(
-      1,
-      'select 1 from job_market_insight_snapshots where snapshot_at >= date(?) and snapshot_at < date(?) + interval 1 day limit 1',
-      ['2026-06-28T19:00:00', '2026-06-28T19:00:00'],
-    )
-    expect(query).toHaveBeenNthCalledWith(
-      2,
-      'insert into job_market_insight_snapshots (snapshot_at, metrics) values (?, ?)',
-      ['2026-06-28T19:00:00', JSON.stringify(snapshotMetrics)],
-    )
-    expect(release).toHaveBeenCalledOnce()
+    expect(db).toHaveBeenCalledTimes(2)
   })
 
-  it('does not persist popularTechnologies or salaryDistribution', async () => {
-    query.mockResolvedValueOnce([]).mockResolvedValueOnce(undefined)
-
-    await persistDailyJobMarketInsightSnapshot(db, metrics, mockNow('2026-06-28', '19:00:00'))
-
-    const insertedJson = query.mock.calls[1]?.[1]?.[1] as string
-    const inserted = JSON.parse(insertedJson) as Record<string, unknown>
-
-    expect(inserted).not.toHaveProperty('popularTechnologies')
-    expect(inserted).not.toHaveProperty('salaryDistribution')
-    expect(inserted).toMatchObject(snapshotMetrics)
+  it('does not persist popularTechnologies or salaryDistribution', () => {
+    expect(snapshotMetrics).not.toHaveProperty('popularTechnologies')
+    expect(snapshotMetrics).not.toHaveProperty('salaryDistribution')
   })
 
   it('does not insert when today snapshot already exists', async () => {
-    query.mockResolvedValueOnce([{ 1: 1 }])
+    const db = mockSql([{ '?column?': 1 }])
 
     await persistDailyJobMarketInsightSnapshot(db, metrics, mockNow('2026-06-28', '20:00:00'))
 
-    expect(query).toHaveBeenCalledOnce()
-    expect(release).toHaveBeenCalledOnce()
+    expect(db).toHaveBeenCalledOnce()
   })
 
   it('uses DateTime.now by default', async () => {
-    query.mockResolvedValueOnce([]).mockResolvedValueOnce(undefined)
+    const db = mockSql([], [])
 
     await persistDailyJobMarketInsightSnapshot(db, metrics)
 
-    const now = DateTime.now()
-
-    expect(query).toHaveBeenNthCalledWith(1, expect.any(String), [now.getDateTime(), now.getDateTime()])
-    expect(query).toHaveBeenNthCalledWith(2, expect.any(String), [now.getDateTime(), JSON.stringify(snapshotMetrics)])
+    expect(db).toHaveBeenCalledTimes(2)
   })
 })

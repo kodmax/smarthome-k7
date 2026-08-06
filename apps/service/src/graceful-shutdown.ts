@@ -1,6 +1,6 @@
 import type { Server } from '@repo/apollo-ws'
 import type { Logger } from '@repo/logger'
-import { closeDbPool } from '@repo/db'
+import { closeSql } from '@repo/db'
 import { closePrometheus } from './prometheus'
 import { captureProductionError, closeSentry } from './sentry'
 import { closeRedisClient } from './redis'
@@ -62,7 +62,7 @@ const closeConnections = async (logger: Logger): Promise<void> => {
     logger.info({ step: 'redis' }, 'Shutdown step complete')
   }
 
-  await closeDbPool()
+  await closeSql()
   logger.info({ step: 'db' }, 'Shutdown step complete')
 
   await closePrometheus()

@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import type { JobAdMatchAnalysis } from '@repo/types'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { CV_SCOPE, CV_TEXT_ID } from '../cv/documentRecord'
 
@@ -84,57 +84,56 @@ export function cvMatchContentToMatchAnalysis(content: CvMatchContent): JobAdMat
   }
 }
 
-export async function saveCvMatch(db: Pool, adId: string, content: CvMatchContent, cvTextHash: string): Promise<void> {
+export async function saveCvMatch(db: Sql, adId: string, content: CvMatchContent, cvTextHash: string): Promise<void> {
   const hash = digestCvMatchContentHash(content)
 
-  await observeDbQuery('insert', 'documents', () =>
-    db.query(
-      `insert into documents (scope, id, hash, source_hash, content)
-     values (?, ?, ?, ?, ?)
-     on duplicate key update
-       hash = values(hash),
-       source_hash = values(source_hash),
-       content = values(content),
-       modified_at = current_timestamp()`,
-      [CV_MATCH_SCOPE, adId, hash, cvTextHash, JSON.stringify(content)],
-    ),
+  await observeDbQuery(
+    'insert',
+    'documents',
+    () =>
+      db`
+      insert into documents (scope, id, hash, source_hash, content)
+      values (${CV_MATCH_SCOPE}, ${adId}, ${hash}, ${cvTextHash}, ${db.json(content)})
+      on conflict (scope, id) do update set
+        hash = excluded.hash,
+        source_hash = excluded.source_hash,
+        content = excluded.content,
+        modified_at = now()
+    `,
   )
 }
 
-export async function loadCvMatchesByAdIds(db: Pool, adIds: string[]): Promise<Map<string, LoadedCvMatch>> {
+export async function loadCvMatchesByAdIds(db: Sql, adIds: string[]): Promise<Map<string, LoadedCvMatch>> {
   if (adIds.length === 0) {
     return new Map()
   }
 
-  const conn = await db.getConnection()
-  try {
-    const rows = (await observeDbQuery('select', 'documents', () =>
-      conn.query(
-        `select id, source_hash, content, modified_at
-       from documents
-       where scope = ?
-         and id in (?)`,
-        [CV_MATCH_SCOPE, adIds],
-      ),
-    )) as DocumentRow[]
+  const rows = await observeDbQuery(
+    'select',
+    'documents',
+    () =>
+      db<DocumentRow[]>`
+      select id, source_hash, content, modified_at
+      from documents
+      where scope = ${CV_MATCH_SCOPE}
+        and id in ${db(adIds)}
+    `,
+  )
 
-    const result = new Map<string, LoadedCvMatch>()
-    for (const row of rows) {
-      const content = parseCvMatchContent(row.content)
-      if (content === null) {
-        continue
-      }
-
-      result.set(row.id, {
-        analysis: cvMatchContentToMatchAnalysis(content),
-        analyzedCvTextHash: row.source_hash,
-      })
+  const result = new Map<string, LoadedCvMatch>()
+  for (const row of rows) {
+    const content = parseCvMatchContent(row.content)
+    if (content === null) {
+      continue
     }
 
-    return result
-  } finally {
-    conn.release()
+    result.set(row.id, {
+      analysis: cvMatchContentToMatchAnalysis(content),
+      analyzedCvTextHash: row.source_hash,
+    })
   }
+
+  return result
 }
 
 export type LoadedCV = {
@@ -142,34 +141,31 @@ export type LoadedCV = {
   hash: string | null
 }
 
-export async function loadCV(db: Pool): Promise<LoadedCV | null> {
-  const conn = await db.getConnection()
-  try {
-    const rows = (await observeDbQuery('select', 'documents', () =>
-      conn.query(
-        `select hash, content
-       from documents
-       where scope = ? and id = ?`,
-        [CV_SCOPE, CV_TEXT_ID],
-      ),
-    )) as Array<{ hash: string; content: unknown }>
+export async function loadCV(db: Sql): Promise<LoadedCV | null> {
+  const rows = await observeDbQuery(
+    'select',
+    'documents',
+    () =>
+      db<Array<{ hash: string; content: unknown }>>`
+      select hash, content
+      from documents
+      where scope = ${CV_SCOPE} and id = ${CV_TEXT_ID}
+    `,
+  )
 
-    const row = rows[0]
-    if (row === undefined) {
-      return null
-    }
+  const row = rows[0]
+  if (row === undefined) {
+    return null
+  }
 
-    const parsed = typeof row.content === 'string' ? JSON.parse(row.content) : row.content
-    const text =
-      typeof parsed === 'object' && parsed !== null && typeof (parsed as { text?: unknown }).text === 'string'
-        ? (parsed as { text: string }).text
-        : null
+  const parsed = typeof row.content === 'string' ? JSON.parse(row.content) : row.content
+  const text =
+    typeof parsed === 'object' && parsed !== null && typeof (parsed as { text?: unknown }).text === 'string'
+      ? (parsed as { text: string }).text
+      : null
 
-    return {
-      text,
-      hash: row.hash,
-    }
-  } finally {
-    conn.release()
+  return {
+    text,
+    hash: row.hash,
   }
 }

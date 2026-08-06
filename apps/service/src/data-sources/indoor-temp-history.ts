@@ -2,7 +2,7 @@ import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import DateTime from '../DateTime'
 import { Inject } from '@/di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 
 type RoomTempHistory = Array<{
   hour: number
@@ -31,7 +31,7 @@ const readingToHistory: Record<string, keyof TempHistory> = {
 
 export class IndoorTempHistorySource extends DataSource<TempHistory> {
   @Inject('db')
-  declare private db: Pool
+  declare private db: Sql
 
   static getId() {
     return 'indoor-temp-history'
@@ -54,38 +54,35 @@ export class IndoorTempHistorySource extends DataSource<TempHistory> {
   }
 
   protected async fetchData() {
-    const conn = await this.db.getConnection()
-    try {
-      const history = (await observeDbQuery('select', 'readings', () =>
-        conn.query(
-          `select
-              reading_name,
-              hour(timestamp) as hour,
-              avg(reading_value) as value
-              from readings
-              where timestamp >= ?
-                and reading_name in ('bathroom_floor_temp', 'bedroom_temp', 'livingroom_temp', 'bathroom_temp')
-              group by reading_name, hour(timestamp)
-              order by reading_name, hour(timestamp) ASC`,
-          [DateTime.now().getDate()],
-        ),
-      )) as HistoryRecord[]
+    const history = await observeDbQuery(
+      'select',
+      'readings',
+      () =>
+        this.db<HistoryRecord[]>`
+        select
+          reading_name,
+          extract(hour from timestamp)::int as hour,
+          avg(reading_value) as value
+        from readings
+        where timestamp >= ${DateTime.now().getDate()}
+          and reading_name in ('bathroom_floor_temp', 'bedroom_temp', 'livingroom_temp', 'bathroom_temp')
+        group by reading_name, extract(hour from timestamp)
+        order by reading_name, extract(hour from timestamp) asc
+      `,
+    )
 
-      const result: TempHistory = {
-        bathroomFloor: [],
-        livingroom: [],
-        bedroom: [],
-        bathroom: [],
-      }
-
-      for (const record of history) {
-        const key = readingToHistory[record.reading_name]
-        result[key].push({ hour: record.hour, value: record.value })
-      }
-
-      return result
-    } finally {
-      conn.release()
+    const result: TempHistory = {
+      bathroomFloor: [],
+      livingroom: [],
+      bedroom: [],
+      bathroom: [],
     }
+
+    for (const record of history) {
+      const key = readingToHistory[record.reading_name]
+      result[key].push({ hour: record.hour, value: record.value })
+    }
+
+    return result
   }
 }

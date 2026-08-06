@@ -1,12 +1,12 @@
 import type OpenAI from 'openai'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { analyzeCvMatch } from './analyzeCvMatch'
 import { type CvMatchContent, loadCV, saveCvMatch } from './cvMatchDocument'
 import { detectOrigin } from './jobPosting/detectOrigin'
 import { fetchJobPostingDetails } from './jobPosting/fetchJobPostingDetails'
 
 type AnalyzeCvMatchInput = {
-  db: Pool
+  db: Sql
   openai: OpenAI
   adId: string
   loadAdUrl: (itemId: string) => Promise<string | null>

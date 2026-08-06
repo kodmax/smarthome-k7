@@ -1,6 +1,6 @@
 import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { MySkillsFeed } from '@repo/types'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { Inject } from '@/di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import {
@@ -17,7 +17,7 @@ type MySkillsCachedFeed = Record<string, never>
 
 export class MySkillsSource extends DataSource<MySkillsFeed, MySkillsCachedFeed> {
   @Inject('db')
-  declare private db: Pool
+  declare private db: Sql
 
   public async handleCommand(command: string, args: string): Promise<void> {
     switch (command) {
@@ -59,24 +59,22 @@ export class MySkillsSource extends DataSource<MySkillsFeed, MySkillsCachedFeed>
   }
 
   private async loadSkillsFromDb(): Promise<MySkillsFeed> {
-    const conn = await this.db.getConnection()
-    try {
-      const rows = (await observeDbQuery('select', 'my_skills', () =>
-        conn.query(
-          `select skill_id, skill_name, experience_level, comment
-         from my_skills
-         order by skill_name`,
-        ),
-      )) as SkillRecordRow[]
+    const rows = await observeDbQuery(
+      'select',
+      'my_skills',
+      () =>
+        this.db<SkillRecordRow[]>`
+        select skill_id, skill_name, experience_level, comment
+        from my_skills
+        order by skill_name
+      `,
+    )
 
-      return {
-        skills: rows.flatMap(row => {
-          const skill = skillRowToMySkill(row)
-          return skill === null ? [] : [skill]
-        }),
-      }
-    } finally {
-      conn.release()
+    return {
+      skills: rows.flatMap(row => {
+        const skill = skillRowToMySkill(row)
+        return skill === null ? [] : [skill]
+      }),
     }
   }
 
@@ -93,33 +91,27 @@ export class MySkillsSource extends DataSource<MySkillsFeed, MySkillsCachedFeed>
   }
 
   private async upsertSkillLevel(input: SetSkillCommandArgs): Promise<void> {
-    const conn = await this.db.getConnection()
-    try {
-      await observeDbQuery('insert', 'my_skills', () =>
-        conn.query(
-          `insert into my_skills (skill_id, skill_name, experience_level, comment)
-         values (?, ?, ?, null)
-         on duplicate key update
-           skill_name = values(skill_name),
-           experience_level = values(experience_level)`,
-          [input.id, input.name, input.level],
-        ),
-      )
-    } finally {
-      conn.release()
-    }
+    await observeDbQuery(
+      'insert',
+      'my_skills',
+      () =>
+        this.db`
+        insert into my_skills (skill_id, skill_name, experience_level, comment)
+        values (${input.id}, ${input.name}, ${input.level}, null)
+        on conflict (skill_id) do update set
+          skill_name = excluded.skill_name,
+          experience_level = excluded.experience_level
+      `,
+    )
   }
 
   private async updateSkillComment(skillId: string, comment: string | null): Promise<boolean> {
-    const conn = await this.db.getConnection()
-    try {
-      const result = await observeDbQuery('update', 'my_skills', () =>
-        conn.query(`update my_skills set comment = ? where skill_id = ?`, [comment, skillId]),
-      )
+    const result = await observeDbQuery(
+      'update',
+      'my_skills',
+      () => this.db`update my_skills set comment = ${comment} where skill_id = ${skillId}`,
+    )
 
-      return ((result as { affectedRows?: number }).affectedRows ?? 0) > 0
-    } finally {
-      conn.release()
-    }
+    return (result.count ?? 0) > 0
   }
 }

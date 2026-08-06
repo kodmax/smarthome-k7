@@ -1,2 +1,0 @@
--- Legacy table schemas were not tracked in repo migrations.
--- Restore manually from production backup if rollback is needed.

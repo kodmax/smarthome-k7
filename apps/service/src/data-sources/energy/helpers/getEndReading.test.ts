@@ -1,4 +1,4 @@
-import type { PoolConnection } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getEndReading } from './getEndReading'
 import { getFirstReadingSince } from './getFirstReadingSince'
@@ -13,7 +13,7 @@ vi.mock('./getLatestReading', () => ({
   getLatestReading: vi.fn(),
 }))
 
-const conn = {} as PoolConnection
+const conn = {} as Sql
 const today = '2026-07-06'
 const yesterday = '2026-07-05'
 

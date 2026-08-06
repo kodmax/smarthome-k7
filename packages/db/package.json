@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@repo/logger": "*",
-    "mariadb": "^3.0.0"
+    "postgres": "^3.4.7"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",

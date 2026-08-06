@@ -9,11 +9,11 @@ for attempt in $(seq 1 30); do
   fi
 
   if [ "$attempt" -eq 30 ]; then
-    echo "fatal: MariaDB migrations failed after 30 attempts" >&2
+    echo "fatal: PostgreSQL migrations failed after 30 attempts" >&2
     exit 1
   fi
 
-  echo "Waiting for MariaDB (attempt ${attempt}/30)..."
+  echo "Waiting for PostgreSQL (attempt ${attempt}/30)..."
   sleep 2
 done
 

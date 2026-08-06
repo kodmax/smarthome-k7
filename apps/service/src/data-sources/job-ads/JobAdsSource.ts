@@ -1,6 +1,6 @@
 import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { Inject } from '@/di'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import type OpenAI from 'openai'
 import {
   JobAdDocument,
@@ -53,7 +53,7 @@ const STALE_APPLIED_ARCHIVE_AFTER_DAYS = 7
 
 export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
   @Inject('db')
-  declare private db: Pool
+  declare private db: Sql
 
   @Inject('openai')
   declare private openai: OpenAI

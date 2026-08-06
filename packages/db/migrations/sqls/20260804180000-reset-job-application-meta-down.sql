@@ -1,1 +1,0 @@
--- Irreversible global reset of application meta.

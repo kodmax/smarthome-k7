@@ -1,3 +1,0 @@
-DROP TABLE IF EXISTS fx;
-DROP TABLE IF EXISTS interest_rates;
-DROP TABLE IF EXISTS commodities;

@@ -1,4 +1,4 @@
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { JobAdsCachedFeed } from '@repo/types'
 import { fetchJustJoinAds } from './jjit/fetchJustJoinAds'
 import { digestJjitId } from './jjit/digestJjitId'
@@ -50,7 +50,7 @@ async function collectListingEntries(): Promise<SyncListingEntry[]> {
   return entries
 }
 
-export async function syncJobAdsFromSources(db: Pool): Promise<JobAdsCachedFeed> {
+export async function syncJobAdsFromSources(db: Sql): Promise<JobAdsCachedFeed> {
   const listingEntries = await collectListingEntries()
   const listingIds = listingEntries.map(entry => entry.id)
 

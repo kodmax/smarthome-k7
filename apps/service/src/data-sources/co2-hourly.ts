@@ -3,11 +3,11 @@ import DateTime from '../DateTime'
 import { Inject } from '../di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { Co2HistoryRecord } from '@repo/types'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 
 export class Co2HourlySource extends DataSource<{ date: string; today: Co2HistoryRecord[] }> {
   @Inject('db')
-  declare private db: Pool
+  declare private db: Sql
 
   static getId() {
     return 'co2-hourly'
@@ -26,26 +26,23 @@ export class Co2HourlySource extends DataSource<{ date: string; today: Co2Histor
   }
 
   protected async fetchData() {
-    const conn = await this.db.getConnection()
-    try {
-      return {
-        today: await observeDbQuery('select', 'readings', () =>
-          conn.query(
-            `select
-              hour(timestamp) as hour,
-              avg(reading_value) as value
-              from readings
-              where timestamp >= ?
-                and reading_name = 'co2'
-              group by hour(timestamp)
-              order by hour(timestamp) ASC`,
-            [DateTime.now().getDate()],
-          ),
-        ),
-        date: DateTime.now().getDate(),
-      }
-    } finally {
-      conn.release()
+    return {
+      today: await observeDbQuery(
+        'select',
+        'readings',
+        () =>
+          this.db<Co2HistoryRecord[]>`
+          select
+            extract(hour from timestamp)::int as hour,
+            avg(reading_value) as value
+          from readings
+          where timestamp >= ${DateTime.now().getDate()}
+            and reading_name = 'co2'
+          group by extract(hour from timestamp)
+          order by extract(hour from timestamp) asc
+        `,
+      ),
+      date: DateTime.now().getDate(),
     }
   }
 }

@@ -1,7 +1,7 @@
 import { CacheAgeUnit, DataSource } from '@repo/feeds'
 import { type CvCachedFeed, type CvFeed } from '@repo/types'
 import type OpenAI from 'openai'
-import type { Pool } from 'mariadb'
+import type { Sql } from '@repo/db'
 import { Inject } from '@/di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import {
@@ -20,7 +20,7 @@ import { extractPdfText } from './extractPdfText'
 
 export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
   @Inject('db')
-  declare private db: Pool
+  declare private db: Sql
 
   @Inject('openai')
   declare private openai: OpenAI
@@ -67,55 +67,49 @@ export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
   }
 
   private async loadCvFromDb(): Promise<CvFeed> {
-    const conn = await this.db.getConnection()
-    try {
-      const rows = (await observeDbQuery('select', 'documents', () =>
-        conn.query(
-          `select scope, id, hash, modified_at, content
-         from documents
-         where scope = ? and id = ?`,
-          [CV_SCOPE, CV_TEXT_ID],
-        ),
-      )) as DocumentRecordRow[]
+    const rows = await observeDbQuery(
+      'select',
+      'documents',
+      () =>
+        this.db<DocumentRecordRow[]>`
+        select scope, id, hash, modified_at, content
+        from documents
+        where scope = ${CV_SCOPE} and id = ${CV_TEXT_ID}
+      `,
+    )
 
-      const row = rows[0]
-      if (row === undefined) {
-        return { cv: null }
-      }
+    const row = rows[0]
+    if (row === undefined) {
+      return { cv: null }
+    }
 
-      const content = parseCvTextContent(row.content)
-      if (content === null) {
-        return { cv: null }
-      }
+    const content = parseCvTextContent(row.content)
+    if (content === null) {
+      return { cv: null }
+    }
 
-      return {
-        cv: {
-          modifiedAt: toModifiedAtIso(row.modified_at),
-          text: content.text,
-          hash: row.hash,
-        },
-      }
-    } finally {
-      conn.release()
+    return {
+      cv: {
+        modifiedAt: toModifiedAtIso(row.modified_at),
+        text: content.text,
+        hash: row.hash,
+      },
     }
   }
 
   private async loadCvTextSourceHash(): Promise<string | null> {
-    const conn = await this.db.getConnection()
-    try {
-      const rows = (await observeDbQuery('select', 'documents', () =>
-        conn.query(
-          `select source_hash
-         from documents
-         where scope = ? and id = ?`,
-          [CV_SCOPE, CV_TEXT_ID],
-        ),
-      )) as { source_hash: string | null }[]
+    const rows = await observeDbQuery(
+      'select',
+      'documents',
+      () =>
+        this.db<{ source_hash: string | null }[]>`
+        select source_hash
+        from documents
+        where scope = ${CV_SCOPE} and id = ${CV_TEXT_ID}
+      `,
+    )
 
-      return rows[0]?.source_hash ?? null
-    } finally {
-      conn.release()
-    }
+    return rows[0]?.source_hash ?? null
   }
 
   private async uploadPdf(input: UploadCommandArgs): Promise<boolean> {
@@ -134,38 +128,32 @@ export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
   }
 
   private async touchCvTextModifiedAt(): Promise<void> {
-    const conn = await this.db.getConnection()
-    try {
-      await observeDbQuery('update', 'documents', () =>
-        conn.query(
-          `update documents
-         set modified_at = current_timestamp()
-         where scope = ? and id = ?`,
-          [CV_SCOPE, CV_TEXT_ID],
-        ),
-      )
-    } finally {
-      conn.release()
-    }
+    await observeDbQuery(
+      'update',
+      'documents',
+      () =>
+        this.db`
+        update documents
+        set modified_at = now()
+        where scope = ${CV_SCOPE} and id = ${CV_TEXT_ID}
+      `,
+    )
   }
 
   private async upsertCvText(content: CvTextContent, hash: string, sourceHash: string): Promise<void> {
-    const conn = await this.db.getConnection()
-    try {
-      await observeDbQuery('insert', 'documents', () =>
-        conn.query(
-          `insert into documents (scope, id, hash, source_hash, content)
-         values (?, ?, ?, ?, ?)
-         on duplicate key update
-           hash = values(hash),
-           source_hash = values(source_hash),
-           content = values(content),
-           modified_at = current_timestamp()`,
-          [CV_SCOPE, CV_TEXT_ID, hash, sourceHash, JSON.stringify(content)],
-        ),
-      )
-    } finally {
-      conn.release()
-    }
+    await observeDbQuery(
+      'insert',
+      'documents',
+      () =>
+        this.db`
+        insert into documents (scope, id, hash, source_hash, content)
+        values (${CV_SCOPE}, ${CV_TEXT_ID}, ${hash}, ${sourceHash}, ${this.db.json(content)})
+        on conflict (scope, id) do update set
+          hash = excluded.hash,
+          source_hash = excluded.source_hash,
+          content = excluded.content,
+          modified_at = now()
+      `,
+    )
   }
 }
