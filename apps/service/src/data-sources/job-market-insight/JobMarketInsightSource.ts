@@ -1,12 +1,9 @@
 import { CacheAgeUnit, DataSource } from '@repo/feeds'
-import { JobAd, JobMarketInsightCachedFeed, JobMarketInsightFeed } from '@repo/types'
+import { JobMarketInsightCachedFeed, JobMarketInsightFeed } from '@repo/types'
 import type { Sql } from '@repo/db'
 import DateTime from '@/DateTime'
 import { Inject } from '@/di'
-import { jjit } from '../job-ads/jjit/jjit'
-import { nfj } from '../job-ads/nfj/nfj'
-import { theprotocol } from '../job-ads/theprotocol'
-import { addAllAds } from './addAllAds'
+import { loadJobAdsForMarketInsight } from '../job-ads/loadJobAdsForMarketInsight'
 import { buildJobMarketInsightFeed } from './buildJobMarketInsightFeed'
 import { loadJobMarketInsightSnapshotAtOrBefore } from './loadJobMarketInsightSnapshotAtOrBefore'
 import { persistDailyJobMarketInsightSnapshot } from './persistDailyJobMarketInsightSnapshot'
@@ -22,7 +19,7 @@ export class JobMarketInsightSource extends DataSource<JobMarketInsightFeed, Job
   }
 
   static getCron() {
-    return '0 * * * *'
+    return '5 * * * *'
   }
 
   static getCacheTTL() {
@@ -30,17 +27,11 @@ export class JobMarketInsightSource extends DataSource<JobMarketInsightFeed, Job
   }
 
   protected getSourceMetricType() {
-    return 'api' as const
+    return 'db' as const
   }
 
   protected async fetchData() {
-    const allAds = new Map<string, JobAd>()
-
-    addAllAds(allAds, await jjit())
-    addAllAds(allAds, await nfj())
-    addAllAds(allAds, await theprotocol())
-
-    const ads = [...allAds.values()]
+    const ads = await loadJobAdsForMarketInsight(this.db)
     const metrics = buildJobMarketInsightFeed(ads)
 
     await persistDailyJobMarketInsightSnapshot(this.db, metrics)
