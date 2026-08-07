@@ -38,8 +38,9 @@ import {
   markStaleAppliedAsArchivedNoResponse,
   updateJobAdApplicationMeta,
   updateJobAdFav,
-  updateManualJobAd,
+  updateJobAdDetails,
 } from './jobAdsRepository'
+import { JobMarketInsightSource } from '../job-market-insight/JobMarketInsightSource'
 import { applyManualJobAdContentUpdate } from './manual/applyManualJobAdContentUpdate'
 import { buildManualJobAdDocument, parseAddManualJobAdArgs } from './manual/parseAddManualJobAdArgs'
 import {
@@ -153,6 +154,7 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
   public async addManualJobAd(input: Parameters<typeof buildManualJobAdDocument>[0]): Promise<void> {
     const document = buildManualJobAdDocument(input)
     await insertManualJobAd(this.db, document)
+    this.requestRefresh(JobMarketInsightSource.getId())
   }
 
   public async editManualJobAd(input: EditManualJobAdCommandArgs): Promise<void> {
@@ -162,7 +164,10 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     }
 
     const updated = applyManualJobAdContentUpdate(existing, input)
-    await updateManualJobAd(this.db, updated)
+    const saved = await updateJobAdDetails(this.db, updated)
+    if (saved) {
+      this.requestRefresh(JobMarketInsightSource.getId())
+    }
   }
 
   public async deleteManualJobAd(id: string): Promise<void> {

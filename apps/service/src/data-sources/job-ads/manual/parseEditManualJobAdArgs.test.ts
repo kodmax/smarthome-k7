@@ -11,6 +11,7 @@ describe('parseEditManualJobAdArgs', () => {
           employmentType: 'b2b',
           salaryFrom: 20_000,
           salaryTo: 25_000,
+          requiredSkills: ['TypeScript'],
         }),
       ),
     ).toEqual({
@@ -19,7 +20,21 @@ describe('parseEditManualJobAdArgs', () => {
       employmentType: 'b2b',
       salaryFrom: 20_000,
       salaryTo: 25_000,
+      requiredSkills: ['TypeScript'],
     })
+  })
+
+  it('rejects invalid requiredSkills', () => {
+    expect(
+      parseEditManualJobAdArgs(
+        JSON.stringify({
+          id: 'manual-1',
+          workplaceType: 'hybrid',
+          employmentType: 'b2b',
+          requiredSkills: ['React', 1],
+        }),
+      ),
+    ).toBeNull()
   })
 
   it('rejects invalid salary range', () => {
@@ -31,6 +46,7 @@ describe('parseEditManualJobAdArgs', () => {
           employmentType: 'b2b',
           salaryFrom: 30_000,
           salaryTo: 20_000,
+          requiredSkills: [],
         }),
       ),
     ).toBeNull()

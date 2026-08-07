@@ -34,7 +34,34 @@ describe('AddManualJobAdDialog', () => {
       workplaceType: 'remote',
       employmentType: 'permanent',
       applyStatus: 'pending-review',
+      requiredSkills: [],
     })
+  })
+
+  it('submits required skills from add form', () => {
+    const onSubmit = vi.fn()
+
+    renderWithTheme(
+      <AddManualJobAdDialog open={true} onClose={vi.fn()} onSubmit={onSubmit} skillOptions={['TypeScript', 'React']} />,
+    )
+
+    fireEvent.change(screen.getByRole('textbox', { name: /^URL ogłoszenia/ }), {
+      target: { value: 'https://example.com/jobs/1' },
+    })
+    fireEvent.change(screen.getByRole('textbox', { name: /^Tytuł/ }), { target: { value: 'Backend Engineer' } })
+    fireEvent.change(screen.getByRole('textbox', { name: /^Firma/ }), { target: { value: 'Acme' } })
+    fireEvent.change(screen.getByRole('combobox', { name: 'Wymagane umiejętności' }), {
+      target: { value: 'TypeScript' },
+    })
+    fireEvent.keyDown(screen.getByRole('combobox', { name: 'Wymagane umiejętności' }), { key: 'Enter' })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dodaj' }))
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        requiredSkills: ['TypeScript'],
+      }),
+    )
   })
 })
 
@@ -66,6 +93,41 @@ describe('ManualJobAdDialog edit mode', () => {
       id: 'manual-1',
       workplaceType: 'remote',
       employmentType: 'permanent',
+      requiredSkills: [],
+    })
+  })
+
+  it('submits required skills from edit form', () => {
+    const onSubmit = vi.fn()
+    const editAd = jobAd({
+      id: 'manual-1',
+      title: 'Backend Engineer',
+      companyName: 'Acme',
+      advertUrl: 'https://example.com/jobs/1',
+      origin: 'manual',
+      workplaceType: 'office',
+      employmentType: 'permanent',
+      requiredSkills: ['TypeScript'],
+    })
+
+    renderWithTheme(
+      <ManualJobAdDialog
+        mode='edit'
+        open={true}
+        onClose={vi.fn()}
+        onSubmit={onSubmit}
+        editAd={editAd}
+        skillOptions={['TypeScript', 'React']}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      id: 'manual-1',
+      workplaceType: 'office',
+      employmentType: 'permanent',
+      requiredSkills: ['TypeScript'],
     })
   })
 })

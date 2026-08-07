@@ -1,8 +1,9 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material'
-import { useCommand } from '@repo/feed-client'
-import { JobAdsFeedItem } from '@repo/types'
-import { type FC, useCallback, useState } from 'react'
+import { useCommand, useFeed } from '@repo/feed-client'
+import { JobAdsFeed, JobAdsFeedItem } from '@repo/types'
+import { type FC, useCallback, useMemo, useState } from 'react'
 import { useTranslations } from '@/i18n'
+import { collectSkillSuggestions } from '../../../../../../requiredSkills'
 import { canDeleteManualAd } from '../../../../../../canDeleteManualAd'
 import { ManualJobAdDialog, type EditManualJobAdPayload } from '../../../../../../components/AddManualJobAdDialog'
 
@@ -10,16 +11,19 @@ type Props = {
   ad: JobAdsFeedItem
 }
 
-export const ManualJobAdActions: FC<Props> = ({ ad }) => {
+export const JobAdDetailsActions: FC<Props> = ({ ad }) => {
   const { t } = useTranslations()
   const labels = t.dashboard.jobAds
   const editManualJobAd = useCommand('job-ads', 'edit-manual')
   const deleteManualJobAd = useCommand('job-ads', 'delete-manual')
+  const jobAdsFeed = useFeed<JobAdsFeed>('job-ads')
 
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
-  const showDelete = canDeleteManualAd(ad.meta.addedAt)
+  const isManualAd = ad.content.origin === 'manual'
+  const showDelete = isManualAd && canDeleteManualAd(ad.meta.addedAt)
+  const skillOptions = useMemo(() => collectSkillSuggestions(jobAdsFeed?.ads), [jobAdsFeed?.ads])
 
   const handleEditSubmit = useCallback(
     (payload: EditManualJobAdPayload) => {
@@ -50,6 +54,7 @@ export const ManualJobAdActions: FC<Props> = ({ ad }) => {
         onClose={() => setEditOpen(false)}
         onSubmit={handleEditSubmit}
         editAd={ad}
+        skillOptions={skillOptions}
       />
       <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} maxWidth='xs' fullWidth>
         <DialogTitle>{labels.deleteManualJobAdTitle}</DialogTitle>

@@ -10,7 +10,7 @@ DataSourceRegistry.add(id, SourceClass)   ← creates DataSource, per-source cro
         ↓
 FeedComposer.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source feeds
         ↓
-FeedEvents (feed / data-update / push / error / command / feeds-request)
+FeedEvents (feed / data-update / refresh / error / command / feeds-request)
         ↓
 @repo/apollo-ws Server   ← debounce + FEED <id> <json> broadcast
 ```

@@ -24,7 +24,7 @@ import { ApplyStatusIcon } from '../../../../../../shared-components'
 import { applyArchiveReasonOptions, applyStatusTargetStatuses } from './applyStatusSelectOptions'
 import { formatAppliedDaysAgo, formatNotApplicable } from './formatAppliedDaysAgo'
 import { RequiredSkillTag } from './RequiredSkillTag'
-import { ManualJobAdActions } from './ManualJobAdActions'
+import { JobAdDetailsActions } from './JobAdDetailsActions'
 import { useCvMatchAnalysis } from './useCvMatchAnalysis'
 
 const favIconSize = designTokens.icon.sizeMd
@@ -387,7 +387,7 @@ export const ApplicationStatusEditor: FC<{
           </Box>
         ) : (
           <Box sx={{ display: 'flex', gap: `${designTokens.space[1]}px`, flexWrap: 'wrap' }}>
-            {isManualAd ? <ManualJobAdActions ad={ad} /> : null}
+            <JobAdDetailsActions ad={ad} />
             {isTheProtocolAd ? (
               <Button
                 size='small'

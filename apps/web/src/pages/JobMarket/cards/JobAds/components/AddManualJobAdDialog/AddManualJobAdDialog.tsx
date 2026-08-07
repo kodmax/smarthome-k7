@@ -1,5 +1,7 @@
 import {
+  Autocomplete,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -17,6 +19,7 @@ import {
 import { JobApplyStatus, JobAdsFeedItem, WorkplaceType } from '@repo/types'
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from '@/i18n'
+import { dedupeSkillsById } from '../../requiredSkills'
 import { reverseManualJobAdSalary } from './manualJobAdSalary'
 
 const MANUAL_APPLY_STATUSES = [
@@ -38,6 +41,7 @@ export type AddManualJobAdPayload = {
   salaryTo?: number
   applyStatus: JobApplyStatus
   appliedAt?: string
+  requiredSkills: string[]
 }
 
 export type EditManualJobAdPayload = {
@@ -46,6 +50,7 @@ export type EditManualJobAdPayload = {
   employmentType: 'permanent' | 'b2b'
   salaryFrom?: number
   salaryTo?: number
+  requiredSkills: string[]
 }
 
 type BaseProps = {
@@ -57,12 +62,14 @@ type AddModeProps = BaseProps & {
   mode: 'add'
   onSubmit: (payload: AddManualJobAdPayload) => void
   editAd?: undefined
+  skillOptions?: string[]
 }
 
 type EditModeProps = BaseProps & {
   mode: 'edit'
   onSubmit: (payload: EditManualJobAdPayload) => void
   editAd: JobAdsFeedItem
+  skillOptions?: string[]
 }
 
 type Props = AddModeProps | EditModeProps
@@ -107,7 +114,9 @@ function formatSalaryInput(value: number | undefined): string {
   return value === undefined ? '' : String(value)
 }
 
-export const ManualJobAdDialog: FC<Props> = ({ mode, open, onClose, onSubmit, editAd }) => {
+export const ManualJobAdDialog: FC<Props> = props => {
+  const { mode, open, onClose, onSubmit, editAd } = props
+  const skillOptions = props.skillOptions ?? []
   const { t } = useTranslations()
   const labels = t.dashboard.jobAds
   const isAddMode = mode === 'add'
@@ -121,6 +130,7 @@ export const ManualJobAdDialog: FC<Props> = ({ mode, open, onClose, onSubmit, ed
   const [salaryTo, setSalaryTo] = useState('')
   const [applyStatus, setApplyStatus] = useState<(typeof MANUAL_APPLY_STATUSES)[number]>('pending-review')
   const [appliedAt, setAppliedAt] = useState('')
+  const [requiredSkills, setRequiredSkills] = useState<string[]>([])
 
   const resetAddForm = useCallback(() => {
     setTitle('')
@@ -132,6 +142,7 @@ export const ManualJobAdDialog: FC<Props> = ({ mode, open, onClose, onSubmit, ed
     setSalaryTo('')
     setApplyStatus('pending-review')
     setAppliedAt('')
+    setRequiredSkills([])
   }, [])
 
   const resetEditForm = useCallback((ad: JobAdsFeedItem) => {
@@ -142,6 +153,7 @@ export const ManualJobAdDialog: FC<Props> = ({ mode, open, onClose, onSubmit, ed
     setEmploymentType(employmentTypeValue)
     setSalaryFrom(formatSalaryInput(reversedSalary.salaryFrom))
     setSalaryTo(formatSalaryInput(reversedSalary.salaryTo))
+    setRequiredSkills(dedupeSkillsById(ad.content.requiredSkills))
   }, [])
 
   useEffect(() => {
@@ -191,6 +203,7 @@ export const ManualJobAdDialog: FC<Props> = ({ mode, open, onClose, onSubmit, ed
         workplaceType,
         employmentType,
         applyStatus,
+        requiredSkills: dedupeSkillsById(requiredSkills),
       }
 
       if (parsedSalaryFrom !== undefined) {
@@ -220,6 +233,7 @@ export const ManualJobAdDialog: FC<Props> = ({ mode, open, onClose, onSubmit, ed
       id: editAd.content.id,
       workplaceType,
       employmentType,
+      requiredSkills: dedupeSkillsById(requiredSkills),
     }
 
     if (parsedSalaryFrom !== undefined) {
@@ -273,6 +287,20 @@ export const ManualJobAdDialog: FC<Props> = ({ mode, open, onClose, onSubmit, ed
               <Typography color='text.secondary'>{editAd.content.companyName}</Typography>
             </Stack>
           ) : null}
+          <Autocomplete
+            multiple
+            freeSolo
+            options={skillOptions}
+            value={requiredSkills}
+            onChange={(_, value) => setRequiredSkills(dedupeSkillsById(value.map(String)))}
+            renderValue={(value, getTagProps) =>
+              value.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index })
+                return <Chip key={key} label={option} size='small' {...tagProps} />
+              })
+            }
+            renderInput={params => <TextField {...params} label={labels.requiredSkills} />}
+          />
           <FormControl fullWidth required>
             <InputLabel id='manual-job-ad-workplace-type'>{labels.workplaceTypeLabel}</InputLabel>
             <Select

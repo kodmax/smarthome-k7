@@ -52,6 +52,10 @@ abstract class DataSource<T, TCache = T> {
     this.feedEvents.emit('error', this.getId(), error, context)
   }
 
+  protected requestRefresh(sourceId: string): void {
+    this.feedEvents.emit('refresh', sourceId)
+  }
+
   public handleCommand(_command: string, _args: string): Promise<void> {
     return Promise.resolve()
   }

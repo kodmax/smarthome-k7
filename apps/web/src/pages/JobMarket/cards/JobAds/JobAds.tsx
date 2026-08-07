@@ -1,4 +1,4 @@
-import { type FC, useCallback, useState } from 'react'
+import { type FC, useCallback, useMemo, useState } from 'react'
 import { useMediaQuery, useTheme } from '@mui/material'
 import { JobAdsIcon, PlusIcon } from '@repo/assets'
 import { ApolloCardAction, BaseCard } from '@repo/apollo-card'
@@ -10,6 +10,7 @@ import { countJobAdsEditViewAds, JobAdsEditView } from './components/JobAdsEditV
 import { JobAdsFilterSelect } from './components/JobAdsFilterSelect'
 import { AcceptableSalarySlider } from './components/AcceptableSalarySlider'
 import { AddManualJobAdDialog, type AddManualJobAdPayload } from './components/AddManualJobAdDialog'
+import { collectSkillSuggestions } from './requiredSkills'
 
 export const JobAds: FC<Record<string, never>> = () => {
   const [adsFilter, setAdsFilter] = useState<JobAdsFilter>(DEFAULT_JOB_ADS_FILTER)
@@ -34,6 +35,8 @@ export const JobAds: FC<Record<string, never>> = () => {
     },
     [addManualJobAd],
   )
+
+  const skillOptions = useMemo(() => collectSkillSuggestions(feed?.ads), [feed?.ads])
 
   if (feed === undefined) {
     return (
@@ -65,7 +68,12 @@ export const JobAds: FC<Record<string, never>> = () => {
       >
         <JobAdsEditView ads={feed.ads} zoom={true} filter={adsFilter} />
       </BaseCard>
-      <AddManualJobAdDialog open={dialogOpen} onClose={() => setDialogOpen(false)} onSubmit={onAddManualJobAd} />
+      <AddManualJobAdDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSubmit={onAddManualJobAd}
+        skillOptions={skillOptions}
+      />
     </>
   )
 }

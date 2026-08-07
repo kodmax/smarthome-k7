@@ -31,6 +31,7 @@ Create one instance in service and pass it to `Server.listen()`, `DataSourceRegi
 | --------------- | ------------------------------ | ----------------------------------------------------- |
 | `feed`          | `feedId`, `value`              | Feed composed successfully                            |
 | `data-update`   | `sourceId`                     | Source cache changed after push, fetch, or cron       |
+| `refresh`       | `sourceId`                     | Request forced refresh (`getData(true)`) of a source  |
 | `error`         | `sourceId`, `error`, `context` | Data source error (handled in service entrypoint)     |
 | `command`       | `DataSourceCommand`            | WS client command routed to push sources              |
 | `feeds-request` | `feedIds[]`                    | Client subscribe — compose feed from source cache/TTL |

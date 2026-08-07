@@ -1,5 +1,6 @@
 import { WorkplaceType } from '@repo/types'
 import { captureInvalidInput } from '@/sentry'
+import { parseRequiredSkills } from './parseRequiredSkills'
 
 const MANUAL_EMPLOYMENT_TYPES = new Set(['permanent', 'b2b'] as const)
 const WORKPLACE_TYPES = new Set<WorkplaceType>(['office', 'remote', 'hybrid'])
@@ -10,6 +11,7 @@ export type EditManualJobAdCommandArgs = {
   employmentType: 'permanent' | 'b2b'
   salaryFrom?: number
   salaryTo?: number
+  requiredSkills: string[]
 }
 
 function isManualEmploymentType(value: unknown): value is EditManualJobAdCommandArgs['employmentType'] {
@@ -75,10 +77,17 @@ export function parseEditManualJobAdArgs(args: string): EditManualJobAdCommandAr
       return null
     }
 
+    const requiredSkills = parseRequiredSkills(parsed.requiredSkills)
+    if (requiredSkills === null) {
+      captureInvalidInput('job-ads: invalid edit-manual requiredSkills', args)
+      return null
+    }
+
     return {
       id: parsed.id.trim(),
       workplaceType: parsed.workplaceType,
       employmentType: parsed.employmentType,
+      requiredSkills,
       ...salary,
     }
   } catch (cause) {

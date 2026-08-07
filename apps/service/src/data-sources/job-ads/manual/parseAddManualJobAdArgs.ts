@@ -4,6 +4,7 @@ import { isJobApplyStatus } from '../applicationMeta'
 import { createJobAdDocument, withApplicationStatusChangedAt } from '../jobAdDocument'
 import { buildManualJobAdSalary } from './buildManualJobAdSalary'
 import { digestManualId } from './digestManualId'
+import { parseRequiredSkills } from './parseRequiredSkills'
 
 const MANUAL_APPLY_STATUSES = new Set<JobApplyStatus>(['pending-review', 'consider', 'applied', 'interview'])
 const MANUAL_EMPLOYMENT_TYPES = new Set(['permanent', 'b2b'] as const)
@@ -19,6 +20,7 @@ export type AddManualJobAdCommandArgs = {
   salaryTo?: number
   applyStatus: JobApplyStatus
   appliedAt?: string
+  requiredSkills: string[]
 }
 
 function isManualEmploymentType(value: unknown): value is AddManualJobAdCommandArgs['employmentType'] {
@@ -84,7 +86,7 @@ export function buildManualJobAdDocument(args: AddManualJobAdCommandArgs, now: D
     advertUrl: args.advertUrl.trim(),
     companyLogoUrl: '',
     companyName: args.companyName.trim(),
-    requiredSkills: [],
+    requiredSkills: args.requiredSkills,
     workplaceType: args.workplaceType,
     employmentType: args.employmentType,
     monthlySalaryRangeAfterTaxes: buildManualJobAdSalary(args.employmentType, args.salaryFrom, args.salaryTo),
@@ -167,6 +169,12 @@ export function parseAddManualJobAdArgs(args: string): AddManualJobAdCommandArgs
       return null
     }
 
+    const requiredSkills = parseRequiredSkills(parsed.requiredSkills)
+    if (requiredSkills === null) {
+      captureInvalidInput('job-ads: invalid add-manual requiredSkills', args)
+      return null
+    }
+
     return {
       title: parsed.title,
       companyName: parsed.companyName,
@@ -177,6 +185,7 @@ export function parseAddManualJobAdArgs(args: string): AddManualJobAdCommandArgs
       salaryTo,
       applyStatus: parsed.applyStatus,
       appliedAt,
+      requiredSkills,
     }
   } catch (cause) {
     captureInvalidInput('job-ads: failed to parse add-manual command args', cause)

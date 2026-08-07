@@ -27,6 +27,7 @@ describe('applyManualJobAdContentUpdate', () => {
       employmentType: 'b2b',
       salaryFrom: 20_000,
       salaryTo: 25_000,
+      requiredSkills: ['TypeScript', 'PostgreSQL'],
     })
 
     expect(updated.content.title).toBe('Backend Engineer')
@@ -35,6 +36,7 @@ describe('applyManualJobAdContentUpdate', () => {
     expect(updated.content.workplaceType).toBe('remote')
     expect(updated.content.employmentType).toBe('b2b')
     expect(updated.content.monthlySalaryRangeAfterTaxes).toEqual(buildManualJobAdSalary('b2b', 20_000, 25_000))
+    expect(updated.content.requiredSkills).toEqual(['TypeScript', 'PostgreSQL'])
     expect(updated.meta.fav).toBe(true)
     expect(updated.meta.application.applyStatus).toBe('applied')
   })

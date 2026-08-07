@@ -17,6 +17,7 @@ describe('parseAddManualJobAdArgs', () => {
           salaryTo: 25_000,
           applyStatus: 'applied',
           appliedAt: '2026-08-01T00:00:00.000Z',
+          requiredSkills: ['TypeScript'],
         }),
       ),
     ).toEqual({
@@ -29,7 +30,24 @@ describe('parseAddManualJobAdArgs', () => {
       salaryTo: 25_000,
       applyStatus: 'applied',
       appliedAt: '2026-08-01T00:00:00.000Z',
+      requiredSkills: ['TypeScript'],
     })
+  })
+
+  it('rejects invalid requiredSkills', () => {
+    expect(
+      parseAddManualJobAdArgs(
+        JSON.stringify({
+          title: 'Backend Engineer',
+          companyName: 'Acme',
+          advertUrl: 'https://example.com/jobs/1',
+          workplaceType: 'remote',
+          employmentType: 'b2b',
+          applyStatus: 'consider',
+          requiredSkills: ['React', 1],
+        }),
+      ),
+    ).toBeNull()
   })
 
   it('rejects invalid URL', () => {
@@ -42,6 +60,7 @@ describe('parseAddManualJobAdArgs', () => {
           workplaceType: 'remote',
           employmentType: 'b2b',
           applyStatus: 'consider',
+          requiredSkills: [],
         }),
       ),
     ).toBeNull()
@@ -57,6 +76,7 @@ describe('parseAddManualJobAdArgs', () => {
           workplaceType: 'remote',
           employmentType: 'b2b',
           applyStatus: 'archived',
+          requiredSkills: [],
         }),
       ),
     ).toBeNull()
@@ -74,6 +94,7 @@ describe('parseAddManualJobAdArgs', () => {
           salaryFrom: 30_000,
           salaryTo: 20_000,
           applyStatus: 'consider',
+          requiredSkills: [],
         }),
       ),
     ).toBeNull()
@@ -90,6 +111,7 @@ describe('buildManualJobAdDocument', () => {
         workplaceType: 'remote',
         employmentType: 'permanent',
         applyStatus: 'applied',
+        requiredSkills: [],
       },
       now,
     )
@@ -101,6 +123,23 @@ describe('buildManualJobAdDocument', () => {
     expect(document.meta.application.statusChangedAt).toBe(now.toISOString())
   })
 
+  it('stores required skills on manual document', () => {
+    const document = buildManualJobAdDocument(
+      {
+        title: 'Backend Engineer',
+        companyName: 'Acme',
+        advertUrl: 'https://example.com/jobs/2',
+        workplaceType: 'remote',
+        employmentType: 'permanent',
+        applyStatus: 'pending-review',
+        requiredSkills: ['React', 'TypeScript'],
+      },
+      now,
+    )
+
+    expect(document.content.requiredSkills).toEqual(['React', 'TypeScript'])
+  })
+
   it('clears appliedAt for pending-review', () => {
     const document = buildManualJobAdDocument(
       {
@@ -110,6 +149,7 @@ describe('buildManualJobAdDocument', () => {
         workplaceType: 'remote',
         employmentType: 'permanent',
         applyStatus: 'pending-review',
+        requiredSkills: ['React'],
       },
       now,
     )

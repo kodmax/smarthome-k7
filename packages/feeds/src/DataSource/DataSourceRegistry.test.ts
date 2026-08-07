@@ -46,21 +46,57 @@ describe('DataSourceRegistry', () => {
     }
   })
 
-  function createRegistry() {
+  function createRegistry(feedEvents = new FeedEvents()) {
     const cacheDir = mkdtempSync(join(tmpdir(), 'registry-'))
     cacheDirs.push(cacheDir)
 
-    return new DataSourceRegistry<{
+    const registry = new DataSourceRegistry<{
       sourceA: ReturnType<typeof createTestSourceClass>
       sourceB: ReturnType<typeof createTestSourceClass>
     }>({
       cache: new FSCache(cacheDir),
-      feedEvents: new FeedEvents(),
+      feedEvents,
       logger: createSilentLogger(),
       onError: noopOnError,
       observeDataSourceRefresh: async (_metricType, _sourceId, fn) => fn(),
     })
+
+    return { registry, feedEvents }
   }
+
+  it('refreshes registered data source on refresh event', async () => {
+    const feedEvents = new FeedEvents()
+    const { registry } = createRegistry(feedEvents)
+
+    await registry.add('sourceA', createTestSourceClass({ id: 'refresh-a' }))
+
+    const source = registry.get('sourceA')
+    const getData = vi.spyOn(source, 'getData').mockResolvedValue({ value: 42 })
+
+    feedEvents.emit('refresh', 'refresh-a')
+    await vi.waitFor(() => {
+      expect(getData).toHaveBeenCalledWith(true)
+    })
+
+    registry.close()
+  })
+
+  it('ignores refresh event for unknown source', async () => {
+    const feedEvents = new FeedEvents()
+    const { registry } = createRegistry(feedEvents)
+
+    await registry.add('sourceA', createTestSourceClass({ id: 'refresh-a' }))
+
+    const source = registry.get('sourceA')
+    const getData = vi.spyOn(source, 'getData')
+
+    feedEvents.emit('refresh', 'missing-source')
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(getData).not.toHaveBeenCalled()
+
+    registry.close()
+  })
 
   it('runs maintenance sequentially for all registered data sources at 3 AM', async () => {
     vi.useFakeTimers()
@@ -68,7 +104,7 @@ describe('DataSourceRegistry', () => {
 
     try {
       const order: string[] = []
-      const registry = createRegistry()
+      const { registry } = createRegistry()
 
       await registry.add(
         'sourceA',

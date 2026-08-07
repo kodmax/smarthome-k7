@@ -13,6 +13,7 @@ export function applyManualJobAdContentUpdate(
       workplaceType: args.workplaceType,
       employmentType: args.employmentType,
       monthlySalaryRangeAfterTaxes: buildManualJobAdSalary(args.employmentType, args.salaryFrom, args.salaryTo),
+      requiredSkills: args.requiredSkills,
     },
   }
 }

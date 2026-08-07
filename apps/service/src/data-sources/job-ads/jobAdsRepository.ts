@@ -198,13 +198,9 @@ export async function loadJobAdsAddedAtByIds(db: Sql, ids: string[]): Promise<Ma
   return byId
 }
 
-export async function updateManualJobAd(db: Sql, document: JobAdDocument): Promise<boolean> {
-  if (!isManualJobAdDocument(document)) {
-    return false
-  }
-
+export async function updateJobAdDetails(db: Sql, document: JobAdDocument): Promise<boolean> {
   const existing = await loadJobAdDocument(db, document.content.id)
-  if (existing === null || !isManualJobAdDocument(existing)) {
+  if (existing === null) {
     return false
   }
 

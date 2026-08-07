@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createJobAdDocument } from '../jobAdDocument'
-import { deleteManualJobAd, updateManualJobAd } from '../jobAdsRepository'
+import { deleteManualJobAd, updateJobAdDetails } from '../jobAdsRepository'
 import { mockDeleteResult, mockSql } from '@/test/mockSql'
 
 const manualDocument = createJobAdDocument({
@@ -29,24 +29,27 @@ const portalDocument = createJobAdDocument({
   publishedAt: '2026-08-06T12:00:00.000Z',
 })
 
-describe('updateManualJobAd', () => {
-  it('updates manual document', async () => {
-    const db = mockSql([{ id: 'manual-1', data: manualDocument }], [])
+describe('updateJobAdDetails', () => {
+  it('updates any existing ad document', async () => {
+    const db = mockSql([{ id: 'jj-1', data: portalDocument }], [])
 
-    const updated = await updateManualJobAd(db, {
-      ...manualDocument,
-      content: { ...manualDocument.content, workplaceType: 'remote' },
+    const updated = await updateJobAdDetails(db, {
+      ...portalDocument,
+      content: {
+        ...portalDocument.content,
+        requiredSkills: ['TypeScript'],
+      },
     })
 
     expect(updated).toBe(true)
     expect(db).toHaveBeenCalledTimes(3)
   })
 
-  it('returns false for portal origin', async () => {
+  it('returns false when ad is missing', async () => {
     const db = mockSql()
 
-    expect(await updateManualJobAd(db, portalDocument)).toBe(false)
-    expect(db).not.toHaveBeenCalled()
+    expect(await updateJobAdDetails(db, portalDocument)).toBe(false)
+    expect(db).toHaveBeenCalledTimes(2)
   })
 })
 

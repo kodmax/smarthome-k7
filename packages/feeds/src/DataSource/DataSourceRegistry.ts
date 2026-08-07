@@ -41,6 +41,22 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
     )
 
     this.chronos.addJob(DATA_SOURCES_MAINTENANCE_CRON, 'data-sources-maintenance', () => this.runMaintenance())
+
+    this.feedEvents.on('refresh', async (sourceId: string) => {
+      const ds = [...this.dataSources.values()].find(source => source.getId() === sourceId)
+      if (ds === undefined) {
+        this.logger.info({ sourceId }, 'Refresh ignored: unknown source')
+        return
+      }
+
+      try {
+        this.logger.info({ sourceId }, 'Data source refresh requested')
+        await ds.getData(true)
+      } catch (e) {
+        this.logger.warn({ err: e, sourceId }, 'Refresh data source error')
+        this.onError(e, 'Refresh data source error')
+      }
+    })
   }
 
   private async runMaintenance(): Promise<void> {
