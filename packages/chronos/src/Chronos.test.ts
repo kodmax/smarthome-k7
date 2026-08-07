@@ -93,7 +93,7 @@ describe('Chronos', () => {
     expect(script).toHaveBeenCalledTimes(2)
   })
 
-  it('records successful occurrence when misfire policy requires store', async () => {
+  it('records successful occurrence when execution store is configured', async () => {
     const store: CronExecutionStore = {
       getLastSuccessfulOccurrence: vi.fn(async () => undefined),
       recordSuccessfulOccurrence: vi.fn(async () => {}),
@@ -114,6 +114,30 @@ describe('Chronos', () => {
     expect(store.recordSuccessfulOccurrence).toHaveBeenCalledWith(
       'data-source',
       'daily',
+      new Date('2024-01-01T12:00:00.000'),
+    )
+  })
+
+  it('records successful occurrence for jobs without policy when store is configured', async () => {
+    const store: CronExecutionStore = {
+      getLastSuccessfulOccurrence: vi.fn(async () => undefined),
+      recordSuccessfulOccurrence: vi.fn(async () => {}),
+    }
+
+    const script = vi.fn(async () => {})
+    chronos = new Chronos({ executionStore: store })
+    chronos.addJob({
+      namespace: 'knx',
+      id: 'clocks-sync',
+      cron: '0 12 1 1 1',
+      script,
+    })
+
+    await vi.advanceTimersByTimeAsync(10_000)
+
+    expect(store.recordSuccessfulOccurrence).toHaveBeenCalledWith(
+      'knx',
+      'clocks-sync',
       new Date('2024-01-01T12:00:00.000'),
     )
   })

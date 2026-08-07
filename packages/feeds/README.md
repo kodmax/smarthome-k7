@@ -6,7 +6,7 @@ Feed framework for `apps/service` — data sources, cache, registry, and feed co
 ## Architecture
 
 ```
-DataSourceRegistry.add(id, SourceClass)   ← creates DataSource, per-source cron, nightly maintenance
+DataSourceRegistry.add(id, SourceClass)   ← creates DataSource, per-source cron + maintenance at 03:00
         ↓
 FeedComposer.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source feeds
         ↓

@@ -105,12 +105,47 @@ describe('DataSourceRegistry', () => {
     registry.close()
   })
 
-  it('runs maintenance sequentially for all registered data sources at 3 AM', async () => {
+  it('runs maintenance for each registered data source at 3 AM', async () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2024-01-01T02:59:55.000'))
 
     try {
-      const order: string[] = []
+      const maintenanceA = vi.fn(async () => {})
+      const maintenanceB = vi.fn(async () => {})
+      const { registry } = createRegistry()
+
+      await registry.add(
+        'sourceA',
+        createTestSourceClass({
+          id: 'maint-a',
+          maintenance: maintenanceA,
+        }),
+      )
+      await registry.add(
+        'sourceB',
+        createTestSourceClass({
+          id: 'maint-b',
+          maintenance: maintenanceB,
+        }),
+      )
+
+      await vi.advanceTimersByTimeAsync(10_000)
+
+      expect(maintenanceA).toHaveBeenCalledTimes(1)
+      expect(maintenanceB).toHaveBeenCalledTimes(1)
+
+      registry.close()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('runs maintenance for other sources when one source fails', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2024-01-01T02:59:55.000'))
+
+    try {
+      const maintenanceB = vi.fn(async () => {})
       const { registry } = createRegistry()
 
       await registry.add(
@@ -118,9 +153,7 @@ describe('DataSourceRegistry', () => {
         createTestSourceClass({
           id: 'maint-a',
           maintenance: async () => {
-            order.push('maint-a-start')
-            await new Promise(resolve => setTimeout(resolve, 20))
-            order.push('maint-a-end')
+            throw new Error('maint-a failed')
           },
         }),
       )
@@ -128,16 +161,13 @@ describe('DataSourceRegistry', () => {
         'sourceB',
         createTestSourceClass({
           id: 'maint-b',
-          maintenance: () => {
-            order.push('maint-b')
-          },
+          maintenance: maintenanceB,
         }),
       )
 
       await vi.advanceTimersByTimeAsync(10_000)
-      await vi.advanceTimersByTimeAsync(50)
 
-      expect(order).toEqual(['maint-a-start', 'maint-a-end', 'maint-b'])
+      expect(maintenanceB).toHaveBeenCalledTimes(1)
 
       registry.close()
     } finally {

@@ -90,7 +90,8 @@ same result.
 - `addFeed` is fully typed: callback receives `DataSourceDataTypes<S>`. Internally stored as `FeedCb`
   (`Record<string, unknown>` → `unknown`) because feeds live in a homogeneous `Map`.
 - Reuse data sources by registry key — `getByIds` returns the same instance registered once in `DataSourceRegistry`.
-- Cron jobs for data sources (per-source refresh + nightly maintenance at 03:00) are registered in `DataSourceRegistry`.
+- Cron jobs for data sources (per-source refresh + per-source maintenance at 03:00, namespace
+  `data-source-maintenance/{sourceId}`) are registered in `DataSourceRegistry.add()`.
 - KNX sources: class per group address in `apps/service/src/data-sources/knx/`, barrel `knx/index.ts`.
 - `volatile: true` — in-memory cache only (typical KNX push sources). Persistent sources use JSON files under the cache
   directory.

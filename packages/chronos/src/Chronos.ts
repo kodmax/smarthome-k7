@@ -8,11 +8,8 @@ import { ChronosOptions, CronExecutionStore, Job, JobRunContext, JobSpec, JobSta
 const requiresExecutionStore = (misfirePolicy: MisfirePolicy | undefined): boolean =>
   misfirePolicy !== undefined && misfirePolicy !== 'skip'
 
-const shouldRecordSuccess = (
-  job: Job,
-  executionStore: CronExecutionStore | undefined,
-): executionStore is CronExecutionStore =>
-  executionStore !== undefined && requiresExecutionStore(job.policy?.misfirePolicy)
+const shouldRecordSuccess = (executionStore: CronExecutionStore | undefined): executionStore is CronExecutionStore =>
+  executionStore !== undefined
 
 export class Chronos {
   private jobs: Job[] = []
@@ -97,7 +94,7 @@ export class Chronos {
     job.activeRuns++
     job.state = JobState.RUNNING
 
-    this.logger?.info({ jobId: job.jobId, attempt }, 'Crontab job starting')
+    this.logger?.info({ jobId: job.jobId, attempt, scheduledAt }, 'Crontab job starting')
     const start = Date.now()
 
     const ctx: JobRunContext = {
@@ -124,9 +121,12 @@ export class Chronos {
       }
 
       job.state = JobState.IDLE
-      this.logger?.info({ jobId: job.jobId, attempt, durationMs: Date.now() - start }, 'Crontab job completed')
+      this.logger?.info(
+        { jobId: job.jobId, attempt, scheduledAt, durationMs: Date.now() - start },
+        'Crontab job completed',
+      )
 
-      if (shouldRecordSuccess(job, this.executionStore)) {
+      if (shouldRecordSuccess(this.executionStore)) {
         await this.executionStore.recordSuccessfulOccurrence(job.namespace, job.id, scheduledAt)
       }
     } catch (e) {

@@ -44,14 +44,6 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
       observeDataSourceRefresh: this.observeDataSourceRefresh,
     } = params)
 
-    this.chronos.addJob({
-      namespace: 'data-source-maintenance',
-      id: 'data-sources',
-      cron: DATA_SOURCES_MAINTENANCE_CRON,
-      policy: DATA_SOURCES_MAINTENANCE_POLICY,
-      script: () => this.runMaintenance(),
-    })
-
     this.feedEvents.on('refresh', async (sourceId: string) => {
       const ds = [...this.dataSources.values()].find(source => source.getId() === sourceId)
       if (ds === undefined) {
@@ -67,29 +59,6 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
         this.onError(e, 'Refresh data source error')
       }
     })
-  }
-
-  private async runMaintenance(): Promise<void> {
-    let hadError = false
-
-    for (const ds of this.dataSources.values()) {
-      const sourceId = ds.getId()
-
-      try {
-        this.logger.debug({ sourceId }, 'Data source maintenance starting')
-        const start = Date.now()
-        await ds.maintenance()
-        this.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source maintenance completed')
-      } catch (e) {
-        hadError = true
-        this.logger.warn({ err: e, sourceId }, 'Data source maintenance error')
-        this.onError(e, 'Data source maintenance error')
-      }
-    }
-
-    if (hadError) {
-      throw new Error('Data source maintenance failed for one or more sources')
-    }
   }
 
   public close(): void {
@@ -113,9 +82,29 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
       observeDataSourceRefresh: this.observeDataSourceRefresh,
     })
 
+    const sourceId = ds.getId()
+
+    this.chronos.addJob({
+      namespace: 'data-source-maintenance',
+      id: sourceId,
+      cron: DATA_SOURCES_MAINTENANCE_CRON,
+      policy: DATA_SOURCES_MAINTENANCE_POLICY,
+      script: async () => {
+        try {
+          this.logger.debug({ sourceId }, 'Data source maintenance starting')
+          const start = Date.now()
+          await ds.maintenance()
+          this.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source maintenance completed')
+        } catch (e) {
+          this.logger.warn({ err: e, sourceId }, 'Data source maintenance error')
+          this.onError(e, 'Data source maintenance error')
+          throw e
+        }
+      },
+    })
+
     const cron = ctor.getCron()
     if (cron !== undefined) {
-      const sourceId = ds.getId()
       this.chronos.addJob({
         namespace: 'data-source',
         id: sourceId,

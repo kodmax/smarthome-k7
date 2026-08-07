@@ -15,7 +15,7 @@ import { Chronos } from '@repo/chronos'
 
 const chronos = new Chronos({
   logger,
-  executionStore, // optional; required for misfirePolicy !== 'skip'
+  executionStore, // optional; records every successful run; required for misfirePolicy !== 'skip'
 })
 
 chronos.addJob({
@@ -64,7 +64,9 @@ chronos.addJob({
 })
 ```
 
-Without `policy`, Chronos behaves as before: best effort, `forbid` overlap, log errors.
+Without `policy`, Chronos behaves as before: best effort, `forbid` overlap, log errors. When `executionStore` is
+configured, every successful run is recorded in `cron_job_last_success`; `misfirePolicy` is only required for catch-up
+via `runMisfireRecovery()`.
 
 Jobs that are still running when the next tick fires are skipped unless `concurrencyPolicy` overrides it.
 
