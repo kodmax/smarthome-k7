@@ -168,4 +168,131 @@ describe('Chronos', () => {
 
     expect(script).not.toHaveBeenCalled()
   })
+
+  it('passes script result to consume with run context', async () => {
+    const script = vi.fn(async () => ({ value: 42 }))
+    const consume = vi.fn(async () => {})
+    chronos = new Chronos()
+    chronos.addJob({
+      namespace: 'test',
+      id: 'with-consume',
+      cron: '0 12 1 1 1',
+      script,
+      consume,
+    })
+
+    await vi.advanceTimersByTimeAsync(10_000)
+
+    expect(script).toHaveBeenCalledTimes(1)
+    expect(consume).toHaveBeenCalledWith(
+      { value: 42 },
+      {
+        scheduledAt: new Date('2024-01-01T12:00:00.000'),
+        attempt: 1,
+        namespace: 'test',
+        id: 'with-consume',
+        jobId: 'test:with-consume',
+      },
+    )
+  })
+
+  it('retries script and consume when consume fails', async () => {
+    const script = vi.fn(async () => 'result')
+    const consume = vi
+      .fn<(result: string) => Promise<void>>()
+      .mockRejectedValueOnce(new Error('consume fail'))
+      .mockResolvedValueOnce(undefined)
+
+    chronos = new Chronos()
+    chronos.addJob({
+      namespace: 'test',
+      id: 'consume-retry',
+      cron: '0 12 1 1 1',
+      script,
+      consume,
+      policy: {
+        retry: { maxAttempts: 2, delaySec: 5 * 60 },
+      },
+    })
+
+    await vi.advanceTimersByTimeAsync(10_000)
+    expect(script).toHaveBeenCalledTimes(1)
+    expect(consume).toHaveBeenCalledTimes(1)
+
+    await vi.advanceTimersByTimeAsync(5 * 60_000)
+    expect(script).toHaveBeenCalledTimes(2)
+    expect(consume).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not record success when consume fails under misfire policy', async () => {
+    const store: CronExecutionStore = {
+      getLastSuccessfulOccurrence: vi.fn(async () => undefined),
+      recordSuccessfulOccurrence: vi.fn(async () => {}),
+    }
+
+    const script = vi.fn(async () => 'result')
+    const consume = vi.fn(async () => {
+      throw new Error('consume fail')
+    })
+
+    chronos = new Chronos({ executionStore: store })
+    chronos.addJob({
+      namespace: 'test',
+      id: 'consume-fail',
+      cron: '0 12 1 1 1',
+      script,
+      consume,
+      policy: {
+        misfirePolicy: 'run-latest',
+        retry: { maxAttempts: 1, delaySec: 5 * 60 },
+      },
+    })
+
+    await vi.advanceTimersByTimeAsync(10_000)
+
+    expect(store.recordSuccessfulOccurrence).not.toHaveBeenCalled()
+  })
+
+  it('does not run consume when replace supersedes the script run', async () => {
+    vi.setSystemTime(new Date('2024-01-01T11:59:55.000'))
+
+    let resolveFirst: (() => void) | undefined
+    const script = vi.fn(
+      () =>
+        new Promise<string>(resolve => {
+          if (script.mock.calls.length === 1) {
+            resolveFirst = () => resolve('stale')
+            return
+          }
+
+          resolve('fresh')
+        }),
+    )
+    const consume = vi.fn(async () => {})
+
+    chronos = new Chronos()
+    chronos.addJob({
+      namespace: 'test',
+      id: 'replace-consume',
+      cron: '* * * * *',
+      script,
+      consume,
+      policy: { concurrencyPolicy: 'replace' },
+    })
+
+    await vi.advanceTimersByTimeAsync(10_000)
+    expect(script).toHaveBeenCalledTimes(1)
+
+    await vi.advanceTimersByTimeAsync(60_000)
+    expect(script).toHaveBeenCalledTimes(2)
+    expect(consume).toHaveBeenCalledTimes(1)
+    expect(consume).toHaveBeenCalledWith(
+      'fresh',
+      expect.objectContaining({ attempt: 1, jobId: 'test:replace-consume' }),
+    )
+
+    resolveFirst?.()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(consume).toHaveBeenCalledTimes(1)
+  })
 })

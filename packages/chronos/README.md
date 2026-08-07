@@ -7,7 +7,7 @@ Minute-resolution cron scheduler for Node.js — runs jobs on standard five-fiel
 Exports from `src/index.ts`:
 
 - `Chronos` — scheduler with `addJob(spec)` and `runMisfireRecovery()`
-- `JobSpec`, `CronJobPolicy`, `CronExecutionStore` — job definition and optional execution policy
+- `JobSpec`, `JobRunContext`, `CronJobPolicy`, `CronExecutionStore` — job definition and optional execution policy
 - `cronJobId(namespace, id)` — builds namespaced job id for logs
 
 ```ts
@@ -23,7 +23,10 @@ chronos.addJob({
   id: 'job-market-insight',
   cron: '5 18 * * *',
   script: async () => {
-    /* ... */
+    return fetchMetrics()
+  },
+  consume: async (metrics, ctx) => {
+    await persistMetrics(metrics, ctx.scheduledAt)
   },
   policy: {
     retry: { maxAttempts: 3, delaySec: 5 * 60 },
@@ -32,6 +35,33 @@ chronos.addJob({
 })
 
 await chronos.runMisfireRecovery()
+```
+
+`script` returns a result; optional `consume` receives it with `JobRunContext` (`scheduledAt`, `attempt`, `namespace`,
+`id`, `jobId`). Success is recorded only after both steps complete. On retry or misfire recovery, Chronos re-runs
+**script and consume**.
+
+Use `consume` for side effects (DB writes, cache, events) when `retry` or `misfirePolicy` is set — keep `script`
+read-only or pure compute so retries do not duplicate mutations. Without `consume`, void-only jobs behave as before.
+
+| Policy                                  | When `consume` helps most                                           |
+| --------------------------------------- | ------------------------------------------------------------------- |
+| `retry`                                 | Side effects in `consume`; failed consume retries the full pipeline |
+| `misfirePolicy: run-latest` / `run-all` | Catch-up after downtime without repeating mutations in `script`     |
+| `retry` + misfire                       | Largest benefit for daily jobs with persistence                     |
+| No policy                               | Mostly clearer separation; no retry safety net                      |
+| `concurrencyPolicy: allow` / `replace`  | Limited — overlapping runs still need idempotency                   |
+
+```ts
+// void-only job (unchanged)
+chronos.addJob({
+  namespace: 'knx',
+  id: 'clocks-sync',
+  cron: '0 * * * *',
+  script: async () => {
+    /* ... */
+  },
+})
 ```
 
 Without `policy`, Chronos behaves as before: best effort, `forbid` overlap, log errors.

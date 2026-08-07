@@ -2,6 +2,16 @@ import type { Logger } from '@repo/logger'
 
 export type Worker = () => Promise<void>
 
+export type JobRunContext = {
+  scheduledAt: Date
+  attempt: number
+  namespace: string
+  id: string
+  jobId: string
+}
+
+export type JobConsume = (result: unknown, ctx: JobRunContext) => Promise<void>
+
 export enum JobState {
   RUNNING,
   ERROR,
@@ -18,11 +28,12 @@ export type CronJobPolicy = {
   concurrencyPolicy?: ConcurrencyPolicy
 }
 
-export type JobSpec = {
+export type JobSpec<TResult = void> = {
   namespace: string
   id: string
   cron: string
-  script: Worker
+  script: () => Promise<TResult>
+  consume?: (result: TResult, ctx: JobRunContext) => Promise<void>
   policy?: CronJobPolicy
 }
 
@@ -43,7 +54,8 @@ export type Job = {
   cron: string
   when: number[][]
   state: JobState
-  script: Worker
+  script: () => Promise<unknown>
+  consume?: JobConsume
   policy?: CronJobPolicy
   runGeneration: number
   activeRuns: number

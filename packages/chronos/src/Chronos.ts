@@ -3,7 +3,7 @@ import { TICK_INTERVAL_MS, TICK_LEAD_MS } from './constants'
 import { cronJobId } from './cronJobId'
 import { parseCronWhen } from './parseCronWhen'
 import { getMissedScheduledTimes, truncateToMinute } from './scheduledTimes'
-import { ChronosOptions, CronExecutionStore, Job, JobSpec, JobState, MisfirePolicy } from './types'
+import { ChronosOptions, CronExecutionStore, Job, JobRunContext, JobSpec, JobState, MisfirePolicy } from './types'
 
 const requiresExecutionStore = (misfirePolicy: MisfirePolicy | undefined): boolean =>
   misfirePolicy !== undefined && misfirePolicy !== 'skip'
@@ -100,8 +100,24 @@ export class Chronos {
     this.logger?.info({ jobId: job.jobId, attempt }, 'Crontab job starting')
     const start = Date.now()
 
+    const ctx: JobRunContext = {
+      scheduledAt,
+      attempt,
+      namespace: job.namespace,
+      id: job.id,
+      jobId: job.jobId,
+    }
+
     try {
-      await job.script()
+      const result = await job.script()
+
+      if (generation !== job.runGeneration) {
+        return
+      }
+
+      if (job.consume !== undefined) {
+        await job.consume(result, ctx)
+      }
 
       if (generation !== job.runGeneration) {
         return
@@ -141,7 +157,7 @@ export class Chronos {
     }
   }
 
-  public addJob(spec: JobSpec): void {
+  public addJob<TResult = void>(spec: JobSpec<TResult>): void {
     const jobId = cronJobId(spec.namespace, spec.id)
 
     if (requiresExecutionStore(spec.policy?.misfirePolicy) && this.executionStore === undefined) {
@@ -155,7 +171,8 @@ export class Chronos {
       cron: spec.cron,
       when: parseCronWhen(spec.cron),
       state: JobState.IDLE,
-      script: spec.script,
+      script: spec.script as () => Promise<unknown>,
+      consume: spec.consume as Job['consume'],
       policy: spec.policy,
       runGeneration: 0,
       activeRuns: 0,
