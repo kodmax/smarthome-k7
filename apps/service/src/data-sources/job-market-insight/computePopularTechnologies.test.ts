@@ -32,19 +32,14 @@ describe('computePopularTechnologies', () => {
   })
 
   it('counts ads without salary and leaves median null', () => {
-    expect(computePopularTechnologies([makeAd(['React']), makeAd(['React']), makeAd(['TypeScript'])])).toEqual([
+    expect(
+      computePopularTechnologies([makeAd(['React']), makeAd(['React']), makeAd(['React']), makeAd(['TypeScript'])]),
+    ).toEqual([
       {
         id: 'react',
         name: 'React',
-        offersCount: 2,
-        sharePercent: 67,
-        medianSalary: null,
-      },
-      {
-        id: 'typescript',
-        name: 'TypeScript',
-        offersCount: 1,
-        sharePercent: 33,
+        offersCount: 3,
+        sharePercent: 75,
         medianSalary: null,
       },
     ])
@@ -55,70 +50,44 @@ describe('computePopularTechnologies', () => {
       computePopularTechnologies([
         makeAd(['Python'], { from: 18_000, to: 22_000 }),
         makeAd(['Python'], { from: 19_000, to: 23_000 }),
+        makeAd(['Python'], { from: 20_000, to: 24_000 }),
         makeAd(['JavaScript'], { from: 28_000, to: 32_000 }),
         makeAd(['JavaScript'], { from: 30_000, to: 34_000 }),
+        makeAd(['JavaScript'], { from: 31_000, to: 35_000 }),
       ]),
     ).toEqual([
       {
         id: 'javascript',
         name: 'JavaScript',
-        offersCount: 2,
+        offersCount: 3,
         sharePercent: 50,
-        medianSalary: 33_000,
+        medianSalary: 34_000,
       },
       {
         id: 'python',
         name: 'Python',
-        offersCount: 2,
+        offersCount: 3,
         sharePercent: 50,
-        medianSalary: 22_500,
+        medianSalary: 23_000,
       },
     ])
   })
 
-  it('includes technologies that appear in a single offer', () => {
+  it('excludes technologies that appear in fewer than three offers', () => {
     expect(
       computePopularTechnologies([
         makeAd(['JavaScript', 'React'], { from: 20_000, to: 24_000 }),
         makeAd(['JavaScript', 'TypeScript'], { from: 28_000, to: 32_000 }),
-        makeAd(['Node.js'], { from: 26_000, to: 30_000 }),
+        makeAd(['JavaScript', 'Node.js'], { from: 26_000, to: 30_000 }),
         makeAd(['Python'], { from: 18_000, to: 22_000 }),
       ]),
     ).toEqual([
       {
         id: 'javascript',
         name: 'JavaScript',
-        offersCount: 2,
-        sharePercent: 50,
-        medianSalary: 28_000,
-      },
-      {
-        id: 'node-js',
-        name: 'Node.js',
-        offersCount: 1,
-        sharePercent: 25,
+        offersCount: 3,
+        sharePercent: 75,
         medianSalary: 30_000,
-      },
-      {
-        id: 'python',
-        name: 'Python',
-        offersCount: 1,
-        sharePercent: 25,
-        medianSalary: 22_000,
-      },
-      {
-        id: 'react',
-        name: 'React',
-        offersCount: 1,
-        sharePercent: 25,
-        medianSalary: 24_000,
-      },
-      {
-        id: 'typescript',
-        name: 'TypeScript',
-        offersCount: 1,
-        sharePercent: 25,
-        medianSalary: 32_000,
       },
     ])
   })
@@ -128,12 +97,13 @@ describe('computePopularTechnologies', () => {
       computePopularTechnologies([
         makeAd(['React', 'React.js', 'ReactJS'], { from: 20_000, to: 24_000 }),
         makeAd(['ReactJS'], { from: 28_000, to: 32_000 }),
+        makeAd(['React.js'], { from: 24_000, to: 28_000 }),
       ]),
     ).toEqual([
       {
         id: 'react',
         name: 'React',
-        offersCount: 2,
+        offersCount: 3,
         sharePercent: 100,
         medianSalary: 28_000,
       },
@@ -220,23 +190,25 @@ describe('computePopularTechnologies', () => {
       computePopularTechnologies([
         makeAd(['HTML'], { from: 20_000, to: 24_000 }),
         makeAd(['HTML5'], { from: 22_000, to: 26_000 }),
+        makeAd(['HTML5'], { from: 23_000, to: 27_000 }),
         makeAd(['CSS'], { from: 24_000, to: 28_000 }),
         makeAd(['CSS3'], { from: 26_000, to: 30_000 }),
+        makeAd(['CSS3'], { from: 27_000, to: 31_000 }),
       ]),
     ).toEqual([
       {
         id: 'css',
         name: 'CSS',
-        offersCount: 2,
+        offersCount: 3,
         sharePercent: 50,
-        medianSalary: 29_000,
+        medianSalary: 30_000,
       },
       {
         id: 'html',
         name: 'HTML',
-        offersCount: 2,
+        offersCount: 3,
         sharePercent: 50,
-        medianSalary: 25_000,
+        medianSalary: 26_000,
       },
     ])
   })
@@ -335,15 +307,16 @@ describe('computePopularTechnologies', () => {
           ],
           { from: 20_000, to: 24_000 },
         ),
-        makeAd(['Software Development'], { from: 22_000, to: 26_000 }),
+        makeAd(['Software Development', 'React'], { from: 22_000, to: 26_000 }),
+        makeAd(['React'], { from: 23_000, to: 27_000 }),
       ]),
     ).toEqual([
       {
         id: 'react',
         name: 'React',
-        offersCount: 1,
-        sharePercent: 50,
-        medianSalary: 24_000,
+        offersCount: 3,
+        sharePercent: 100,
+        medianSalary: 26_000,
       },
     ])
   })
@@ -351,8 +324,14 @@ describe('computePopularTechnologies', () => {
   it('keeps C, C# and C++ as distinct technologies with unique ids', () => {
     const result = computePopularTechnologies([
       makeAd(['C'], { from: 10_000, to: 12_000 }),
+      makeAd(['C'], { from: 10_500, to: 12_500 }),
+      makeAd(['C'], { from: 11_000, to: 13_000 }),
       makeAd(['C#'], { from: 14_000, to: 16_000 }),
+      makeAd(['C#'], { from: 14_500, to: 16_500 }),
+      makeAd(['C#'], { from: 15_000, to: 17_000 }),
       makeAd(['C++'], { from: 15_000, to: 17_000 }),
+      makeAd(['C++'], { from: 15_500, to: 17_500 }),
+      makeAd(['C++'], { from: 16_000, to: 18_000 }),
       makeAd(['ES6'], { from: 11_000, to: 13_000 }),
       makeAd(['ES6+'], { from: 12_000, to: 14_000 }),
     ])
@@ -361,8 +340,6 @@ describe('computePopularTechnologies', () => {
       { id: 'c', name: 'C' },
       { id: 'csharp', name: 'C#' },
       { id: 'cplusplus', name: 'C++' },
-      { id: 'es6', name: 'ES6' },
-      { id: 'es6plus', name: 'ES6+' },
     ])
     expect(new Set(result.map(({ id }) => id)).size).toBe(result.length)
   })

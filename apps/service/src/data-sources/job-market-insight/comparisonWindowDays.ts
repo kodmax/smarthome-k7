@@ -1,0 +1,1 @@
+export const COMPARISON_WINDOW_DAYS = 7

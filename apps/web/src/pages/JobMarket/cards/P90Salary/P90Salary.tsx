@@ -19,7 +19,7 @@ export const P90Salary: FC<Record<string, never>> = () => {
       value={feed?.p90Salary.value}
       previous={feed?.p90Salary.previous}
       variant='currency'
-      headingInfo={p90OffersCount !== undefined ? formatMetricValue(p90OffersCount, 'count') : undefined}
+      headingInfo={p90OffersCount != null ? formatMetricValue(p90OffersCount, 'count') : undefined}
     />
   )
 }

@@ -2,6 +2,8 @@ import { isIgnoredSkillKey, normalizeSkillKey, toTechnologyId, unifySkillName } 
 import { JobAd, JobMarketPopularTechnology } from '@repo/types'
 import { median } from './median'
 
+export const MIN_POPULAR_TECHNOLOGY_OFFERS = 3
+
 const computeTechnologyMedian = (ads: JobAd[]): number | null => {
   const result = median(
     ads.map(ad => ad.monthlySalaryRangeAfterTaxes?.to).filter((value): value is number => value !== undefined),
@@ -49,6 +51,7 @@ export const computePopularTechnologies = (ads: JobAd[]): JobMarketPopularTechno
       sharePercent: Math.round((matching.length / ads.length) * 100),
       medianSalary: computeTechnologyMedian(matching),
     }))
+    .filter(technology => technology.offersCount >= MIN_POPULAR_TECHNOLOGY_OFFERS)
     .sort((a, b) => b.offersCount - a.offersCount || a.name.localeCompare(b.name))
 
   const seenIds = new Set<string>()

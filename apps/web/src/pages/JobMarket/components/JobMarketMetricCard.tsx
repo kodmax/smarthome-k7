@@ -14,7 +14,7 @@ export type JobMarketMetricCardProps = {
   cardId: string
   icon: StyledLucideIcon
   title: string
-  value?: number
+  value?: number | null
   previous?: number | null
   variant: JobMarketMetricVariant
   headingInfo?: ReactNode
@@ -41,7 +41,7 @@ export const JobMarketMetricCard: FC<JobMarketMetricCardProps> = ({
   headingInfo,
 }) => {
   const { t } = useTranslations()
-  const hasChange = value !== undefined && previous != null
+  const hasChange = value != null && previous != null
   const changeAbsolute = hasChange ? getAbsoluteChange(value, previous) : 0
 
   return (
@@ -49,7 +49,7 @@ export const JobMarketMetricCard: FC<JobMarketMetricCardProps> = ({
       cardId={cardId}
       icon={icon}
       title={title}
-      primary={value !== undefined ? formatMetricValue(value, variant) : '--'}
+      primary={value != null ? formatMetricValue(value, variant) : '--'}
       secondary={hasChange ? formatMetricChange(value, previous, variant) : '--'}
       secondaryColor={changeToneColor(getChangeTone(changeAbsolute))}
       tertiary={t.jobMarket.summary.vsPreviousPeriod}

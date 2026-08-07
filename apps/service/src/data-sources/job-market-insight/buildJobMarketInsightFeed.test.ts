@@ -22,10 +22,19 @@ describe('buildJobMarketInsightFeed', () => {
     const feed = buildJobMarketInsightFeed([
       makeAd(),
       makeAd({ id: '2', requiredSkills: ['React'], workplaceType: 'office' }),
+      makeAd({ id: '3', requiredSkills: ['React'], workplaceType: 'hybrid' }),
     ])
 
-    expect(feed.adsCount).toBe(2)
-    expect(feed.popularTechnologies.length).toBeGreaterThan(0)
+    expect(feed.adsCount).toBe(3)
+    expect(feed.popularTechnologies).toEqual([
+      {
+        id: 'react',
+        name: 'React',
+        offersCount: 3,
+        sharePercent: 100,
+        medianSalary: 24_000,
+      },
+    ])
     expect(feed.salaryDistribution).toHaveLength(7)
   })
 

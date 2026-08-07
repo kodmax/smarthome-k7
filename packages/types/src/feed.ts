@@ -438,7 +438,7 @@ export type JobMarketInsightMetrics = {
 }
 
 export type JobMarketChangeMetric = {
-  value: number
+  value: number | null
   previous: number | null
 }
 
@@ -457,7 +457,7 @@ export type JobMarketInsightFeed = {
   salaryDistribution: JobMarketSalaryDistributionBracket[]
 }
 
-export type JobMarketInsightCachedFeed = JobMarketInsightMetrics
+export type JobMarketInsightCachedFeed = JobMarketInsightFeed
 
 export type { SkillExperienceLevel } from './skillExperienceLevel'
 

@@ -5,7 +5,10 @@ import { observeDbQuery } from '@/prometheus/dbMetrics'
 
 const DAILY_SNAPSHOT_TIME = '18:00:00'
 
-type JobMarketInsightSnapshotMetrics = Omit<JobMarketInsightMetrics, 'popularTechnologies' | 'salaryDistribution'>
+export type JobMarketInsightSnapshotMetrics = Omit<
+  JobMarketInsightMetrics,
+  'popularTechnologies' | 'salaryDistribution'
+>
 
 export const toSnapshotMetrics = (metrics: JobMarketInsightMetrics): JobMarketInsightSnapshotMetrics => ({
   adsCount: metrics.adsCount,
