@@ -25,6 +25,18 @@ describe('buildManualJobAdSalary', () => {
     )
   })
 
+  it('applies paid vacation days for b2b offers', () => {
+    expect(buildManualJobAdSalary('b2b', 30_000, 30_000, 20)).toEqual(
+      getMonthlySalaryAfterTax('b2b', 'Month', 30_000, 30_000, 20),
+    )
+  })
+
+  it('ignores paid vacation days for permanent offers', () => {
+    expect(buildManualJobAdSalary('permanent', 50_000, 67_000, 20)).toEqual(
+      buildManualJobAdSalary('permanent', 50_000, 67_000),
+    )
+  })
+
   it('drops implausible salary ranges', () => {
     expect(buildManualJobAdSalary('permanent', 1_000, 2_000)).toBeUndefined()
   })

@@ -414,6 +414,8 @@ export const en: Translations = {
       workplaceTypeLabel: 'Work mode',
       salaryHintPermanent: 'Gross monthly amounts (PLN)',
       salaryHintB2b: 'Net monthly amounts (PLN)',
+      paidVacationDaysLabel: 'Paid vacation (days)',
+      paidVacationDaysHint: 'Empty = no vacation adjustment. Entered days raise the hourly rate.',
       salaryFrom: 'Salary from',
       salaryTo: 'Salary to',
       editManualJobAd: 'Refine details',

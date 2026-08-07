@@ -7,11 +7,25 @@ const unitMultiplier: Record<SalaryUnit, number> = {
   Year: 1,
 }
 
+export const ANNUAL_WORK_HOURS = 2008
+export const PLANNED_WORK_HOURS = 1800
+const HOURS_PER_VACATION_DAY = 8
+
+function vacationHours(paidVacationDays?: number): number {
+  return paidVacationDays === undefined ? 0 : paidVacationDays * HOURS_PER_VACATION_DAY
+}
+
+function b2bNetFromAnnualContractValue(annualContractValue: number, paidVacationDays?: number): number {
+  const billableDenominator = ANNUAL_WORK_HOURS - vacationHours(paidVacationDays)
+  return Math.round(((annualContractValue / billableDenominator) * PLANNED_WORK_HOURS * 0.88 - 12_000) / 12)
+}
+
 export const getMonthlySalaryAfterTax = (
   contractType: ContractType,
   unit: SalaryUnit,
   from: number,
   to: number,
+  paidVacationDays?: number,
 ): SalaryRange => {
   switch (contractType) {
     case 'permanent':
@@ -25,16 +39,16 @@ export const getMonthlySalaryAfterTax = (
     case 'b2b':
     case 'any':
       return {
-        from: Math.round((((from * unitMultiplier[unit]) / 2008) * 1800 * 0.88 - 12_000) / 12),
-        to: Math.round((((to * unitMultiplier[unit]) / 2008) * 1800 * 0.88 - 12_000) / 12),
+        from: b2bNetFromAnnualContractValue(from * unitMultiplier[unit], paidVacationDays),
+        to: b2bNetFromAnnualContractValue(to * unitMultiplier[unit], paidVacationDays),
       }
 
     case 'uod':
     case 'mandate_contract':
     case 'contract':
       return {
-        from: Math.round((((from * unitMultiplier[unit]) / 2008) * 1800 * 0.88) / 12),
-        to: Math.round((((to * unitMultiplier[unit]) / 2008) * 1800 * 0.88) / 12),
+        from: Math.round((((from * unitMultiplier[unit]) / ANNUAL_WORK_HOURS) * PLANNED_WORK_HOURS * 0.88) / 12),
+        to: Math.round((((to * unitMultiplier[unit]) / ANNUAL_WORK_HOURS) * PLANNED_WORK_HOURS * 0.88) / 12),
       }
 
     default: {

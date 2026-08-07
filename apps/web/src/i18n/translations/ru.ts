@@ -414,6 +414,8 @@ export const ru: Translations = {
       workplaceTypeLabel: 'Формат работы',
       salaryHintPermanent: 'Суммы брутто в месяц (PLN)',
       salaryHintB2b: 'Суммы нетто в месяц (PLN)',
+      paidVacationDaysLabel: 'Оплачиваемый отпуск (дни)',
+      paidVacationDaysHint: 'Пусто = без коррекции отпуска. Указанные дни повышают почасовую ставку.',
       salaryFrom: 'Зарплата от',
       salaryTo: 'Зарплата до',
       editManualJobAd: 'Уточнить детали',

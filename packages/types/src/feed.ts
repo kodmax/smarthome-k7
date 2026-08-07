@@ -347,6 +347,7 @@ export type JobAd = {
   workplaceType: WorkplaceType
   employmentType: EmploymentType
   monthlySalaryRangeAfterTaxes?: SalaryRange
+  paidVacationDays?: number
   origin: 'jj' | 'nfj' | 'theprotocol' | 'manual'
   publishedAt: string
 }

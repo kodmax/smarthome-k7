@@ -375,6 +375,8 @@ export type Translations = {
       workplaceTypeLabel: string
       salaryHintPermanent: string
       salaryHintB2b: string
+      paidVacationDaysLabel: string
+      paidVacationDaysHint: string
       salaryFrom: string
       salaryTo: string
       editManualJobAd: string

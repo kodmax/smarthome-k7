@@ -5,6 +5,7 @@ import { createJobAdDocument, withApplicationStatusChangedAt } from '../jobAdDoc
 import { buildManualJobAdSalary } from './buildManualJobAdSalary'
 import { digestManualId } from './digestManualId'
 import { parseRequiredSkills } from './parseRequiredSkills'
+import { parsePaidVacationDays } from './parsePaidVacationDays'
 
 const MANUAL_APPLY_STATUSES = new Set<JobApplyStatus>(['pending-review', 'consider', 'applied', 'interview'])
 const MANUAL_EMPLOYMENT_TYPES = new Set(['permanent', 'b2b'] as const)
@@ -21,6 +22,7 @@ export type AddManualJobAdCommandArgs = {
   applyStatus: JobApplyStatus
   appliedAt?: string
   requiredSkills: string[]
+  paidVacationDays?: number
 }
 
 function isManualEmploymentType(value: unknown): value is AddManualJobAdCommandArgs['employmentType'] {
@@ -89,7 +91,13 @@ export function buildManualJobAdDocument(args: AddManualJobAdCommandArgs, now: D
     requiredSkills: args.requiredSkills,
     workplaceType: args.workplaceType,
     employmentType: args.employmentType,
-    monthlySalaryRangeAfterTaxes: buildManualJobAdSalary(args.employmentType, args.salaryFrom, args.salaryTo),
+    monthlySalaryRangeAfterTaxes: buildManualJobAdSalary(
+      args.employmentType,
+      args.salaryFrom,
+      args.salaryTo,
+      args.paidVacationDays,
+    ),
+    paidVacationDays: args.employmentType === 'b2b' ? args.paidVacationDays : undefined,
     origin: 'manual',
     publishedAt,
   })
@@ -175,6 +183,12 @@ export function parseAddManualJobAdArgs(args: string): AddManualJobAdCommandArgs
       return null
     }
 
+    const paidVacationDays = parsePaidVacationDays(parsed.paidVacationDays)
+    if (paidVacationDays === null) {
+      captureInvalidInput('job-ads: invalid add-manual paidVacationDays', args)
+      return null
+    }
+
     return {
       title: parsed.title,
       companyName: parsed.companyName,
@@ -186,6 +200,7 @@ export function parseAddManualJobAdArgs(args: string): AddManualJobAdCommandArgs
       applyStatus: parsed.applyStatus,
       appliedAt,
       requiredSkills,
+      paidVacationDays,
     }
   } catch (cause) {
     captureInvalidInput('job-ads: failed to parse add-manual command args', cause)

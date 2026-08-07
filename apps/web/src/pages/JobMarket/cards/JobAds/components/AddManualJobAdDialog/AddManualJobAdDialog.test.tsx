@@ -130,4 +130,33 @@ describe('ManualJobAdDialog edit mode', () => {
       requiredSkills: ['TypeScript'],
     })
   })
+
+  it('shows paid vacation field only for b2b and submits it for portal ads', () => {
+    const onSubmit = vi.fn()
+    const editAd = jobAd({
+      id: 'jj-1',
+      title: 'Portal Role',
+      companyName: 'Portal Co',
+      advertUrl: 'https://example.com/jobs/2',
+      origin: 'jj',
+      workplaceType: 'office',
+      employmentType: 'b2b',
+      monthlySalaryRangeAfterTaxes: { from: 22_665, to: 22_665 },
+    })
+
+    renderWithTheme(<ManualJobAdDialog mode='edit' open={true} onClose={vi.fn()} onSubmit={onSubmit} editAd={editAd} />)
+
+    expect(screen.getByRole('spinbutton', { name: 'Płatny urlop (dni)' })).toBeInTheDocument()
+
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Płatny urlop (dni)' }), { target: { value: '20' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'jj-1',
+        employmentType: 'b2b',
+        paidVacationDays: 20,
+      }),
+    )
+  })
 })

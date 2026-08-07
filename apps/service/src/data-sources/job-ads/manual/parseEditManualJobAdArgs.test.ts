@@ -51,6 +51,26 @@ describe('parseEditManualJobAdArgs', () => {
       ),
     ).toBeNull()
   })
+
+  it('parses paid vacation days for b2b edits', () => {
+    expect(
+      parseEditManualJobAdArgs(
+        JSON.stringify({
+          id: 'jj-1',
+          workplaceType: 'hybrid',
+          employmentType: 'b2b',
+          requiredSkills: [],
+          paidVacationDays: 20,
+        }),
+      ),
+    ).toEqual({
+      id: 'jj-1',
+      workplaceType: 'hybrid',
+      employmentType: 'b2b',
+      requiredSkills: [],
+      paidVacationDays: 20,
+    })
+  })
 })
 
 describe('parseDeleteManualJobAdArgs', () => {

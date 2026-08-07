@@ -47,6 +47,21 @@ describe('getMonthlySalaryAfterTax', () => {
         to: Math.round((((120 * 2008) / 2008) * 1800 * 0.88 - 12_000) / 12),
       })
     })
+
+    it('raises net when paid vacation days are set', () => {
+      const withoutVacation = getMonthlySalaryAfterTax('b2b', 'Month', 30_000, 30_000)
+      const withTwentyDays = getMonthlySalaryAfterTax('b2b', 'Month', 30_000, 30_000, 20)
+
+      expect(withoutVacation).toEqual({ from: 22_665, to: 22_665 })
+      expect(withTwentyDays).toEqual({ from: 24_714, to: 24_714 })
+      expect(withTwentyDays.from).toBeGreaterThan(withoutVacation.from)
+    })
+
+    it('ignores paid vacation days for permanent contracts', () => {
+      expect(getMonthlySalaryAfterTax('permanent', 'Month', 50_000, 67_000, 20)).toEqual(
+        getMonthlySalaryAfterTax('permanent', 'Month', 50_000, 67_000),
+      )
+    })
   })
 
   describe('uod-like contract types', () => {

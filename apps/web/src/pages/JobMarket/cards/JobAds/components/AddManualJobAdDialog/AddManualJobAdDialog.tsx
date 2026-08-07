@@ -42,6 +42,7 @@ export type AddManualJobAdPayload = {
   applyStatus: JobApplyStatus
   appliedAt?: string
   requiredSkills: string[]
+  paidVacationDays?: number
 }
 
 export type EditManualJobAdPayload = {
@@ -51,6 +52,7 @@ export type EditManualJobAdPayload = {
   salaryFrom?: number
   salaryTo?: number
   requiredSkills: string[]
+  paidVacationDays?: number
 }
 
 type BaseProps = {
@@ -114,6 +116,20 @@ function formatSalaryInput(value: number | undefined): string {
   return value === undefined ? '' : String(value)
 }
 
+function parseOptionalPaidVacationDaysInput(value: string): number | undefined {
+  const trimmed = value.trim()
+  if (trimmed.length === 0) {
+    return undefined
+  }
+
+  const parsed = Number(trimmed)
+  if (!Number.isInteger(parsed) || parsed < 0 || parsed > 50) {
+    return undefined
+  }
+
+  return parsed
+}
+
 export const ManualJobAdDialog: FC<Props> = props => {
   const { mode, open, onClose, onSubmit, editAd } = props
   const skillOptions = props.skillOptions ?? []
@@ -131,6 +147,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
   const [applyStatus, setApplyStatus] = useState<(typeof MANUAL_APPLY_STATUSES)[number]>('pending-review')
   const [appliedAt, setAppliedAt] = useState('')
   const [requiredSkills, setRequiredSkills] = useState<string[]>([])
+  const [paidVacationDays, setPaidVacationDays] = useState('')
 
   const resetAddForm = useCallback(() => {
     setTitle('')
@@ -143,17 +160,23 @@ export const ManualJobAdDialog: FC<Props> = props => {
     setApplyStatus('pending-review')
     setAppliedAt('')
     setRequiredSkills([])
+    setPaidVacationDays('')
   }, [])
 
   const resetEditForm = useCallback((ad: JobAdsFeedItem) => {
     const employmentTypeValue = ad.content.employmentType === 'b2b' ? 'b2b' : 'permanent'
-    const reversedSalary = reverseManualJobAdSalary(employmentTypeValue, ad.content.monthlySalaryRangeAfterTaxes)
+    const reversedSalary = reverseManualJobAdSalary(
+      employmentTypeValue,
+      ad.content.monthlySalaryRangeAfterTaxes,
+      ad.content.paidVacationDays,
+    )
 
     setWorkplaceType(ad.content.workplaceType)
     setEmploymentType(employmentTypeValue)
     setSalaryFrom(formatSalaryInput(reversedSalary.salaryFrom))
     setSalaryTo(formatSalaryInput(reversedSalary.salaryTo))
     setRequiredSkills(dedupeSkillsById(ad.content.requiredSkills))
+    setPaidVacationDays(formatSalaryInput(ad.content.paidVacationDays))
   }, [])
 
   useEffect(() => {
@@ -180,15 +203,22 @@ export const ManualJobAdDialog: FC<Props> = props => {
 
   const parsedSalaryFrom = useMemo(() => parseOptionalSalaryInput(salaryFrom), [salaryFrom])
   const parsedSalaryTo = useMemo(() => parseOptionalSalaryInput(salaryTo), [salaryTo])
+  const parsedPaidVacationDays = useMemo(() => parseOptionalPaidVacationDaysInput(paidVacationDays), [paidVacationDays])
   const hasInvalidSalaryInput =
     (salaryFrom.trim().length > 0 && parsedSalaryFrom === undefined) ||
     (salaryTo.trim().length > 0 && parsedSalaryTo === undefined) ||
     (parsedSalaryFrom !== undefined && parsedSalaryTo !== undefined && parsedSalaryFrom > parsedSalaryTo)
+  const hasInvalidPaidVacationDaysInput =
+    employmentType === 'b2b' && paidVacationDays.trim().length > 0 && parsedPaidVacationDays === undefined
 
   const canSubmitAdd =
-    title.trim().length > 0 && companyName.trim().length > 0 && isValidAdvertUrl(advertUrl) && !hasInvalidSalaryInput
+    title.trim().length > 0 &&
+    companyName.trim().length > 0 &&
+    isValidAdvertUrl(advertUrl) &&
+    !hasInvalidSalaryInput &&
+    !hasInvalidPaidVacationDaysInput
 
-  const canSubmitEdit = !hasInvalidSalaryInput && editAd !== undefined
+  const canSubmitEdit = !hasInvalidSalaryInput && !hasInvalidPaidVacationDaysInput && editAd !== undefined
 
   const handleSubmit = () => {
     if (isAddMode) {
@@ -220,6 +250,10 @@ export const ManualJobAdDialog: FC<Props> = props => {
         }
       }
 
+      if (employmentType === 'b2b' && parsedPaidVacationDays !== undefined) {
+        payload.paidVacationDays = parsedPaidVacationDays
+      }
+
       onSubmit(payload)
       resetAddForm()
       return
@@ -241,6 +275,10 @@ export const ManualJobAdDialog: FC<Props> = props => {
     }
     if (parsedSalaryTo !== undefined) {
       payload.salaryTo = parsedSalaryTo
+    }
+
+    if (employmentType === 'b2b' && parsedPaidVacationDays !== undefined) {
+      payload.paidVacationDays = parsedPaidVacationDays
     }
 
     onSubmit(payload)
@@ -324,9 +362,13 @@ export const ManualJobAdDialog: FC<Props> = props => {
               labelId='manual-job-ad-employment-type'
               value={employmentType}
               label={labels.employmentType.label}
-              onChange={(event: SelectChangeEvent<'permanent' | 'b2b'>) =>
-                setEmploymentType(event.target.value as 'permanent' | 'b2b')
-              }
+              onChange={(event: SelectChangeEvent<'permanent' | 'b2b'>) => {
+                const nextEmploymentType = event.target.value as 'permanent' | 'b2b'
+                setEmploymentType(nextEmploymentType)
+                if (nextEmploymentType === 'permanent') {
+                  setPaidVacationDays('')
+                }
+              }}
             >
               {EMPLOYMENT_TYPES.map(type => (
                 <MenuItem key={type} value={type}>
@@ -353,6 +395,17 @@ export const ManualJobAdDialog: FC<Props> = props => {
             helperText={salaryHint}
             fullWidth
           />
+          {employmentType === 'b2b' ? (
+            <TextField
+              label={labels.paidVacationDaysLabel}
+              value={paidVacationDays}
+              onChange={event => setPaidVacationDays(event.target.value)}
+              type='number'
+              inputProps={{ min: 0, max: 50, step: 1 }}
+              helperText={labels.paidVacationDaysHint}
+              fullWidth
+            />
+          ) : null}
           {isAddMode ? (
             <>
               <FormControl fullWidth required>

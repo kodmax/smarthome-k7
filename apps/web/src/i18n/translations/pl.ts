@@ -414,6 +414,8 @@ export const pl: Translations = {
       workplaceTypeLabel: 'Tryb pracy',
       salaryHintPermanent: 'Kwoty brutto miesięcznie (PLN)',
       salaryHintB2b: 'Kwoty netto miesięcznie (PLN)',
+      paidVacationDaysLabel: 'Płatny urlop (dni)',
+      paidVacationDaysHint: 'Puste = bez korekty urlopu. Podane dni podwyższają stawkę godzinową.',
       salaryFrom: 'Wynagrodzenie od',
       salaryTo: 'Wynagrodzenie do',
       editManualJobAd: 'Doprecyzuj szczegóły',
