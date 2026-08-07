@@ -3,22 +3,25 @@ import { useMediaQuery, useTheme } from '@mui/material'
 import { JobAdsIcon, PlusIcon } from '@repo/assets'
 import { ApolloCardAction, BaseCard } from '@repo/apollo-card'
 import { useCommand, useFeed } from '@repo/feed-client'
-import { JobAdsFeed } from '@repo/types'
+import { JobAdsFeed, JobMarketInsightFeed } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { DEFAULT_JOB_ADS_FILTER, type JobAdsFilter } from './jobAdsFilter'
 import { countJobAdsEditViewAds, JobAdsEditView } from './components/JobAdsEditView'
 import { JobAdsFilterSelect } from './components/JobAdsFilterSelect'
+import { JobAdsSkillsFilter } from './components/JobAdsSkillsFilter'
 import { AcceptableSalarySlider } from './components/AcceptableSalarySlider'
 import { AddManualJobAdDialog, type AddManualJobAdPayload } from './components/AddManualJobAdDialog'
-import { collectSkillSuggestions } from './requiredSkills'
+import { collectSkillFilterOptions, collectSkillSuggestions } from './requiredSkills'
 
 export const JobAds: FC<Record<string, never>> = () => {
   const [adsFilter, setAdsFilter] = useState<JobAdsFilter>(DEFAULT_JOB_ADS_FILTER)
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
   const [dialogOpen, setDialogOpen] = useState(false)
   const theme = useTheme()
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'))
 
   const feed = useFeed<JobAdsFeed>('job-ads')
+  const insightFeed = useFeed<JobMarketInsightFeed>('job-market-insight')
   const addManualJobAd = useCommand('job-ads', 'add-manual')
   const { t } = useTranslations()
   const labels = t.dashboard.jobAds
@@ -37,6 +40,10 @@ export const JobAds: FC<Record<string, never>> = () => {
   )
 
   const skillOptions = useMemo(() => collectSkillSuggestions(feed?.ads), [feed?.ads])
+  const skillFilterOptions = useMemo(
+    () => collectSkillFilterOptions(feed?.ads, insightFeed?.popularTechnologies),
+    [feed?.ads, insightFeed?.popularTechnologies],
+  )
 
   if (feed === undefined) {
     return (
@@ -55,7 +62,7 @@ export const JobAds: FC<Record<string, never>> = () => {
         height={14}
         extraHeight={4}
         allowZoom={false}
-        headingInfo={countJobAdsEditViewAds(feed.ads, adsFilter)}
+        headingInfo={countJobAdsEditViewAds(feed.ads, adsFilter, selectedSkills)}
         actions={
           <>
             {isSmUp && adsFilter === 'pending-review' ? (
@@ -63,10 +70,11 @@ export const JobAds: FC<Record<string, never>> = () => {
             ) : null}
             <ApolloCardAction title={labels.addManualJobAd} onClick={() => setDialogOpen(true)} Icon={PlusIcon} />
             <JobAdsFilterSelect value={adsFilter} onChange={onAdsFilterChange} />
+            <JobAdsSkillsFilter options={skillFilterOptions} value={selectedSkills} onChange={setSelectedSkills} />
           </>
         }
       >
-        <JobAdsEditView ads={feed.ads} zoom={true} filter={adsFilter} />
+        <JobAdsEditView ads={feed.ads} zoom={true} filter={adsFilter} skillsFilter={selectedSkills} />
       </BaseCard>
       <AddManualJobAdDialog
         open={dialogOpen}

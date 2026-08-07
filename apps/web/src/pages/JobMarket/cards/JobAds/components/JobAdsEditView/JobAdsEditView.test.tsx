@@ -36,4 +36,31 @@ describe('JobAdsEditView archived filter', () => {
     expect(screen.getByText('Not Interested Role')).toBeInTheDocument()
     expect(vi.mocked(useCommand)).toHaveBeenCalled()
   })
+
+  it('filters ads by required skills within the active status view', () => {
+    renderWithTheme(
+      <JobAdsEditView
+        zoom={true}
+        filter='pending-review'
+        skillsFilter={['TypeScript', 'PostgreSQL']}
+        ads={[
+          jobAd({
+            id: '1',
+            title: 'Matching Role',
+            requiredSkills: ['TypeScript', 'PostgreSQL'],
+            meta: { application: { status: 'pending-review' } },
+          }),
+          jobAd({
+            id: '2',
+            title: 'Partial Role',
+            requiredSkills: ['TypeScript'],
+            meta: { application: { status: 'pending-review' } },
+          }),
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('Matching Role')).toBeInTheDocument()
+    expect(screen.queryByText('Partial Role')).not.toBeInTheDocument()
+  })
 })

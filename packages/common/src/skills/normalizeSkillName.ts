@@ -147,6 +147,10 @@ export const normalizeSkillKey = (skill: string): string => {
     return 'tailwindcss'
   }
 
+  if (normalized.startsWith('nextjs') || normalized.startsWith('nextapp')) {
+    return 'next'
+  }
+
   if (normalized.endsWith('js') && normalized.length > 4 && !SCRIPT_SKILL_KEYS.has(normalized) && normalized !== 'js') {
     normalized = normalized.slice(0, -2)
   }

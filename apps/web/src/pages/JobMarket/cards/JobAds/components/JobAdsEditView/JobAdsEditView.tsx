@@ -3,7 +3,12 @@ import { FC, useCallback, useMemo, useState } from 'react'
 import { TableEmptyMessage } from '@/card-components'
 import { useCommand } from '@repo/feed-client'
 import { useTranslations } from '@/i18n'
-import { type JobAdsFilter, filterJobAdsByCategory, groupArchivedJobAdsByReason } from '../../jobAdsFilter'
+import {
+  type JobAdsFilter,
+  filterJobAdsByCategory,
+  filterJobAdsByRequiredSkills,
+  groupArchivedJobAdsByReason,
+} from '../../jobAdsFilter'
 import { JobAdsArchivedAdList } from './JobAdsArchivedAdList'
 import type { ChangeApplicationStatePayload } from './JobAdsEditAdList/Ad/AdExpandedEditorRow/ApplicationStatusEditor'
 import { JobAdsEditAdList } from './JobAdsEditAdList'
@@ -12,9 +17,10 @@ type Props = {
   ads: JobAdsFeedItem[] | undefined
   zoom: boolean
   filter: JobAdsFilter
+  skillsFilter?: string[]
 }
 
-export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter }) => {
+export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter, skillsFilter = [] }) => {
   const { t } = useTranslations()
   const [expandedAdId, setExpandedAdId] = useState<string | null>(null)
 
@@ -23,7 +29,10 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter }) => {
   const unfav = useCommand('job-ads', 'unfav')
   const analyzeCvMatch = useCommand('job-ads', 'analyze-cv-match')
 
-  const filteredAds = useMemo(() => filterJobAdsByCategory(ads ?? [], filter), [ads, filter])
+  const filteredAds = useMemo(() => {
+    const byStatus = filterJobAdsByCategory(ads ?? [], filter)
+    return filterJobAdsByRequiredSkills(byStatus, skillsFilter)
+  }, [ads, filter, skillsFilter])
   const archivedGroups = useMemo(
     () => (filter === 'archived' ? groupArchivedJobAdsByReason(filteredAds) : null),
     [filter, filteredAds],
@@ -77,6 +86,10 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter }) => {
   )
 }
 
-export function countJobAdsEditViewAds(ads: JobAdsFeedItem[] | undefined, filter: JobAdsFilter): number {
-  return filterJobAdsByCategory(ads ?? [], filter).length
+export function countJobAdsEditViewAds(
+  ads: JobAdsFeedItem[] | undefined,
+  filter: JobAdsFilter,
+  skillsFilter: string[] = [],
+): number {
+  return filterJobAdsByRequiredSkills(filterJobAdsByCategory(ads ?? [], filter), skillsFilter).length
 }

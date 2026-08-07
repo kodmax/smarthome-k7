@@ -18,7 +18,12 @@ export const JobAdsFilterSelect: FC<Props> = ({ value, onChange }) => {
 
   return (
     <FormControl size='small' sx={{ minWidth: 168 }}>
-      <Select value={value} onChange={handleChange} aria-label={labels.filters.label}>
+      <Select
+        value={value}
+        onChange={handleChange}
+        aria-label={labels.filters.label}
+        inputProps={{ 'aria-label': labels.filters.label }}
+      >
         {JOB_ADS_FILTER_ORDER.map(filter => (
           <MenuItem key={filter} value={filter}>
             {labels.applyStatus[filter]}

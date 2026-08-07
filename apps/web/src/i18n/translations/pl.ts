@@ -364,6 +364,7 @@ export const pl: Translations = {
       publishedTodayTag: 'nowa',
       filters: {
         label: 'Filtr',
+        skillsLabel: 'Umiejętności',
       },
       acceptableSalary: {
         label: 'Minimalne wynagrodzenie',

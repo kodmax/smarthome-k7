@@ -2,6 +2,7 @@ import { renderWithTheme as render, screen } from '@/test/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent } from '@testing-library/react'
 import { useFeed } from '@repo/feed-client'
+import { JobAdsFeed } from '@repo/types'
 import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { jobAdsFeed } from '@/pages/JobMarket/test/fixtures/jobAdsFeed'
 import { JobAds } from './JobAds'
@@ -21,6 +22,20 @@ vi.mock('@repo/feed-client', () => ({
 
 const mockedUseFeed = vi.mocked(useFeed)
 
+function mockJobAdsFeeds(jobAds: JobAdsFeed, insight?: { popularTechnologies: { id: string; name: string }[] }) {
+  mockedUseFeed.mockImplementation(topic => {
+    if (topic === 'job-ads') {
+      return jobAds
+    }
+    if (topic === 'job-market-insight') {
+      return {
+        popularTechnologies: insight?.popularTechnologies ?? [],
+      }
+    }
+    return undefined
+  })
+}
+
 describe('JobAds', () => {
   beforeEach(() => {
     mockedUseFeed.mockReturnValue(undefined)
@@ -34,7 +49,7 @@ describe('JobAds', () => {
   })
 
   it('renders job ads from the feed', () => {
-    mockedUseFeed.mockReturnValue(
+    mockJobAdsFeeds(
       jobAdsFeed(jobAd({ id: '1', title: 'Backend Engineer' }), jobAd({ id: '2', title: 'Frontend Engineer' })),
     )
 
@@ -45,7 +60,7 @@ describe('JobAds', () => {
   })
 
   it('shows only pending-review ads with the default filter', () => {
-    mockedUseFeed.mockReturnValue(
+    mockJobAdsFeeds(
       jobAdsFeed(
         jobAd({ id: '1', title: 'Open Role', meta: { application: { status: 'pending-review' } } }),
         jobAd({ id: '2', title: 'Applied Role', meta: { application: { status: 'applied' } } }),
@@ -59,7 +74,7 @@ describe('JobAds', () => {
   })
 
   it('opens manual job ad dialog from card action', () => {
-    mockedUseFeed.mockReturnValue(jobAdsFeed(jobAd({ id: '1', title: 'Open Role' })))
+    mockJobAdsFeeds(jobAdsFeed(jobAd({ id: '1', title: 'Open Role' })))
 
     render(<JobAds />)
 
@@ -69,7 +84,7 @@ describe('JobAds', () => {
   })
 
   it('shows salary slider only on pending-review view', () => {
-    mockedUseFeed.mockReturnValue({
+    mockJobAdsFeeds({
       ...jobAdsFeed(jobAd({ id: '1', title: 'Open Role', meta: { application: { status: 'pending-review' } } })),
       salaryRange: { min: 15_000, max: 35_000 },
       acceptableSalary: 24_000,
@@ -79,9 +94,80 @@ describe('JobAds', () => {
 
     expect(screen.getByRole('slider', { name: 'Minimalne akceptowalne wynagrodzenie' })).toBeInTheDocument()
 
-    fireEvent.mouseDown(screen.getByRole('combobox'))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Filtr' }))
     fireEvent.click(screen.getByRole('option', { name: 'Zaaplikowane' }))
 
     expect(screen.queryByRole('slider', { name: 'Minimalne akceptowalne wynagrodzenie' })).not.toBeInTheDocument()
+  })
+
+  it('filters ads by required skills with AND semantics', () => {
+    mockJobAdsFeeds(
+      jobAdsFeed(
+        jobAd({
+          id: '1',
+          title: 'Full stack',
+          requiredSkills: ['TypeScript', 'React'],
+          meta: { application: { status: 'pending-review' } },
+        }),
+        jobAd({
+          id: '2',
+          title: 'Backend only',
+          requiredSkills: ['TypeScript'],
+          meta: { application: { status: 'pending-review' } },
+        }),
+      ),
+    )
+
+    render(<JobAds />)
+
+    expect(screen.getByText('Full stack')).toBeInTheDocument()
+    expect(screen.getByText('Backend only')).toBeInTheDocument()
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Umiejętności' }))
+    fireEvent.click(screen.getByRole('option', { name: 'TypeScript' }))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Umiejętności' }))
+    fireEvent.click(screen.getByRole('option', { name: 'React' }))
+
+    expect(screen.getByText('Full stack')).toBeInTheDocument()
+    expect(screen.queryByText('Backend only')).not.toBeInTheDocument()
+  })
+
+  it('keeps selected skills when switching status views', () => {
+    mockJobAdsFeeds(
+      jobAdsFeed(
+        jobAd({
+          id: '1',
+          title: 'Open React Role',
+          requiredSkills: ['React'],
+          meta: { application: { status: 'pending-review' } },
+        }),
+        jobAd({
+          id: '2',
+          title: 'Applied React Role',
+          requiredSkills: ['React'],
+          meta: { application: { status: 'applied' } },
+        }),
+        jobAd({
+          id: '3',
+          title: 'Applied Plain Role',
+          requiredSkills: [],
+          meta: { application: { status: 'applied' } },
+        }),
+      ),
+    )
+
+    render(<JobAds />)
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Umiejętności' }))
+    fireEvent.click(screen.getByRole('option', { name: 'React' }))
+
+    expect(screen.queryByText('Applied React Role')).not.toBeInTheDocument()
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Filtr' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Zaaplikowane' }))
+
+    expect(screen.getByText('Applied React Role')).toBeInTheDocument()
+    expect(screen.queryByText('Applied Plain Role')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'React' })).toBeInTheDocument()
   })
 })

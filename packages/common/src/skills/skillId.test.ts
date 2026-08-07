@@ -19,6 +19,7 @@ describe('toSkillId', () => {
     expect(toSkillId('TypeScript')).toBe('typescript')
     expect(toSkillId('REST API')).toBe('rest-api')
     expect(toSkillId('GitLab')).toBe('git')
+    expect(toSkillId('Next.js (App Router)')).toBe('next-js')
   })
 
   it('maps C family skills to unique ids', () => {

@@ -325,6 +325,7 @@ export type Translations = {
       publishedTodayTag: string
       filters: {
         label: string
+        skillsLabel: string
       }
       acceptableSalary: {
         label: string

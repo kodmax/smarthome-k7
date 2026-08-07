@@ -364,6 +364,7 @@ export const ru: Translations = {
       publishedTodayTag: 'новая',
       filters: {
         label: 'Фильтр',
+        skillsLabel: 'Навыки',
       },
       acceptableSalary: {
         label: 'Минимальная зарплата',

@@ -13,6 +13,8 @@ describe('normalizeSkillKey', () => {
     expect(normalizeSkillKey('nestJS')).toBe('nest')
     expect(normalizeSkillKey('Next.js')).toBe('next')
     expect(normalizeSkillKey('Next JS')).toBe('next')
+    expect(normalizeSkillKey('Next.js (App Router)')).toBe('next')
+    expect(normalizeSkillKey('Next.js App Router')).toBe('next')
   })
 
   it('keeps script languages intact', () => {
@@ -124,6 +126,7 @@ describe('unifySkillName', () => {
     expect(unifySkillName('JS')).toBe('JavaScript')
     expect(unifySkillName('Spring')).toBe('Spring Boot')
     expect(unifySkillName('Tailwind')).toBe('Tailwind CSS')
+    expect(unifySkillName('Next.js (App Router)')).toBe('Next.js')
   })
 
   it('preserves unknown skills as trimmed originals', () => {
