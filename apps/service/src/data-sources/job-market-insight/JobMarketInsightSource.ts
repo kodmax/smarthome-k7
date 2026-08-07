@@ -23,6 +23,13 @@ export class JobMarketInsightSource extends DataSource<JobMarketInsightFeed, Job
     return '5 18 * * *'
   }
 
+  static getCronPolicy() {
+    return {
+      retry: { maxAttempts: 3, delaySec: 5 * 60 },
+      misfirePolicy: 'run-latest' as const,
+    }
+  }
+
   static getCacheTTL() {
     return CacheAgeUnit.DAY
   }

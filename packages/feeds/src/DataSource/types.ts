@@ -1,6 +1,7 @@
 import type { Logger } from '@repo/logger'
 import type { CacheEntry } from '../Cache'
 import { FeedEvents } from '../FeedComposer'
+import type { CronJobPolicy } from '@repo/chronos'
 import { DataSource } from './DataSource'
 
 export type DataSourceCommand = {
@@ -24,6 +25,7 @@ export type DataSourceCtor<T = unknown, TCache = T> = {
   getId(): string
   getCacheTTL(): number
   getCron(): string | undefined
+  getCronPolicy(): CronJobPolicy | undefined
   isVolatile(): boolean
 }
 

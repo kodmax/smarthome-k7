@@ -3,14 +3,20 @@ import { DataSourceNotFound, DuplicateDataSourceIdError } from './Errors'
 import { DataSourceFromCtor, DataSourceRefreshObserver, RegistryBaseType } from './types'
 import { Cache } from '../Cache'
 import { FeedEvents } from '../FeedComposer'
-import { Logger, readScopedLogLevel } from '@repo/logger'
+import { Logger } from '@repo/logger'
 import { ErrorHandler } from './types'
-import { Chronos } from '@repo/chronos'
+import { Chronos, type CronJobPolicy } from '@repo/chronos'
 
 const DATA_SOURCES_MAINTENANCE_CRON = '0 3 * * *'
 
+const DATA_SOURCES_MAINTENANCE_POLICY: CronJobPolicy = {
+  retry: { maxAttempts: 3, delaySec: 5 * 60 },
+  misfirePolicy: 'run-latest',
+}
+
 type DataSourceRegistryParams = {
   cache: Cache
+  chronos: Chronos
   feedEvents: FeedEvents
   logger: Logger
   onError: ErrorHandler
@@ -31,16 +37,20 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
   constructor(params: DataSourceRegistryParams) {
     ;({
       cache: this.cache,
+      chronos: this.chronos,
       feedEvents: this.feedEvents,
       logger: this.logger,
       onError: this.onError,
       observeDataSourceRefresh: this.observeDataSourceRefresh,
     } = params)
-    this.chronos = new Chronos(
-      params.logger.child({ component: 'data-source-cron' }, { level: readScopedLogLevel('data-source-cron') }),
-    )
 
-    this.chronos.addJob(DATA_SOURCES_MAINTENANCE_CRON, 'data-sources-maintenance', () => this.runMaintenance())
+    this.chronos.addJob({
+      namespace: 'data-source-maintenance',
+      id: 'data-sources',
+      cron: DATA_SOURCES_MAINTENANCE_CRON,
+      policy: DATA_SOURCES_MAINTENANCE_POLICY,
+      script: () => this.runMaintenance(),
+    })
 
     this.feedEvents.on('refresh', async (sourceId: string) => {
       const ds = [...this.dataSources.values()].find(source => source.getId() === sourceId)
@@ -60,6 +70,8 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
   }
 
   private async runMaintenance(): Promise<void> {
+    let hadError = false
+
     for (const ds of this.dataSources.values()) {
       const sourceId = ds.getId()
 
@@ -69,9 +81,14 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
         await ds.maintenance()
         this.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source maintenance completed')
       } catch (e) {
+        hadError = true
         this.logger.warn({ err: e, sourceId }, 'Data source maintenance error')
         this.onError(e, 'Data source maintenance error')
       }
+    }
+
+    if (hadError) {
+      throw new Error('Data source maintenance failed for one or more sources')
     }
   }
 
@@ -99,15 +116,21 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
     const cron = ctor.getCron()
     if (cron !== undefined) {
       const sourceId = ds.getId()
-      this.chronos.addJob(cron, sourceId, async () => {
-        try {
-          this.logger.info({ sourceId, cron }, 'Data source scheduled refresh')
-          await ds.getData(true)
-        } catch (e) {
-          this.logger.warn({ err: e, sourceId }, 'Crontab data source update error')
-          this.onError(e, 'Crontab data source update error')
-          throw e
-        }
+      this.chronos.addJob({
+        namespace: 'data-source',
+        id: sourceId,
+        cron,
+        policy: ctor.getCronPolicy(),
+        script: async () => {
+          try {
+            this.logger.info({ sourceId, cron }, 'Data source scheduled refresh')
+            await ds.getData(true)
+          } catch (e) {
+            this.logger.warn({ err: e, sourceId }, 'Crontab data source update error')
+            this.onError(e, 'Crontab data source update error')
+            throw e
+          }
+        },
       })
     }
 

@@ -1,4 +1,5 @@
 import type { Logger } from '@repo/logger'
+import type { CronJobPolicy } from '@repo/chronos'
 import type { CacheEntry, Snapshot } from '../Cache'
 import { FeedEvents } from '../FeedComposer'
 import type {
@@ -71,6 +72,10 @@ abstract class DataSource<T, TCache = T> {
   }
 
   public static getCron(): string | undefined {
+    return undefined
+  }
+
+  public static getCronPolicy(): CronJobPolicy | undefined {
     return undefined
   }
 

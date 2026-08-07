@@ -7,6 +7,7 @@ import { FSCache } from '../Cache'
 import { DataSource } from './DataSource'
 import { DataSourceRegistry } from './DataSourceRegistry'
 import { createSilentLogger } from '@repo/logger'
+import { Chronos, type CronExecutionStore } from '@repo/chronos'
 import { DataSourceCtor } from './types'
 
 const noopOnError = (): void => void 0
@@ -50,11 +51,17 @@ describe('DataSourceRegistry', () => {
     const cacheDir = mkdtempSync(join(tmpdir(), 'registry-'))
     cacheDirs.push(cacheDir)
 
+    const executionStore: CronExecutionStore = {
+      getLastSuccessfulOccurrence: vi.fn(async () => undefined),
+      recordSuccessfulOccurrence: vi.fn(async () => {}),
+    }
+
     const registry = new DataSourceRegistry<{
       sourceA: ReturnType<typeof createTestSourceClass>
       sourceB: ReturnType<typeof createTestSourceClass>
     }>({
       cache: new FSCache(cacheDir),
+      chronos: new Chronos({ logger: createSilentLogger(), executionStore }),
       feedEvents,
       logger: createSilentLogger(),
       onError: noopOnError,

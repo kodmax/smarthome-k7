@@ -41,9 +41,11 @@ feedEvents.on('error', (sourceId, error, context) => {
 })
 
 const cache = new FSCache(config.cache.dir)
+const dataSourceChronos = new Chronos({ logger, executionStore })
 
 const dataSources = new DataSourceRegistry<DataSourceRegistryType>({
   cache,
+  chronos: dataSourceChronos,
   feedEvents,
   logger,
   onError,

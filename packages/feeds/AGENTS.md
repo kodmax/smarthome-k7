@@ -82,7 +82,10 @@ same result.
 ## Feed conventions
 
 - Register data sources via `dataSources.add(id, SourceClass)` in `apps/service`. Each source class declares
-  `static getId()`, `static getCacheTTL()`, and optionally overrides `static isVolatile()` (default `false`).
+  `static getId()`, `static getCacheTTL()`, optionally `static getCron()`, `static getCronPolicy()`, and optionally
+  overrides `static isVolatile()` (default `false`).
+- `DataSourceRegistry` receives a configured `Chronos` instance from `apps/service` (with optional `executionStore` for
+  misfire recovery).
 - Compose feeds via `feeds.addFeed(feedId, dataSources.getByIds([...]), cb)` — callback is required.
 - `addFeed` is fully typed: callback receives `DataSourceDataTypes<S>`. Internally stored as `FeedCb`
   (`Record<string, unknown>` → `unknown`) because feeds live in a homogeneous `Map`.

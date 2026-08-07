@@ -6,20 +6,37 @@ Minute-resolution cron scheduler for Node.js — runs jobs on standard five-fiel
 
 Exports from `src/index.ts`:
 
-- `Chronos` — scheduler with `addJob(cron, id, fn)` and `close()`
-- `Chronos` — optional `Logger` from `@repo/logger` for job lifecycle logs
-- Log priority constants
+- `Chronos` — scheduler with `addJob(spec)` and `runMisfireRecovery()`
+- `JobSpec`, `CronJobPolicy`, `CronExecutionStore` — job definition and optional execution policy
+- `cronJobId(namespace, id)` — builds namespaced job id for logs
 
 ```ts
 import { Chronos } from '@repo/chronos'
 
-const chronos = new Chronos((priority, msg) => console.log(priority, msg))
-chronos.addJob('0 * * * *', 'hourly-task', async () => {
-  /* ... */
+const chronos = new Chronos({
+  logger,
+  executionStore, // optional; required for misfirePolicy !== 'skip'
 })
+
+chronos.addJob({
+  namespace: 'data-source',
+  id: 'job-market-insight',
+  cron: '5 18 * * *',
+  script: async () => {
+    /* ... */
+  },
+  policy: {
+    retry: { maxAttempts: 3, delaySec: 5 * 60 },
+    misfirePolicy: 'run-latest',
+  },
+})
+
+await chronos.runMisfireRecovery()
 ```
 
-Jobs that are still running when the next tick fires are skipped (no overlap).
+Without `policy`, Chronos behaves as before: best effort, `forbid` overlap, log errors.
+
+Jobs that are still running when the next tick fires are skipped unless `concurrencyPolicy` overrides it.
 
 ## Consumers
 

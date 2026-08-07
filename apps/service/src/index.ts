@@ -2,6 +2,7 @@
 process.setMaxListeners(11)
 import { Server } from '@repo/apollo-ws'
 import { FSCache, RedisCache, FeedComposer, FeedEvents, DataSourceRegistry } from '@repo/feeds'
+import { Chronos } from '@repo/chronos'
 import { initKnxCronJobs } from '@repo/cron-scripts'
 import { getSql } from '@repo/db'
 import { createLogger, readScopedLogLevel } from '@repo/logger'
@@ -17,6 +18,7 @@ import { initRedisClient } from './redis'
 import { initPrometheus, registerWsMetrics, observeDataSourceRefresh } from './prometheus'
 import { initSentry, captureProductionError } from './sentry'
 import { DataSourceRegistryType } from './data-sources'
+import { PostgresCronJobLastSuccessStore } from './cron/postgresCronJobLastSuccessStore'
 
 const main = async () => {
   const rootLogger = createLogger({ name: 'service' })
@@ -53,12 +55,20 @@ const main = async () => {
 
   const cache = cacheBackend === 'fs' ? new FSCache(config.cache.dir) : new RedisCache(getDependency('redis'))
 
+  const cronExecutionStore = new PostgresCronJobLastSuccessStore(getDependency('db'))
+
+  const dataSourceChronos = new Chronos({
+    logger: rootLogger.child({ component: 'data-source-cron' }, { level: readScopedLogLevel('data-source-cron') }),
+    executionStore: cronExecutionStore,
+  })
+
   const dataSources = new DataSourceRegistry<DataSourceRegistryType>({
     logger: rootLogger.child({ component: 'data-source' }),
     onError: reportProductionError,
     observeDataSourceRefresh,
     feedEvents,
     cache,
+    chronos: dataSourceChronos,
   })
 
   const feeds = new FeedComposer(feedEvents, {
@@ -77,6 +87,7 @@ const main = async () => {
   registerWsMetrics(feedEvents)
 
   await initWebFeeds(feeds, dataSources)
+  await dataSourceChronos.runMisfireRecovery()
 
   if (!config.knx.disabled) {
     const knx = await knxInit(rootLogger)
@@ -85,7 +96,10 @@ const main = async () => {
 
     if (!config.cron.disabled) {
       registerKnxCron(
-        initKnxCronJobs(knx, rootLogger.child({ component: 'knx-cron' }, { level: readScopedLogLevel('knx-cron') })),
+        initKnxCronJobs(knx, {
+          logger: rootLogger.child({ component: 'knx-cron' }, { level: readScopedLogLevel('knx-cron') }),
+          executionStore: cronExecutionStore,
+        }),
       )
       rootLogger.info('KNX cron jobs initialized')
     }
