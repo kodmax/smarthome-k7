@@ -1,26 +1,55 @@
-import { describe, expect, it } from 'vitest'
-import { parseAcceptableSalaryValue, parseSetAcceptableSalaryCommandArgs } from './jobAdsPreferences'
+import { describe, expect, it, vi } from 'vitest'
+import {
+  HOURLY_SALARY_CALCULATION_PREFERENCE_KEY,
+  HourlySalaryCalculationNotConfiguredError,
+  JOB_ADS_PREFERENCES_SCOPE,
+  loadHourlySalaryCalculation,
+  parseHourlySalaryCalculation,
+} from './jobAdsPreferences'
+import { DEFAULT_HOURLY_SALARY_CALCULATION } from './testFixtures/hourlySalaryCalculation'
 
-describe('parseAcceptableSalaryValue', () => {
-  it('accepts positive integers', () => {
-    expect(parseAcceptableSalaryValue(24_000)).toBe(24_000)
+describe('parseHourlySalaryCalculation', () => {
+  it('accepts a valid configuration object', () => {
+    expect(parseHourlySalaryCalculation(DEFAULT_HOURLY_SALARY_CALCULATION)).toEqual(DEFAULT_HOURLY_SALARY_CALCULATION)
   })
 
-  it('rejects non-numbers and non-positive values', () => {
-    expect(parseAcceptableSalaryValue('24000')).toBeNull()
-    expect(parseAcceptableSalaryValue(24_000.5)).toBeNull()
-    expect(parseAcceptableSalaryValue(0)).toBeNull()
-    expect(parseAcceptableSalaryValue(-1)).toBeNull()
+  it('returns null for invalid values', () => {
+    expect(parseHourlySalaryCalculation(undefined)).toBeNull()
+    expect(parseHourlySalaryCalculation({ ...DEFAULT_HOURLY_SALARY_CALCULATION, timeSpentRemote: 0 })).toBeNull()
+    expect(
+      parseHourlySalaryCalculation({ ...DEFAULT_HOURLY_SALARY_CALCULATION, hybridOfficeDaysPerWeek: 1.5 }),
+    ).toBeNull()
   })
 })
 
-describe('parseSetAcceptableSalaryCommandArgs', () => {
-  it('parses valid command args', () => {
-    expect(parseSetAcceptableSalaryCommandArgs(JSON.stringify({ value: 25_000 }))).toEqual({ value: 25_000 })
+describe('loadHourlySalaryCalculation', () => {
+  it('throws when preference is missing', async () => {
+    const db = vi.fn().mockResolvedValue([])
+
+    await expect(loadHourlySalaryCalculation(db as never)).rejects.toThrow(HourlySalaryCalculationNotConfiguredError)
   })
 
-  it('rejects invalid command args', () => {
-    expect(parseSetAcceptableSalaryCommandArgs(JSON.stringify({ value: '25000' }))).toBeNull()
-    expect(parseSetAcceptableSalaryCommandArgs('not-json')).toBeNull()
+  it('loads configuration from preferences', async () => {
+    const customCalculation = {
+      ...DEFAULT_HOURLY_SALARY_CALCULATION,
+      timeSpentRemote: 6,
+    }
+    const db = vi.fn().mockResolvedValue([{ value: customCalculation }])
+
+    await expect(loadHourlySalaryCalculation(db as never)).resolves.toEqual(customCalculation)
+    expect(db).toHaveBeenCalled()
+  })
+
+  it('throws for invalid stored values', async () => {
+    const db = vi.fn().mockResolvedValue([{ value: { timeSpentRemote: '7' } }])
+
+    await expect(loadHourlySalaryCalculation(db as never)).rejects.toThrow(HourlySalaryCalculationNotConfiguredError)
+  })
+})
+
+describe('hourly salary calculation preference key', () => {
+  it('uses the job-ads scope and dedicated key', () => {
+    expect(JOB_ADS_PREFERENCES_SCOPE).toBe('job-ads')
+    expect(HOURLY_SALARY_CALCULATION_PREFERENCE_KEY).toBe('hourly_salary_calculation')
   })
 })

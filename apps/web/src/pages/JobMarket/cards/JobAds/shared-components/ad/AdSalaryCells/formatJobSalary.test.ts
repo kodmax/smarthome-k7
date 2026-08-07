@@ -10,15 +10,24 @@ describe('formatJobSalary', () => {
     })
   })
 
-  it('formats monthly salary in thousands', () => {
+  it('formats monthly salary in thousands and reads take-home hourly rate from content', () => {
     expect(
       formatJobSalary({
         monthlySalaryRangeAfterTaxes: { from: 15_400, to: 22_600 },
+        takeHomeHourlyRate: 172,
       }),
     ).toEqual({
       monthlySalaryFrom: 15,
       monthlySalaryTo: 23,
-      b2bHourlyRateEquivalent: Math.round((22_600 / 0.88 + 1000) / 150),
+      b2bHourlyRateEquivalent: 172,
     })
+  })
+
+  it('returns null hourly rate when takeHomeHourlyRate is missing', () => {
+    expect(
+      formatJobSalary({
+        monthlySalaryRangeAfterTaxes: { from: 22_600, to: 22_600 },
+      }).b2bHourlyRateEquivalent,
+    ).toBeNull()
   })
 })

@@ -347,6 +347,7 @@ export type JobAd = {
   workplaceType: WorkplaceType
   employmentType: EmploymentType
   monthlySalaryRangeAfterTaxes?: SalaryRange
+  takeHomeHourlyRate?: number
   paidVacationDays?: number
   origin: 'jj' | 'nfj' | 'theprotocol' | 'manual'
   publishedAt: string
@@ -361,6 +362,15 @@ export type JobAdsFeedItem = {
 export type JobAdsSalaryRange = {
   min: number
   max: number
+}
+
+export type JobAdsHourlySalaryCalculation = {
+  vacationDaysPerYear: number
+  workingDaysPerYear: number
+  workingDaysPerWeek: number
+  timeSpentRemote: number
+  timeSpentOffice: number
+  hybridOfficeDaysPerWeek: number
 }
 
 export type JobAdsFeed = {

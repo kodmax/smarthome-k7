@@ -69,8 +69,8 @@ export const JobAds: FC<Record<string, never>> = () => {
               <AcceptableSalarySlider salaryRange={feed.salaryRange} acceptableSalary={feed.acceptableSalary} />
             ) : null}
             <ApolloCardAction title={labels.addManualJobAd} onClick={() => setDialogOpen(true)} Icon={PlusIcon} />
-            <JobAdsFilterSelect value={adsFilter} onChange={onAdsFilterChange} />
             <JobAdsSkillsFilter options={skillFilterOptions} value={selectedSkills} onChange={setSelectedSkills} />
+            <JobAdsFilterSelect value={adsFilter} onChange={onAdsFilterChange} />
           </>
         }
       >

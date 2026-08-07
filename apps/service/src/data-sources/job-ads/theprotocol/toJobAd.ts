@@ -37,6 +37,8 @@ export const toJobAd = (ad: Ad): JobAd | null => {
         ? 'hybrid'
         : 'office'
 
+  const monthlySalaryRangeAfterTaxes = sanitizeMonthlySalaryRange(bestContractType.salaryRange)
+
   return {
     id: digestTheprotocolId(ad.offerUrlName),
     title: ad.title,
@@ -46,7 +48,7 @@ export const toJobAd = (ad: Ad): JobAd | null => {
     requiredSkills: ad.technologies,
     workplaceType,
     employmentType: bestContractType.type,
-    monthlySalaryRangeAfterTaxes: sanitizeMonthlySalaryRange(bestContractType.salaryRange),
+    monthlySalaryRangeAfterTaxes,
     origin: 'theprotocol',
     publishedAt: toIsoDate(ad.publicationDateUtc),
   }

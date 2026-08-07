@@ -1,6 +1,6 @@
 import type { Sql } from '@repo/db'
 import { JobAdsCachedFeed } from '@repo/types'
-import { fetchJustJoinAds } from './jjit/fetchJustJoinAds'
+import { fetchJustJoinAds } from './jjit/jjit'
 import { digestJjitId } from './jjit/digestJjitId'
 import { toJobAd as toJjitJobAd } from './jjit/toJobAd'
 import { fetchNfjListing } from './nfj/nfj'

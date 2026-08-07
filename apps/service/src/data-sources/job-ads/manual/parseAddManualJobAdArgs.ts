@@ -82,6 +82,12 @@ function resolveAppliedAt(applyStatus: JobApplyStatus, appliedAt: string | undef
 export function buildManualJobAdDocument(args: AddManualJobAdCommandArgs, now: Date = new Date()): JobAdDocument {
   const publishedAt = args.appliedAt ?? now.toISOString()
   const appliedAt = resolveAppliedAt(args.applyStatus, args.appliedAt, now)
+  const monthlySalaryRangeAfterTaxes = buildManualJobAdSalary(
+    args.employmentType,
+    args.salaryFrom,
+    args.salaryTo,
+    args.paidVacationDays,
+  )
   const document = createJobAdDocument({
     id: digestManualId(args.advertUrl),
     title: args.title.trim(),
@@ -91,12 +97,7 @@ export function buildManualJobAdDocument(args: AddManualJobAdCommandArgs, now: D
     requiredSkills: args.requiredSkills,
     workplaceType: args.workplaceType,
     employmentType: args.employmentType,
-    monthlySalaryRangeAfterTaxes: buildManualJobAdSalary(
-      args.employmentType,
-      args.salaryFrom,
-      args.salaryTo,
-      args.paidVacationDays,
-    ),
+    monthlySalaryRangeAfterTaxes,
     paidVacationDays: args.employmentType === 'b2b' ? args.paidVacationDays : undefined,
     origin: 'manual',
     publishedAt,

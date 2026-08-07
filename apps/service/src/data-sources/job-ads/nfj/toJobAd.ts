@@ -5,6 +5,12 @@ import { sanitizeMonthlySalaryRange } from '../sanitizeMonthlySalary'
 import { digestNfjId } from './digestNfjId'
 
 export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {
+  const workplaceType = hybridIds.has(ad.id) ? 'hybrid' : ad.location.fullyRemote ? 'remote' : 'office'
+  const monthlySalaryRangeAfterTaxes =
+    ad.salary.from !== undefined && ad.salary.to !== undefined
+      ? sanitizeMonthlySalaryRange(getMonthlySalaryAfterTax(ad.salary.type, 'Month', ad.salary.from, ad.salary.to))
+      : undefined
+
   return {
     id: digestNfjId(ad.url),
     origin: 'nfj',
@@ -13,12 +19,9 @@ export const toJobAd = (ad: NoFluffJobsAd, hybridIds: Set<string>): JobAd => {
     companyLogoUrl: `https://static.nofluffjobs.com/${ad.logo.original}`,
     companyName: ad.name,
     requiredSkills: ad.tiles.values.filter(item => item.type === 'requirement').map(item => item.value),
-    workplaceType: hybridIds.has(ad.id) ? 'hybrid' : ad.location.fullyRemote ? 'remote' : 'office',
+    workplaceType,
     employmentType: ad.salary.type,
-    monthlySalaryRangeAfterTaxes:
-      ad.salary.from !== undefined && ad.salary.to !== undefined
-        ? sanitizeMonthlySalaryRange(getMonthlySalaryAfterTax(ad.salary.type, 'Month', ad.salary.from, ad.salary.to))
-        : undefined,
+    monthlySalaryRangeAfterTaxes,
     publishedAt: new Date(ad.posted).toISOString(),
   }
 }

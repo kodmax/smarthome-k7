@@ -6,6 +6,17 @@ import { digestJjitId } from './digestJjitId'
 
 export const toJobAd = (jjAd: JustJoinAd): JobAd => {
   const jjEmploymentType = jjAd.employmentTypes.find(item => item.currency === 'PLN')
+  const monthlySalaryRangeAfterTaxes =
+    jjEmploymentType !== undefined && jjEmploymentType.fromPerUnit !== null && jjEmploymentType.toPerUnit !== null
+      ? sanitizeMonthlySalaryRange(
+          getMonthlySalaryAfterTax(
+            jjEmploymentType.type,
+            jjEmploymentType.unit,
+            jjEmploymentType.fromPerUnit,
+            jjEmploymentType.toPerUnit,
+          ),
+        )
+      : undefined
 
   return {
     id: digestJjitId(jjAd.slug),
@@ -17,17 +28,7 @@ export const toJobAd = (jjAd: JustJoinAd): JobAd => {
     requiredSkills: jjAd.requiredSkills.filter(item => item.level >= 3).map(item => item.name),
     workplaceType: jjAd.workplaceType,
     employmentType: jjEmploymentType?.type ?? 'b2b',
-    monthlySalaryRangeAfterTaxes:
-      jjEmploymentType !== undefined && jjEmploymentType.fromPerUnit !== null && jjEmploymentType.toPerUnit !== null
-        ? sanitizeMonthlySalaryRange(
-            getMonthlySalaryAfterTax(
-              jjEmploymentType.type,
-              jjEmploymentType.unit,
-              jjEmploymentType.fromPerUnit,
-              jjEmploymentType.toPerUnit,
-            ),
-          )
-        : undefined,
+    monthlySalaryRangeAfterTaxes,
     publishedAt: jjAd.lastPublishedAt,
   }
 }

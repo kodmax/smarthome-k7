@@ -6,7 +6,12 @@ export type FormattedJobSalary = {
   b2bHourlyRateEquivalent: number | null
 }
 
-export function formatJobSalary(ad: Pick<JobAd, 'monthlySalaryRangeAfterTaxes'>): FormattedJobSalary {
+export type FormatJobSalaryInput = {
+  monthlySalaryRangeAfterTaxes?: JobAd['monthlySalaryRangeAfterTaxes']
+  takeHomeHourlyRate?: JobAd['takeHomeHourlyRate']
+}
+
+export function formatJobSalary(ad: FormatJobSalaryInput): FormattedJobSalary {
   if (ad.monthlySalaryRangeAfterTaxes === undefined) {
     return {
       monthlySalaryFrom: null,
@@ -20,6 +25,6 @@ export function formatJobSalary(ad: Pick<JobAd, 'monthlySalaryRangeAfterTaxes'>)
   return {
     monthlySalaryFrom: Math.round(from / 1000),
     monthlySalaryTo: Math.round(to / 1000),
-    b2bHourlyRateEquivalent: Math.round((to / 0.88 + 1000) / 150),
+    b2bHourlyRateEquivalent: ad.takeHomeHourlyRate ?? null,
   }
 }

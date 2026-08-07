@@ -4,14 +4,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createJobAdDocument } from './jobAdDocument'
 import * as jobAdsRepository from './jobAdsRepository'
 import { syncJobAdsFromSources } from './syncJobAdsFromSources'
-import * as jjitFetch from './jjit/fetchJustJoinAds'
+import * as jjitFetch from './jjit/jjit'
 import * as nfjFetch from './nfj/nfj'
 import * as theprotocolFetch from './theprotocol/theprotocol'
 import { digestJjitId } from './jjit/digestJjitId'
 import { NoFluffJobsAd } from './nfj/types'
 import { Ad } from './theprotocol/types'
 
-vi.mock('./jjit/fetchJustJoinAds')
+vi.mock('./jjit/jjit')
 vi.mock('./nfj/nfj')
 vi.mock('./theprotocol/theprotocol')
 

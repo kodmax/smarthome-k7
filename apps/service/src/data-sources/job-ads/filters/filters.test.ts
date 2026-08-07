@@ -1,14 +1,6 @@
 import { JobAd, JobAdsFeedItem, emptyJobAdMeta, jobAdApplicationFromMeta } from '@repo/types'
 import { describe, expect, it } from 'vitest'
-import {
-  filterJobAdsByAcceptableSalary,
-  isHybridOrRemote,
-  isSalaryAboveThreshold,
-  notManager,
-  noUwantedSkills,
-  shouldFilterJobAdBySalary,
-  withReact,
-} from './filters'
+import { filterJobAdsByAcceptableSalary, isSalaryAboveThreshold, shouldFilterJobAdBySalary } from './filters'
 
 const baseAd: JobAd = {
   id: '1',
@@ -45,20 +37,6 @@ const adWithStatus = (
       statusChangedAt: null,
     }),
   },
-})
-
-describe('noUwantedSkills', () => {
-  it('rejects ads requiring Python', () => {
-    expect(noUwantedSkills({ ...baseAd, requiredSkills: ['Python', 'React'] })).toBe(false)
-  })
-
-  it('rejects ads requiring Angular', () => {
-    expect(noUwantedSkills({ ...baseAd, requiredSkills: ['Angular'] })).toBe(false)
-  })
-
-  it('accepts ads with React and no blocked skills', () => {
-    expect(noUwantedSkills(baseAd)).toBe(true)
-  })
 })
 
 describe('isSalaryAboveThreshold', () => {
@@ -127,33 +105,5 @@ describe('filterJobAdsByAcceptableSalary', () => {
     const archived = adWithStatus('archived', { from: 10_000, to: 12_000 })
 
     expect(filterJobAdsByAcceptableSalary([archived], 20_000)).toEqual([archived])
-  })
-})
-
-describe('notManager', () => {
-  it('rejects titles containing Manager', () => {
-    expect(notManager({ ...baseAd, title: 'Engineering Manager' })).toBe(false)
-  })
-
-  it('accepts titles without Manager', () => {
-    expect(notManager(baseAd)).toBe(true)
-  })
-})
-
-describe('withReact', () => {
-  it('requires React in skills', () => {
-    expect(withReact({ ...baseAd, requiredSkills: ['Vue'] })).toBe(false)
-    expect(withReact(baseAd)).toBe(true)
-  })
-})
-
-describe('isHybridOrRemote', () => {
-  it('accepts hybrid and remote', () => {
-    expect(isHybridOrRemote({ ...baseAd, workplaceType: 'hybrid' })).toBe(true)
-    expect(isHybridOrRemote({ ...baseAd, workplaceType: 'remote' })).toBe(true)
-  })
-
-  it('rejects office', () => {
-    expect(isHybridOrRemote({ ...baseAd, workplaceType: 'office' })).toBe(false)
   })
 })

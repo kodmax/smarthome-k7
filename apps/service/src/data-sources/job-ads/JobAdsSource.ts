@@ -10,9 +10,15 @@ import {
   emptyJobAdMeta,
   jobAdApplicationFromMeta,
 } from '@repo/types'
+import { getTakeHomeHourlyRate } from './getTakeHomeHourlyRate'
 import { filterJobAdsByAcceptableSalary, dedupeJobAdDocuments } from './filters'
 import { computeJobAdsSalaryRange } from './computeJobAdsSalaryRange'
-import { loadAcceptableSalary, parseSetAcceptableSalaryCommandArgs, saveAcceptableSalary } from './jobAdsPreferences'
+import {
+  loadAcceptableSalary,
+  loadHourlySalaryCalculation,
+  parseSetAcceptableSalaryCommandArgs,
+  saveAcceptableSalary,
+} from './jobAdsPreferences'
 import {
   applyStatusChange,
   emptyApplicationMeta,
@@ -199,17 +205,30 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     const listingIdSet = new Set(cached.listingIds)
     const allListingIds = [...cached.listingIds, ...manualIds.filter(id => !listingIdSet.has(id))]
     const documentsById = await loadJobAdsByIds(this.db, allListingIds)
+    const [acceptableSalary, hourlySalaryCalculation] = await Promise.all([
+      loadAcceptableSalary(this.db),
+      loadHourlySalaryCalculation(this.db),
+    ])
     const documents = dedupeJobAdDocuments(
       allListingIds.flatMap(id => {
         const document = documentsById.get(id)
         return document !== undefined ? [document] : []
       }),
-    ).sort(
-      (a, b) => (b.content.monthlySalaryRangeAfterTaxes?.to ?? 0) - (a.content.monthlySalaryRangeAfterTaxes?.to ?? 0),
     )
+      .map(document => ({
+        ...document,
+        content: {
+          ...document.content,
+          takeHomeHourlyRate: getTakeHomeHourlyRate(
+            document.content.monthlySalaryRangeAfterTaxes,
+            document.content.workplaceType,
+            hourlySalaryCalculation,
+          ),
+        },
+      }))
+      .sort((a, b) => (b.content.takeHomeHourlyRate ?? 0) - (a.content.takeHomeHourlyRate ?? 0))
 
     const salaryRange = computeJobAdsSalaryRange(documents.map(document => document.content))
-    const acceptableSalary = await loadAcceptableSalary(this.db)
     const ads = await this.toFeedItems(documents)
 
     return {

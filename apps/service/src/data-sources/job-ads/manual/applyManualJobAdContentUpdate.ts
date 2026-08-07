@@ -7,6 +7,12 @@ export function applyManualJobAdContentUpdate(
   args: EditManualJobAdCommandArgs,
 ): JobAdDocument {
   const paidVacationDays = args.employmentType === 'b2b' ? args.paidVacationDays : undefined
+  const monthlySalaryRangeAfterTaxes = buildManualJobAdSalary(
+    args.employmentType,
+    args.salaryFrom,
+    args.salaryTo,
+    paidVacationDays,
+  )
 
   return {
     ...existing,
@@ -14,12 +20,7 @@ export function applyManualJobAdContentUpdate(
       ...existing.content,
       workplaceType: args.workplaceType,
       employmentType: args.employmentType,
-      monthlySalaryRangeAfterTaxes: buildManualJobAdSalary(
-        args.employmentType,
-        args.salaryFrom,
-        args.salaryTo,
-        paidVacationDays,
-      ),
+      monthlySalaryRangeAfterTaxes,
       paidVacationDays,
       requiredSkills: args.requiredSkills,
     },

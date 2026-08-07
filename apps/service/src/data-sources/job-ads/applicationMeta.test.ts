@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import {
   applyStatusChange,
   emptyApplicationMeta,
-  parseApplicationMeta,
   parseChangeStateCommandArgs,
   resolveStatusChangedAt,
 } from './applicationMeta'
@@ -255,58 +254,6 @@ describe('applicationMeta', () => {
       archiveReason: 'offer-accepted',
       comment: null,
       appliedAt: '2026-07-18T12:00:00.000Z',
-      rejectedAt: null,
-      statusChangedAt: null,
-    })
-  })
-
-  it('parses application meta with archiveReason', () => {
-    expect(
-      parseApplicationMeta({
-        applyStatus: 'archived',
-        archiveReason: 'rejected',
-        comment: null,
-        appliedAt: '2026-07-18T12:00:00.000Z',
-        rejectedAt: '2026-07-19T12:00:00.000Z',
-        statusChangedAt: null,
-      }),
-    ).toEqual({
-      applyStatus: 'archived',
-      archiveReason: 'rejected',
-      comment: null,
-      appliedAt: '2026-07-18T12:00:00.000Z',
-      rejectedAt: '2026-07-19T12:00:00.000Z',
-      statusChangedAt: null,
-    })
-  })
-
-  it('rejects archived meta without archiveReason', () => {
-    expect(
-      parseApplicationMeta({
-        applyStatus: 'archived',
-        comment: null,
-        appliedAt: null,
-        rejectedAt: null,
-        statusChangedAt: null,
-      }),
-    ).toBeNull()
-  })
-
-  it('maps legacy not-interested archive reason to other', () => {
-    expect(
-      parseApplicationMeta({
-        applyStatus: 'archived',
-        archiveReason: 'not-interested',
-        comment: null,
-        appliedAt: null,
-        rejectedAt: null,
-        statusChangedAt: null,
-      }),
-    ).toEqual({
-      applyStatus: 'archived',
-      archiveReason: 'other',
-      comment: null,
-      appliedAt: null,
       rejectedAt: null,
       statusChangedAt: null,
     })
