@@ -18,7 +18,7 @@ describe('formatJobSalary', () => {
       }),
     ).toEqual({
       monthlySalaryFrom: 15,
-      monthlySalaryTo: 23,
+      monthlySalaryTo: 22.6,
       b2bHourlyRateEquivalent: 172,
     })
   })

@@ -24,23 +24,22 @@ const SalaryCellContent: FC<{ ad: JobAdsFeedItem; children: ReactNode }> = ({ ad
       minWidth: 0,
     }}
   >
-    <WorkplaceTypeIndicator workplaceType={ad.content.workplaceType} />
-    <EmploymentTypeIndicator employmentType={ad.content.employmentType} />
-    {children}
+    <Box sx={{ flex: '0 0 16px' }}>
+      <WorkplaceTypeIndicator workplaceType={ad.content.workplaceType} />
+    </Box>
+    <Box sx={{ flex: '0 0 16px' }}>
+      <EmploymentTypeIndicator employmentType={ad.content.employmentType} />
+    </Box>
+    <Box sx={{ flex: '0 0 88px' }}>{children}</Box>
   </Box>
 )
 
 export const AdSalaryCells: FC<Props> = ({ ad, zoom, showHourlySalaryOnXs = false }) => {
-  const { monthlySalaryFrom, monthlySalaryTo, b2bHourlyRateEquivalent } = useMemo(
-    () => formatJobSalary(ad.content),
-    [ad.content],
-  )
+  const { monthlySalaryTo, b2bHourlyRateEquivalent } = useMemo(() => formatJobSalary(ad.content), [ad.content])
   const hourlySalaryValue =
     b2bHourlyRateEquivalent !== null ? <ReadingValue displayValue={b2bHourlyRateEquivalent} unit='PLN/h' /> : null
   const monthlySalaryValue =
-    ad.content.monthlySalaryRangeAfterTaxes !== undefined ? (
-      <ReadingValue displayValue={`${monthlySalaryFrom} — ${monthlySalaryTo}`} unit='kPLN' />
-    ) : null
+    monthlySalaryTo !== null ? <ReadingValue displayValue={monthlySalaryTo.toFixed(1)} unit='kPLN' /> : null
 
   return (
     <>

@@ -24,7 +24,7 @@ export function formatJobSalary(ad: FormatJobSalaryInput): FormattedJobSalary {
 
   return {
     monthlySalaryFrom: Math.round(from / 1000),
-    monthlySalaryTo: Math.round(to / 1000),
+    monthlySalaryTo: Math.round(to / 100) / 10,
     b2bHourlyRateEquivalent: ad.takeHomeHourlyRate ?? null,
   }
 }
