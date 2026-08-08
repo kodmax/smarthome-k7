@@ -64,14 +64,16 @@ export const JobAds: FC<Record<string, never>> = () => {
         allowZoom={false}
         headingInfo={countJobAdsEditViewAds(feed.ads, adsFilter, selectedSkills)}
         actions={
-          <>
-            {isSmUp && adsFilter === 'pending-review' ? (
-              <AcceptableSalarySlider salaryRange={feed.salaryRange} acceptableSalary={feed.acceptableSalary} />
-            ) : null}
-            <ApolloCardAction title={labels.addManualJobAd} onClick={() => setDialogOpen(true)} Icon={PlusIcon} />
-            <JobAdsSkillsFilter options={skillFilterOptions} value={selectedSkills} onChange={setSelectedSkills} />
-            <JobAdsFilterSelect value={adsFilter} onChange={onAdsFilterChange} />
-          </>
+          isSmUp ? (
+            <>
+              {adsFilter === 'pending-review' ? (
+                <AcceptableSalarySlider salaryRange={feed.salaryRange} acceptableSalary={feed.acceptableSalary} />
+              ) : null}
+              <ApolloCardAction title={labels.addManualJobAd} onClick={() => setDialogOpen(true)} Icon={PlusIcon} />
+              <JobAdsSkillsFilter options={skillFilterOptions} value={selectedSkills} onChange={setSelectedSkills} />
+              <JobAdsFilterSelect value={adsFilter} onChange={onAdsFilterChange} />
+            </>
+          ) : undefined
         }
       >
         <JobAdsEditView ads={feed.ads} zoom={true} filter={adsFilter} skillsFilter={selectedSkills} />
