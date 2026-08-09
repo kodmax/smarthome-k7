@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { createLogger, destination, readScopedLogLevel } from '@repo/logger'
+import { destination, readScopedLogLevel, createLogger } from '@repo/logger'
 import { apolloWsOptions, apolloWsUrl } from './config.js'
 import { DASHBOARD_FEED_IDS } from './feeds/dashboardFeeds.js'
 import { FeedStore } from './feeds/FeedStore.js'

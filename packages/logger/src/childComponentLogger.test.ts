@@ -4,7 +4,9 @@ vi.mock('@repo/env', () => ({
   isProduction: true,
 }))
 
-import { childComponentLogger, createLogger, readScopedLogLevel } from './index'
+import { childComponentLogger } from './childComponentLogger'
+import { createLogger } from './createLogger'
+import { readScopedLogLevel } from './logLevel'
 
 const env = process.env
 

@@ -12,3 +12,6 @@ export function createLogger(options: CreateLoggerOptions = {}): pino.Logger {
   const [pinoOptions, stream] = createPinoConfig(options)
   return pino({ name: pinoOptions.name, level: pinoOptions.level }, stream)
 }
+
+const rootLogger = createLogger()
+export { rootLogger }

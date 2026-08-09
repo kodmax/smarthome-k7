@@ -1,4 +1,4 @@
-export { createLogger } from './createLogger'
+export { rootLogger, createLogger } from './createLogger'
 export type { CreateLoggerOptions } from './createLogger'
 export { createPinoConfig } from './createPinoConfig'
 export type { PinoConfigOptions } from './createPinoConfig'

@@ -12,7 +12,8 @@ vi.mock('./isJournaldLoggingEnabled', () => ({
   isJournaldLoggingEnabled,
 }))
 
-import { createLogger, readScopedLogLevel } from './index'
+import { createLogger } from './createLogger'
+import { readScopedLogLevel } from './logLevel'
 
 const env = process.env
 

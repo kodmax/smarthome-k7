@@ -34,6 +34,8 @@ declare module 'process' {
 
         readonly NO_METRICS?: string
         readonly METRICS_PORT?: string
+
+        readonly API_PORT?: string
       }
     }
   }

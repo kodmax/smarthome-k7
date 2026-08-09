@@ -1,4 +1,4 @@
-import type { INestApplicationContext } from '@nestjs/common'
+import type { INestApplication } from '@nestjs/common'
 import type { Server } from '@repo/apollo-ws'
 import type { Logger } from '@repo/logger'
 import { closeSql } from '@repo/db'
@@ -10,7 +10,7 @@ import type { KnxLink } from 'js-knx'
 let knxLink: KnxLink | undefined
 let knxCron: { stop(): void } | undefined
 let apolloServer: Server | undefined
-let nestContext: INestApplicationContext | undefined
+let nestApp: INestApplication | undefined
 let dataSourceRegistry: { close(): void } | undefined
 let shuttingDown = false
 let shutdownLogger: Logger | undefined
@@ -31,16 +31,13 @@ export const registerApollo = (server: Server): void => {
   apolloServer = server
 }
 
-export const registerNestContext = (ctx: INestApplicationContext): void => {
-  nestContext = ctx
+export const registerNestApp = (ctx: INestApplication): void => {
+  nestApp = ctx
 }
 
 const closeConnections = async (logger: Logger): Promise<void> => {
-  const nest = nestContext
-  nestContext = undefined
-
-  if (nest !== undefined) {
-    await nest.close()
+  if (nestApp !== undefined) {
+    await nestApp.close()
     logger.info({ step: 'nest' }, 'Shutdown step complete')
   }
 

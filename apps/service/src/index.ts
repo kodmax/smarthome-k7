@@ -4,7 +4,7 @@ import { Server } from '@repo/apollo-ws'
 import { FSCache, RedisCache, FeedComposer, FeedEvents, DataSourceRegistry } from '@repo/feeds'
 import { Chronos } from '@repo/chronos'
 import { getSql } from '@repo/db'
-import { createLogger, readScopedLogLevel } from '@repo/logger'
+import { readScopedLogLevel, rootLogger } from '@repo/logger'
 import { config } from './config'
 import path from 'node:path'
 import { appMode, isDevelopment } from '@repo/env'
@@ -15,10 +15,10 @@ import {
   registerApollo,
   registerDataSources,
   registerKnxCron,
-  registerNestContext,
+  registerNestApp,
   setupGracefulShutdown,
 } from './graceful-shutdown'
-import { createNestContext } from './nest/nest-bootstrap'
+import { createNestApp } from './nest/nest-bootstrap'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
 import { initPrometheus, registerWsMetrics, observeDataSourceRefresh } from './prometheus'
@@ -28,17 +28,15 @@ import { PostgresCronJobLastSuccessStore } from './cron/postgresCronJobLastSucce
 import { initKnxCronJobs } from '@repo/cron-scripts'
 
 const main = async () => {
-  const rootLogger = createLogger({ name: 'service' })
+  const serviceLogger = rootLogger.child({ name: 'service' })
 
   if (isDevelopment) {
-    rootLogger.info({ appMode }, 'App mode')
+    serviceLogger.info({ appMode }, 'App mode')
   }
 
-  initSentry(rootLogger)
-  initPrometheus(rootLogger)
-  setupGracefulShutdown(rootLogger)
-
-  registerNestContext(await createNestContext())
+  initSentry(serviceLogger)
+  initPrometheus(serviceLogger)
+  setupGracefulShutdown(serviceLogger)
 
   const reportProductionError = (error: unknown, context: string) => {
     captureProductionError(error instanceof Error ? error : new Error(context, { cause: error }))
@@ -51,13 +49,13 @@ const main = async () => {
   const cacheBackend = config.redis.disabled ? 'fs' : 'redis'
 
   if (cacheBackend === 'redis') {
-    registerDependency('redis', await initRedisClient(rootLogger))
+    registerDependency('redis', await initRedisClient(serviceLogger))
   }
 
   const feedEvents = new FeedEvents()
 
   feedEvents.on('error', (sourceId, error, context) => {
-    rootLogger.child({ component: 'data-source' }).warn({ err: error, sourceId }, context)
+    serviceLogger.child({ component: 'data-source' }).warn({ err: error, sourceId }, context)
     reportProductionError(error, context)
   })
 
@@ -66,12 +64,12 @@ const main = async () => {
   const cronExecutionStore = new PostgresCronJobLastSuccessStore(getDependency('db'))
 
   const dataSourceChronos = new Chronos({
-    logger: rootLogger.child({ component: 'data-source-cron' }, { level: readScopedLogLevel('data-source-cron') }),
+    logger: serviceLogger.child({ component: 'data-source-cron' }, { level: readScopedLogLevel('data-source-cron') }),
     executionStore: cronExecutionStore,
   })
 
   const dataSources = new DataSourceRegistry<DataSourceRegistryType>({
-    logger: rootLogger.child({ component: 'data-source' }),
+    logger: serviceLogger.child({ component: 'data-source' }),
     onError: reportProductionError,
     observeDataSourceRefresh,
     feedEvents,
@@ -80,17 +78,18 @@ const main = async () => {
   })
 
   const feeds = new FeedComposer(feedEvents, {
-    logger: rootLogger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
+    logger: serviceLogger.child({ component: 'feeds' }, { level: readScopedLogLevel('feeds') }),
     onError: reportProductionError,
   })
 
   const apollo = await Server.listen({
-    logger: rootLogger.child({ component: 'ws' }, { level: readScopedLogLevel('ws') }),
+    logger: serviceLogger.child({ component: 'ws' }, { level: readScopedLogLevel('ws') }),
     onError: reportProductionError,
     feedEvents,
   })
   registerApollo(apollo)
   registerDataSources(dataSources)
+  registerNestApp(await createNestApp())
 
   registerWsMetrics(feedEvents)
 
@@ -98,24 +97,24 @@ const main = async () => {
   await dataSourceChronos.runMisfireRecovery()
 
   if (!config.knx.disabled) {
-    const knx = await knxInit(rootLogger)
+    const knx = await knxInit(serviceLogger)
     registerDependency('knx', knx)
     await initKnxFeeds(feeds, dataSources)
 
     if (!config.cron.disabled) {
       registerKnxCron(
         initKnxCronJobs(knx, {
-          logger: rootLogger.child({ component: 'knx-cron' }, { level: readScopedLogLevel('knx-cron') }),
+          logger: serviceLogger.child({ component: 'knx-cron' }, { level: readScopedLogLevel('knx-cron') }),
           executionStore: cronExecutionStore,
         }),
       )
-      rootLogger.info('KNX cron jobs initialized')
+      serviceLogger.info('KNX cron jobs initialized')
     }
   }
 
-  rootLogger.info({ feedCount: feeds.getFeedCount() }, 'Feeds initialized')
+  serviceLogger.info({ feedCount: feeds.getFeedCount() }, 'Feeds initialized')
 
-  rootLogger.info(
+  serviceLogger.info(
     {
       appMode,
       cacheBackend,

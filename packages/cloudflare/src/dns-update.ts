@@ -1,7 +1,7 @@
 import { CloudflareDNS } from './CloudflareDNS'
-import { createLogger } from '@repo/logger'
+import { rootLogger } from '@repo/logger'
 
-const logger = createLogger({ name: 'cloudflare-dns' })
+const logger = rootLogger.child({ name: 'cloudflare-dns' })
 
 const TOKEN = process.env.CLOUDFLARE_API_TOKEN ?? ''
 const ZONE_ID = process.env.CLOUDFLARE_ZONE_ID ?? ''

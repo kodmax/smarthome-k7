@@ -1,9 +1,9 @@
 import { NodeSDK } from '@opentelemetry/sdk-node'
-import { createLogger } from '@repo/logger'
+import { rootLogger } from '@repo/logger'
 
 const SERVICE_NAME = 'apollo-daemon'
 
-const logger = createLogger({ name: 'otel-instrumentation' })
+const logger = rootLogger.child({ name: 'otel-instrumentation' })
 
 const sdk = new NodeSDK({
   serviceName: SERVICE_NAME,
