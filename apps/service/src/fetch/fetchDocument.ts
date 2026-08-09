@@ -1,10 +1,10 @@
-import { parseHTML } from 'linkedom'
 import { fetchText } from './fetchText'
+import { parseHtmlDocument } from './parseHtmlDocument'
 
 export async function fetchDocument(
   url: string,
   extraHeaders?: Record<string, string>,
   method = 'GET',
 ): Promise<Document> {
-  return parseHTML(await fetchText(url, extraHeaders, method)).window.document
+  return parseHtmlDocument(await fetchText(url, extraHeaders, method))
 }

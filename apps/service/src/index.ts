@@ -3,7 +3,6 @@ process.setMaxListeners(11)
 import { Server } from '@repo/apollo-ws'
 import { FSCache, RedisCache, FeedComposer, FeedEvents, DataSourceRegistry } from '@repo/feeds'
 import { Chronos } from '@repo/chronos'
-import { initKnxCronJobs } from '@repo/cron-scripts'
 import { getSql } from '@repo/db'
 import { createLogger, readScopedLogLevel } from '@repo/logger'
 import { config } from './config'
@@ -19,6 +18,7 @@ import { initPrometheus, registerWsMetrics, observeDataSourceRefresh } from './p
 import { initSentry, captureProductionError } from './sentry'
 import { DataSourceRegistryType } from './data-sources'
 import { PostgresCronJobLastSuccessStore } from './cron/postgresCronJobLastSuccessStore'
+import { initKnxCronJobs } from '@repo/cron-scripts'
 
 const main = async () => {
   const rootLogger = createLogger({ name: 'service' })

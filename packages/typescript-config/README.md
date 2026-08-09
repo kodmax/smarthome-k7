@@ -4,13 +4,16 @@ Shared `tsconfig.json` presets for the monorepo.
 
 ## Presets
 
-| File                 | Purpose                                |
-| -------------------- | -------------------------------------- |
-| `base.json`          | Strict ESNext — base for most packages |
-| `vite.json`          | Vite apps (DOM, `noEmit`)              |
-| `react-library.json` | React libraries (`jsx: react-jsx`)     |
+| File                 | Purpose                                           |
+| -------------------- | ------------------------------------------------- |
+| `base.json`          | Strict ESNext — base for most packages            |
+| `node.json`          | Node backend — `node16` emit to `dist/` with maps |
+| `vite.json`          | Vite apps (DOM, `noEmit`)                         |
+| `react-library.json` | React libraries (`jsx: react-jsx`)                |
 
 ## Usage
+
+Vite app:
 
 ```json
 {
@@ -20,10 +23,29 @@ Shared `tsconfig.json` presets for the monorepo.
 }
 ```
 
+Node package (emit to `dist/`):
+
+```json
+{
+  "extends": "@repo/typescript-config/node.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "src/**/*.test.ts", "src/**/*.spec.ts"]
+}
+```
+
+`rootDir` and `outDir` must live in the consuming package — TypeScript resolves path options relative to the file that
+defines them, not the extended preset.
+
 ## Consumers
 
-`apps/web`, `apps/mcp`, `@repo/apollo-card`, `@repo/chronos`, `@repo/cron-scripts`, `@repo/feed-client`,
-`@repo/i18n-react`, `@repo/assets`, and other packages with a local `tsconfig.json`.
+`apps/web`, `apps/mcp`, `apps/service`, `@repo/apollo-card`, `@repo/apollo-ws`, `@repo/chronos`, `@repo/common`,
+`@repo/cron-scripts`, `@repo/db`, `@repo/di`, `@repo/env`, `@repo/feeds`, `@repo/feed-client`, `@repo/i18n-react`,
+`@repo/knx-schema`, `@repo/logger`, `@repo/transmission`, `@repo/types`, `@repo/assets`, and other packages with a local
+`tsconfig.json`.
 
 ## Scripts
 

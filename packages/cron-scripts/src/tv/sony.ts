@@ -1,6 +1,6 @@
 #!/usr/bin/node
 import { IpControl } from 'sony-bravia-ip-control'
-import { requireEnv } from '#config/env'
+import { requireEnv } from '../config/env'
 
 const isNoSignal = async (sony: IpControl): Promise<boolean> => {
   const inputs = await sony.getCurrentExternalInputsStatus()
@@ -31,6 +31,6 @@ const run = async (sony: IpControl) => {
   }
 }
 
-await run(new IpControl(requireEnv('SONY_TV_IP'), requireEnv('SONY_TV_SECRET'))).catch(e => {
+void run(new IpControl(requireEnv('SONY_TV_IP'), requireEnv('SONY_TV_SECRET'))).catch(() => {
   // ignore
 })

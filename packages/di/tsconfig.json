@@ -1,18 +1,8 @@
 {
+  "extends": "@repo/typescript-config/node.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "commonjs",
     "rootDir": "src",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "outDir": "./dist",
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "experimentalDecorators": true,
-    "skipLibCheck": true
+    "outDir": "./dist"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["dist", "src/**/*.test.ts", "src/**/*.spec.ts"]

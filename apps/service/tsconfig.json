@@ -1,24 +1,25 @@
 {
+  "extends": "@repo/typescript-config/node.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "commonjs",
-    "rootDir": "./",
-    "moduleResolution": "node",
+    "rootDir": "src",
+    "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@/utils/*": ["./src/data-sources/utils/*"]
     },
     "resolveJsonModule": true,
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
     "experimentalDecorators": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "skipLibCheck": true
+    "noUnusedParameters": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["dist", "scripts", "src/**/*.test.ts", "src/**/*.spec.ts"]
+  "exclude": ["dist", "scripts", "src/**/*.test.ts", "src/**/*.spec.ts"],
+  "tsc-alias": {
+    "replacers": {
+      "base-url": {
+        "enabled": false
+      }
+    }
+  }
 }
