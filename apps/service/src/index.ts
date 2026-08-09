@@ -89,7 +89,6 @@ const main = async () => {
   })
   registerApollo(apollo)
   registerDataSources(dataSources)
-  registerNestApp(await createNestApp())
 
   registerWsMetrics(feedEvents)
 
@@ -113,6 +112,8 @@ const main = async () => {
   }
 
   serviceLogger.info({ feedCount: feeds.getFeedCount() }, 'Feeds initialized')
+
+  registerNestApp(await createNestApp({ dataSources, feeds }))
 
   serviceLogger.info(
     {

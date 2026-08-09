@@ -626,7 +626,7 @@ describe('getFeedData', () => {
   it('throws for an unknown feed id', async () => {
     const { feeds } = createCompositionFeeds()
 
-    await expect(feeds.getFeedData('missing-feed')).rejects.toThrow('Feed <missing-feed> not registered.')
+    await expect(feeds.getFeedData('missing-feed')).rejects.toThrow('Feed not found: missing-feed')
   })
 
   it('coalesces concurrent getFeedData calls into one composition', async () => {
@@ -679,9 +679,30 @@ describe('getFeedData', () => {
     ])
 
     expect(results).toEqual([
-      { status: 'rejected', reason: expect.objectContaining({ message: 'Feed <missing-feed> not registered.' }) },
-      { status: 'rejected', reason: expect.objectContaining({ message: 'Feed <missing-feed> not registered.' }) },
-      { status: 'rejected', reason: expect.objectContaining({ message: 'Feed <missing-feed> not registered.' }) },
+      {
+        status: 'rejected',
+        reason: expect.objectContaining({
+          message: 'Feed not found: missing-feed',
+          feedId: 'missing-feed',
+          name: 'FeedNotFound',
+        }),
+      },
+      {
+        status: 'rejected',
+        reason: expect.objectContaining({
+          message: 'Feed not found: missing-feed',
+          feedId: 'missing-feed',
+          name: 'FeedNotFound',
+        }),
+      },
+      {
+        status: 'rejected',
+        reason: expect.objectContaining({
+          message: 'Feed not found: missing-feed',
+          feedId: 'missing-feed',
+          name: 'FeedNotFound',
+        }),
+      },
     ])
   })
 

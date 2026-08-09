@@ -1,15 +1,18 @@
 import 'reflect-metadata'
 import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
+import { AppModule, BootstrapDeps } from './app.module'
 import { nestLogger } from './logger/nest-logger'
 import { PinoNestLoggerService } from './logger/pino-nest-logger.service'
+import { HttpExceptionFilter } from './filters/http-exception.filter'
 
 const DEFAULT_PORT = 3679
 
-export const createNestApp = async () => {
-  const app = await NestFactory.create(AppModule, {
+export const createNestApp = async (deps: BootstrapDeps) => {
+  const app = await NestFactory.create(AppModule.register(deps), {
     logger: new PinoNestLoggerService(nestLogger()),
   })
+
+  app.useGlobalFilters(new HttpExceptionFilter())
 
   const port = Number(process.env.API_PORT ?? DEFAULT_PORT)
   if (Number.isNaN(port)) {

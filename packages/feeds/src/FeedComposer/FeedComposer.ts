@@ -1,6 +1,7 @@
 import type { DataSourceDataTypes, Feed, FeedSources, FeedsOptions, SourceRegistration } from './types'
 import { AnyDataSource } from '../DataSource'
 import { FeedEvents } from './FeedEvents'
+import { FeedNotFound } from './Errors'
 
 export type { DataSourceDataTypes, FeedsOptions } from './types'
 
@@ -59,16 +60,13 @@ export class FeedComposer {
     })
   }
 
-  private async getSourceContent(src: SourceRegistration['dataSource'], triggeredBy?: string): Promise<unknown> {
-    if (triggeredBy === src.getId()) {
-      return src.getRecentContent()
+  private getRegisteredFeed(feedId: string): Feed {
+    const feed = this.feeds.get(feedId)
+    if (feed === undefined) {
+      throw new FeedNotFound(feedId)
     }
 
-    if (triggeredBy === undefined) {
-      return src.getData()
-    }
-
-    return src.ensureContent()
+    return feed
   }
 
   private async collectSourceContents(
@@ -86,19 +84,27 @@ export class FeedComposer {
     return [...feed.sources.entries()].find(([, src]) => src.getId() === sourceId)?.[0]
   }
 
-  private async composeFeedContent(feedId: string, triggeredBy?: string): Promise<unknown | null> {
-    const feed = this.feeds.get(feedId)
-    if (feed === undefined) {
-      throw new Error(`Feed <${feedId}> not registered.`)
-    }
+  /** Subscribe / GET — every source uses getData(); always returns payload or throws. */
+  private async composeFeedOnSubscribe(feedId: string): Promise<unknown> {
+    const feed = this.getRegisteredFeed(feedId)
+    const data = await this.collectSourceContents(feed, src => src.getData())
 
-    const data = await this.collectSourceContents(feed, src => this.getSourceContent(src, triggeredBy))
+    return feed.cb(data)
+  }
 
-    if (triggeredBy !== undefined) {
-      const triggerKey = this.findSourceKey(feed, triggeredBy)
-      if (triggerKey !== undefined && data[triggerKey] === null) {
-        return null
-      }
+  /**
+   * Push / data-update — trigger source reads cache only; siblings use ensureContent().
+   * Returns undefined when the trigger source has no recent content (skip broadcast).
+   */
+  private async composeFeedOnSourceUpdate(feedId: string, triggeredBy: string): Promise<unknown | undefined> {
+    const feed = this.getRegisteredFeed(feedId)
+    const data = await this.collectSourceContents(feed, src =>
+      triggeredBy === src.getId() ? src.getRecentContent() : src.ensureContent(),
+    )
+
+    const triggerKey = this.findSourceKey(feed, triggeredBy)
+    if (triggerKey !== undefined && data[triggerKey] === null) {
+      return undefined
     }
 
     return feed.cb(data)
@@ -106,11 +112,13 @@ export class FeedComposer {
 
   private async publishFeed(feedId: string, triggeredBy?: string): Promise<void> {
     try {
-      const content = await this.composeFeedContent(feedId, triggeredBy)
-      if (content === null) {
-        if (triggeredBy !== undefined) {
-          this.options.logger.info({ feedId, skipReason: 'No recent content' }, 'Feed update skipped')
-        }
+      const content =
+        triggeredBy === undefined
+          ? await this.composeFeedOnSubscribe(feedId)
+          : await this.composeFeedOnSourceUpdate(feedId, triggeredBy)
+
+      if (content === undefined) {
+        this.options.logger.info({ feedId, skipReason: 'No recent content' }, 'Feed update skipped')
         return
       }
 
@@ -149,13 +157,8 @@ export class FeedComposer {
     return composition
   }
 
-  private async runGetFeedData(feedId: string): Promise<unknown> {
-    const content = await this.composeFeedContent(feedId)
-    if (content === null) {
-      throw new Error(`Feed <${feedId}> has no content.`)
-    }
-
-    return content
+  private runGetFeedData(feedId: string): Promise<unknown> {
+    return this.composeFeedOnSubscribe(feedId)
   }
 
   public async addFeed<R, S extends Record<string, AnyDataSource>>(
