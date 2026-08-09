@@ -46,7 +46,7 @@ export default defineConfig(({ mode }) => {
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/phpmyadmin(\/|$)/],
+          navigateFallbackDenylist: [/^\/api\//, /^\/ws(\/|$)/],
           cleanupOutdatedCaches: true,
         },
       }),
@@ -57,6 +57,11 @@ export default defineConfig(({ mode }) => {
         '/ws': {
           target: 'ws://127.0.0.1:3678',
           ws: true,
+        },
+        '/api/': {
+          target: 'http://127.0.0.1:3679',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/api/, ''),
         },
       },
     },
