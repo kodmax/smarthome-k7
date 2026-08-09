@@ -1,15 +1,15 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { parseHTML } from 'linkedom'
 import type { JobPostingDetails } from './types'
+import { parseHtmlDocument } from '@/fetch/parseHtmlDocument'
 
 type PortalFixtureDir = 'jjit' | 'nfj'
 
 const jobPostingRoot = __dirname
 
-export function loadFixtureDocument(portal: PortalFixtureDir, filename: string): Document {
+export async function loadFixtureDocument(portal: PortalFixtureDir, filename: string): Promise<Document> {
   const html = readFileSync(path.join(jobPostingRoot, portal, 'fixtures', filename), 'utf8')
-  return parseHTML(html).window.document
+  return parseHtmlDocument(html)
 }
 
 export function loadFixtureExpected(portal: PortalFixtureDir, filename: string): JobPostingDetails {

@@ -1,9 +1,9 @@
 import type { ChronosOptions } from '@repo/chronos'
 import { KnxLink } from 'js-knx'
 import { Chronos } from '@repo/chronos'
-import { clocksSync } from './clocks-sync.js'
-import { logAirCondition } from './log-air-condition.js'
-import { logHourlyConsumption } from './log-hourly-consumption.js'
+import { clocksSync } from './clocks-sync'
+import { logAirCondition } from './log-air-condition'
+import { logHourlyConsumption } from './log-hourly-consumption'
 
 export function initKnxCronJobs(knx: KnxLink, options: ChronosOptions = {}): Chronos {
   const chronos = new Chronos(options)

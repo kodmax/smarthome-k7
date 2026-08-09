@@ -1,7 +1,7 @@
 import { URL } from 'url'
-import { parseHTML } from 'linkedom'
 import { observeHttpRequest } from '@/prometheus/httpMetrics'
 import { FetchError } from './FetchError'
+import { parseHtmlDocument } from './parseHtmlDocument'
 
 export async function yahooFetch(url: string): Promise<Document> {
   const purl = new URL(url)
@@ -24,5 +24,5 @@ export async function yahooFetch(url: string): Promise<Document> {
     throw new FetchError(req.statusText, req.status, await req.text())
   }
 
-  return parseHTML(await req.text()).window.document
+  return parseHtmlDocument(await req.text())
 }
