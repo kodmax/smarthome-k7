@@ -11,7 +11,14 @@ import { appMode, isDevelopment } from '@repo/env'
 import { getDependency, registerDependency } from './di'
 import { initKnxFeeds, initWebFeeds } from './feeds'
 import { knxInit } from './knx-init'
-import { registerApollo, registerDataSources, registerKnxCron, setupGracefulShutdown } from './graceful-shutdown'
+import {
+  registerApollo,
+  registerDataSources,
+  registerKnxCron,
+  registerNestContext,
+  setupGracefulShutdown,
+} from './graceful-shutdown'
+import { createNestContext } from './nest/nest-bootstrap'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
 import { initPrometheus, registerWsMetrics, observeDataSourceRefresh } from './prometheus'
@@ -29,6 +36,9 @@ const main = async () => {
 
   initSentry(rootLogger)
   initPrometheus(rootLogger)
+  setupGracefulShutdown(rootLogger)
+
+  registerNestContext(await createNestContext(rootLogger))
 
   const reportProductionError = (error: unknown, context: string) => {
     captureProductionError(error instanceof Error ? error : new Error(context, { cause: error }))
@@ -37,8 +47,6 @@ const main = async () => {
   registerDependency('config', config)
   registerDependency('db', getSql())
   registerDependency('openai', initOpenAIClient())
-
-  setupGracefulShutdown(rootLogger)
 
   const cacheBackend = config.redis.disabled ? 'fs' : 'redis'
 
