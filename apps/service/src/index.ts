@@ -38,7 +38,7 @@ const main = async () => {
   initPrometheus(rootLogger)
   setupGracefulShutdown(rootLogger)
 
-  registerNestContext(await createNestContext(rootLogger))
+  registerNestContext(await createNestContext())
 
   const reportProductionError = (error: unknown, context: string) => {
     captureProductionError(error instanceof Error ? error : new Error(context, { cause: error }))

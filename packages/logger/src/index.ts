@@ -1,5 +1,8 @@
 export { createLogger } from './createLogger'
 export type { CreateLoggerOptions } from './createLogger'
+export { createPinoConfig } from './createPinoConfig'
+export type { PinoConfigOptions } from './createPinoConfig'
+export { childComponentLogger } from './childComponentLogger'
 export { readGlobalLogLevel, readScopedLogLevel } from './logLevel'
 export { createCaptureLogger, createSilentLogger } from './testLoggers'
 export { redactUrl } from './redactUrl'

@@ -1,42 +1,44 @@
-import { LoggerService } from '@nestjs/common'
+import { Injectable, LoggerService } from '@nestjs/common'
 import type { Logger } from '@repo/logger'
-import { readScopedLogLevel } from '@repo/logger'
 
-const NEST_FRAMEWORK_LOG = { source: 'nest-framework' } as const
-
+@Injectable()
 export class PinoNestLoggerService implements LoggerService {
-  private readonly frameworkLogger: Logger
+  private readonly logger: Logger
 
-  constructor(root: Logger) {
-    this.frameworkLogger = root.child(NEST_FRAMEWORK_LOG)
+  constructor(rootLogger: Logger) {
+    this.logger = rootLogger.child({ source: 'nest-framework' })
   }
 
-  private forContext(context?: string): Logger {
-    if (context === undefined) {
-      return this.frameworkLogger
+  log(message: unknown, context?: string): void {
+    this.write('info', message, context)
+  }
+
+  error(message: unknown, trace?: string, context?: string): void {
+    if (trace) {
+      this.logger.error({ context, trace }, String(message))
+      return
     }
-
-    const level = readScopedLogLevel(context)
-    return level ? this.frameworkLogger.child({ context }, { level }) : this.frameworkLogger.child({ context })
+    this.write('error', message, context)
   }
 
-  log(message: string, context?: string): void {
-    this.forContext(context).info(message)
+  warn(message: unknown, context?: string): void {
+    this.write('warn', message, context)
   }
 
-  error(message: string, trace?: string, context?: string): void {
-    this.forContext(context).error(trace !== undefined ? { trace } : {}, message)
+  debug(message: unknown, context?: string): void {
+    this.write('debug', message, context)
   }
 
-  warn(message: string, context?: string): void {
-    this.forContext(context).warn(message)
+  verbose(message: unknown, context?: string): void {
+    this.write('trace', message, context)
   }
 
-  debug(message: string, context?: string): void {
-    this.forContext(context).debug(message)
-  }
-
-  verbose(message: string, context?: string): void {
-    this.forContext(context).debug(message)
+  private write(level: 'info' | 'error' | 'warn' | 'debug' | 'trace', message: unknown, context?: string): void {
+    const msg = String(message)
+    if (context) {
+      this.logger[level]({ context }, msg)
+      return
+    }
+    this.logger[level](msg)
   }
 }

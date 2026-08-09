@@ -1,17 +1,16 @@
 import { DynamicModule, Global, Module } from '@nestjs/common'
-import type { Logger } from '@repo/logger'
 import { AppLogger } from './app-logger.service'
 import { ROOT_LOGGER } from './logger.constants'
+import { nestLogger } from './nest-logger'
 
 @Global()
 @Module({})
 export class LoggerModule {
-  static forRoot(logger: Logger): DynamicModule {
+  static forRoot(): DynamicModule {
     return {
       module: LoggerModule,
-      global: true,
-      providers: [{ provide: ROOT_LOGGER, useValue: logger }, AppLogger],
-      exports: [ROOT_LOGGER, AppLogger],
+      providers: [{ provide: ROOT_LOGGER, useFactory: nestLogger }, AppLogger],
+      exports: [AppLogger],
     }
   }
 }

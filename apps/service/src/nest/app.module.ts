@@ -1,16 +1,9 @@
-import { DynamicModule, Module } from '@nestjs/common'
-import type { Logger } from '@repo/logger'
+import { Module } from '@nestjs/common'
 import { AppService } from './app.service'
 import { LoggerModule } from './logger/logger.module'
 
 @Module({
+  imports: [LoggerModule.forRoot()],
   providers: [AppService],
 })
-export class AppModule {
-  static register(options: { logger: Logger }): DynamicModule {
-    return {
-      module: AppModule,
-      imports: [LoggerModule.forRoot(options.logger)],
-    }
-  }
-}
+export class AppModule {}

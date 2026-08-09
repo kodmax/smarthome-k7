@@ -1,8 +1,5 @@
 import pino from 'pino'
-import { isProduction } from '@repo/env'
-import { createJournaldStream } from './createJournaldStream'
-import { isJournaldLoggingEnabled } from './isJournaldLoggingEnabled'
-import { resolveRootLogLevel } from './logLevel'
+import { createPinoConfig } from './createPinoConfig'
 
 export type CreateLoggerOptions = {
   name?: string
@@ -11,28 +8,7 @@ export type CreateLoggerOptions = {
   fd?: number
 }
 
-function buildStream(destination: pino.DestinationStream): pino.DestinationStream {
-  if (isProduction) {
-    return destination
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-  const pretty = require('pino-pretty') as typeof import('pino-pretty')
-  return pretty({
-    colorize: true,
-    translateTime: 'SYS:standard',
-    hideObject: false,
-    destination,
-  })
-}
-
 export function createLogger(options: CreateLoggerOptions = {}): pino.Logger {
-  const level = resolveRootLogLevel(options.name)
-  const destination = options.destination ?? pino.destination(options.fd ?? 1)
-
-  if (isJournaldLoggingEnabled()) {
-    return pino({ name: options.name, level }, createJournaldStream(destination))
-  }
-
-  return pino({ name: options.name, level }, buildStream(destination))
+  const [pinoOptions, stream] = createPinoConfig(options)
+  return pino({ name: pinoOptions.name, level: pinoOptions.level }, stream)
 }
