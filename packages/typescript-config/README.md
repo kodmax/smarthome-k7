@@ -4,12 +4,12 @@ Shared `tsconfig.json` presets for the monorepo.
 
 ## Presets
 
-| File                 | Purpose                                           |
-| -------------------- | ------------------------------------------------- |
-| `base.json`          | Strict ESNext — base for most packages            |
-| `node.json`          | Node backend — `node16` emit to `dist/` with maps |
-| `vite.json`          | Vite apps (DOM, `noEmit`)                         |
-| `react-library.json` | React libraries (`jsx: react-jsx`)                |
+| File                 | Purpose                                                                        |
+| -------------------- | ------------------------------------------------------------------------------ |
+| `base.json`          | Strict ESNext — base for most packages                                         |
+| `node.json`          | Node backend — `node16` emit to `dist/` with maps (`inlineSources` for Sentry) |
+| `vite.json`          | Vite apps (DOM, `noEmit`)                                                      |
+| `react-library.json` | React libraries (`jsx: react-jsx`)                                             |
 
 ## Usage
 
