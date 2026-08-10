@@ -1,14 +1,16 @@
-import { OnMessage } from './types'
+import { OnFeedChanged } from './types'
+
+const FEED_UPDATE_PREFIX = 'FEED-UPDATE '
 
 export class WSClient {
   private readonly topics: Set<string> = new Set<string>()
   private ws: WebSocket
 
-  constructor(uri: string, onMessage: OnMessage) {
-    this.ws = this.connect(uri, onMessage)
+  constructor(uri: string, onFeedChanged: OnFeedChanged) {
+    this.ws = this.connect(uri, onFeedChanged)
   }
 
-  connect(uri: string, onMessage: OnMessage): WebSocket {
+  connect(uri: string, onFeedChanged: OnFeedChanged): WebSocket {
     const ws = new WebSocket(uri)
 
     ws.addEventListener('open', () => {
@@ -18,15 +20,13 @@ export class WSClient {
     })
 
     ws.addEventListener('message', (ev: MessageEvent<string>) => {
-      if (ev.data.substring(0, 5) === 'FEED ') {
-        const i = ev.data.indexOf(' ', 5)
-        const [topic, payload] = [ev.data.substring(5, i), JSON.parse(ev.data.substring(i + 1))]
-        onMessage({ topic, payload })
+      if (ev.data.startsWith(FEED_UPDATE_PREFIX)) {
+        onFeedChanged(ev.data.slice(FEED_UPDATE_PREFIX.length))
       }
     })
 
     ws.addEventListener('close', () => {
-      this.ws = this.connect(uri, onMessage)
+      this.ws = this.connect(uri, onFeedChanged)
     })
 
     return ws

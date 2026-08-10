@@ -10,9 +10,9 @@ DataSourceRegistry.add(id, SourceClass)   ← creates DataSource, per-source cro
         ↓
 FeedComposer.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source feeds
         ↓
-FeedEvents (feed / data-update / refresh / error / feeds-request)
+FeedEvents (feed-changed / data-update / refresh / error)
         ↓
-@repo/apollo-ws Server   ← debounce + FEED <id> <json> broadcast
+@repo/apollo-ws Server   ← debounce + FEED-UPDATE <id> notification
 ```
 
 Business logic (scrapers, KNX classes, feed wiring) stays in [`apps/service`](../../apps/service). This package is
@@ -57,7 +57,7 @@ const feeds = new FeedComposer(feedEvents, { logger, onError })
 await dataSources.add('weather', WeatherSource)
 await feeds.addFeed('weather', dataSources.getByIds(['weather']), ({ weather }) => weather)
 
-const payload = await feeds.getFeedData('weather') // same object as FEED weather <json> over WebSocket
+const payload = await feeds.getFeedData('weather') // REST GET /feeds/weather
 ```
 
 Shutdown: `dataSources.close()` stops Chronos jobs (wired in `apps/service/src/graceful-shutdown.ts`).

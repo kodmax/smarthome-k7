@@ -14,30 +14,14 @@ export class FeedComposer {
     private feedEvents: FeedEvents,
     private options: FeedsOptions,
   ) {
-    this.feedEvents.on('feeds-request', feedsIds => {
-      for (const id of feedsIds) {
-        if (this.feeds.has(id)) {
-          this.publishFeed(id).catch(e => {
-            this.options.logger.warn({ err: e, feedId: id }, 'Feed request error')
-            this.options.onError(e, 'Feed request error')
-          })
-        }
-      }
-    })
-
-    this.feedEvents.addListener('data-update', async (sourceId: string) => {
+    this.feedEvents.addListener('data-update', (sourceId: string) => {
       for (const feed of this.feeds.values()) {
         if (this.findSourceKey(feed, sourceId) === undefined) {
           continue
         }
 
-        try {
-          this.options.logger.debug({ feedId: feed.feedId, sourceId }, 'Refreshing feed due to source update')
-          await this.publishFeed(feed.feedId, sourceId)
-        } catch (e) {
-          this.options.logger.warn({ err: e, feedId: feed.feedId, sourceId }, 'Feed update error')
-          this.options.onError(e, 'Feed update error')
-        }
+        this.options.logger.debug({ feedId: feed.feedId, sourceId }, 'Feed changed due to source update')
+        this.feedEvents.emit('feed-changed', feed.feedId)
       }
     })
   }
@@ -66,56 +50,12 @@ export class FeedComposer {
     return [...feed.sources.entries()].find(([, src]) => src.getId() === sourceId)?.[0]
   }
 
-  /** Subscribe / GET — every source uses getData(); always returns payload or throws. */
-  private async composeFeedOnSubscribe(feedId: string): Promise<unknown> {
+  /** REST GET — read from cache when available; fetch without emitting data-update on miss. */
+  private async composeFeedForRead(feedId: string): Promise<unknown> {
     const feed = this.getRegisteredFeed(feedId)
-    const data = await this.collectSourceContents(feed, src => src.getData())
+    const data = await this.collectSourceContents(feed, src => src.ensureContent())
 
     return feed.cb(data)
-  }
-
-  /**
-   * Push / data-update — trigger source reads cache only; siblings use ensureContent().
-   * Returns undefined when the trigger source has no recent content (skip broadcast).
-   */
-  private async composeFeedOnSourceUpdate(feedId: string, triggeredBy: string): Promise<unknown | undefined> {
-    const feed = this.getRegisteredFeed(feedId)
-    const data = await this.collectSourceContents(feed, src =>
-      triggeredBy === src.getId() ? src.getRecentContent() : src.ensureContent(),
-    )
-
-    const triggerKey = this.findSourceKey(feed, triggeredBy)
-    if (triggerKey !== undefined && data[triggerKey] === null) {
-      return undefined
-    }
-
-    return feed.cb(data)
-  }
-
-  private async publishFeed(feedId: string, triggeredBy?: string): Promise<void> {
-    try {
-      const content =
-        triggeredBy === undefined
-          ? await this.composeFeedOnSubscribe(feedId)
-          : await this.composeFeedOnSourceUpdate(feedId, triggeredBy)
-
-      if (content === undefined) {
-        this.options.logger.info({ feedId, skipReason: 'No recent content' }, 'Feed update skipped')
-        return
-      }
-
-      this.options.logger.debug(
-        { feedId, ...(triggeredBy !== undefined ? { triggeredBy } : {}) },
-        'Feed update successful',
-      )
-      this.feedEvents.emit('feed', feedId, content)
-    } catch (e) {
-      this.options.logger.warn(
-        { err: e, feedId, ...(triggeredBy !== undefined ? { triggeredBy } : {}) },
-        'Feed callback error',
-      )
-      this.options.onError(e, 'Feed callback error')
-    }
   }
 
   public getFeedData(feedId: string): Promise<unknown> {
@@ -140,7 +80,7 @@ export class FeedComposer {
   }
 
   private runGetFeedData(feedId: string): Promise<unknown> {
-    return this.composeFeedOnSubscribe(feedId)
+    return this.composeFeedForRead(feedId)
   }
 
   public async addFeed<R, S extends Record<string, AnyDataSource>>(

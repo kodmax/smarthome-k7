@@ -11,8 +11,8 @@ Exports from `src/index.ts`:
 - `Server` — WebSocket server (default port **3678**)
 - `Server.listen({ feedEvents, logger, onError, port? })` — shares one `FeedEvents` instance with `@repo/feeds`
 
-Message protocol: `FEED <topic> <json>`. Subscriptions and commands are handled by [`@repo/feed-client`](../feed-client)
-on the client side.
+Message protocol: `FEED-UPDATE <topic>`. Subscriptions are handled by [`@repo/feed-client`](../feed-client) on the
+client side; feed content is fetched via REST.
 
 ## Usage
 
@@ -23,8 +23,8 @@ const feedEvents = new FeedEvents()
 const apollo = await Server.listen({ feedEvents, logger, onError })
 ```
 
-Incoming client messages emit on `feedEvents` (`feeds-request`, `command`). Outgoing updates listen on `feed` (1 s
-debounce per topic).
+Incoming client messages register subscriptions. Outgoing updates listen on `feed-changed` (1 s debounce per topic) and
+broadcast `FEED-UPDATE <feedId>`.
 
 ## Scripts
 

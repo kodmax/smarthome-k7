@@ -14,9 +14,9 @@ DataSourceRegistry.add(id, SourceClass)
     → cache (volatile RAM or persistent JSON / Redis)
     → data-update event
 FeedComposer.addFeed(feedId, getByIds([...]), cb)
-    → feed event (or getFeedData for in-process read)
+    → feed-changed event (or getFeedData for REST read)
 Server (@repo/apollo-ws, debounce 1 s)
-    → WebSocket clients
+    → WebSocket FEED-UPDATE notifications
 ```
 
 Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `DataSourceRegistry.close()` stops Chronos jobs, then
@@ -27,13 +27,13 @@ Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `DataSourceRegistry
 Create one instance in service and pass it to `Server.listen()`, `DataSourceRegistry`, and `FeedComposer`. Pass Pino
 `Logger` via options for operational logging.
 
-| Event           | Payload                        | When                                                  |
-| --------------- | ------------------------------ | ----------------------------------------------------- |
-| `feed`          | `feedId`, `value`              | Feed composed successfully                            |
-| `data-update`   | `sourceId`                     | Source cache changed after push, fetch, or cron       |
-| `refresh`       | `sourceId`                     | Request forced refresh (`getData(true)`) of a source  |
-| `error`         | `sourceId`, `error`, `context` | Data source error (handled in service entrypoint)     |
-| `feeds-request` | `feedIds[]`                    | Client subscribe — compose feed from source cache/TTL |
+| Event             | Payload                        | When                                                 |
+| ----------------- | ------------------------------ | ---------------------------------------------------- |
+| `feed-changed`    | `feedId`                       | Source in feed updated — notify WS clients           |
+| `data-update`     | `sourceId`                     | Source cache changed after push, fetch, or cron      |
+| `refresh`         | `sourceId`                     | Request forced refresh (`getData(true)`) of a source |
+| `error`           | `sourceId`, `error`, `context` | Data source error (handled in service entrypoint)    |
+| `clients-changed` | `count`                        | WebSocket connect/disconnect                         |
 
 ### When to use events vs `onError`
 
@@ -44,30 +44,18 @@ Create one instance in service and pass it to `Server.listen()`, `DataSourceRegi
 
 Do **not** route all feeds errors through `FeedEvents` — the event bus is not an error bus.
 
-## How feeds are composed (two paths)
+## How feeds are composed
 
-**Client subscribe** (`feeds-request`): every source in the feed gets `getData()`. Sources finish at different times;
-each success emits `data-update` and may trigger another composition pass.
+**REST read** (`getFeedData(feedId)`): every source uses `ensureContent()` — cache hit when available, fetch on miss
+without emitting `data-update`. Concurrent GETs for the same `feedId` share one in-flight composition.
 
-**Push / cron** (`data-update` handler): `feed(feedId, sourceId)` runs with `triggeredBy` set. The **trigger** source
-uses `getRecentContent()` (push already wrote to cache before emitting `data-update`; KNX volatile cache stays warm in
-RAM). Other sources in the same feed use `ensureContent()` — read from cache when available, otherwise fetch without
-emitting another `data-update`. Do **not** use `getRecentContent()` for all sources (regression from 28fb434): siblings
-without cache would return `null` from `getRecentContent()`; if the **trigger** source has no cache, `FeedComposer`
-skips the feed event entirely.
-
-**Subscribe** (`feeds-request`, no `triggeredBy`): every source uses `getData()`, which may emit `data-update` after
-refresh — intentional; the server debounce merges rapid multi-source updates.
-
-**In-process read** (`getFeedData(feedId)`): composes and returns the same payload as the `feed` event / WebSocket
-`FEED <id> <json>`, without emitting `feed`. Uses the same subscribe path as `feeds-request`. Concurrent calls for the
-same `feedId` (e.g. multiple clients GET-ing after a WS change event) share one in-flight composition and receive the
-same result.
+**Push / cron** (`data-update` handler): emits `feed-changed` for each feed containing the updated source. No
+server-side composition for WS — clients fetch via REST after receiving `FEED-UPDATE <feedId>`.
 
 ## Intentional behavior — do not "fix"
 
-- **1 s debounce** on `feed` in `Server` — multi-source feeds update one source at a time; debounce sends one broadcast
-  with the final combined state. Do not add per-source debounce or remove the global timer.
+- **1 s debounce** on `feed-changed` in `Server` — multi-source feeds update one source at a time; debounce sends one
+  notification with the final combined state. Do not add per-source debounce or remove the global timer.
 - **Refresh log at `info`** in `DataSource` — successful fetch is logged at info; cache hit stays at debug. This is
   deliberate visibility, not a bug.
 - **No stale fallback** when `script()` fails — reject and let UI show missing data; do not serve old cache after a

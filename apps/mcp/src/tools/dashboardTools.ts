@@ -3,6 +3,7 @@ import * as z from 'zod'
 import type {
   Co2Data,
   EnergyFeed,
+  HomeTempFeedData,
   HumidityData,
   JobAdsFeed,
   LightsFeed,
@@ -13,7 +14,8 @@ import type {
   TransmissionFeed,
   WeatherFeed,
 } from '@repo/types'
-import type { FeedStore } from '../feeds/FeedStore.js'
+import { DASHBOARD_FEED_IDS, type DashboardFeedId } from '../feeds/dashboardFeeds.js'
+import { fetchFeed, fetchFeeds, pollFeedUntil } from '../feeds/fetchFeed.js'
 import { sendDataSourceCommand } from '../feeds/sendDataSourceCommand.js'
 import { formatControlLightResult, formatLights, listLightCircuitIds, resolveLightCircuit } from './formatLights.js'
 import {
@@ -29,11 +31,18 @@ import {
   formatTorrentSearchResults,
   formatTorrentsStatus,
   formatWeather,
-  missingDataMessage,
 } from './formatDashboard.js'
 import { feedUnavailable, serviceUnavailable, textResult } from './toolHelpers.js'
 
-export function registerDashboardTools(server: McpServer, feedStore: FeedStore): void {
+async function fetchFeedSafe<T>(feedId: string): Promise<T | undefined> {
+  try {
+    return await fetchFeed<T>(feedId)
+  } catch {
+    return undefined
+  }
+}
+
+export function registerDashboardTools(server: McpServer): void {
   server.registerTool(
     'knx_temperatures',
     {
@@ -42,8 +51,9 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
         'Aktualne temperatury pomieszczeń z KNX: salon, sypialnia, łazienka, podłoga łazienki. Użyj gdy pytasz o temperaturę w konkretnym pokoju.',
     },
     async () => {
-      if (missingDataMessage(feedStore)) return serviceUnavailable(feedStore)
-      return textResult(formatTemperatures(feedStore))
+      const feeds = await fetchFeeds(DASHBOARD_FEED_IDS)
+      if (Object.keys(feeds).length === 0) return serviceUnavailable()
+      return textResult(formatTemperatures(feeds as Partial<Record<DashboardFeedId, HomeTempFeedData>>))
     },
   )
 
@@ -54,8 +64,8 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
       description: 'Stan ogrzewania wody/podłogi i tryby HVAC (Comfort, Economy itd.) w salonie, sypialni i łazience.',
     },
     async () => {
-      const feed = feedStore.get<TemperatureData>('heating')
-      if (!feed) return feedUnavailable(feedStore, 'ogrzewanie')
+      const feed = await fetchFeedSafe<TemperatureData>('heating')
+      if (!feed) return feedUnavailable('ogrzewanie')
       return textResult(formatHeating(feed))
     },
   )
@@ -67,13 +77,12 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
       description: 'CO₂ i wilgotność w domu (czujniki KNX). Użyj przed decyzją o wietrzeniu.',
     },
     async () => {
-      if (missingDataMessage(feedStore)) return serviceUnavailable(feedStore)
-      return textResult(
-        formatAirQuality(
-          feedStore.get<Co2Data>('home.air-quality.co2'),
-          feedStore.get<HumidityData>('home.air-quality.humidity'),
-        ),
-      )
+      const [co2, humidity] = await Promise.all([
+        fetchFeedSafe<Co2Data>('home.air-quality.co2'),
+        fetchFeedSafe<HumidityData>('home.air-quality.humidity'),
+      ])
+      if (co2 === undefined && humidity === undefined) return serviceUnavailable()
+      return textResult(formatAirQuality(co2, humidity))
     },
   )
 
@@ -85,8 +94,8 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
         'Chwilowy pobór prądu, zużycie dzienne, pomiar licznika, koszty i średnie zużycie z dashboardu energii.',
     },
     async () => {
-      const feed = feedStore.get<EnergyFeed>('energy')
-      if (!feed) return feedUnavailable(feedStore, 'energia')
+      const feed = await fetchFeedSafe<EnergyFeed>('energy')
+      if (!feed) return feedUnavailable('energia')
       return textResult(formatEnergy(feed))
     },
   )
@@ -99,8 +108,8 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
         'Temperatura, wiatr, wilgotność, UV, AQI i prognoza na dziś — dane z zewnętrznej stacji/pogody na dashboardzie.',
     },
     async () => {
-      const feed = feedStore.get<WeatherFeed>('weather')
-      if (!feed) return feedUnavailable(feedStore, 'pogoda')
+      const feed = await fetchFeedSafe<WeatherFeed>('weather')
+      if (!feed) return feedUnavailable('pogoda')
       return textResult(formatWeather(feed))
     },
   )
@@ -116,8 +125,8 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
       },
     },
     async ({ symbol }) => {
-      const feed = feedStore.get<StockMarketFeed>('stock-market')
-      if (!feed) return feedUnavailable(feedStore, 'giełda')
+      const feed = await fetchFeedSafe<StockMarketFeed>('stock-market')
+      if (!feed) return feedUnavailable('giełda')
 
       const quote = formatStockQuote(feed, symbol)
       if (!quote) {
@@ -137,8 +146,8 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
         'Status rynku (otwarty/zamknięty) i wszystkie notowania z watchlisty na dashboardzie. Użyj gdy pytasz ogólnie o giełdę, nie o jedną akcję.',
     },
     async () => {
-      const feed = feedStore.get<StockMarketFeed>('stock-market')
-      if (!feed) return feedUnavailable(feedStore, 'giełda')
+      const feed = await fetchFeedSafe<StockMarketFeed>('stock-market')
+      if (!feed) return feedUnavailable('giełda')
       return textResult(formatStockMarketOverview(feed))
     },
   )
@@ -151,8 +160,8 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
         'Widoczne oferty pracy z dashboardu (JustJoin/NoFluff/TheProtocol) — tylko te, które nie są ukryte, tak jak na karcie ofert.',
     },
     async () => {
-      const feed = feedStore.get<JobAdsFeed>('job-ads')
-      if (!feed) return feedUnavailable(feedStore, 'oferty pracy')
+      const feed = await fetchFeedSafe<JobAdsFeed>('job-ads')
+      if (!feed) return feedUnavailable('oferty pracy')
       return textResult(formatJobAds(feed, true))
     },
   )
@@ -164,8 +173,8 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
       description: 'Nieprzeczytane nagłówki artykułów z karty News na dashboardzie (tak jak domyślny widok karty).',
     },
     async () => {
-      const feed = feedStore.get<NewsFeed>('news')
-      if (!feed) return feedUnavailable(feedStore, 'wiadomości')
+      const feed = await fetchFeedSafe<NewsFeed>('news')
+      if (!feed) return feedUnavailable('wiadomości')
       return textResult(formatNews(feed))
     },
   )
@@ -186,14 +195,9 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
         return textResult('Podaj niepustą frazę wyszukiwania (parametr query).')
       }
 
-      if (!feedStore.isConnected()) {
-        return textResult('Brak połączenia z Apollo WebSocket — nie można poczekać na wynik wyszukiwania.')
-      }
-
       try {
-        const waitForResults = feedStore.waitForFeed<Torrent[]>('top-torrents')
         await sendDataSourceCommand('torrents', 'search', { query: trimmedQuery })
-        const torrents = await waitForResults
+        const torrents = await fetchFeed<Torrent[]>('top-torrents')
         return textResult(formatTorrentSearchResults(trimmedQuery, torrents))
       } catch (error) {
         const message = error instanceof Error ? error.message : 'nieznany błąd'
@@ -209,10 +213,12 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
       description: 'Top torrenty pogrupowane po tytułach (jak na karcie dashboardu) oraz status sesji Transmission.',
     },
     async () => {
-      if (missingDataMessage(feedStore)) return serviceUnavailable(feedStore)
-      return textResult(
-        formatTorrentsStatus(feedStore.get<Torrent[]>('top-torrents'), feedStore.get<TransmissionFeed>('transmission')),
-      )
+      const [torrents, transmission] = await Promise.all([
+        fetchFeedSafe<Torrent[]>('top-torrents'),
+        fetchFeedSafe<TransmissionFeed>('transmission'),
+      ])
+      if (torrents === undefined && transmission === undefined) return serviceUnavailable()
+      return textResult(formatTorrentsStatus(torrents, transmission))
     },
   )
 
@@ -230,8 +236,8 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
       },
     },
     async ({ room }) => {
-      const feed = feedStore.get<LightsFeed>('home.lights')
-      if (!feed) return feedUnavailable(feedStore, 'światła KNX')
+      const feed = await fetchFeedSafe<LightsFeed>('home.lights')
+      if (!feed) return feedUnavailable('światła KNX')
       return textResult(formatLights(feed, room))
     },
   )
@@ -260,9 +266,13 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
       }
 
       try {
-        const waitForUpdate = feedStore.waitForFeed<LightsFeed>('home.lights', 20000)
+        const expectedValue = state === 'on' ? 1 : 0
         await sendDataSourceCommand('lights', 'set', { circuitId, state })
-        const feed = await waitForUpdate
+        const feed = await pollFeedUntil<LightsFeed>(
+          'home.lights',
+          current => current.circuits[circuitId]?.reading.value === expectedValue,
+          { initialDelayMs: 500, intervalMs: 500, timeoutMs: 20_000 },
+        )
         return textResult(formatControlLightResult(circuitId, state, feed))
       } catch (error) {
         const message = error instanceof Error ? error.message : 'nieznany błąd'
@@ -279,9 +289,9 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
         'Skrót wszystkich kart dashboardu naraz. Użyj tylko gdy potrzebujesz ogólnego przeglądu — w pozostałych przypadkach wybierz węższe narzędzie.',
     },
     async () => {
-      const missing = missingDataMessage(feedStore)
-      if (missing) return textResult(missing)
-      return textResult(formatDashboardSummary(feedStore))
+      const feeds = await fetchFeeds(DASHBOARD_FEED_IDS)
+      if (Object.keys(feeds).length === 0) return serviceUnavailable()
+      return textResult(formatDashboardSummary(feeds))
     },
   )
 }

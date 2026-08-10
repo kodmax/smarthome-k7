@@ -29,7 +29,7 @@ export class Server {
   private readonly feedDebounceTimeout: Map<string, NodeJS.Timeout> = new Map()
   private wsServer: WebSocketServer | undefined
 
-  private readonly onFeed = (id: string, value: unknown): void => {
+  private readonly onFeedChanged = (id: string): void => {
     const previousTimeoutId = this.feedDebounceTimeout.get(id)
     if (previousTimeoutId !== undefined) {
       clearTimeout(previousTimeoutId)
@@ -39,7 +39,7 @@ export class Server {
       id,
       setTimeout(() => {
         this.feedDebounceTimeout.delete(id)
-        this.feed(id, value)
+        this.notifyFeedUpdate(id)
       }, 1000),
     )
   }
@@ -68,7 +68,7 @@ export class Server {
     }
     this.feedDebounceTimeout.clear()
 
-    this.feedEvents.removeListener('feed', this.onFeed)
+    this.feedEvents.removeListener('feed-changed', this.onFeedChanged)
 
     for (const client of this.clients) {
       client.ws.close()
@@ -87,27 +87,25 @@ export class Server {
     this.options.logger.info('Apollo WebSocket Server closed')
   }
 
-  private feed(id: string, value: unknown): void {
-    const content = JSON.stringify(value)
-
+  private notifyFeedUpdate(id: string): void {
     const outbox: Promise<Client>[] = []
     for (const client of this.clients) {
       const ip = clientIp(client.socket)
       if (client.subscriptions.has('*') || client.subscriptions.has(id)) {
         outbox.push(
           new Promise((resolve, reject) => {
-            this.options.logger.debug({ feedId: id, clientIp: ip }, 'Feed broadcast to client')
-            client.ws.send(`FEED ${id} ${content}`, e => (e ? reject(e) : resolve(client)))
+            this.options.logger.debug({ feedId: id, clientIp: ip }, 'Feed update broadcast to client')
+            client.ws.send(`FEED-UPDATE ${id}`, e => (e ? reject(e) : resolve(client)))
           }),
         )
       } else {
-        this.options.logger.debug({ feedId: id, clientIp: ip }, 'Skip feed broadcast to client')
+        this.options.logger.debug({ feedId: id, clientIp: ip }, 'Skip feed update broadcast to client')
       }
     }
 
     Promise.all(outbox).catch(e => {
-      this.options.logger.warn({ err: e, feedId: id }, 'Feed broadcast error')
-      this.options.onError(e, 'Feed broadcast error')
+      this.options.logger.warn({ err: e, feedId: id }, 'Feed update broadcast error')
+      this.options.onError(e, 'Feed update broadcast error')
     })
   }
 
@@ -130,9 +128,7 @@ export class Server {
 
         if (cmd === 'subscribe') {
           params.forEach(sub => client.subscriptions.add(sub))
-
           this.options.logger.info({ clientIp: ip, feedIds: params }, 'Client subscribed')
-          this.feedEvents.emit('feeds-request', params)
         } else {
           this.options.logger.info({ clientIp: ip, cmd }, 'Client sent unknown command')
         }
@@ -152,7 +148,7 @@ export class Server {
       })
     })
 
-    this.feedEvents.addListener('feed', this.onFeed)
+    this.feedEvents.addListener('feed-changed', this.onFeedChanged)
 
     return new Promise((resolve, reject) => {
       server.on('listening', () => {

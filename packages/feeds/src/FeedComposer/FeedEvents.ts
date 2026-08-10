@@ -1,12 +1,11 @@
 import EventEmitter from 'events'
 
 export type FeedEventMap = {
-  feed: [feedId: string, value: unknown]
+  'feed-changed': [feedId: string]
   'data-update': [sourceId: string]
   refresh: [sourceId: string]
   error: [sourceId: string, error: Error, context: string]
   'clients-changed': [count: number]
-  'feeds-request': [feedIds: string[]]
 }
 
 type EventKey = keyof FeedEventMap

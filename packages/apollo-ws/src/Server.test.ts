@@ -50,14 +50,14 @@ describe('Server', () => {
     await server.close()
   })
 
-  it('parses subscribe and emits feeds-request', async () => {
+  it('registers subscribe without emitting feeds-request', async () => {
     const requested: string[][] = []
-    feedEvents.on('feeds-request', feedIds => requested.push([...feedIds]))
+    feedEvents.on('feed-changed', () => requested.push([]))
 
     ws.send('subscribe feed-a feed-b')
+    await new Promise(resolve => setTimeout(resolve, 20))
 
-    await vi.waitFor(() => expect(requested).toHaveLength(1))
-    expect(requested[0]).toEqual(['feed-a', 'feed-b'])
+    expect(requested).toEqual([])
   })
 
   it('broadcasts feed updates only to subscribed clients', async () => {
@@ -66,24 +66,24 @@ describe('Server', () => {
     ws.send('subscribe my-feed')
     await new Promise(resolve => setTimeout(resolve, 20))
 
-    feedEvents.emit('feed', 'my-feed', { value: 1 })
+    feedEvents.emit('feed-changed', 'my-feed')
     await new Promise(resolve => setTimeout(resolve, 1100))
 
-    expect(messages).toEqual(['FEED my-feed {"value":1}'])
+    expect(messages).toEqual(['FEED-UPDATE my-feed'])
   })
 
-  it('debounces rapid feed updates and sends the last value once', async () => {
+  it('debounces rapid feed updates and sends one notification', async () => {
     const messages: string[] = []
     ws.on('message', data => messages.push(data.toString()))
     ws.send('subscribe debounced-feed')
     await new Promise(resolve => setTimeout(resolve, 20))
 
-    feedEvents.emit('feed', 'debounced-feed', { value: 1 })
-    feedEvents.emit('feed', 'debounced-feed', { value: 2 })
-    feedEvents.emit('feed', 'debounced-feed', { value: 3 })
+    feedEvents.emit('feed-changed', 'debounced-feed')
+    feedEvents.emit('feed-changed', 'debounced-feed')
+    feedEvents.emit('feed-changed', 'debounced-feed')
     await new Promise(resolve => setTimeout(resolve, 1100))
 
-    expect(messages).toEqual(['FEED debounced-feed {"value":3}'])
+    expect(messages).toEqual(['FEED-UPDATE debounced-feed'])
   })
 
   it('emits clients-changed when clients connect and disconnect', async () => {

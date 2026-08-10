@@ -13,8 +13,7 @@ import type {
   WeatherFeed,
 } from '@repo/types'
 import { isArchivedApplyStatus, isJobAdApplied } from '@repo/types'
-import type { FeedStore } from '../feeds/FeedStore.js'
-import { DASHBOARD_FEED_IDS, type DashboardFeedId } from '../feeds/dashboardFeeds.js'
+import { type DashboardFeedId } from '../feeds/dashboardFeeds.js'
 import { getTopTitles } from '../torrents/getTopTitles.js'
 
 const TEMPERATURE_FEEDS: Array<{ id: DashboardFeedId; label: string }> = [
@@ -30,9 +29,9 @@ function formatTemperature(feed: HomeTempFeedData): string {
   return `${current} (cel: ${feed.setpoint} °C)`
 }
 
-export function formatTemperatures(feedStore: FeedStore): string {
+export function formatTemperatures(feeds: Partial<Record<DashboardFeedId, HomeTempFeedData>>): string {
   return TEMPERATURE_FEEDS.map(({ id, label }) => {
-    const feed = feedStore.get<HomeTempFeedData>(id)
+    const feed = feeds[id]
     if (!feed) return `${label}: brak danych`
     return `${label}: ${formatTemperature(feed)}`
   }).join('\n')
@@ -266,46 +265,46 @@ function section(title: string, body: string): string {
   return `## ${title}\n${body}`
 }
 
-export function formatDashboardSummary(feedStore: FeedStore): string {
+export function formatDashboardSummary(feeds: Partial<Record<DashboardFeedId, unknown>>): string {
   const sections: string[] = []
 
-  sections.push(section('Temperatury', formatTemperatures(feedStore)))
+  sections.push(section('Temperatury', formatTemperatures(feeds as Partial<Record<DashboardFeedId, HomeTempFeedData>>)))
 
-  const heating = feedStore.get<TemperatureData>('heating')
+  const heating = feeds.heating as TemperatureData | undefined
   sections.push(section('Ogrzewanie', heating ? formatHeating(heating) : 'brak danych'))
 
   sections.push(
     section(
       'Powietrze w domu',
       formatAirQuality(
-        feedStore.get<Co2Data>('home.air-quality.co2'),
-        feedStore.get<HumidityData>('home.air-quality.humidity'),
+        feeds['home.air-quality.co2'] as Co2Data | undefined,
+        feeds['home.air-quality.humidity'] as HumidityData | undefined,
       ),
     ),
   )
 
-  const energy = feedStore.get<EnergyFeed>('energy')
+  const energy = feeds.energy as EnergyFeed | undefined
   sections.push(section('Energia', energy ? formatEnergy(energy) : 'brak danych'))
 
-  const weather = feedStore.get<WeatherFeed>('weather')
+  const weather = feeds.weather as WeatherFeed | undefined
   sections.push(section('Pogoda', weather ? formatWeather(weather) : 'brak danych'))
 
-  const stockMarket = feedStore.get<StockMarketFeed>('stock-market')
+  const stockMarket = feeds['stock-market'] as StockMarketFeed | undefined
   sections.push(section('Giełda', stockMarket ? formatStockMarketOverview(stockMarket) : 'brak danych'))
 
-  const fxRates = feedStore.get<FxRatesFeed>('fx-rates')
+  const fxRates = feeds['fx-rates'] as FxRatesFeed | undefined
   sections.push(section('Kursy walut', fxRates ? formatFxRates(fxRates) : 'brak danych'))
 
-  const news = feedStore.get<NewsFeed>('news')
+  const news = feeds.news as NewsFeed | undefined
   sections.push(section('Wiadomości', news ? formatNews(news) : 'brak danych'))
 
-  const jobAds = feedStore.get<JobAdsFeed>('job-ads')
+  const jobAds = feeds['job-ads'] as JobAdsFeed | undefined
   sections.push(section('Oferty pracy', jobAds ? formatJobAds(jobAds, true) : 'brak danych'))
 
-  const torrents = feedStore.get<Torrent[]>('top-torrents')
+  const torrents = feeds['top-torrents'] as Torrent[] | undefined
   sections.push(section('Top torrenty', torrents ? formatTorrents(torrents) : 'brak danych'))
 
-  const transmission = feedStore.get<TransmissionFeed>('transmission')
+  const transmission = feeds.transmission as TransmissionFeed | undefined
   sections.push(section('Transmission', transmission ? formatTransmission(transmission) : 'brak danych'))
 
   return sections.join('\n\n')
@@ -327,15 +326,4 @@ export function formatTorrentsStatus(
   lines.push(torrents ? formatTorrents(torrents) : 'Top torrenty: brak danych')
 
   return lines.join('\n')
-}
-
-export function countCachedFeeds(feedStore: FeedStore): number {
-  return DASHBOARD_FEED_IDS.filter(id => feedStore.get(id) !== undefined).length
-}
-
-export function missingDataMessage(feedStore: FeedStore): string | null {
-  if (countCachedFeeds(feedStore) > 0) return null
-
-  const status = feedStore.isConnected() ? 'połączony, czekam na FEED' : 'brak połączenia z Apollo'
-  return `Brak danych dashboardu (${status}). Czy apps/service działa?`
 }

@@ -8,7 +8,7 @@ export class TorrentSource extends DataSource<Torrent[]> {
 
   public async search(query: string): Promise<void> {
     this.query = query
-    void this.push(await this.fetchData())
+    await this.push(await this.fetchData())
   }
 
   static getId(): string {

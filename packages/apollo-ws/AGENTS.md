@@ -6,8 +6,8 @@ handles the wire protocol and client lifecycle.
 ## Responsibilities
 
 - Accept WebSocket connections
-- Parse client messages → emit on shared `FeedEvents` (`feeds-request`, `command`)
-- Listen for `feed` events → debounce 1 s per topic → broadcast `FEED <id> <json>`
+- Parse client `subscribe` messages — register feed interest for notifications
+- Listen for `feed-changed` events → debounce 1 s per topic → broadcast `FEED-UPDATE <id>`
 - `Server.close()` — clear debounce timers, close connections
 
 ## Wiring (service)
@@ -26,8 +26,8 @@ Shutdown order in `apps/service/src/graceful-shutdown.ts`: KNX cron → `dataSou
 
 ## Intentional behavior — do not "fix"
 
-- **1 s debounce** on outgoing `feed` — multi-source feeds update one source at a time; debounce sends one broadcast
-  with the final combined state.
+- **1 s debounce** on outgoing `feed-changed` — multi-source feeds update one source at a time; debounce sends one
+  notification with the final combined state.
 
 ## Scripts
 

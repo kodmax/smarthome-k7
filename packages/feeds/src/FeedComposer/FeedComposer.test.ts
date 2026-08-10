@@ -23,33 +23,6 @@ function waitForDataUpdate(vent: FeedEvents, sourceId: string): Promise<void> {
   })
 }
 
-async function waitForFeedIdle(vent: FeedEvents, feedId: string): Promise<void> {
-  await new Promise<void>(resolve => {
-    let quietTimer: ReturnType<typeof setTimeout> | undefined
-
-    const onFeed = (id: string) => {
-      if (id !== feedId) {
-        return
-      }
-
-      if (quietTimer !== undefined) {
-        clearTimeout(quietTimer)
-      }
-
-      quietTimer = setTimeout(() => {
-        vent.removeListener('feed', onFeed)
-        resolve()
-      }, 25)
-    }
-
-    vent.on('feed', onFeed)
-    quietTimer = setTimeout(() => {
-      vent.removeListener('feed', onFeed)
-      resolve()
-    }, 25)
-  })
-}
-
 function createTestSourceClass<T>(options: {
   id: string
   getCacheTTL?: () => number
@@ -172,65 +145,78 @@ describe('Feeds composition', () => {
     return { vent, feeds, cache }
   }
 
-  describe('data-update source selection (triggeredBy)', () => {
-    it('reads the trigger source from cache via getRecentContent without re-running getData script', async () => {
+  describe('data-update notifications', () => {
+    it('emits feed-changed for feeds containing the updated source', async () => {
       const { vent, feeds, cache } = createCompositionFeeds()
-
-      let pushA: (content: { value: number }) => void = () => {}
-      let pushB: (content: { value: number }) => void = () => {}
-      const getDataA = vi.fn(async () => ({ value: 10 }))
-      const getDataB = vi.fn(async () => ({ value: 20 }))
-      const SourceA = createTestSourceClass({
-        id: 'source-a',
-        isVolatile: true,
-        getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        fetchData: getDataA,
-        onInit: ({ push }) => {
-          pushA = push
-        },
-      })
-      const SourceB = createTestSourceClass({
-        id: 'source-b',
-        isVolatile: true,
-        getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        fetchData: getDataB,
-        onInit: ({ push }) => {
-          pushB = push
-        },
-      })
 
       await feeds.addFeed(
         'composed',
-        { a: await createDataSource(cache, vent, SourceA), b: await createDataSource(cache, vent, SourceB) },
+        {
+          a: await createDataSource(cache, vent, createTestSourceClass({ id: 'source-a', isVolatile: true })),
+          b: await createDataSource(cache, vent, createTestSourceClass({ id: 'source-b', isVolatile: true })),
+        },
         content => content,
       )
 
-      const sourcesReady = Promise.all([waitForDataUpdate(vent, 'source-a'), waitForDataUpdate(vent, 'source-b')])
-      pushA({ value: 10 })
-      pushB({ value: 20 })
-      await sourcesReady
-      await waitForFeedIdle(vent, 'composed')
-
-      getDataA.mockClear()
-      getDataB.mockClear()
-
-      const feedEvents: unknown[] = []
-      vent.on('feed', (_id, value) => feedEvents.push(value))
+      const changed: string[] = []
+      vent.on('feed-changed', feedId => changed.push(feedId))
 
       vent.emit('data-update', 'source-a')
-      await waitForFeedIdle(vent, 'composed')
 
-      expect(feedEvents).toHaveLength(1)
-      expect(getDataA).not.toHaveBeenCalled()
-      expect(getDataB).not.toHaveBeenCalled()
-      expect(feedEvents[0]).toEqual({ a: { value: 10 }, b: { value: 20 } })
+      expect(changed).toEqual(['composed'])
     })
 
-    it('runs getData script on non-trigger sources that have no cache', async () => {
+    it('does not emit feed-changed for unrelated feeds', async () => {
+      const { vent, feeds, cache } = createCompositionFeeds()
+
+      await feeds.addFeed(
+        'other-feed',
+        { src: await createDataSource(cache, vent, createTestSourceClass({ id: 'other-src', isVolatile: true })) },
+        ({ src }) => src,
+      )
+
+      const changed: string[] = []
+      vent.on('feed-changed', feedId => changed.push(feedId))
+
+      vent.emit('data-update', 'missing-source')
+
+      expect(changed).toEqual([])
+    })
+  })
+
+  describe('getFeedData via ensureContent', () => {
+    it('reads cached content after push without calling fetchData again', async () => {
+      const { vent, feeds, cache } = createCompositionFeeds()
+
+      let pushSrc: (content: { value: number }) => void = () => {}
+      const fetchData = vi.fn(async () => ({ value: 10 }))
+      const Source = createTestSourceClass({
+        id: 'cached-src',
+        isVolatile: true,
+        getCacheTTL: () => FRESH_CACHE_TTL_MS,
+        fetchData,
+        onInit: ({ push }) => {
+          pushSrc = push
+        },
+      })
+
+      await feeds.addFeed('cached-feed', { src: await createDataSource(cache, vent, Source) }, ({ src }) => src)
+
+      const ready = waitForDataUpdate(vent, 'cached-src')
+      pushSrc({ value: 42 })
+      await ready
+
+      fetchData.mockClear()
+
+      await expect(feeds.getFeedData('cached-feed')).resolves.toEqual({ value: 42 })
+      expect(fetchData).not.toHaveBeenCalled()
+    })
+
+    it('fetches cold sibling via ensureContent without emitting data-update', async () => {
       const { vent, feeds, cache } = createCompositionFeeds()
 
       let pushWarm: (content: { value: number }) => void = () => {}
-      const getDataCold = vi.fn(async () => ({ value: 99 }))
+      const fetchCold = vi.fn(async () => ({ value: 99 }))
       const WarmSource = createTestSourceClass({
         id: 'warm',
         isVolatile: true,
@@ -242,214 +228,11 @@ describe('Feeds composition', () => {
       const ColdSource = createTestSourceClass({
         id: 'cold',
         isVolatile: true,
-        fetchData: getDataCold,
+        fetchData: fetchCold,
       })
 
       await feeds.addFeed(
-        'partial',
-        {
-          warm: await createDataSource(cache, vent, WarmSource),
-          cold: await createDataSource(cache, vent, ColdSource),
-        },
-        content => content,
-      )
-
-      const feedEvents: unknown[] = []
-      vent.on('feed', (_id, value) => feedEvents.push(value))
-
-      const warmReady = waitForDataUpdate(vent, 'warm')
-      pushWarm({ value: 1 })
-      await warmReady
-      await waitForFeedIdle(vent, 'partial')
-
-      expect(getDataCold).toHaveBeenCalledOnce()
-      expect(feedEvents.at(-1)).toEqual({ warm: { value: 1 }, cold: { value: 99 } })
-    })
-
-    it('fetches sibling content via ensureContent when sibling has no cache', async () => {
-      const { vent, feeds, cache } = createCompositionFeeds()
-
-      let pushB: (content: { value: number }) => void = () => {}
-      const getDataA = vi.fn(async () => ({ value: 10 }))
-      const getDataB = vi.fn(async () => ({ value: 20 }))
-      const SourceA = createTestSourceClass({
-        id: 'source-a',
-        isVolatile: true,
-        fetchData: getDataA,
-      })
-      const SourceB = createTestSourceClass({
-        id: 'source-b',
-        isVolatile: true,
-        getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        fetchData: getDataB,
-        onInit: ({ push }) => {
-          pushB = push
-        },
-      })
-
-      await feeds.addFeed(
-        'composed',
-        { a: await createDataSource(cache, vent, SourceA), b: await createDataSource(cache, vent, SourceB) },
-        content => content,
-      )
-
-      const feedEvents: unknown[] = []
-      vent.on('feed', (_id, value) => feedEvents.push(value))
-
-      const sourceBReady = waitForDataUpdate(vent, 'source-b')
-      pushB({ value: 20 })
-      await sourceBReady
-      await waitForFeedIdle(vent, 'composed')
-
-      expect(getDataA).toHaveBeenCalledOnce()
-      expect(getDataB).toHaveBeenCalledTimes(0)
-      expect(feedEvents.at(-1)).toEqual({ a: { value: 10 }, b: { value: 20 } })
-    })
-
-    it('composes feed when trigger source emits data-update without writing new cache content', async () => {
-      const { vent, feeds, cache } = createCompositionFeeds()
-
-      let pushTrigger: (content?: { value: number }) => void = () => {}
-      const getDataTrigger = vi.fn(async () => ({ value: 100 }))
-      const getDataSibling = vi.fn(async () => ({ value: 200 }))
-      const TriggerSource = createTestSourceClass({
-        id: 'job-ads',
-        isVolatile: true,
-        getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        fetchData: getDataTrigger,
-        onInit: ({ push }) => {
-          pushTrigger = push
-        },
-      })
-      const SiblingSource = createTestSourceClass({
-        id: 'my-skills',
-        isVolatile: true,
-        fetchData: getDataSibling,
-      })
-
-      await feeds.addFeed(
-        'job-ads-feed',
-        {
-          jobAds: await createDataSource(cache, vent, TriggerSource),
-          mySkills: await createDataSource(cache, vent, SiblingSource),
-        },
-        content => content,
-      )
-
-      const warmReady = waitForDataUpdate(vent, 'job-ads')
-      pushTrigger({ value: 42 })
-      await warmReady
-      await waitForFeedIdle(vent, 'job-ads-feed')
-
-      getDataTrigger.mockClear()
-      getDataSibling.mockClear()
-
-      const feedEvents: unknown[] = []
-      vent.on('feed', (_id, value) => feedEvents.push(value))
-
-      const updateReady = waitForDataUpdate(vent, 'job-ads')
-      pushTrigger()
-      await updateReady
-      await waitForFeedIdle(vent, 'job-ads-feed')
-
-      expect(feedEvents).toHaveLength(1)
-      expect(getDataTrigger).not.toHaveBeenCalled()
-      expect(getDataSibling).not.toHaveBeenCalled()
-      expect(feedEvents[0]).toEqual({ jobAds: { value: 42 }, mySkills: { value: 200 } })
-    })
-
-    it('skips feed when trigger source has no recent content', async () => {
-      const { vent, feeds, cache } = createCompositionFeeds()
-
-      const TriggerSource = createTestSourceClass({
-        id: 'empty-trigger',
-        isVolatile: true,
-      })
-      const SiblingSource = createTestSourceClass({
-        id: 'sibling',
-        isVolatile: true,
-        fetchData: vi.fn(async () => ({ value: 99 })),
-      })
-
-      await feeds.addFeed(
-        'skip-on-null',
-        {
-          trigger: await createDataSource(cache, vent, TriggerSource),
-          sibling: await createDataSource(cache, vent, SiblingSource),
-        },
-        content => content,
-      )
-
-      const feedEvents: unknown[] = []
-      vent.on('feed', (_id, value) => feedEvents.push(value))
-
-      vent.emit('data-update', 'empty-trigger')
-      await waitForFeedIdle(vent, 'skip-on-null')
-
-      expect(feedEvents).toHaveLength(0)
-    })
-
-    it('does not skip feed when only a non-trigger source lacks recent content', async () => {
-      const { vent, feeds, cache } = createCompositionFeeds()
-
-      let pushTrigger: (content: { value: number }) => void = () => {}
-      const getDataSibling = vi.fn(async () => ({ value: 77 }))
-      const TriggerSource = createTestSourceClass({
-        id: 'trigger',
-        isVolatile: true,
-        getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        onInit: ({ push }) => {
-          pushTrigger = push
-        },
-      })
-      const SiblingSource = createTestSourceClass({
-        id: 'no-cache-sibling',
-        isVolatile: true,
-        fetchData: getDataSibling,
-      })
-
-      await feeds.addFeed(
-        'mixed',
-        {
-          trigger: await createDataSource(cache, vent, TriggerSource),
-          sibling: await createDataSource(cache, vent, SiblingSource),
-        },
-        content => content,
-      )
-
-      const feedEvents: unknown[] = []
-      vent.on('feed', (_id, value) => feedEvents.push(value))
-
-      const warmReady = waitForDataUpdate(vent, 'trigger')
-      pushTrigger({ value: 5 })
-      await warmReady
-      await waitForFeedIdle(vent, 'mixed')
-
-      expect(getDataSibling).toHaveBeenCalledOnce()
-      expect(feedEvents.at(-1)).toEqual({ trigger: { value: 5 }, sibling: { value: 77 } })
-    })
-
-    it('does not cascade data-update when sibling is fetched during feed composition', async () => {
-      const { vent, feeds, cache } = createCompositionFeeds()
-
-      let pushWarm: (content: { value: number }) => void = () => {}
-      const getDataCold = vi.fn(async () => ({ value: 99 }))
-      const WarmSource = createTestSourceClass({
-        id: 'warm',
-        isVolatile: true,
-        getCacheTTL: () => FRESH_CACHE_TTL_MS,
-        onInit: ({ push }) => {
-          pushWarm = push
-        },
-      })
-      const ColdSource = createTestSourceClass({
-        id: 'cold',
-        isVolatile: true,
-        fetchData: getDataCold,
-      })
-
-      await feeds.addFeed(
-        'no-cascade',
+        'mixed-feed',
         {
           warm: await createDataSource(cache, vent, WarmSource),
           cold: await createDataSource(cache, vent, ColdSource),
@@ -458,19 +241,18 @@ describe('Feeds composition', () => {
       )
 
       const dataUpdates: string[] = []
-      const feedEvents: unknown[] = []
       vent.on('data-update', sourceId => dataUpdates.push(sourceId))
-      vent.on('feed', (_id, value) => feedEvents.push(value))
 
       const warmReady = waitForDataUpdate(vent, 'warm')
       pushWarm({ value: 1 })
       await warmReady
-      await waitForFeedIdle(vent, 'no-cascade')
 
-      expect(getDataCold).toHaveBeenCalledOnce()
-      expect(dataUpdates).toEqual(['warm'])
-      expect(feedEvents).toHaveLength(1)
-      expect(feedEvents[0]).toEqual({ warm: { value: 1 }, cold: { value: 99 } })
+      fetchCold.mockClear()
+      dataUpdates.length = 0
+
+      await expect(feeds.getFeedData('mixed-feed')).resolves.toEqual({ warm: { value: 1 }, cold: { value: 99 } })
+      expect(fetchCold).toHaveBeenCalledOnce()
+      expect(dataUpdates).toEqual([])
     })
   })
 })
@@ -498,7 +280,7 @@ describe('getFeedData', () => {
     return { vent, feeds, cache }
   }
 
-  it('returns the same payload as the feed event on subscribe', async () => {
+  it('returns composed payload from cached source content', async () => {
     const { vent, feeds, cache } = createCompositionFeeds()
 
     let pushSrc: (content: { value: number }) => void = () => {}
@@ -518,22 +300,11 @@ describe('getFeedData', () => {
     const sourceReady = waitForDataUpdate(vent, 'get-feed-src')
     pushSrc({ value: 42 })
     await sourceReady
-    await waitForFeedIdle(vent, 'get-feed')
 
-    const feedEvents: unknown[] = []
-    vent.on('feed', (_id, value) => feedEvents.push(value))
-
-    vent.emit('feeds-request', ['get-feed'])
-    await waitForFeedIdle(vent, 'get-feed')
-
-    const fromEvent = feedEvents.at(-1)
-    const fromGetFeedData = await feeds.getFeedData('get-feed')
-
-    expect(fromGetFeedData).toEqual(fromEvent)
-    expect(fromGetFeedData).toEqual({ reading: 42 })
+    await expect(feeds.getFeedData('get-feed')).resolves.toEqual({ reading: 42 })
   })
 
-  it('matches the WebSocket JSON payload shape', async () => {
+  it('returns JSON-serializable payload', async () => {
     const { vent, feeds, cache } = createCompositionFeeds()
 
     await feeds.addFeed(
@@ -548,12 +319,10 @@ describe('getFeedData', () => {
       ({ src }) => src,
     )
 
-    await waitForFeedIdle(vent, 'ws-feed')
-
     const data = await feeds.getFeedData('ws-feed')
-    const wsPayload = JSON.parse(JSON.stringify(data))
+    const payload = JSON.parse(JSON.stringify(data))
 
-    expect(wsPayload).toEqual({ value: 7 })
+    expect(payload).toEqual({ value: 7 })
   })
 
   it('throws for an unknown feed id', async () => {
@@ -639,7 +408,7 @@ describe('getFeedData', () => {
     ])
   })
 
-  it('runs a new composition after the in-flight one completes', async () => {
+  it('reuses cached content on subsequent getFeedData calls', async () => {
     const { vent, feeds, cache } = createCompositionFeeds()
 
     const fetchData = vi.fn(async () => ({ value: 1 }))
@@ -659,6 +428,6 @@ describe('getFeedData', () => {
     await feeds.getFeedData('sequential-feed')
     await feeds.getFeedData('sequential-feed')
 
-    expect(fetchData).toHaveBeenCalledTimes(2)
+    expect(fetchData).toHaveBeenCalledOnce()
   })
 })

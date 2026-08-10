@@ -1,20 +1,22 @@
 # @repo/feed-client
 
-React client library for the smarthome backend — WebSocket feed subscriptions and HTTP data-source commands.
+React client library for the smarthome backend — REST feed reads, WebSocket change notifications, and HTTP commands.
 
 ## API
 
 | Export                     | Description                                              |
 | -------------------------- | -------------------------------------------------------- |
-| `useFeed(topic)`           | Hook — subscribes to a topic, returns the latest payload |
+| `useFeed(topic)`           | Hook — fetches feed via REST, refreshes on `FEED-UPDATE` |
+| `fetchFeed(feedId)`        | Imperative REST fetch (`GET /api/feeds/:feedId`)         |
 | `useCommand(source, name)` | Hook — sends a typed command via HTTP                    |
 | `sendCommand`              | Imperative command sender (same HTTP transport)          |
 
-Feed subscriptions use WebSocket (`ws(s)://<host>/ws`).
+Feed content uses HTTP (`GET /api/feeds/{feedId}`). Change notifications use WebSocket (`FEED-UPDATE {feedId}` on
+`ws(s)://<host>/ws`).
 
 Commands use HTTP (`/api/data-sources/{sourceId}/command/{name}`).
 
-Both URLs are derived from the same backend origin (`window.location.origin` by default, overridable via
+All URLs are derived from the same backend origin (`window.location.origin` by default, overridable via
 `VITE_BACKEND_BASE_URL`).
 
 ## Usage

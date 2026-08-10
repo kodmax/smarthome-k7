@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { subscribe } from './feed'
 
 /**
- * Reads live data from a WebSocket feed topic.
+ * Reads live data from a feed topic via REST, refreshed on WebSocket FEED-UPDATE events.
  *
  * @returns The latest payload for `topic`, or `initialValue` until the first message arrives.
  *

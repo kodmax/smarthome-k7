@@ -7,6 +7,8 @@ export type Message = {
 
 export type OnMessage = (msg: Message) => void
 
+export type OnFeedChanged = (feedId: string) => void
+
 export type TopicUpdate<P> = {
   topic: string
   payload: P

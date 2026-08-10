@@ -1,7 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { ClientOptions } from 'ws'
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const envPath = path.join(packageRoot, '.env')
@@ -33,13 +32,4 @@ function loadEnvFile(filePath: string): void {
 
 loadEnvFile(envPath)
 
-export const apolloWsUrl = process.env.APOLLO_WS_URL ?? 'ws://127.0.0.1:3678'
 export const serviceApiUrl = process.env.SERVICE_API_URL ?? 'http://127.0.0.1:3679'
-
-export const apolloWsOptions: ClientOptions = {}
-
-const caFile = process.env.APOLLO_WS_CA_FILE?.trim()
-if (caFile) {
-  const resolved = path.isAbsolute(caFile) ? caFile : path.join(packageRoot, caFile)
-  apolloWsOptions.ca = fs.readFileSync(resolved)
-}
