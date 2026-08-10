@@ -1,7 +1,10 @@
 import type { Sql } from '@repo/db'
+import { rootLogger } from '@repo/logger'
 import type { JobAdsHourlySalaryCalculation } from '@repo/types'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { captureInvalidInput, captureProductionError } from '@/sentry'
+
+const logger = rootLogger.child({ component: 'job-ads' })
 
 export const JOB_ADS_PREFERENCES_SCOPE = 'job-ads'
 export const ACCEPTABLE_SALARY_PREFERENCE_KEY = 'acceptable_salary'
@@ -54,6 +57,7 @@ export async function loadAcceptableSalary(db: Sql): Promise<number | null> {
 
     return parseAcceptableSalaryValue(row.value)
   } catch (error) {
+    logger.error({ err: error }, 'Failed to load acceptable salary preference')
     captureProductionError(error)
     return null
   }
@@ -143,6 +147,7 @@ export async function loadHourlySalaryCalculation(db: Sql): Promise<JobAdsHourly
       throw error
     }
 
+    logger.error({ err: error }, 'Failed to load hourly salary calculation preference')
     captureProductionError(error)
     throw error
   }
