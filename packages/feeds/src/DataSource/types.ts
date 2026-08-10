@@ -4,12 +4,6 @@ import { FeedEvents } from '../FeedComposer'
 import type { CronJobPolicy } from '@repo/chronos'
 import { DataSource } from './DataSource'
 
-export type DataSourceCommand = {
-  sourceId: string
-  name: string
-  args: string
-}
-
 export type ErrorHandler = (error: unknown, context: string) => void
 
 export type DataSourceParams<TCache = unknown> = {

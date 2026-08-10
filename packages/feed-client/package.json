@@ -7,9 +7,11 @@
   "license": "MIT",
   "scripts": {
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "lint": "eslint \"src/**/*.ts\""
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "vitest run"
   },
   "dependencies": {
+    "@repo/types": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -19,6 +21,7 @@
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "eslint": "^8.57.0",
-    "typescript": "5.5.4"
+    "typescript": "5.5.4",
+    "vitest": "^4.1.8"
   }
 }

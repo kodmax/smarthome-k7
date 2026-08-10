@@ -1,3 +1,7 @@
-export { subscribe, sendCommand } from './feed'
+export { subscribe } from './feed'
 export { useFeed } from './useFeed'
 export { useCommand } from './useCommand'
+export { sendCommand } from './sendCommand'
+export { buildCommandRequest } from './buildCommandRequest'
+export { getBackendBaseUrl } from './getBackendBaseUrl'
+export { getDefaultApiBaseUrl } from './getDefaultApiBaseUrl'

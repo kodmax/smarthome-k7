@@ -60,39 +60,6 @@ describe('Server', () => {
     expect(requested[0]).toEqual(['feed-a', 'feed-b'])
   })
 
-  it('parses command and emits command with joined args', async () => {
-    const commands: Array<{ sourceId: string; name: string; args: string }> = []
-    feedEvents.on('command', command => commands.push(command))
-
-    ws.send('command knx-light toggle on fast')
-
-    await vi.waitFor(() => expect(commands).toHaveLength(1))
-    expect(commands[0]).toEqual({
-      sourceId: 'knx-light',
-      name: 'toggle',
-      args: 'on fast',
-    })
-  })
-
-  it('logs truncated command arguments when args are long', async () => {
-    const longArgs = 'a'.repeat(150)
-    ws.send(`command cv upload ${longArgs}`)
-
-    await vi.waitFor(() =>
-      expect(
-        capture
-          .getEntries()
-          .some(
-            entry =>
-              entry.commandArgs === `${'a'.repeat(100)}… (150 chars)` &&
-              entry.sourceId === 'cv' &&
-              entry.commandName === 'upload',
-          ),
-      ).toBe(true),
-    )
-    expect(capture.getEntries().some(entry => entry.commandArgs === longArgs)).toBe(false)
-  })
-
   it('broadcasts feed updates only to subscribed clients', async () => {
     const messages: string[] = []
     ws.on('message', data => messages.push(data.toString()))

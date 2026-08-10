@@ -10,7 +10,7 @@ import {
   groupArchivedJobAdsByReason,
 } from '../../jobAdsFilter'
 import { JobAdsArchivedAdList } from './JobAdsArchivedAdList'
-import type { ChangeApplicationStatePayload } from './JobAdsEditAdList/Ad/AdExpandedEditorRow/ApplicationStatusEditor'
+import type { JobAdsChangeStatePayload } from '@repo/types'
 import { JobAdsEditAdList } from './JobAdsEditAdList'
 
 type Props = {
@@ -39,15 +39,13 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter, skillsFilter = []
   )
 
   const onChangeApplicationState = useCallback(
-    ({ id, applyStatus, archiveReason, comment }: ChangeApplicationStatePayload) => {
-      changeState(
-        JSON.stringify({
-          id,
-          applyStatus,
-          archiveReason,
-          comment: comment || undefined,
-        }),
-      )
+    ({ id, applyStatus, archiveReason, comment }: JobAdsChangeStatePayload) => {
+      changeState({
+        id,
+        applyStatus,
+        archiveReason,
+        comment: comment || undefined,
+      })
       setExpandedAdId(null)
     },
     [changeState],

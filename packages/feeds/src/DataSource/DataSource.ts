@@ -57,10 +57,6 @@ abstract class DataSource<T, TCache = T> {
     this.feedEvents.emit('refresh', sourceId)
   }
 
-  public handleCommand(_command: string, _args: string): Promise<void> {
-    return Promise.resolve()
-  }
-
   protected abstract fetchData(): Promise<TCache>
 
   protected isCacheValid(_cached: TCache): boolean {

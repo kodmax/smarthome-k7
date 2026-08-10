@@ -5,7 +5,6 @@ import {
   JobApplyStatus,
   canTransition,
 } from '@repo/types'
-import { captureInvalidInput } from '@/sentry'
 
 const APPLY_STATUSES = new Set<JobApplyStatus>(['pending-review', 'consider', 'applied', 'interview', 'archived'])
 
@@ -125,51 +124,4 @@ export function applyStatusChange(
   }
 
   return next
-}
-
-export type ChangeStateCommandArgs = {
-  id: string
-  applyStatus: JobApplyStatus
-  archiveReason?: JobAdArchiveReason
-  comment?: string
-}
-
-export function parseChangeStateCommandArgs(args: string): ChangeStateCommandArgs | null {
-  try {
-    const parsed = JSON.parse(args) as Record<string, unknown>
-    if (typeof parsed.id !== 'string' || !isJobApplyStatus(parsed.applyStatus)) {
-      captureInvalidInput('job-ads: invalid change-state command args', args)
-      return null
-    }
-
-    if (parsed.comment !== undefined && typeof parsed.comment !== 'string') {
-      captureInvalidInput('job-ads: invalid change-state command comment', args)
-      return null
-    }
-
-    if (parsed.archiveReason !== undefined && !isJobAdArchiveReason(parsed.archiveReason)) {
-      captureInvalidInput('job-ads: invalid change-state command archiveReason', args)
-      return null
-    }
-
-    if (parsed.applyStatus === 'archived' && parsed.archiveReason === undefined) {
-      captureInvalidInput('job-ads: missing archiveReason for archived status', args)
-      return null
-    }
-
-    if (parsed.applyStatus !== 'archived' && parsed.archiveReason !== undefined) {
-      captureInvalidInput('job-ads: unexpected archiveReason for non-archived status', args)
-      return null
-    }
-
-    return {
-      id: parsed.id,
-      applyStatus: parsed.applyStatus,
-      archiveReason: parsed.archiveReason,
-      comment: parsed.comment,
-    }
-  } catch (cause) {
-    captureInvalidInput('job-ads: failed to parse change-state command args', cause)
-    return null
-  }
 }

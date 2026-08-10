@@ -2,7 +2,7 @@ import { getDefaultWebSocketUrl } from './getDefaultWebSocketUrl'
 import { TopicSubscriber } from './types'
 import { WSClient } from './WSClient'
 
-const websocketUrl = import.meta.env.VITE_WEBSOCKET_URL ?? getDefaultWebSocketUrl()
+const websocketUrl = getDefaultWebSocketUrl()
 const subscribers: Map<string, TopicSubscriber<unknown>[]> = new Map()
 const recentPayload: Map<string, unknown> = new Map()
 
@@ -33,8 +33,4 @@ const subscribe: (topic: string, subscriber: TopicSubscriber<unknown>) => () => 
   }
 }
 
-const sendCommand: (sourceId: string, name: string, args?: string) => void = (sourceId, name, args) => {
-  wsClient.command({ sourceId, name, args: args ?? '' })
-}
-
-export { subscribe, sendCommand }
+export { subscribe }

@@ -7,25 +7,20 @@ import {
   JobAdsCachedFeed,
   JobAdsFeed,
   JobAdsFeedItem,
+  type JobAdsEditManualPayload,
+  type JobAdsChangeStatePayload,
   emptyJobAdMeta,
   jobAdApplicationFromMeta,
 } from '@repo/types'
 import { getTakeHomeHourlyRate } from './getTakeHomeHourlyRate'
 import { filterJobAdsByAcceptableSalary, dedupeJobAdDocuments } from './filters'
 import { computeJobAdsSalaryRange } from './computeJobAdsSalaryRange'
-import {
-  loadAcceptableSalary,
-  loadHourlySalaryCalculation,
-  parseSetAcceptableSalaryCommandArgs,
-  saveAcceptableSalary,
-} from './jobAdsPreferences'
+import { loadAcceptableSalary, loadHourlySalaryCalculation, saveAcceptableSalary } from './jobAdsPreferences'
 import {
   applyStatusChange,
   emptyApplicationMeta,
-  parseChangeStateCommandArgs,
   resolveStatusChangedAt,
   type ChangeApplyStatusInput,
-  type ChangeStateCommandArgs,
 } from './applicationMeta'
 import { runAnalyzeCvMatchCommand } from './analyzeCvMatchCommand'
 import { loadCvMatchesByAdIds, loadCV } from './cvMatchDocument'
@@ -48,12 +43,7 @@ import {
 } from './jobAdsRepository'
 import { JobMarketInsightSource } from '../job-market-insight/JobMarketInsightSource'
 import { applyManualJobAdContentUpdate } from './manual/applyManualJobAdContentUpdate'
-import { buildManualJobAdDocument, parseAddManualJobAdArgs } from './manual/parseAddManualJobAdArgs'
-import {
-  parseDeleteManualJobAdArgs,
-  parseEditManualJobAdArgs,
-  type EditManualJobAdCommandArgs,
-} from './manual/parseEditManualJobAdArgs'
+import { buildManualJobAdDocument } from './manual/buildManualJobAdDocument'
 import { syncJobAdsFromSources } from './syncJobAdsFromSources'
 
 const STALE_APPLIED_ARCHIVE_AFTER_DAYS = 7
@@ -65,63 +55,12 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
   @Inject('openai')
   declare private openai: OpenAI
 
-  public async handleCommand(command: string, args: string): Promise<void> {
-    switch (command) {
-      case 'change-state': {
-        const parsed = parseChangeStateCommandArgs(args)
-        if (parsed !== null) {
-          await this.changeState(parsed)
-        }
-        break
-      }
-      case 'fav':
-        await this.fav(args)
-        break
-      case 'unfav':
-        await this.unfav(args)
-        break
-      case 'set-acceptable-salary': {
-        const parsed = parseSetAcceptableSalaryCommandArgs(args)
-        if (parsed !== null) {
-          await this.setAcceptableSalary(parsed.value)
-        }
-        break
-      }
-      case 'analyze-cv-match':
-        await this.analyzeCvMatch(args.trim())
-        break
-      case 'add-manual': {
-        const parsed = parseAddManualJobAdArgs(args)
-        if (parsed !== null) {
-          await this.addManualJobAd(parsed)
-        }
-        break
-      }
-      case 'edit-manual': {
-        const parsed = parseEditManualJobAdArgs(args)
-        if (parsed !== null) {
-          await this.editManualJobAd(parsed)
-        }
-        break
-      }
-      case 'delete-manual': {
-        const parsed = parseDeleteManualJobAdArgs(args)
-        if (parsed !== null) {
-          await this.deleteManualJobAd(parsed)
-        }
-        break
-      }
-      default:
-        return
-    }
-  }
-
   public async setAcceptableSalary(value: number): Promise<void> {
     await saveAcceptableSalary(this.db, value)
     await this.push()
   }
 
-  public async changeState(input: ChangeStateCommandArgs): Promise<void> {
+  public async changeState(input: JobAdsChangeStatePayload): Promise<void> {
     await this.saveApplicationChange(input.id, {
       applyStatus: input.applyStatus,
       archiveReason: input.archiveReason,
@@ -167,7 +106,7 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     await this.push()
   }
 
-  public async editManualJobAd(input: EditManualJobAdCommandArgs): Promise<void> {
+  public async editManualJobAd(input: JobAdsEditManualPayload): Promise<void> {
     const existing = await loadJobAdDocument(this.db, input.id)
     if (existing !== null) {
       const updated = applyManualJobAdContentUpdate(existing, input)

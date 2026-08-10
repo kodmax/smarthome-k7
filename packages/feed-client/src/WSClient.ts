@@ -1,8 +1,7 @@
-import { Command, OnMessage } from './types'
+import { OnMessage } from './types'
 
 export class WSClient {
   private readonly topics: Set<string> = new Set<string>()
-  private readonly commandQueue: string[] = []
   private ws: WebSocket
 
   constructor(uri: string, onMessage: OnMessage) {
@@ -30,12 +29,6 @@ export class WSClient {
       this.ws = this.connect(uri, onMessage)
     })
 
-    ws.addEventListener('open', () => {
-      for (const commandText of this.commandQueue) {
-        this.ws.send(commandText)
-      }
-    })
-
     return ws
   }
 
@@ -45,16 +38,5 @@ export class WSClient {
     }
 
     this.topics.add(topic)
-  }
-
-  command(command: Command): void {
-    const commandText = `command ${command.sourceId} ${command.name} ${command.args}`
-
-    if (this.ws.readyState !== this.ws.OPEN) {
-      this.commandQueue.push(commandText)
-      return
-    }
-
-    this.ws.send(commandText)
   }
 }

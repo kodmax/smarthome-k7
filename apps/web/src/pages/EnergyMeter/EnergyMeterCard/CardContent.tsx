@@ -60,13 +60,15 @@ export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
 
   useEffect(() => {
     reset()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount only
   }, [])
 
   useEffect(() => {
-    const id = setInterval(() => requestReadings(''), REFRESH_INTERVAL)
+    const id = setInterval(() => requestReadings(), REFRESH_INTERVAL)
     return () => {
       clearInterval(id)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount only; requestReadings is stable
   }, [])
 
   useEffect(() => {

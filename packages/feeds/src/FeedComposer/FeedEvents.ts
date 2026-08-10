@@ -1,12 +1,10 @@
 import EventEmitter from 'events'
-import type { DataSourceCommand } from '../DataSource'
 
 export type FeedEventMap = {
   feed: [feedId: string, value: unknown]
   'data-update': [sourceId: string]
   refresh: [sourceId: string]
   error: [sourceId: string, error: Error, context: string]
-  command: [command: DataSourceCommand]
   'clients-changed': [count: number]
   'feeds-request': [feedIds: string[]]
 }

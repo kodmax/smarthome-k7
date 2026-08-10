@@ -1,25 +1,33 @@
 # @repo/feed-client
 
-React client library for the Apollo WebSocket protocol — feed subscriptions and commands to the backend.
+React client library for the smarthome backend — WebSocket feed subscriptions and HTTP data-source commands.
 
 ## API
 
-| Export           | Description                                              |
-| ---------------- | -------------------------------------------------------- |
-| `useFeed(topic)` | Hook — subscribes to a topic, returns the latest payload |
-| `useCommand()`   | Sends a command to a data source                         |
+| Export                     | Description                                              |
+| -------------------------- | -------------------------------------------------------- |
+| `useFeed(topic)`           | Hook — subscribes to a topic, returns the latest payload |
+| `useCommand(source, name)` | Hook — sends a typed command via HTTP                    |
+| `sendCommand`              | Imperative command sender (same HTTP transport)          |
 
-Default WebSocket URL: same host and scheme as the page (`ws(s)://<host>/ws`, overridable via `VITE_WEBSOCKET_URL`).
+Feed subscriptions use WebSocket (`ws(s)://<host>/ws`).
+
+Commands use HTTP (`/api/data-sources/{sourceId}/command/{name}`).
+
+Both URLs are derived from the same backend origin (`window.location.origin` by default, overridable via
+`VITE_BACKEND_BASE_URL`).
 
 ## Usage
 
 Consumed exclusively by [`apps/web`](../../apps/web):
 
 ```tsx
-import { useFeed } from '@repo/feed-client'
+import { useFeed, useCommand } from '@repo/feed-client'
 import type { WeatherFeed } from '@repo/types'
 
 const weather = useFeed<WeatherFeed>('weather')
+const fav = useCommand('job-ads', 'fav')
+fav('jj-123')
 ```
 
 Calling `useFeed` with the same topic from multiple components is fine: the client keeps one WebSocket subscription per
@@ -32,3 +40,4 @@ The package exports TypeScript source with no separate build step — Vite compi
 | Script            | Description       |
 | ----------------- | ----------------- |
 | `lint` / `format` | ESLint / Prettier |
+| `test`            | Vitest            |

@@ -9,7 +9,7 @@ import {
   JobTitleContent,
   PublishedTodayTag,
 } from '../../../../shared-components'
-import type { ChangeApplicationStatePayload } from './AdExpandedEditorRow/ApplicationStatusEditor'
+import type { JobAdsChangeStatePayload } from '@repo/types'
 import { AdExpandedEditorRow } from './AdExpandedEditorRow'
 import { EditApplicationButton } from './EditApplicationButton'
 
@@ -19,7 +19,7 @@ export const Ad: FC<{
   editMode: boolean
   expanded: boolean
   onToggleExpand: (id: string) => void
-  onChangeApplicationState: (payload: ChangeApplicationStatePayload) => void
+  onChangeApplicationState: (payload: JobAdsChangeStatePayload) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
   onAnalyzeCvMatch: (id: string) => void

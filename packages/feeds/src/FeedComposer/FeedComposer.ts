@@ -40,24 +40,6 @@ export class FeedComposer {
         }
       }
     })
-
-    this.feedEvents.on('command', async ev => {
-      const registration = this.sourcesById.get(ev.sourceId)
-      if (registration === undefined) {
-        this.options.logger.info({ sourceId: ev.sourceId, commandName: ev.name }, 'Command ignored: unknown source')
-        return
-      }
-
-      try {
-        await registration.dataSource.handleCommand(ev.name, ev.args)
-      } catch (e) {
-        this.options.logger.warn(
-          { err: e, sourceId: ev.sourceId, commandName: ev.name },
-          'Data source command execution error',
-        )
-        this.options.onError(e, 'Data source command execution error')
-      }
-    })
   }
 
   private getRegisteredFeed(feedId: string): Feed {

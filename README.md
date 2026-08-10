@@ -93,7 +93,8 @@ KNX scheduled tasks (energy logging, clock sync, indoor readings) run inside [`a
 - **Service:** copy `apps/service/.env.example` → `.env` (`DB_*` for runtime pool, KNX, location, scraper cookies).
 - **Database migrations:** copy `packages/db/.env.example` → `packages/db/.env` (`DB_MIGRATE_*` — can differ from
   service, e.g. DDL user).
-- **Web:** optional `VITE_WEBSOCKET_URL` (defaults to `ws(s)://<host>/ws`; Vite dev proxy forwards to `:3678`).
+- **Web:** optional `VITE_BACKEND_BASE_URL` (defaults to page origin; WebSocket at `/ws`, API at `/api`; Vite dev proxy
+  forwards to `:3678` / `:3679`).
 - **MCP:** copy `apps/mcp/.env.example` → `.env` (`APOLLO_WS_URL`, optional `APOLLO_WS_CA_FILE`).
 
 ## Docker Compose (Mac / practice)

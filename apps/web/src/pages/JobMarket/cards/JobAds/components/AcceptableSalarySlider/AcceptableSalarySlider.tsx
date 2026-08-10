@@ -1,6 +1,6 @@
 import { Box, Slider, Typography } from '@mui/material'
 import { useCommand } from '@repo/feed-client'
-import { JobAdsFeed } from '@repo/types'
+import { JobAdsFeed, type JobAdsSetAcceptableSalaryPayload } from '@repo/types'
 import { FC, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from '@/i18n'
 
@@ -40,7 +40,7 @@ type InnerProps = {
   labels: { label: string; ariaLabel: string; valueAtLeast: string }
   salaryRange: NonNullable<JobAdsFeed['salaryRange']>
   acceptableSalary: JobAdsFeed['acceptableSalary']
-  setAcceptableSalary: (args: string) => void
+  setAcceptableSalary: (payload: JobAdsSetAcceptableSalaryPayload) => void
 }
 
 const AcceptableSalarySliderInner: FC<InnerProps> = ({
@@ -77,7 +77,7 @@ const AcceptableSalarySliderInner: FC<InnerProps> = ({
 
       const next = toSliderValue(newValue)
       setValue(next)
-      setAcceptableSalary(JSON.stringify({ value: next }))
+      setAcceptableSalary({ value: next })
     },
     [setAcceptableSalary],
   )

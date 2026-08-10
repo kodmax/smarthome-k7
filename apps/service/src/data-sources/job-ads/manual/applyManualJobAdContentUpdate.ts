@@ -1,11 +1,7 @@
-import { JobAdDocument } from '@repo/types'
+import { JobAdDocument, type JobAdsEditManualPayload } from '@repo/types'
 import { buildManualJobAdSalary } from './buildManualJobAdSalary'
-import type { EditManualJobAdCommandArgs } from './parseEditManualJobAdArgs'
 
-export function applyManualJobAdContentUpdate(
-  existing: JobAdDocument,
-  args: EditManualJobAdCommandArgs,
-): JobAdDocument {
+export function applyManualJobAdContentUpdate(existing: JobAdDocument, args: JobAdsEditManualPayload): JobAdDocument {
   const paidVacationDays = args.employmentType === 'b2b' ? args.paidVacationDays : undefined
   const monthlySalaryRangeAfterTaxes = buildManualJobAdSalary(
     args.employmentType,

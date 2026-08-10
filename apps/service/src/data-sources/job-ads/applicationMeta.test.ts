@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  applyStatusChange,
-  emptyApplicationMeta,
-  parseChangeStateCommandArgs,
-  resolveStatusChangedAt,
-} from './applicationMeta'
+import { applyStatusChange, emptyApplicationMeta, resolveStatusChangedAt } from './applicationMeta'
 
 describe('applicationMeta', () => {
   it('sets appliedAt only on first transition to applied', () => {
@@ -263,23 +258,5 @@ describe('applicationMeta', () => {
     expect(resolveStatusChangedAt('consider', '2026-07-19T15:00:00.000Z')).toBe('2026-07-19T15:00:00.000Z')
     expect(resolveStatusChangedAt('pending-review', '2026-07-19T15:00:00.000Z')).toBeNull()
     expect(resolveStatusChangedAt('applied', undefined)).toBeNull()
-  })
-
-  it('parses change-state command args', () => {
-    expect(
-      parseChangeStateCommandArgs(JSON.stringify({ id: 'jj-1', applyStatus: 'applied', comment: 'CV sent' })),
-    ).toEqual({
-      id: 'jj-1',
-      applyStatus: 'applied',
-      comment: 'CV sent',
-    })
-
-    expect(
-      parseChangeStateCommandArgs(JSON.stringify({ id: 'jj-2', applyStatus: 'archived', archiveReason: 'other' })),
-    ).toEqual({
-      id: 'jj-2',
-      applyStatus: 'archived',
-      archiveReason: 'other',
-    })
   })
 })

@@ -13,7 +13,6 @@ type FeedWaiter = {
 export class FeedStore {
   private readonly cache = new Map<string, unknown>()
   private readonly subscriptions = new Set<string>()
-  private readonly commandQueue: string[] = []
   private readonly feedWaiters = new Map<string, FeedWaiter>()
   private ws: WebSocket | null = null
   private reconnectTimer: NodeJS.Timeout | undefined
@@ -51,17 +50,6 @@ export class FeedStore {
 
   isConnected(): boolean {
     return this.ws?.readyState === WebSocket.OPEN
-  }
-
-  command(sourceId: string, name: string, args: string): void {
-    const commandText = `command ${sourceId} ${name} ${args}`
-
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(commandText)
-      return
-    }
-
-    this.commandQueue.push(commandText)
   }
 
   waitForFeed<T>(feedId: string, timeoutMs = DEFAULT_FEED_TIMEOUT_MS): Promise<T> {
@@ -106,14 +94,8 @@ export class FeedStore {
     this.ws = ws
 
     ws.on('open', () => {
-      const queuedCommands = this.commandQueue.length
-      this.logger.info({ url: this.url, ...(queuedCommands > 0 ? { queuedCommands } : {}) }, 'Apollo WS connected')
+      this.logger.info({ url: this.url }, 'Apollo WS connected')
       ws.send(`subscribe ${[...this.subscriptions].join(' ')}`)
-
-      for (const commandText of this.commandQueue) {
-        ws.send(commandText)
-      }
-      this.commandQueue.length = 0
     })
 
     ws.on('message', data => {

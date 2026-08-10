@@ -56,7 +56,6 @@ function createTestSourceClass<T>(options: {
   fetchData?: () => Promise<T>
   isVolatile?: boolean
   onInit?: (ctx: { push: (content?: T) => void }) => void
-  handleCommand?: (command: string, args: string) => void | Promise<void>
   maintenance?: () => void | Promise<void>
 }): DataSourceCtor<T> {
   class TestSource extends DataSource<T> {
@@ -75,10 +74,6 @@ function createTestSourceClass<T>(options: {
     public constructor(params: DataSourceParams<T>) {
       super(params)
       options.onInit?.({ push: content => void this.push(content) })
-    }
-
-    public async handleCommand(command: string, args: string): Promise<void> {
-      await options.handleCommand?.(command, args)
     }
 
     protected async fetchData(): Promise<T> {
@@ -149,68 +144,6 @@ describe('Feeds data source registration', () => {
       { src: await createDataSource(cache, vent, createTestSourceClass({ id: 'source-b' })) },
       ({ src }) => src,
     )
-  })
-
-  it('routes commands through vent to the push source handler', async () => {
-    const commandHandler = vi.fn()
-    const vent = new FeedEvents()
-    const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
-    cacheDirs.push(cacheDir)
-    const cache = new FSCache(cacheDir)
-    const feeds = new FeedComposer(vent, {
-      logger: createSilentLogger(),
-      onError: noopOnError,
-    })
-
-    const src = await createDataSource(
-      cache,
-      vent,
-      createTestSourceClass({
-        id: 'routed-src',
-        isVolatile: true,
-        handleCommand: (command, args) => {
-          if (command === 'setLevel') {
-            commandHandler(args)
-          }
-        },
-      }),
-    )
-
-    await feeds.addFeed('routed', { src }, ({ src: routedSrc }) => routedSrc)
-
-    vent.emit('command', { sourceId: 'routed-src', name: 'setLevel', args: '50' })
-    vent.emit('command', { sourceId: 'other-src', name: 'setLevel', args: '99' })
-
-    await vi.waitFor(() => expect(commandHandler).toHaveBeenCalledTimes(1))
-    expect(commandHandler).toHaveBeenCalledWith('50')
-  })
-
-  it('calls onError when command execution fails', async () => {
-    const onError = vi.fn()
-    const failure = new Error('command failed')
-    const vent = new FeedEvents()
-    const cacheDir = mkdtempSync(join(tmpdir(), 'feeds-'))
-    cacheDirs.push(cacheDir)
-    const cache = new FSCache(cacheDir)
-    const feeds = new FeedComposer(vent, { logger: createSilentLogger(), onError })
-
-    const src = await createDataSource(
-      cache,
-      vent,
-      createTestSourceClass({
-        id: 'cmd-src',
-        handleCommand: async () => {
-          throw failure
-        },
-      }),
-    )
-
-    await feeds.addFeed('cmd-feed', { src }, ({ src: cmdSrc }) => cmdSrc)
-
-    vent.emit('command', { sourceId: 'cmd-src', name: 'fail', args: '' })
-
-    await vi.waitFor(() => expect(onError).toHaveBeenCalledTimes(1))
-    expect(onError).toHaveBeenCalledWith(failure, 'Data source command execution error')
   })
 })
 

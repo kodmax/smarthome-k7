@@ -1,5 +1,5 @@
 import { CacheAgeUnit, DataSource } from '@repo/feeds'
-import { type CvCachedFeed, type CvFeed } from '@repo/types'
+import { type CvCachedFeed, type CvFeed, type CvUploadPayload } from '@repo/types'
 import type OpenAI from 'openai'
 import type { Sql } from '@repo/db'
 import { Inject } from '@/di'
@@ -10,11 +10,9 @@ import {
   digestCvPdfSourceHash,
   digestDocumentContentHash,
   parseCvTextContent,
-  parseUploadCommandArgs,
   toModifiedAtIso,
   type CvTextContent,
   type DocumentRecordRow,
-  type UploadCommandArgs,
 } from './documentRecord'
 import { extractPdfText } from './extractPdfText'
 
@@ -25,19 +23,7 @@ export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
   @Inject('openai')
   declare private openai: OpenAI
 
-  public async handleCommand(command: string, args: string): Promise<void> {
-    switch (command) {
-      case 'upload': {
-        const parsed = parseUploadCommandArgs(args)
-        if (parsed !== null) {
-          await this.upload(parsed)
-        }
-        break
-      }
-    }
-  }
-
-  public async upload(input: UploadCommandArgs): Promise<void> {
+  public async upload(input: CvUploadPayload): Promise<void> {
     if (!(await this.uploadPdf(input))) {
       return
     }
@@ -112,7 +98,7 @@ export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
     return rows[0]?.source_hash ?? null
   }
 
-  private async uploadPdf(input: UploadCommandArgs): Promise<boolean> {
+  private async uploadPdf(input: CvUploadPayload): Promise<boolean> {
     const sourceHash = digestCvPdfSourceHash(input.base64)
     const existingSourceHash = await this.loadCvTextSourceHash()
     if (existingSourceHash === sourceHash) {

@@ -34,6 +34,7 @@ function loadEnvFile(filePath: string): void {
 loadEnvFile(envPath)
 
 export const apolloWsUrl = process.env.APOLLO_WS_URL ?? 'ws://127.0.0.1:3678'
+export const serviceApiUrl = process.env.SERVICE_API_URL ?? 'http://127.0.0.1:3679'
 
 export const apolloWsOptions: ClientOptions = {}
 

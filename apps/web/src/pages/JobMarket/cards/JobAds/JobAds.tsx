@@ -3,14 +3,14 @@ import { useMediaQuery, useTheme } from '@mui/material'
 import { JobAdsIcon, PlusIcon } from '@repo/assets'
 import { ApolloCardAction, BaseCard } from '@repo/apollo-card'
 import { useCommand, useFeed } from '@repo/feed-client'
-import { JobAdsFeed, JobMarketInsightFeed } from '@repo/types'
+import { JobAdsFeed, JobMarketInsightFeed, type JobAdsAddManualPayload } from '@repo/types'
 import { useTranslations } from '@/i18n'
 import { DEFAULT_JOB_ADS_FILTER, type JobAdsFilter } from './jobAdsFilter'
 import { countJobAdsEditViewAds, JobAdsEditView } from './components/JobAdsEditView'
 import { JobAdsFilterSelect } from './components/JobAdsFilterSelect'
 import { JobAdsSkillsFilter } from './components/JobAdsSkillsFilter'
 import { AcceptableSalarySlider } from './components/AcceptableSalarySlider'
-import { AddManualJobAdDialog, type AddManualJobAdPayload } from './components/AddManualJobAdDialog'
+import { AddManualJobAdDialog } from './components/AddManualJobAdDialog'
 import { collectSkillFilterOptions, collectSkillSuggestions } from './requiredSkills'
 
 export const JobAds: FC<Record<string, never>> = () => {
@@ -31,8 +31,8 @@ export const JobAds: FC<Record<string, never>> = () => {
   }, [])
 
   const onAddManualJobAd = useCallback(
-    (payload: AddManualJobAdPayload) => {
-      addManualJobAd(JSON.stringify(payload))
+    (payload: JobAdsAddManualPayload) => {
+      addManualJobAd(payload)
       setAdsFilter(payload.applyStatus)
       setDialogOpen(false)
     },

@@ -1,7 +1,12 @@
-import { SKILL_EXPERIENCE_LEVEL_ORDER, type SkillExperienceLevel } from '@repo/types'
+import {
+  SKILL_EXPERIENCE_LEVEL_ORDER,
+  type MySkillsSetSkillCommentPayload,
+  type MySkillsSetSkillLevelPayload,
+  type SkillExperienceLevel,
+} from '@repo/types'
 import { IsIn, IsNotEmpty, IsString } from 'class-validator'
 
-export class SetSkillLevelDto {
+export class SetSkillLevelDto implements MySkillsSetSkillLevelPayload {
   @IsString()
   @IsNotEmpty()
   id!: string
@@ -14,7 +19,7 @@ export class SetSkillLevelDto {
   level!: SkillExperienceLevel
 }
 
-export class SetSkillCommentDto {
+export class SetSkillCommentDto implements MySkillsSetSkillCommentPayload {
   @IsString()
   @IsNotEmpty()
   id!: string

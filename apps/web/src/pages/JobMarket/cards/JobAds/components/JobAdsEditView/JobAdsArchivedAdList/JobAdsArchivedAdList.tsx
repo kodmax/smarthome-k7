@@ -5,7 +5,7 @@ import { FC } from 'react'
 import { useTranslations } from '@/i18n'
 import { isDefaultExpandedArchivedGroup, type ArchivedJobAdsGroup } from '../../../jobAdsFilter'
 import { ApplyStatusIcon } from '../../../shared-components'
-import type { ChangeApplicationStatePayload } from '../JobAdsEditAdList/Ad/AdExpandedEditorRow/ApplicationStatusEditor'
+import type { JobAdsChangeStatePayload } from '@repo/types'
 import { JobAdsEditAdList } from '../JobAdsEditAdList'
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
   zoom: boolean
   expandedAdId?: string | null
   onToggleExpand?: (id: string) => void
-  onChangeApplicationState?: (payload: ChangeApplicationStatePayload) => void
+  onChangeApplicationState?: (payload: JobAdsChangeStatePayload) => void
   onFav?: (id: string) => void
   onUnfav?: (id: string) => void
   onAnalyzeCvMatch?: (id: string) => void

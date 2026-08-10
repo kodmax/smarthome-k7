@@ -1,4 +1,13 @@
-import type { JobAdArchiveReason, JobApplyStatus, WorkplaceType } from '@repo/types'
+import type {
+  JobAdsAddManualPayload,
+  JobAdsEditManualPayload,
+  JobAdArchiveReason,
+  JobAdsChangeStatePayload,
+  JobAdsDeleteManualPayload,
+  JobAdsSetAcceptableSalaryPayload,
+  JobApplyStatus,
+  WorkplaceType,
+} from '@repo/types'
 import {
   IsArray,
   IsDefined,
@@ -57,7 +66,7 @@ export class ItemIdDto {
   itemId!: string
 }
 
-export class ChangeStateDto {
+export class ChangeStateDto implements JobAdsChangeStatePayload {
   @IsString()
   @IsNotEmpty()
   id!: string
@@ -77,7 +86,7 @@ export class ChangeStateDto {
   comment?: string
 }
 
-export class SetAcceptableSalaryDto {
+export class SetAcceptableSalaryDto implements JobAdsSetAcceptableSalaryPayload {
   @IsNumber()
   @IsPositive()
   value!: number
@@ -89,7 +98,7 @@ export class AnalyzeCvMatchDto {
   adId!: string
 }
 
-export class AddManualJobAdDto {
+export class AddManualJobAdDto implements JobAdsAddManualPayload {
   @IsString()
   @IsNotEmpty()
   title!: string
@@ -135,7 +144,7 @@ export class AddManualJobAdDto {
   paidVacationDays?: number
 }
 
-export class EditManualJobAdDto {
+export class EditManualJobAdDto implements JobAdsEditManualPayload {
   @IsString()
   @IsNotEmpty()
   id!: string
@@ -167,7 +176,7 @@ export class EditManualJobAdDto {
   paidVacationDays?: number
 }
 
-export class DeleteManualJobAdDto {
+export class DeleteManualJobAdDto implements JobAdsDeleteManualPayload {
   @IsString()
   @IsNotEmpty()
   id!: string

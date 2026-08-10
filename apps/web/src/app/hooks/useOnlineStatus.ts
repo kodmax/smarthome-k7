@@ -14,6 +14,7 @@ export function useOnlineStatus(): boolean {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount only
   }, [])
 
   return isOnline

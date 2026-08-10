@@ -66,19 +66,6 @@ export class HomeLightsSource extends DataSource<LightsFeed> {
     return this.buildFeed()
   }
 
-  public async handleCommand(command: string, args: string): Promise<void> {
-    if (command !== 'set') {
-      return
-    }
-
-    const [circuitId, state] = args.trim().split(/\s+/)
-    if (circuitId === undefined || state === undefined) {
-      throw new Error(`Invalid lights set command: "${args}"`)
-    }
-
-    await this.setLight(circuitId, state)
-  }
-
   public async setLight(circuitId: string, state: string): Promise<void> {
     if (homeLightsById[circuitId] === undefined) {
       throw new Error(`Unknown light circuit: "${circuitId}"`)

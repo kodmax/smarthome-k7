@@ -1,13 +1,17 @@
 import { useCallback } from 'react'
-import { sendCommand } from './feed'
+import type { CommandPayloadRegistry } from '@repo/types'
+import { sendCommand } from './sendCommand'
 
-const useCommand = (sourceId: string, name: string): ((args?: string) => void) => {
+type CommandFn<P> = P extends void ? () => void : (payload: P) => void
+
+export function useCommand<S extends keyof CommandPayloadRegistry, N extends keyof CommandPayloadRegistry[S]>(
+  sourceId: S,
+  name: N,
+): CommandFn<CommandPayloadRegistry[S][N]> {
   return useCallback(
-    (args?: string) => {
-      sendCommand(sourceId, name, args)
-    },
+    ((payload?: CommandPayloadRegistry[S][N]) => {
+      sendCommand(sourceId, name, payload as CommandPayloadRegistry[S][N])
+    }) as CommandFn<CommandPayloadRegistry[S][N]>,
     [sourceId, name],
   )
 }
-
-export { useCommand }

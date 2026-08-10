@@ -20,17 +20,6 @@ export class NewsSource extends DataSource<NewsFeed, NewsCachedFeed> {
   @Inject('config')
   declare private config: typeof AppConfig
 
-  public async handleCommand(command: string, args: string): Promise<void> {
-    switch (command) {
-      case 'read':
-        await this.read(args)
-        break
-      case 'unread':
-        await this.unread(args)
-        break
-    }
-  }
-
   public async read(itemUid: string): Promise<void> {
     await this.markMeta(itemUid, 'read', true)
     void this.push()

@@ -15,6 +15,7 @@ export const usePageHeaderScrolled = () => {
     window.addEventListener('scroll', updateScrolled, { passive: true })
 
     return () => window.removeEventListener('scroll', updateScrolled)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount only
   }, [])
 
   return scrolled

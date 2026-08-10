@@ -10,7 +10,7 @@ DataSourceRegistry.add(id, SourceClass)   ← creates DataSource, per-source cro
         ↓
 FeedComposer.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source feeds
         ↓
-FeedEvents (feed / data-update / refresh / error / command / feeds-request)
+FeedEvents (feed / data-update / refresh / error / feeds-request)
         ↓
 @repo/apollo-ws Server   ← debounce + FEED <id> <json> broadcast
 ```
@@ -26,7 +26,7 @@ Exports from `src/index.ts`:
 | ------------------------ | ------------------------------------------------------------------------------------------ |
 | `DataSourceRegistry`     | Register source classes, cron + maintenance, `getByIds()`                                  |
 | `FeedComposer`           | Compose feeds from ready-made `DataSource` instances; `getFeedData()` for in-process reads |
-| `DataSource`             | Fetch, push, cache, commands, cron                                                         |
+| `DataSource`             | Fetch, push, cache, cron                                                                   |
 | `FeedEvents`             | Shared event bus (service passes one instance to WS + registry + feeds)                    |
 | `FSCache` / `RedisCache` | Persistent or volatile cache backends                                                      |
 

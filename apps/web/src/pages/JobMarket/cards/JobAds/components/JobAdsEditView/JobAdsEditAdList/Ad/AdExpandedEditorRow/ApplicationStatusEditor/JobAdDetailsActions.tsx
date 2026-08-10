@@ -5,7 +5,8 @@ import { type FC, useCallback, useMemo, useState } from 'react'
 import { useTranslations } from '@/i18n'
 import { collectSkillSuggestions } from '../../../../../../requiredSkills'
 import { canDeleteManualAd } from '../../../../../../canDeleteManualAd'
-import { ManualJobAdDialog, type EditManualJobAdPayload } from '../../../../../../components/AddManualJobAdDialog'
+import { ManualJobAdDialog } from '../../../../../../components/AddManualJobAdDialog'
+import type { JobAdsEditManualPayload } from '@repo/types'
 
 type Props = {
   ad: JobAdsFeedItem
@@ -26,15 +27,15 @@ export const JobAdDetailsActions: FC<Props> = ({ ad }) => {
   const skillOptions = useMemo(() => collectSkillSuggestions(jobAdsFeed?.ads), [jobAdsFeed?.ads])
 
   const handleEditSubmit = useCallback(
-    (payload: EditManualJobAdPayload) => {
-      editManualJobAd(JSON.stringify(payload))
+    (payload: JobAdsEditManualPayload) => {
+      editManualJobAd(payload)
       setEditOpen(false)
     },
     [editManualJobAd],
   )
 
   const handleDeleteConfirm = useCallback(() => {
-    deleteManualJobAd(JSON.stringify({ id: ad.content.id }))
+    deleteManualJobAd({ id: ad.content.id })
     setDeleteOpen(false)
   }, [ad.content.id, deleteManualJobAd])
 

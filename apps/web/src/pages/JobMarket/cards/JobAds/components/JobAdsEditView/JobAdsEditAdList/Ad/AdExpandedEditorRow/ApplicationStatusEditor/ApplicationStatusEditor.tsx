@@ -37,10 +37,6 @@ export type SaveApplicationState = {
   comment: string
 }
 
-export type ChangeApplicationStatePayload = SaveApplicationState & {
-  id: string
-}
-
 export const ApplicationStatusEditor: FC<{
   ad: JobAdsFeedItem
   onSave: (state: SaveApplicationState) => void

@@ -20,7 +20,6 @@ function createTestSourceClass<T, TCache = T>(options: {
   isVolatile?: boolean
   getSourceMetricType?: () => SourceMetricType
   isMetricsEnabled?: () => boolean
-  handleCommand?: (command: string, args: string) => void | Promise<void>
   maintenance?: () => void | Promise<void>
 }): DataSourceCtor<T, TCache> {
   class TestSource extends DataSource<T, TCache> {
@@ -34,10 +33,6 @@ function createTestSourceClass<T, TCache = T>(options: {
 
     public static isVolatile(): boolean {
       return options.isVolatile ?? false
-    }
-
-    public async handleCommand(command: string, args: string): Promise<void> {
-      await options.handleCommand?.(command, args)
     }
 
     protected isCacheValid(cached: TCache): boolean {

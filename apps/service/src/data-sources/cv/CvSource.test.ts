@@ -89,20 +89,11 @@ describe('CvSource', () => {
     registerDependency('db', db)
 
     const source = await createCvSource()
-    await source.handleCommand('upload', JSON.stringify({ base64: pdfBase64 }))
+    await source.upload({ base64: pdfBase64 })
 
     expect(extractPdfText).not.toHaveBeenCalled()
     expect(db).toHaveBeenCalledTimes(2)
     expect(emitSpy).toHaveBeenCalledWith('data-update', 'cv')
-  })
-
-  it('does not push when upload args are invalid', async () => {
-    const source = await createCvSource()
-    await source.handleCommand('upload', JSON.stringify({ base64: '' }))
-
-    expect(extractPdfText).not.toHaveBeenCalled()
-    expect(db).not.toHaveBeenCalled()
-    expect(emitSpy).not.toHaveBeenCalled()
   })
 
   it('extracts and upserts cv-text when source_hash differs', async () => {
@@ -110,7 +101,7 @@ describe('CvSource', () => {
     registerDependency('db', db)
 
     const source = await createCvSource()
-    await source.handleCommand('upload', JSON.stringify({ base64: pdfBase64 }))
+    await source.upload({ base64: pdfBase64 })
 
     expect(extractPdfText).toHaveBeenCalledWith(openai, pdfBase64)
     expect(db).toHaveBeenCalledTimes(3)

@@ -5,12 +5,6 @@ export type Message = {
   topic: string
 }
 
-export type Command = {
-  sourceId: string
-  name: string
-  args: string
-}
-
 export type OnMessage = (msg: Message) => void
 
 export type TopicUpdate<P> = {

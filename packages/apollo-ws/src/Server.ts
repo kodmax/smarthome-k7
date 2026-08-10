@@ -1,8 +1,7 @@
 import { WebSocket, WebSocketServer } from 'ws'
 import { Socket } from 'net'
 import type { Logger } from '@repo/logger'
-import { formatCommandArgsForLog } from './formatCommandArgsForLog'
-import { FeedEvents, DataSourceCommand, type ErrorHandler } from '@repo/feeds'
+import { FeedEvents, type ErrorHandler } from '@repo/feeds'
 
 export type ApolloWebSocketOptions = {
   /**
@@ -134,25 +133,6 @@ export class Server {
 
           this.options.logger.info({ clientIp: ip, feedIds: params }, 'Client subscribed')
           this.feedEvents.emit('feeds-request', params)
-        } else if (cmd === 'command') {
-          const [sourceId, name, ...args] = params
-          const argsText = args.join(' ')
-          const command: DataSourceCommand = {
-            args: argsText,
-            sourceId,
-            name,
-          }
-
-          this.options.logger.info(
-            {
-              clientIp: ip,
-              sourceId,
-              commandName: name,
-              commandArgs: formatCommandArgsForLog(argsText),
-            },
-            'Client requested command',
-          )
-          this.feedEvents.emit('command', command)
         } else {
           this.options.logger.info({ clientIp: ip, cmd }, 'Client sent unknown command')
         }

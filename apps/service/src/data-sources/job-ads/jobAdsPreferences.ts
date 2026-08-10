@@ -18,10 +18,6 @@ export class HourlySalaryCalculationNotConfiguredError extends Error {
   }
 }
 
-export type SetAcceptableSalaryCommandArgs = {
-  value: number
-}
-
 export function parseAcceptableSalaryValue(value: unknown): number | null {
   if (typeof value !== 'number' || !Number.isInteger(value) || value <= 0) {
     if (value !== null && value !== undefined) {
@@ -31,26 +27,6 @@ export function parseAcceptableSalaryValue(value: unknown): number | null {
   }
 
   return value
-}
-
-export function parseSetAcceptableSalaryCommandArgs(args: string): SetAcceptableSalaryCommandArgs | null {
-  try {
-    const parsed = JSON.parse(args) as Record<string, unknown>
-    if (!('value' in parsed)) {
-      captureInvalidInput('job-ads: invalid set-acceptable-salary command args', args)
-      return null
-    }
-
-    const value = parseAcceptableSalaryValue(parsed.value)
-    if (value === null) {
-      return null
-    }
-
-    return { value }
-  } catch (cause) {
-    captureInvalidInput('job-ads: failed to parse set-acceptable-salary command args', cause)
-    return null
-  }
 }
 
 type PreferenceRow = {

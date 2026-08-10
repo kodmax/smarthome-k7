@@ -16,10 +16,6 @@ export type DocumentRecordRow = {
   content: CvTextContent | string
 }
 
-export type UploadCommandArgs = {
-  base64: string
-}
-
 export function digestCvPdfSourceHash(base64: string): string {
   return createHash('sha256').update(Buffer.from(base64, 'base64')).digest('hex')
 }
@@ -33,42 +29,30 @@ export function digestDocumentContentHash(documentId: string, content: CvTextCon
   }
 }
 
-export function parseUploadCommandArgs(args: string): UploadCommandArgs | null {
-  try {
-    const parsed = JSON.parse(args) as Record<string, unknown>
-    if (typeof parsed.base64 !== 'string' || parsed.base64.length === 0) {
-      captureInvalidInput('cv: invalid upload command args', args)
+export function parseCvTextContent(content: CvTextContent | string): CvTextContent | null {
+  if (typeof content === 'string') {
+    try {
+      const parsed = JSON.parse(content) as Record<string, unknown>
+      if (typeof parsed.text !== 'string') {
+        captureInvalidInput('cv: invalid cv text content in row', content)
+        return null
+      }
+
+      return { text: parsed.text }
+    } catch (cause) {
+      captureInvalidInput('cv: failed to parse cv text content in row', cause)
       return null
     }
+  }
 
-    return {
-      base64: parsed.base64,
-    }
-  } catch (cause) {
-    captureInvalidInput('cv: failed to parse upload command args', cause)
+  if (typeof content.text !== 'string') {
+    captureInvalidInput('cv: invalid cv text content in row', content)
     return null
   }
+
+  return content
 }
 
-export function parseCvTextContent(content: DocumentRecordRow['content']): CvTextContent | null {
-  let parsed: unknown
-  try {
-    parsed = typeof content === 'string' ? (JSON.parse(content) as unknown) : content
-  } catch (cause) {
-    captureInvalidInput('cv: failed to parse cv-text content', cause)
-    return null
-  }
-
-  if (typeof parsed !== 'object' || parsed === null || typeof (parsed as CvTextContent).text !== 'string') {
-    captureInvalidInput('cv: invalid cv-text content shape', content)
-    return null
-  }
-
-  return {
-    text: (parsed as CvTextContent).text,
-  }
-}
-
-export function toModifiedAtIso(value: Date | string): string {
-  return value instanceof Date ? value.toISOString() : new Date(value).toISOString()
+export function toModifiedAtIso(modifiedAt: Date | string): string {
+  return modifiedAt instanceof Date ? modifiedAt.toISOString() : modifiedAt
 }

@@ -6,14 +6,6 @@ import { observeHttpFetch } from '@/prometheus/httpMetrics'
 export class TorrentSource extends DataSource<Torrent[]> {
   private query = ''
 
-  public async handleCommand(command: string, args: string): Promise<void> {
-    switch (command) {
-      case 'search':
-        await this.search(args)
-        return
-    }
-  }
-
   public async search(query: string): Promise<void> {
     this.query = query
     void this.push(await this.fetchData())

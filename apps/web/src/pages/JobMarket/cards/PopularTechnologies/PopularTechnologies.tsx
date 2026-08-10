@@ -49,14 +49,14 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
 
   const onLevelChange = useCallback(
     (id: string, name: string, level: SkillExperienceLevel) => {
-      setSkillLevel(JSON.stringify({ id, name, level }))
+      setSkillLevel({ id, name, level })
     },
     [setSkillLevel],
   )
 
   const onCommentBlur = useCallback(
     (id: string, comment: string) => {
-      setSkillComment(JSON.stringify({ id, comment }))
+      setSkillComment({ id, comment })
     },
     [setSkillComment],
   )

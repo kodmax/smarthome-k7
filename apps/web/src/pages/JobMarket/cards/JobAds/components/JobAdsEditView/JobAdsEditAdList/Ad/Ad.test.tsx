@@ -1,5 +1,5 @@
 import { type JobAdsFeedItem } from '@repo/types'
-import type { ChangeApplicationStatePayload } from './AdExpandedEditorRow/ApplicationStatusEditor'
+import type { JobAdsChangeStatePayload } from '@repo/types'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
@@ -13,7 +13,7 @@ function renderAd(
   zoom: boolean,
   editMode = false,
   expanded = false,
-  onChangeApplicationState: (payload: ChangeApplicationStatePayload) => void = noop,
+  onChangeApplicationState: (payload: JobAdsChangeStatePayload) => void = noop,
   onToggleExpand: () => void = noop,
 ) {
   return renderInTableBody(
@@ -242,7 +242,7 @@ describe('Ad', () => {
   })
 
   it('does not save without selecting a new status', () => {
-    const onChangeApplicationState = vi.fn<(payload: ChangeApplicationStatePayload) => void>()
+    const onChangeApplicationState = vi.fn<(payload: JobAdsChangeStatePayload) => void>()
 
     renderAd(
       jobAd({ id: '6', title: 'Save Role', meta: { application: { status: 'pending-review' } } }),

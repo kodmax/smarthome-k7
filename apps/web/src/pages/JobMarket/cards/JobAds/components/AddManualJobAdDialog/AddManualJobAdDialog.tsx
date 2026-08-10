@@ -16,7 +16,13 @@ import {
   Typography,
   type SelectChangeEvent,
 } from '@mui/material'
-import { JobApplyStatus, JobAdsFeedItem, WorkplaceType } from '@repo/types'
+import {
+  JobApplyStatus,
+  JobAdsFeedItem,
+  type JobAdsAddManualPayload,
+  type JobAdsEditManualPayload,
+  WorkplaceType,
+} from '@repo/types'
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from '@/i18n'
 import { dedupeSkillsById } from '../../requiredSkills'
@@ -31,30 +37,6 @@ const MANUAL_APPLY_STATUSES = [
 const WORKPLACE_TYPES = ['office', 'remote', 'hybrid'] as const satisfies readonly WorkplaceType[]
 const EMPLOYMENT_TYPES = ['permanent', 'b2b'] as const
 
-export type AddManualJobAdPayload = {
-  title: string
-  companyName: string
-  advertUrl: string
-  workplaceType: WorkplaceType
-  employmentType: 'permanent' | 'b2b'
-  salaryFrom?: number
-  salaryTo?: number
-  applyStatus: JobApplyStatus
-  appliedAt?: string
-  requiredSkills: string[]
-  paidVacationDays?: number
-}
-
-export type EditManualJobAdPayload = {
-  id: string
-  workplaceType: WorkplaceType
-  employmentType: 'permanent' | 'b2b'
-  salaryFrom?: number
-  salaryTo?: number
-  requiredSkills: string[]
-  paidVacationDays?: number
-}
-
 type BaseProps = {
   open: boolean
   onClose: () => void
@@ -62,14 +44,14 @@ type BaseProps = {
 
 type AddModeProps = BaseProps & {
   mode: 'add'
-  onSubmit: (payload: AddManualJobAdPayload) => void
+  onSubmit: (payload: JobAdsAddManualPayload) => void
   editAd?: undefined
   skillOptions?: string[]
 }
 
 type EditModeProps = BaseProps & {
   mode: 'edit'
-  onSubmit: (payload: EditManualJobAdPayload) => void
+  onSubmit: (payload: JobAdsEditManualPayload) => void
   editAd: JobAdsFeedItem
   skillOptions?: string[]
 }
@@ -226,7 +208,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
         return
       }
 
-      const payload: AddManualJobAdPayload = {
+      const payload: JobAdsAddManualPayload = {
         title: title.trim(),
         companyName: companyName.trim(),
         advertUrl: advertUrl.trim(),
@@ -263,7 +245,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
       return
     }
 
-    const payload: EditManualJobAdPayload = {
+    const payload: JobAdsEditManualPayload = {
       id: editAd.content.id,
       workplaceType,
       employmentType,

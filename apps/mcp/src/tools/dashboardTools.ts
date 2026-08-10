@@ -14,6 +14,7 @@ import type {
   WeatherFeed,
 } from '@repo/types'
 import type { FeedStore } from '../feeds/FeedStore.js'
+import { sendDataSourceCommand } from '../feeds/sendDataSourceCommand.js'
 import { formatControlLightResult, formatLights, listLightCircuitIds, resolveLightCircuit } from './formatLights.js'
 import {
   formatAirQuality,
@@ -186,12 +187,12 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
       }
 
       if (!feedStore.isConnected()) {
-        return textResult('Brak połączenia z Apollo WebSocket — nie można wyszukać torrentów.')
+        return textResult('Brak połączenia z Apollo WebSocket — nie można poczekać na wynik wyszukiwania.')
       }
 
       try {
         const waitForResults = feedStore.waitForFeed<Torrent[]>('top-torrents')
-        feedStore.command('torrents', 'search', trimmedQuery)
+        await sendDataSourceCommand('torrents', 'search', { query: trimmedQuery })
         const torrents = await waitForResults
         return textResult(formatTorrentSearchResults(trimmedQuery, torrents))
       } catch (error) {
@@ -258,13 +259,9 @@ export function registerDashboardTools(server: McpServer, feedStore: FeedStore):
         )
       }
 
-      if (!feedStore.isConnected()) {
-        return textResult('Brak połączenia z Apollo WebSocket — nie można sterować światłami.')
-      }
-
       try {
         const waitForUpdate = feedStore.waitForFeed<LightsFeed>('home.lights', 20000)
-        feedStore.command('lights', 'set', `${circuitId} ${state}`)
+        await sendDataSourceCommand('lights', 'set', { circuitId, state })
         const feed = await waitForUpdate
         return textResult(formatControlLightResult(circuitId, state, feed))
       } catch (error) {
