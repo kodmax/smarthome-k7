@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { AppModule, BootstrapDeps } from './app.module'
 import { nestLogger } from './logger/nest-logger'
@@ -13,6 +14,12 @@ export const createNestApp = async (deps: BootstrapDeps) => {
   })
 
   app.useGlobalFilters(new HttpExceptionFilter())
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
 
   const port = Number(process.env.API_PORT ?? DEFAULT_PORT)
   if (Number.isNaN(port)) {
