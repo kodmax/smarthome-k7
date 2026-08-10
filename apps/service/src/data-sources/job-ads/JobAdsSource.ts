@@ -57,7 +57,7 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
 
   public async setAcceptableSalary(value: number): Promise<void> {
     await saveAcceptableSalary(this.db, value)
-    await this.push()
+    void this.push()
   }
 
   public async changeState(input: JobAdsChangeStatePayload): Promise<void> {
@@ -66,7 +66,7 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
       archiveReason: input.archiveReason,
       comment: input.comment,
     })
-    await this.push()
+    void this.push()
   }
 
   private async saveApplicationChange(itemId: string, input: ChangeApplyStatusInput): Promise<void> {
@@ -81,12 +81,12 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
 
   public async fav(itemId: string): Promise<void> {
     await updateJobAdFav(this.db, itemId.trim(), true)
-    await this.push()
+    void this.push()
   }
 
   public async unfav(itemId: string): Promise<void> {
     await updateJobAdFav(this.db, itemId.trim(), false)
-    await this.push()
+    void this.push()
   }
 
   public async analyzeCvMatch(adId: string): Promise<void> {
@@ -96,14 +96,14 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
       adId,
       loadAdUrl: itemId => loadJobAdAdvertUrl(this.db, itemId),
     })
-    await this.push()
+    void this.push()
   }
 
   public async addManualJobAd(input: Parameters<typeof buildManualJobAdDocument>[0]): Promise<void> {
     const document = buildManualJobAdDocument(input)
     await insertManualJobAd(this.db, document)
     this.requestRefresh(JobMarketInsightSource.getId())
-    await this.push()
+    void this.push()
   }
 
   public async editManualJobAd(input: JobAdsEditManualPayload): Promise<void> {
@@ -115,12 +115,12 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
         this.requestRefresh(JobMarketInsightSource.getId())
       }
     }
-    await this.push()
+    void this.push()
   }
 
   public async deleteManualJobAd(id: string): Promise<void> {
     await deleteManualJobAdFromDb(this.db, id)
-    await this.push()
+    void this.push()
   }
 
   static getId() {
