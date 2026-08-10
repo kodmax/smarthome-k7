@@ -3,16 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "default": "./dist/index.js"
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "transpile": "node ../../scripts/transpile-package.mjs",
+    "dev": "node ../../scripts/transpile-package.mjs --watch",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "vitest run"
   },

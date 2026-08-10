@@ -3,21 +3,22 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "transpile": "node ../../scripts/transpile-package.mjs",
+    "dev": "node ../../scripts/transpile-package.mjs --watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "clean": "rm -rf dist",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "main": "./dist/knx/schedule.js",
-  "types": "./dist/knx/schedule.d.ts",
+  "types": "./src/knx/schedule.ts",
   "exports": {
     ".": {
-      "types": "./dist/knx/schedule.d.ts",
+      "types": "./src/knx/schedule.ts",
       "default": "./dist/knx/schedule.js"
     },
     "./knx/schedule": {
-      "types": "./dist/knx/schedule.d.ts",
+      "types": "./src/knx/schedule.ts",
       "default": "./dist/knx/schedule.js"
     }
   },

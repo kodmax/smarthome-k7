@@ -15,6 +15,7 @@
     "mcp": "yarn workspace mcp build && npx @modelcontextprotocol/inspector node --use-system-ca apps/mcp/dist/index.js"
   },
   "devDependencies": {
+    "esbuild": "^0.27.3",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "turbo": "^2.9.16"

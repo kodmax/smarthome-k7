@@ -3,16 +3,17 @@
   "version": "4.1.0",
   "description": "WebSocket transport for the feed framework — protocol, subscriptions, and broadcast.",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "default": "./dist/index.js"
     }
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "transpile": "node ../../scripts/transpile-package.mjs",
+    "dev": "node ../../scripts/transpile-package.mjs --watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "vitest run"

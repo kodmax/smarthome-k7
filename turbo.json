@@ -24,8 +24,12 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "transpile": {
+      "dependsOn": ["^transpile"],
+      "outputs": ["dist/**"]
+    },
     "dev": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^transpile"],
       "cache": false,
       "persistent": true
     }

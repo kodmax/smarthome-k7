@@ -5,16 +5,17 @@ import { fileURLToPath } from 'node:url'
 
 const serviceRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 const repoRoot = join(serviceRoot, '../..')
-const tscBin = join(serviceRoot, 'node_modules/.bin/tsc')
+const srcDir = join(serviceRoot, 'src')
+const swcBin = join(serviceRoot, 'node_modules/.bin/swc')
 const tscAliasBin = join(serviceRoot, 'node_modules/.bin/tsc-alias')
-const TSC_READY = 'Found 0 errors. Watching for file changes.'
 const DEP_RESTART_DEBOUNCE_MS = 300
+const REBUILD_DEBOUNCE_MS = 150
 
 let nodeProcess
-let tscProcess
-let tscOutput = ''
 let hasStarted = false
 let depRestartTimer
+let rebuildTimer
+let rebuildPending = false
 
 const repoPackageNames = () => {
   const pkgJson = JSON.parse(readFileSync(join(serviceRoot, 'package.json'), 'utf8'))
@@ -28,7 +29,26 @@ const repoPackageNames = () => {
 }
 
 const runTscAlias = () => {
-  execSync(`"${tscAliasBin}" -p tsconfig.json`, { cwd: serviceRoot, stdio: 'inherit' })
+  try {
+    execSync(`"${tscAliasBin}" -p tsconfig.json`, { cwd: serviceRoot, stdio: 'inherit' })
+    return true
+  } catch {
+    console.error('[dev] tsc-alias failed — path aliases in dist may be stale')
+    return false
+  }
+}
+
+const compileService = () => {
+  try {
+    execSync(`"${swcBin}" src -d dist --strip-leading-paths --config-file .swcrc`, {
+      cwd: serviceRoot,
+      stdio: 'inherit',
+    })
+    return true
+  } catch {
+    console.error('[dev] compile failed — fix errors above; watcher still running')
+    return false
+  }
 }
 
 const startNode = () => {
@@ -40,21 +60,45 @@ const startNode = () => {
   })
 }
 
-const onTscReady = () => {
-  runTscAlias()
-
-  if (!hasStarted) {
-    hasStarted = true
-    startNode()
-    console.log('[dev] ready — watching apps/service/src and @repo/*/dist')
+const rebuildService = ({ immediate = false } = {}) => {
+  if (rebuildPending) {
     return
   }
 
-  console.log('[dev] recompiled — restarting service…')
-  startNode()
+  clearTimeout(rebuildTimer)
+
+  const run = () => {
+    rebuildPending = true
+
+    try {
+      if (!compileService()) {
+        return
+      }
+
+      runTscAlias()
+
+      if (!hasStarted) {
+        hasStarted = true
+        startNode()
+        console.log('[dev] ready — watching apps/service/src and @repo/*/dist')
+      } else {
+        console.log('[dev] recompiled — restarting service…')
+        startNode()
+      }
+    } finally {
+      rebuildPending = false
+    }
+  }
+
+  if (immediate) {
+    run()
+    return
+  }
+
+  rebuildTimer = setTimeout(run, REBUILD_DEBOUNCE_MS)
 }
 
-const scheduleDepRestart = (packageName) => {
+const scheduleDepRestart = packageName => {
   if (!hasStarted) {
     return
   }
@@ -66,51 +110,51 @@ const scheduleDepRestart = (packageName) => {
   }, DEP_RESTART_DEBOUNCE_MS)
 }
 
-const watchRepoPackageDist = (packageName) => {
+const watchRepoPackageDist = packageName => {
   const distDir = join(repoRoot, 'packages', packageName, 'dist')
 
   if (!existsSync(distDir)) {
-    console.warn(`[dev] skip watch — missing ${distDir} (run build first)`)
+    console.warn(`[dev] skip watch — missing ${distDir} (waiting for transpile)`)
     return
   }
 
-  watch(distDir, { recursive: true }, () => {
+  watch(distDir, { recursive: true }, (_event, filename) => {
+    if (!filename || !/\.m?js$/.test(filename)) {
+      return
+    }
+
     scheduleDepRestart(packageName)
   })
 
   console.log(`[dev] watching packages/${packageName}/dist`)
 }
 
-const shutdown = (signal) => {
+const shutdown = signal => {
   clearTimeout(depRestartTimer)
+  clearTimeout(rebuildTimer)
   nodeProcess?.kill(signal)
-  tscProcess?.kill(signal)
   process.exit(0)
 }
 
-console.log('[dev] starting tsc --watch…')
+console.log('[dev] watching apps/service/src…')
 
 for (const packageName of repoPackageNames()) {
   watchRepoPackageDist(packageName)
 }
 
-tscProcess = spawn(tscBin, ['-w', '--preserveWatchOutput'], {
-  cwd: serviceRoot,
-  stdio: ['inherit', 'pipe', 'inherit'],
-})
+if (!existsSync(join(serviceRoot, 'dist/index.js'))) {
+  execSync(`rm -rf dist`, { cwd: serviceRoot, stdio: 'inherit' })
+}
 
-tscProcess.stdout.on('data', (chunk) => {
-  const text = chunk.toString()
-  process.stdout.write(text)
-  tscOutput += text
-
-  if (!tscOutput.includes(TSC_READY)) {
+watch(srcDir, { recursive: true }, (_event, filename) => {
+  if (!filename || !/\.tsx?$/.test(filename)) {
     return
   }
 
-  tscOutput = ''
-  onTscReady()
+  rebuildService()
 })
+
+rebuildService({ immediate: true })
 
 process.on('SIGINT', () => shutdown('SIGINT'))
 process.on('SIGTERM', () => shutdown('SIGTERM'))
