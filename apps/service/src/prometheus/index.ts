@@ -1,4 +1,5 @@
 export { closePrometheus, initPrometheus } from './initPrometheus'
 export { observeDataSourceRefresh } from './dataSourceMetrics'
+export { incApiCommand, parseCommandRequestPath, type ApiCommandOutcome } from './commandMetrics'
 export { observeHttpFetch, observeHttpRequest, type HttpContentFormat } from './httpMetrics'
 export { registerWsMetrics } from './wsMetrics'

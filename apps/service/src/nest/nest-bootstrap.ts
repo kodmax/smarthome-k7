@@ -6,6 +6,7 @@ import { AppModule, BootstrapDeps } from './app.module'
 import { nestLogger } from './logger/nest-logger'
 import { PinoNestLoggerService } from './logger/pino-nest-logger.service'
 import { HttpExceptionFilter } from './filters/http-exception.filter'
+import { CommandMetricsInterceptor } from './interceptors/command-metrics.interceptor'
 
 const DEFAULT_PORT = 3679
 const JSON_BODY_LIMIT = '1mb'
@@ -17,6 +18,7 @@ export const createNestApp = async (deps: BootstrapDeps) => {
 
   app.useBodyParser('json', { limit: JSON_BODY_LIMIT })
   app.useGlobalFilters(new HttpExceptionFilter())
+  app.useGlobalInterceptors(new CommandMetricsInterceptor())
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
