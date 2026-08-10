@@ -16,7 +16,6 @@ const main = async () => {
 
   const sourcemapDirs = [
     join(serviceRoot, 'dist'),
-    join(repoRoot, 'packages/apollo-ws/dist'),
     join(repoRoot, 'packages/feeds/dist'),
     join(repoRoot, 'packages/db/dist'),
     join(repoRoot, 'packages/chronos/dist'),

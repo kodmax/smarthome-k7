@@ -27,6 +27,6 @@ RUN chmod +x /entrypoint.sh
 
 WORKDIR /app/apps/service
 
-EXPOSE 3678 9464
+EXPOSE 3679 9464
 
 ENTRYPOINT ["/entrypoint.sh"]

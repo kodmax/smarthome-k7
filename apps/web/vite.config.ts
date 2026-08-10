@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/ws': {
-          target: 'ws://127.0.0.1:3678',
+          target: 'ws://127.0.0.1:3679',
           ws: true,
         },
         '/api/': {

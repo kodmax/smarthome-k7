@@ -1,7 +1,7 @@
 # `@repo/feeds`
 
-Feed framework used by `apps/service`. Works together with `@repo/apollo-ws` (WebSocket on port **3678**). Client:
-`@repo/feed-client`.
+Feed framework used by `apps/service`. WebSocket transport: Nest gateway in `apps/service` (`/ws` on port **3679**).
+Client: `@repo/feed-client`.
 
 Business logic and feed definitions live in `apps/service/src/feeds/**` and `apps/service/src/data-sources/**` — keep
 this package infrastructure-only.
@@ -15,16 +15,16 @@ DataSourceRegistry.add(id, SourceClass)
     → data-update event
 FeedComposer.addFeed(feedId, getByIds([...]), cb)
     → feed-changed event (or getFeedData for REST read)
-Server (@repo/apollo-ws, debounce 1 s)
+FeedWebSocketService (Nest, debounce 1 s)
     → WebSocket FEED-UPDATE notifications
 ```
 
-Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `DataSourceRegistry.close()` stops Chronos jobs, then
-`Server.close()` clears debounce timers and closes WebSocket connections.
+Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `DataSourceRegistry.close()` stops Chronos jobs; Nest
+`close()` clears WebSocket debounce timers and connections.
 
 ## Event bus (`FeedEvents`)
 
-Create one instance in service and pass it to `Server.listen()`, `DataSourceRegistry`, and `FeedComposer`. Pass Pino
+Create one instance in service and pass it to `DataSourceRegistry`, `FeedComposer`, and Nest `EventsModule`. Pass Pino
 `Logger` via options for operational logging.
 
 | Event             | Payload                        | When                                                 |
@@ -94,4 +94,4 @@ yarn lint
 ## Tests still to add (P4)
 
 `FeedComposer.test.ts` and `DataSourceRegistry.test.ts` cover registration, composition, and maintenance. Still missing:
-`Server` protocol/debounce (in `@repo/apollo-ws`). Cron scheduling lives in `@repo/chronos`.
+`FeedWebSocketService` protocol/debounce (in `apps/service`). Cron scheduling lives in `@repo/chronos`.

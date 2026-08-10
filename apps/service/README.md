@@ -6,7 +6,7 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 
 - Node.js (CommonJS), TypeScript
 - esbuild (bundling)
-- `@repo/feeds`, `@repo/apollo-ws`, `js-knx`, `@repo/db`, `@repo/transmission`, Vitest
+- `@repo/feeds`, `js-knx`, `@repo/db`, `@repo/transmission`, Vitest
 
 ## Startup
 
@@ -15,10 +15,11 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 1. `FeedEvents` — shared event bus
 2. `DataSourceRegistry` — register all source classes (cron + nightly maintenance)
 3. `FeedComposer` — compose feeds from registry instances
-4. `@repo/apollo-ws` `Server.listen()` — WebSocket on port **3678**
+4. Nest WebSocket gateway — `/ws` on port **3679** (same process as HTTP API)
 5. `initWebFeeds()` / `initKnxFeeds()` — register sources, then `feeds.addFeed(...)`
 
-Graceful shutdown (`graceful-shutdown.ts`): KNX cron → `dataSources.close()` → KNX disconnect → WebSocket close.
+Graceful shutdown (`graceful-shutdown.ts`): KNX cron → `dataSources.close()` → KNX disconnect → Nest close (WebSocket +
+HTTP).
 
 ## Running
 
@@ -30,7 +31,7 @@ yarn workspace service dev        # service only (no web, no @repo/* watchers)
 yarn workspace service start      # production (after build)
 ```
 
-The WebSocket server listens on port **3678**.
+HTTP API and WebSocket share port **3679** (`API_PORT`). WebSocket path: `/ws`.
 
 ## Environment variables
 
@@ -76,7 +77,6 @@ KNX cron jobs (energy logging, clock sync, indoor readings) run in-process via `
 | Package              | Role                                            |
 | -------------------- | ----------------------------------------------- |
 | `@repo/feeds`        | Data sources, cache, registry, feed composition |
-| `@repo/apollo-ws`    | WebSocket server                                |
 | `@repo/cron-scripts` | KNX scheduled jobs (in-process)                 |
 | `@repo/db`           | Shared MariaDB pool + migrations                |
 | `@repo/transmission` | Transmission BitTorrent RPC client              |

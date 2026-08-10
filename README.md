@@ -11,7 +11,6 @@ WebSocket.
 | [`apps/service`](apps/service)                             | Backend — feeds, cache, WebSocket             |
 | [`apps/mcp`](apps/mcp)                                     | MCP server for Cursor (dashboard tools)       |
 | [`packages/feeds`](packages/feeds)                         | Data sources, cache, registry, feed composer  |
-| [`packages/apollo-ws`](packages/apollo-ws)                 | WebSocket server (port 3678)                  |
 | [`packages/apollo-card`](packages/apollo-card)             | Zoomable dashboard card shell                 |
 | [`packages/feed-client`](packages/feed-client)             | React hooks for feed subscriptions            |
 | [`packages/types`](packages/types)                         | Shared feed payload types                     |
@@ -40,8 +39,8 @@ yarn install
 yarn dev
 ```
 
-Starts `apps/web` (Vite) and `apps/service` (WebSocket backend on port **3678**) in parallel. The frontend connects via
-`ws(s)://<host>/ws` (Vite dev proxy → `:3678`).
+Starts `apps/web` (Vite) and `apps/service` (HTTP + WebSocket on port **3679**) in parallel. The frontend connects via
+`ws(s)://<host>/ws` (Vite dev proxy → `:3679`).
 
 Individually:
 
@@ -71,7 +70,7 @@ yarn workspace service dev
 ```
 apps/service
     ├── @repo/feeds        DataSourceRegistry + FeedComposer + cache
-    ├── @repo/apollo-ws    WebSocket :3678
+    ├── Nest WebSocket     /ws on :3679
     ├── @repo/knx-schema
     ├── @repo/db
     ├── @repo/cron-scripts (KNX jobs)
@@ -94,7 +93,7 @@ KNX scheduled tasks (energy logging, clock sync, indoor readings) run inside [`a
 - **Database migrations:** copy `packages/db/.env.example` → `packages/db/.env` (`DB_MIGRATE_*` — can differ from
   service, e.g. DDL user).
 - **Web:** optional `VITE_BACKEND_BASE_URL` (defaults to page origin; WebSocket at `/ws`, API at `/api`; Vite dev proxy
-  forwards to `:3678` / `:3679`).
+  forwards to `:3679`).
 - **MCP:** copy `apps/mcp/.env.example` → `.env` (`APOLLO_WS_URL`, optional `APOLLO_WS_CA_FILE`).
 
 ## Docker Compose (Mac / practice)
@@ -107,8 +106,8 @@ cp apps/service/.env.docker.example apps/service/.env.docker
 docker compose up --build
 ```
 
-Open **http://localhost** — WebSocket uses `ws://localhost/ws` (nginx proxies to service). For UI hot reload, use
-`yarn dev` instead of the `web` container and map service port `3678:3678` if needed.
+Open **http://localhost** — WebSocket uses `ws://localhost/ws` (nginx proxies to service :3679). For UI hot reload, use
+`yarn dev` instead of the `web` container.
 
 | Action                      | Database                |
 | --------------------------- | ----------------------- |
@@ -143,7 +142,7 @@ yarn db:migrate
 yarn dev
 ```
 
-Vite serves the UI and proxies `/ws` → `localhost:3678` — no extra config. Stop deps:
+Vite serves the UI and proxies `/ws` → `localhost:3679` — no extra config. Stop deps:
 `docker compose -f docker-compose.deps.yml down`.
 
 Uses the same `postgres-data` volume as the full stack, so data survives switching between modes.

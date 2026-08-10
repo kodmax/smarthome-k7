@@ -42,10 +42,9 @@ defines them, not the extended preset.
 
 ## Consumers
 
-`apps/web`, `apps/mcp`, `apps/service`, `@repo/apollo-card`, `@repo/apollo-ws`, `@repo/chronos`, `@repo/common`,
-`@repo/cron-scripts`, `@repo/db`, `@repo/di`, `@repo/env`, `@repo/feeds`, `@repo/feed-client`, `@repo/i18n-react`,
-`@repo/knx-schema`, `@repo/logger`, `@repo/transmission`, `@repo/types`, `@repo/assets`, and other packages with a local
-`tsconfig.json`.
+`apps/web`, `apps/mcp`, `apps/service`, `@repo/apollo-card`, `@repo/chronos`, `@repo/common`, `@repo/cron-scripts`,
+`@repo/db`, `@repo/di`, `@repo/env`, `@repo/feeds`, `@repo/feed-client`, `@repo/i18n-react`, `@repo/knx-schema`,
+`@repo/logger`, `@repo/transmission`, `@repo/types`, `@repo/assets`, and other packages with a local `tsconfig.json`.
 
 ## Scripts
 

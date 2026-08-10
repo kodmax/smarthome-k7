@@ -1,7 +1,6 @@
 #!/usr/bin/ts-node
 import './load-env'
 process.setMaxListeners(11)
-import { Server } from '@repo/apollo-ws'
 import { FSCache, RedisCache, FeedComposer, FeedEvents, DataSourceRegistry } from '@repo/feeds'
 import { Chronos } from '@repo/chronos'
 import { getSql } from '@repo/db'
@@ -12,13 +11,7 @@ import { appMode, isDevelopment } from '@repo/env'
 import { getDependency, registerDependency } from './di'
 import { initKnxFeeds, initWebFeeds } from './feeds'
 import { knxInit } from './knx-init'
-import {
-  registerApollo,
-  registerDataSources,
-  registerKnxCron,
-  registerNestApp,
-  setupGracefulShutdown,
-} from './graceful-shutdown'
+import { registerDataSources, registerKnxCron, registerNestApp, setupGracefulShutdown } from './graceful-shutdown'
 import { createNestApp } from './nest/nest-bootstrap'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
@@ -83,12 +76,6 @@ const main = async () => {
     onError: reportProductionError,
   })
 
-  const apollo = await Server.listen({
-    logger: serviceLogger.child({ component: 'ws' }, { level: readScopedLogLevel('ws') }),
-    onError: reportProductionError,
-    feedEvents,
-  })
-  registerApollo(apollo)
   registerDataSources(dataSources)
 
   registerWsMetrics(feedEvents)
@@ -114,7 +101,14 @@ const main = async () => {
 
   serviceLogger.info({ feedCount: feeds.getFeedCount() }, 'Feeds initialized')
 
-  registerNestApp(await createNestApp({ dataSources, feeds }))
+  registerNestApp(
+    await createNestApp({
+      dataSources,
+      feeds,
+      feedEvents,
+      onError: reportProductionError,
+    }),
+  )
 
   serviceLogger.info(
     {

@@ -1,7 +1,7 @@
 # @repo/feeds
 
 Feed framework for `apps/service` — data sources, cache, registry, and feed composition. WebSocket transport lives in
-[`@repo/apollo-ws`](../apollo-ws).
+[`apps/service`](../../apps/service) (Nest gateway at `/ws`).
 
 ## Architecture
 
@@ -12,7 +12,7 @@ FeedComposer.addFeed(feedId, getByIds([...]), cb)   ← composes multi-source fe
         ↓
 FeedEvents (feed-changed / data-update / refresh / error)
         ↓
-@repo/apollo-ws Server   ← debounce + FEED-UPDATE <id> notification
+Nest FeedWebSocketService   ← debounce + FEED-UPDATE <id> notification
 ```
 
 Business logic (scrapers, KNX classes, feed wiring) stays in [`apps/service`](../../apps/service). This package is

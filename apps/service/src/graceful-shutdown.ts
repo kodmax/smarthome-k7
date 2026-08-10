@@ -1,5 +1,4 @@
 import type { INestApplication } from '@nestjs/common'
-import type { Server } from '@repo/apollo-ws'
 import type { Logger } from '@repo/logger'
 import { closeSql } from '@repo/db'
 import { closePrometheus } from './prometheus'
@@ -9,7 +8,6 @@ import type { KnxLink } from 'js-knx'
 
 let knxLink: KnxLink | undefined
 let knxCron: { stop(): void } | undefined
-let apolloServer: Server | undefined
 let nestApp: INestApplication | undefined
 let dataSourceRegistry: { close(): void } | undefined
 let shuttingDown = false
@@ -25,10 +23,6 @@ export const registerKnxCron = (chronos: { stop(): void }): void => {
 
 export const registerDataSources = (registry: { close(): void }): void => {
   dataSourceRegistry = registry
-}
-
-export const registerApollo = (server: Server): void => {
-  apolloServer = server
 }
 
 export const registerNestApp = (ctx: INestApplication): void => {
@@ -62,11 +56,6 @@ const closeConnections = async (logger: Logger): Promise<void> => {
       shutdownLogger?.error({ err, step: 'knx' }, 'KNX disconnect failed')
       captureProductionError(err)
     }
-  }
-
-  if (apolloServer !== undefined) {
-    await apolloServer.close()
-    logger.info({ step: 'ws' }, 'Shutdown step complete')
   }
 
   if (await closeRedisClient()) {

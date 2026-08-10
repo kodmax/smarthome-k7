@@ -13,10 +13,6 @@
       "path": "apps/service"
     },
     {
-      "name": "packages/apollo-ws",
-      "path": "packages/apollo-ws"
-    },
-    {
       "name": "packages/cloudflare",
       "path": "packages/cloudflare"
     },
