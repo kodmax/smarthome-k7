@@ -175,7 +175,7 @@ abstract class DataSource<T, TCache = T> {
           const content = await this.composeContent(cached)
           resolve(content)
 
-          this.logger.info({ sourceId, forceRefresh, durationMs: Date.now() - start }, 'Data source content refreshed')
+          this.logger.debug({ sourceId, forceRefresh, durationMs: Date.now() - start }, 'Data source content refreshed')
           this.updating = void 0
         })
         .catch(e => {

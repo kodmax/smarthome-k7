@@ -52,7 +52,7 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
       }
 
       try {
-        this.logger.info({ sourceId }, 'Data source refresh requested')
+        this.logger.debug({ sourceId }, 'Data source refresh requested')
         await ds.getData(true)
       } catch (e) {
         this.logger.warn({ err: e, sourceId }, 'Refresh data source error')
@@ -112,7 +112,7 @@ export class DataSourceRegistry<T extends RegistryBaseType> {
         policy: ctor.getCronPolicy(),
         script: async () => {
           try {
-            this.logger.info({ sourceId, cron }, 'Data source scheduled refresh')
+            this.logger.debug({ sourceId, cron }, 'Data source scheduled refresh')
             await ds.getData(true)
           } catch (e) {
             this.logger.warn({ err: e, sourceId }, 'Crontab data source update error')

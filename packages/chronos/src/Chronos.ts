@@ -94,7 +94,7 @@ export class Chronos {
     job.activeRuns++
     job.state = JobState.RUNNING
 
-    this.logger?.info({ jobId: job.jobId, attempt, scheduledAt }, 'Crontab job starting')
+    this.logger?.debug({ jobId: job.jobId, attempt, scheduledAt }, 'Crontab job starting')
     const start = Date.now()
 
     const ctx: JobRunContext = {
@@ -121,7 +121,7 @@ export class Chronos {
       }
 
       job.state = JobState.IDLE
-      this.logger?.info(
+      this.logger?.debug(
         { jobId: job.jobId, attempt, scheduledAt, durationMs: Date.now() - start },
         'Crontab job completed',
       )

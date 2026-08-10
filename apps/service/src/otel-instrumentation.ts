@@ -1,3 +1,4 @@
+import './load-env'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { rootLogger } from '@repo/logger'
 

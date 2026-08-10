@@ -1,4 +1,5 @@
 #!/usr/bin/ts-node
+import './load-env'
 process.setMaxListeners(11)
 import { Server } from '@repo/apollo-ws'
 import { FSCache, RedisCache, FeedComposer, FeedEvents, DataSourceRegistry } from '@repo/feeds'
