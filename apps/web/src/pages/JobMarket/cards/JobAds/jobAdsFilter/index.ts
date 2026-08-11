@@ -1,5 +1,6 @@
 export { DEFAULT_JOB_ADS_FILTER, JOB_ADS_FILTER_ORDER, filterJobAdsByCategory, type JobAdsFilter } from './jobAdsFilter'
 export { filterJobAdsByRequiredSkills } from './filterJobAdsByRequiredSkills'
+export { filterJobAdsByAppliedAt } from './filterJobAdsByAppliedAt'
 export {
   DEFAULT_EXPANDED_ARCHIVED_GROUPS,
   JOB_AD_ARCHIVE_REASON_ORDER,

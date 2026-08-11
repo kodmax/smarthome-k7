@@ -215,7 +215,7 @@ describe('applicationMeta', () => {
     })
   })
 
-  it('rejects rearchive outside pre-application reasons', () => {
+  it('allows rearchive between post-application archive reasons', () => {
     expect(
       applyStatusChange(
         {
@@ -228,7 +228,14 @@ describe('applicationMeta', () => {
         },
         { applyStatus: 'archived', archiveReason: 'withdrawn' },
       ),
-    ).toBeNull()
+    ).toEqual({
+      applyStatus: 'archived',
+      archiveReason: 'withdrawn',
+      comment: null,
+      appliedAt: '2026-07-18T12:00:00.000Z',
+      rejectedAt: '2026-07-19T12:00:00.000Z',
+      statusChangedAt: null,
+    })
   })
 
   it('allows interview to archived with offer-accepted', () => {

@@ -40,6 +40,12 @@ const INTERVIEW_ARCHIVE_REASONS = [
   'offer-accepted',
 ] as const satisfies readonly JobAdArchiveReason[]
 
+const ALL_ARCHIVE_REASONS = [
+  ...PRE_APPLICATION_ARCHIVE_REASONS,
+  ...POST_APPLICATION_ARCHIVE_REASONS,
+  'offer-accepted',
+] as const satisfies readonly JobAdArchiveReason[]
+
 const STATUS_TRANSITIONS: Record<JobApplyStatus, readonly JobApplyStatus[]> = {
   'pending-review': ['consider', 'applied'],
   consider: ['applied'],
@@ -88,11 +94,7 @@ export function isPreApplicationArchiveReason(reason: JobAdArchiveReason): boole
 }
 
 export function availableRearchiveReasons(currentArchiveReason: JobAdArchiveReason): JobAdArchiveReason[] {
-  if (!isPreApplicationArchiveReason(currentArchiveReason)) {
-    return []
-  }
-
-  return [...PRE_APPLICATION_ARCHIVE_REASONS]
+  return ALL_ARCHIVE_REASONS.filter(reason => reason !== currentArchiveReason)
 }
 
 function canRearchive(
@@ -103,7 +105,6 @@ function canRearchive(
     fromArchiveReason !== null &&
     toArchiveReason !== null &&
     toArchiveReason !== fromArchiveReason &&
-    isPreApplicationArchiveReason(fromArchiveReason) &&
     availableRearchiveReasons(fromArchiveReason).includes(toArchiveReason)
   )
 }
@@ -150,8 +151,15 @@ export function availableTargetStatuses(
       return []
     }
 
-    const targets = [...availableUnarchiveTargets(archiveReason)]
-    if (isPreApplicationArchiveReason(archiveReason)) {
+    const unarchive = [...availableUnarchiveTargets(archiveReason)]
+    const rearchiveAvailable = availableRearchiveReasons(archiveReason).length > 0
+
+    if (unarchive.length === 0 && rearchiveAvailable) {
+      return ['archived']
+    }
+
+    const targets = [...unarchive]
+    if (rearchiveAvailable) {
       targets.push('archived')
     }
 

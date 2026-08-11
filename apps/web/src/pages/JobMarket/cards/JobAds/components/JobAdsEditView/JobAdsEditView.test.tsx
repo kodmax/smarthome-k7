@@ -63,4 +63,35 @@ describe('JobAdsEditView archived filter', () => {
     expect(screen.getByText('Matching Role')).toBeInTheDocument()
     expect(screen.queryByText('Partial Role')).not.toBeInTheDocument()
   })
+
+  it('filters archived ads by appliedAt when onlyAppliedArchived is enabled', () => {
+    renderWithTheme(
+      <JobAdsEditView
+        zoom={true}
+        filter='archived'
+        onlyAppliedArchived={true}
+        ads={[
+          jobAd({
+            id: '1',
+            title: 'Applied archived',
+            meta: {
+              application: {
+                status: 'archived',
+                archiveReason: 'rejected',
+                appliedAt: '2026-01-01T00:00:00.000Z',
+              },
+            },
+          }),
+          jobAd({
+            id: '2',
+            title: 'Skipped archived',
+            meta: { application: { status: 'archived', archiveReason: 'other', appliedAt: null } },
+          }),
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('Applied archived')).toBeInTheDocument()
+    expect(screen.queryByText('Skipped archived')).not.toBeInTheDocument()
+  })
 })

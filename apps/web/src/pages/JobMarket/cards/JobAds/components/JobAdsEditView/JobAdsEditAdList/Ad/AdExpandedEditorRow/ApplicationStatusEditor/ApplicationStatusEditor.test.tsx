@@ -364,7 +364,9 @@ describe('ApplicationStatusEditor', () => {
     })
   })
 
-  it('does not offer status changes for post-application archived ads without unarchive targets', () => {
+  it('offers archived-only status change for post-application archived ads to rearchive', () => {
+    const onSave = vi.fn()
+
     renderWithTheme(
       <ApplicationStatusEditor
         ad={jobAd({
@@ -372,7 +374,7 @@ describe('ApplicationStatusEditor', () => {
           title: 'Role',
           meta: { application: { status: 'archived', archiveReason: 'rejected' } },
         })}
-        onSave={vi.fn()}
+        onSave={onSave}
         onFav={vi.fn()}
         onUnfav={vi.fn()}
         onAnalyzeCvMatch={vi.fn()}
@@ -381,8 +383,22 @@ describe('ApplicationStatusEditor', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Zmień stan' }))
 
-    expect(screen.queryByLabelText('Nowy status')).not.toBeInTheDocument()
-    expect(screen.getByLabelText('Komentarz')).toBeInTheDocument()
+    expect(screen.getByLabelText('Nowy status')).toBeInTheDocument()
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Nowy status' }))
+    expect(screen.getByRole('option', { name: 'Zarchiwizowane' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Rozmowa' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Zaaplikowane' })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('option', { name: 'Zarchiwizowane' }))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Powód archiwizacji' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Rozmyśliłem się' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }))
+
+    expect(onSave).toHaveBeenCalledWith({
+      applyStatus: 'archived',
+      archiveReason: 'withdrawn',
+      comment: '',
+    })
   })
 
   it('submits the selected status and trimmed comment', () => {

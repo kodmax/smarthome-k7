@@ -365,6 +365,8 @@ export const ru: Translations = {
       filters: {
         label: 'Фильтр',
         skillsLabel: 'Навыки',
+        appliedOnlyLabel: 'Показать только откликнутые',
+        appliedOnlyActiveLabel: 'Показать все архивные',
       },
       acceptableSalary: {
         label: 'Минимальная зарплата',

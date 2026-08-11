@@ -8,6 +8,7 @@ import { useTranslations } from '@/i18n'
 import { DEFAULT_JOB_ADS_FILTER, type JobAdsFilter } from './jobAdsFilter'
 import { countJobAdsEditViewAds, JobAdsEditView } from './components/JobAdsEditView'
 import { JobAdsFilterSelect } from './components/JobAdsFilterSelect'
+import { JobAdsAppliedFilterToggle } from './components/JobAdsAppliedFilterToggle'
 import { JobAdsSkillsFilter } from './components/JobAdsSkillsFilter'
 import { AcceptableSalarySlider } from './components/AcceptableSalarySlider'
 import { AddManualJobAdDialog } from './components/AddManualJobAdDialog'
@@ -16,6 +17,7 @@ import { collectSkillFilterOptions, collectSkillSuggestions } from './requiredSk
 export const JobAds: FC<Record<string, never>> = () => {
   const [adsFilter, setAdsFilter] = useState<JobAdsFilter>(DEFAULT_JOB_ADS_FILTER)
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
+  const [onlyAppliedArchived, setOnlyAppliedArchived] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const theme = useTheme()
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'))
@@ -28,6 +30,9 @@ export const JobAds: FC<Record<string, never>> = () => {
 
   const onAdsFilterChange = useCallback((filter: JobAdsFilter) => {
     setAdsFilter(filter)
+    if (filter !== 'archived') {
+      setOnlyAppliedArchived(false)
+    }
   }, [])
 
   const onAddManualJobAd = useCallback(
@@ -62,7 +67,7 @@ export const JobAds: FC<Record<string, never>> = () => {
         height={14}
         extraHeight={4}
         allowZoom={false}
-        headingInfo={countJobAdsEditViewAds(feed.ads, adsFilter, selectedSkills)}
+        headingInfo={countJobAdsEditViewAds(feed.ads, adsFilter, selectedSkills, onlyAppliedArchived)}
         actions={
           isSmUp ? (
             <>
@@ -70,13 +75,25 @@ export const JobAds: FC<Record<string, never>> = () => {
                 <AcceptableSalarySlider salaryRange={feed.salaryRange} acceptableSalary={feed.acceptableSalary} />
               ) : null}
               <ApolloCardAction title={labels.addManualJobAd} onClick={() => setDialogOpen(true)} Icon={PlusIcon} />
+              {adsFilter === 'archived' ? (
+                <JobAdsAppliedFilterToggle
+                  active={onlyAppliedArchived}
+                  onToggle={() => setOnlyAppliedArchived(current => !current)}
+                />
+              ) : null}
               <JobAdsSkillsFilter options={skillFilterOptions} value={selectedSkills} onChange={setSelectedSkills} />
               <JobAdsFilterSelect value={adsFilter} onChange={onAdsFilterChange} />
             </>
           ) : undefined
         }
       >
-        <JobAdsEditView ads={feed.ads} zoom={true} filter={adsFilter} skillsFilter={selectedSkills} />
+        <JobAdsEditView
+          ads={feed.ads}
+          zoom={true}
+          filter={adsFilter}
+          skillsFilter={selectedSkills}
+          onlyAppliedArchived={onlyAppliedArchived}
+        />
       </BaseCard>
       <AddManualJobAdDialog
         open={dialogOpen}

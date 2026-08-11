@@ -3,6 +3,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 let isProduction = false
 
+const silentLogger = {
+  warn: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  debug: vi.fn(),
+  child: vi.fn(),
+}
+
+silentLogger.child.mockReturnValue(silentLogger)
+
 vi.mock('@repo/env', () => ({
   get isProduction() {
     return isProduction
@@ -10,6 +20,14 @@ vi.mock('@repo/env', () => ({
   get isDevelopment() {
     return !isProduction
   },
+}))
+
+vi.mock('@/sentry', () => ({
+  captureProductionError: vi.fn(),
+}))
+
+vi.mock('../logger/nest-logger', () => ({
+  nestLogger: () => silentLogger,
 }))
 
 import { HttpExceptionFilter } from './http-exception.filter'
@@ -28,6 +46,7 @@ const createHost = (statusMock: ReturnType<typeof vi.fn>, jsonMock: ReturnType<t
 describe('HttpExceptionFilter', () => {
   beforeEach(() => {
     isProduction = false
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

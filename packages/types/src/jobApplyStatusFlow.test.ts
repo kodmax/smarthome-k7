@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   availableArchiveReasons,
+  availableRearchiveReasons,
   availableTargetStatuses,
   availableTransitions,
   availableUnarchiveTargets,
@@ -88,24 +89,47 @@ describe('jobApplyStatusFlow', () => {
 
   it('lists unarchive targets as target statuses from archived', () => {
     expect(availableTargetStatuses('archived', 'other')).toEqual(['pending-review', 'consider', 'archived'])
-    expect(availableTargetStatuses('archived', 'no-response')).toEqual(['interview'])
-    expect(availableTargetStatuses('archived', 'rejected')).toEqual([])
+    expect(availableTargetStatuses('archived', 'no-response')).toEqual(['interview', 'archived'])
+    expect(availableTargetStatuses('archived', 'rejected')).toEqual(['archived'])
+    expect(availableTargetStatuses('archived', 'withdrawn')).toEqual(['archived'])
     expect(availableTargetStatuses('archived', null)).toEqual([])
   })
 
-  it('allows pre-application rearchive within archived status', () => {
+  it('lists rearchive reasons for any archive reason except the current one', () => {
+    expect(availableRearchiveReasons('withdrawn')).toHaveLength(9)
+    expect(availableRearchiveReasons('withdrawn')).not.toContain('withdrawn')
+    expect(availableRearchiveReasons('other')).toHaveLength(9)
+    expect(availableRearchiveReasons('other')).not.toContain('other')
+  })
+
+  it('allows rearchive between archive reasons while staying archived', () => {
     expect(canTransition('archived', 'archived', 'other', 'weak-match')).toBe(true)
-    expect(canTransition('archived', 'archived', 'other', 'rejected')).toBe(false)
-    expect(canTransition('archived', 'archived', 'rejected', 'withdrawn')).toBe(false)
+    expect(canTransition('archived', 'archived', 'other', 'rejected')).toBe(true)
+    expect(canTransition('archived', 'archived', 'rejected', 'withdrawn')).toBe(true)
+    expect(canTransition('archived', 'archived', 'withdrawn', 'rejected')).toBe(true)
     expect(availableTransitions('archived', 'stack-mismatch')).toEqual([
       { to: 'pending-review' },
       { to: 'consider' },
+      { to: 'archived', archiveReason: 'other' },
+      { to: 'archived', archiveReason: 'unmet-requirements' },
+      { to: 'archived', archiveReason: 'weak-match' },
+      { to: 'archived', archiveReason: 'manager-track' },
+      { to: 'archived', archiveReason: 'company-excluded' },
+      { to: 'archived', archiveReason: 'rejected' },
+      { to: 'archived', archiveReason: 'withdrawn' },
+      { to: 'archived', archiveReason: 'no-response' },
+      { to: 'archived', archiveReason: 'offer-accepted' },
+    ])
+    expect(availableTransitions('archived', 'withdrawn')).toEqual([
       { to: 'archived', archiveReason: 'other' },
       { to: 'archived', archiveReason: 'unmet-requirements' },
       { to: 'archived', archiveReason: 'stack-mismatch' },
       { to: 'archived', archiveReason: 'weak-match' },
       { to: 'archived', archiveReason: 'manager-track' },
       { to: 'archived', archiveReason: 'company-excluded' },
+      { to: 'archived', archiveReason: 'rejected' },
+      { to: 'archived', archiveReason: 'no-response' },
+      { to: 'archived', archiveReason: 'offer-accepted' },
     ])
   })
 })

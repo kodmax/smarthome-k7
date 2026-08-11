@@ -252,6 +252,7 @@ export async function deleteStaleJobAds(db: Sql, retentionDays: number): Promise
       db`
       delete from job_ads
       where last_seen < now() - ${`${retentionDays} days`}::interval
+        and data->'meta'->'application'->>'appliedAt' is null
     `,
   )
 

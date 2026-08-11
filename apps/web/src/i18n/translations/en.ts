@@ -365,6 +365,8 @@ export const en: Translations = {
       filters: {
         label: 'Filter',
         skillsLabel: 'Skills',
+        appliedOnlyLabel: 'Show applied only',
+        appliedOnlyActiveLabel: 'Show all archived',
       },
       acceptableSalary: {
         label: 'Minimum salary',

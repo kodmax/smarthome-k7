@@ -5,6 +5,7 @@ import { useCommand } from '@repo/feed-client'
 import { useTranslations } from '@/i18n'
 import {
   type JobAdsFilter,
+  filterJobAdsByAppliedAt,
   filterJobAdsByCategory,
   filterJobAdsByRequiredSkills,
   groupArchivedJobAdsByReason,
@@ -18,9 +19,10 @@ type Props = {
   zoom: boolean
   filter: JobAdsFilter
   skillsFilter?: string[]
+  onlyAppliedArchived?: boolean
 }
 
-export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter, skillsFilter = [] }) => {
+export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter, skillsFilter = [], onlyAppliedArchived = false }) => {
   const { t } = useTranslations()
   const [expandedAdId, setExpandedAdId] = useState<string | null>(null)
 
@@ -31,8 +33,9 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter, skillsFilter = []
 
   const filteredAds = useMemo(() => {
     const byStatus = filterJobAdsByCategory(ads ?? [], filter)
-    return filterJobAdsByRequiredSkills(byStatus, skillsFilter)
-  }, [ads, filter, skillsFilter])
+    const bySkills = filterJobAdsByRequiredSkills(byStatus, skillsFilter)
+    return filter === 'archived' && onlyAppliedArchived ? filterJobAdsByAppliedAt(bySkills, true) : bySkills
+  }, [ads, filter, skillsFilter, onlyAppliedArchived])
   const archivedGroups = useMemo(
     () => (filter === 'archived' ? groupArchivedJobAdsByReason(filteredAds) : null),
     [filter, filteredAds],
@@ -88,6 +91,10 @@ export function countJobAdsEditViewAds(
   ads: JobAdsFeedItem[] | undefined,
   filter: JobAdsFilter,
   skillsFilter: string[] = [],
+  onlyAppliedArchived = false,
 ): number {
-  return filterJobAdsByRequiredSkills(filterJobAdsByCategory(ads ?? [], filter), skillsFilter).length
+  const byStatus = filterJobAdsByCategory(ads ?? [], filter)
+  const bySkills = filterJobAdsByRequiredSkills(byStatus, skillsFilter)
+  const filtered = filter === 'archived' && onlyAppliedArchived ? filterJobAdsByAppliedAt(bySkills, true) : bySkills
+  return filtered.length
 }

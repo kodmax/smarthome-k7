@@ -170,4 +170,109 @@ describe('JobAds', () => {
     expect(screen.queryByText('Applied Plain Role')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'React' })).toBeInTheDocument()
   })
+
+  it('shows applied filter toggle only on archived view', () => {
+    mockJobAdsFeeds(
+      jobAdsFeed(
+        jobAd({
+          id: '1',
+          title: 'Archived Role',
+          meta: { application: { status: 'archived', archiveReason: 'other' } },
+        }),
+      ),
+    )
+
+    render(<JobAds />)
+
+    expect(screen.queryByRole('button', { name: 'Pokaż tylko zaaplikowane' })).not.toBeInTheDocument()
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Filtr' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Zarchiwizowane' }))
+
+    expect(screen.getByRole('button', { name: 'Pokaż tylko zaaplikowane' })).toBeInTheDocument()
+  })
+
+  it('toggles archived applied-only filter', () => {
+    mockJobAdsFeeds(
+      jobAdsFeed(
+        jobAd({
+          id: '1',
+          title: 'Applied archived',
+          meta: {
+            application: {
+              status: 'archived',
+              archiveReason: 'rejected',
+              appliedAt: '2026-01-01T00:00:00.000Z',
+            },
+          },
+        }),
+        jobAd({
+          id: '2',
+          title: 'Skipped archived',
+          meta: { application: { status: 'archived', archiveReason: 'other', appliedAt: null } },
+        }),
+      ),
+    )
+
+    render(<JobAds />)
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Filtr' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Zarchiwizowane' }))
+
+    expect(screen.getByText('Applied archived')).toBeInTheDocument()
+    expect(screen.getByText('Skipped archived')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pokaż tylko zaaplikowane' }))
+
+    expect(screen.getByText('Applied archived')).toBeInTheDocument()
+    expect(screen.queryByText('Skipped archived')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Pokaż wszystkie zarchiwizowane' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pokaż wszystkie zarchiwizowane' }))
+
+    expect(screen.getByText('Skipped archived')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Pokaż tylko zaaplikowane' })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('resets applied filter when leaving archived view', () => {
+    mockJobAdsFeeds(
+      jobAdsFeed(
+        jobAd({
+          id: '1',
+          title: 'Applied archived',
+          meta: {
+            application: {
+              status: 'archived',
+              archiveReason: 'rejected',
+              appliedAt: '2026-01-01T00:00:00.000Z',
+            },
+          },
+        }),
+        jobAd({
+          id: '2',
+          title: 'Skipped archived',
+          meta: { application: { status: 'archived', archiveReason: 'other', appliedAt: null } },
+        }),
+      ),
+    )
+
+    render(<JobAds />)
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Filtr' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Zarchiwizowane' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Pokaż tylko zaaplikowane' }))
+
+    expect(screen.queryByText('Skipped archived')).not.toBeInTheDocument()
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Filtr' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Do przejrzenia' }))
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Filtr' }))
+    fireEvent.click(screen.getByRole('option', { name: 'Zarchiwizowane' }))
+
+    expect(screen.getByText('Skipped archived')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Pokaż tylko zaaplikowane' })).toHaveAttribute('aria-pressed', 'false')
+  })
 })

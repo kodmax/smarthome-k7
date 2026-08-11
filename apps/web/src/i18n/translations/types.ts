@@ -326,6 +326,8 @@ export type Translations = {
       filters: {
         label: string
         skillsLabel: string
+        appliedOnlyLabel: string
+        appliedOnlyActiveLabel: string
       }
       acceptableSalary: {
         label: string

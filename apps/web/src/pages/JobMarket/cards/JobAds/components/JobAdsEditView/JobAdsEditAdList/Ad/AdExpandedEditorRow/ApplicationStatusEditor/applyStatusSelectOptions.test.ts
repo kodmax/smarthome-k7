@@ -16,8 +16,9 @@ describe('applyStatusTargetStatuses', () => {
 
   it('returns unarchive targets and archived from pre-application archived', () => {
     expect(applyStatusTargetStatuses('archived', 'other')).toEqual(['pending-review', 'consider', 'archived'])
-    expect(applyStatusTargetStatuses('archived', 'no-response')).toEqual(['interview'])
-    expect(applyStatusTargetStatuses('archived', 'rejected')).toEqual([])
+    expect(applyStatusTargetStatuses('archived', 'no-response')).toEqual(['interview', 'archived'])
+    expect(applyStatusTargetStatuses('archived', 'rejected')).toEqual(['archived'])
+    expect(applyStatusTargetStatuses('archived', 'withdrawn')).toEqual(['archived'])
   })
 })
 
@@ -41,16 +42,20 @@ describe('applyArchiveReasonOptions', () => {
     expect(applyArchiveReasonOptions('interview')).toEqual(['rejected', 'withdrawn', 'offer-accepted'])
   })
 
-  it('returns pre-application rearchive reasons from archived pre-application ads', () => {
+  it('returns rearchive reasons from archived ads', () => {
     expect(applyArchiveReasonOptions('archived', 'other')).toEqual([
-      'other',
       'unmet-requirements',
       'stack-mismatch',
       'weak-match',
       'manager-track',
       'company-excluded',
+      'rejected',
+      'withdrawn',
+      'no-response',
+      'offer-accepted',
     ])
-    expect(applyArchiveReasonOptions('archived', 'no-response')).toEqual([])
-    expect(applyArchiveReasonOptions('archived', 'rejected')).toEqual([])
+    expect(applyArchiveReasonOptions('archived', 'no-response')).toHaveLength(9)
+    expect(applyArchiveReasonOptions('archived', 'rejected')).toHaveLength(9)
+    expect(applyArchiveReasonOptions('archived', 'withdrawn')).toHaveLength(9)
   })
 })
