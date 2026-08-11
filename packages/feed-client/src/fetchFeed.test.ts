@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { FeedFetchError, fetchFeed } from './fetchFeed'
+import { fetchFeed } from './fetchFeed'
 
 describe('fetchFeed', () => {
   beforeEach(() => {

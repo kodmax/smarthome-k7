@@ -25,7 +25,8 @@ const loadFeed = (topic: string): void => {
 }
 
 const wsClient = new WSClient(websocketUrl, feedId => {
-  if (subscribers.has(feedId)) {
+  const topicSubscribers = subscribers.get(feedId)
+  if ((topicSubscribers?.length ?? 0) > 0) {
     loadFeed(feedId)
   }
 })
@@ -48,6 +49,10 @@ const subscribe: (topic: string, subscriber: TopicSubscriber<unknown>) => () => 
   return () => {
     const topicSubscribers = subscribers.get(topic) ?? []
     topicSubscribers.splice(topicSubscribers.indexOf(subscriber), 1)
+    if (topicSubscribers.length === 0) {
+      subscribers.delete(topic)
+      wsClient.unsubscribe(topic)
+    }
   }
 }
 

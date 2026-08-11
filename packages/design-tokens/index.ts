@@ -16,3 +16,4 @@ export {
   below2xlSideMenuScaleMediaQuery,
   theme,
 } from './theme'
+export { PillToggleButtonGroup } from './PillToggleButtonGroup'

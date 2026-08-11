@@ -1,4 +1,5 @@
-import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { ToggleButton } from '@mui/material'
+import { PillToggleButtonGroup } from '@repo/design-tokens'
 import { type FC, type MouseEvent, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from '@/i18n'
 import { BorderedPanel, parseTargetTime, SectionField, TargetTimePicker } from './components'
@@ -64,7 +65,7 @@ export const TimerPanel: FC<TimerPanelProps> = ({ onChange, noLimit = false }) =
   return (
     <BorderedPanel>
       <SectionField label={labels.label}>
-        <ToggleButtonGroup
+        <PillToggleButtonGroup
           exclusive
           size='large'
           pill
@@ -77,7 +78,7 @@ export const TimerPanel: FC<TimerPanelProps> = ({ onChange, noLimit = false }) =
         >
           <ToggleButton value='no-limit'>{labels.noLimit}</ToggleButton>
           <ToggleButton value='with-timer'>{labels.withTimer}</ToggleButton>
-        </ToggleButtonGroup>
+        </PillToggleButtonGroup>
       </SectionField>
 
       {timerMode === 'with-timer' ? (
