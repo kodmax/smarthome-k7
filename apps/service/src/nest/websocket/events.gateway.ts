@@ -4,6 +4,7 @@ import type { WebSocket, WebSocketServer } from 'ws'
 import { AppLogger } from '../logger/app-logger.service'
 import type { Logger } from 'pino'
 import { FeedWebSocketService } from './feed-websocket.service'
+import { parseDeviceIdFromCookie } from './parseDeviceIdFromCookie'
 
 @WebSocketGateway({ path: '/ws' })
 export class EventsGateway implements OnGatewayInit<WebSocketServer>, OnGatewayConnection<WebSocket> {
@@ -28,6 +29,9 @@ export class EventsGateway implements OnGatewayInit<WebSocketServer>, OnGatewayC
       return
     }
 
-    this.feedWebSocket.registerClient(client, (request as IncomingMessage).socket)
+    const incomingMessage = request as IncomingMessage
+    const deviceId = parseDeviceIdFromCookie(incomingMessage.headers.cookie)
+
+    this.feedWebSocket.registerClient(client, incomingMessage.socket, deviceId)
   }
 }

@@ -6,6 +6,7 @@ export type FeedEventMap = {
   refresh: [sourceId: string]
   error: [sourceId: string, error: Error, context: string]
   'clients-changed': [count: number]
+  'feed-update-sent': [deviceId: string, feedId: string]
 }
 
 type EventKey = keyof FeedEventMap

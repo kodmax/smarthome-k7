@@ -23,6 +23,10 @@ vi.mock('./getDefaultWebSocketUrl', () => ({
   getDefaultWebSocketUrl: () => 'ws://test',
 }))
 
+vi.mock('./getDeviceId', () => ({
+  ensureDeviceId: vi.fn(),
+}))
+
 describe('subscribe', () => {
   beforeEach(async () => {
     vi.clearAllMocks()

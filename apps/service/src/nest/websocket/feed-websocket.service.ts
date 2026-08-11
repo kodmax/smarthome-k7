@@ -7,6 +7,7 @@ import { AppLogger } from '../logger/app-logger.service'
 import { FEED_EVENTS, WS_ON_ERROR } from './events.constants'
 
 type Client = {
+  deviceId: string
   subscriptions: Set<string>
   socket: Socket
   ws: WebSocket
@@ -65,32 +66,33 @@ export class FeedWebSocketService implements OnModuleInit, OnModuleDestroy {
     this.logger.info('WebSocket server closed')
   }
 
-  registerClient(ws: WebSocket, socket: Socket): void {
+  registerClient(ws: WebSocket, socket: Socket, deviceId: string): void {
     const client: Client = {
+      deviceId,
       subscriptions: new Set<string>(),
       socket,
       ws,
     }
     const ip = clientIp(socket)
 
-    this.logger.info({ clientIp: ip }, 'Client connected')
+    this.logger.info({ deviceId, clientIp: ip }, 'Client connected')
 
     ws.on('message', data => {
       const [cmd, ...params] = data.toString('utf-8').split(' ')
 
       if (cmd === 'subscribe') {
         params.forEach(sub => client.subscriptions.add(sub))
-        this.logger.info({ clientIp: ip, feedIds: params }, 'Client subscribed')
+        this.logger.info({ deviceId, clientIp: ip, feedIds: params }, 'Client subscribed')
       } else if (cmd === 'unsubscribe') {
         params.forEach(sub => client.subscriptions.delete(sub))
-        this.logger.info({ clientIp: ip, feedIds: params }, 'Client unsubscribed')
+        this.logger.info({ deviceId, clientIp: ip, feedIds: params }, 'Client unsubscribed')
       } else {
-        this.logger.info({ clientIp: ip, cmd }, 'Client sent unknown command')
+        this.logger.info({ deviceId, clientIp: ip, cmd }, 'Client sent unknown command')
       }
     })
 
     ws.on('error', error => {
-      this.logger.warn({ err: error, clientIp: ip }, 'Client socket error')
+      this.logger.warn({ err: error, deviceId, clientIp: ip }, 'Client socket error')
       this.onError(error, 'Client socket error')
     })
 
@@ -109,7 +111,7 @@ export class FeedWebSocketService implements OnModuleInit, OnModuleDestroy {
       }
 
       const ip = clientIp(client.socket)
-      this.logger.info({ clientIp: ip }, 'Client disconnected')
+      this.logger.info({ deviceId: client.deviceId, clientIp: ip }, 'Client disconnected')
       this.clients.delete(client)
       this.feedEvents.emit('clients-changed', this.clients.size)
       return
@@ -117,19 +119,33 @@ export class FeedWebSocketService implements OnModuleInit, OnModuleDestroy {
   }
 
   private notifyFeedUpdate(id: string): void {
-    const outbox: Promise<Client>[] = []
+    const outbox: Promise<void>[] = []
 
     for (const client of this.clients) {
       const ip = clientIp(client.socket)
       if (client.subscriptions.has('*') || client.subscriptions.has(id)) {
         outbox.push(
           new Promise((resolve, reject) => {
-            this.logger.debug({ feedId: id, clientIp: ip }, 'Feed update broadcast to client')
-            client.ws.send(`FEED-UPDATE ${id}`, error => (error ? reject(error) : resolve(client)))
+            this.logger.debug(
+              { feedId: id, deviceId: client.deviceId, clientIp: ip },
+              'Feed update broadcast to client',
+            )
+            client.ws.send(`FEED-UPDATE ${id}`, error => {
+              if (error) {
+                reject(error)
+                return
+              }
+
+              this.feedEvents.emit('feed-update-sent', client.deviceId, id)
+              resolve()
+            })
           }),
         )
       } else {
-        this.logger.debug({ feedId: id, clientIp: ip }, 'Skip feed update broadcast to client')
+        this.logger.debug(
+          { feedId: id, deviceId: client.deviceId, clientIp: ip },
+          'Skip feed update broadcast to client',
+        )
       }
     }
 

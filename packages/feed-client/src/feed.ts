@@ -1,7 +1,10 @@
 import { fetchFeed } from './fetchFeed'
+import { ensureDeviceId } from './getDeviceId'
 import { getDefaultWebSocketUrl } from './getDefaultWebSocketUrl'
 import { TopicSubscriber } from './types'
 import { WSClient } from './WSClient'
+
+ensureDeviceId()
 
 const websocketUrl = getDefaultWebSocketUrl()
 const subscribers: Map<string, TopicSubscriber<unknown>[]> = new Map()

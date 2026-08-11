@@ -7,6 +7,8 @@ import type { WebSocket } from 'ws'
 import { AppLogger } from '../logger/app-logger.service'
 import { FeedWebSocketService } from './feed-websocket.service'
 
+const TEST_DEVICE_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
+
 const noopOnError = (): void => void 0
 
 type MockWebSocket = WebSocket & EventEmitter & { sent: string[] }
@@ -49,7 +51,7 @@ describe('FeedWebSocketService', () => {
     service.onModuleInit()
 
     ws = createMockWebSocket()
-    service.registerClient(ws, createMockSocket())
+    service.registerClient(ws, createMockSocket(), TEST_DEVICE_ID)
   })
 
   afterEach(async () => {
@@ -100,12 +102,27 @@ describe('FeedWebSocketService', () => {
     expect(ws.sent).toEqual(['FEED-UPDATE debounced-feed'])
   })
 
+  it('emits feed-update-sent after broadcasting to a subscribed client', async () => {
+    const sent: Array<{ deviceId: string; feedId: string }> = []
+    feedEvents.on('feed-update-sent', (deviceId, feedId) => {
+      sent.push({ deviceId, feedId })
+    })
+
+    ws.emit('message', Buffer.from('subscribe my-feed'))
+    await new Promise(resolve => setTimeout(resolve, 20))
+
+    feedEvents.emit('feed-changed', 'my-feed')
+    await new Promise(resolve => setTimeout(resolve, 1100))
+
+    expect(sent).toEqual([{ deviceId: TEST_DEVICE_ID, feedId: 'my-feed' }])
+  })
+
   it('emits clients-changed when clients connect and disconnect', async () => {
     const counts: number[] = []
     feedEvents.on('clients-changed', count => counts.push(count))
 
     const secondClient = createMockWebSocket()
-    service.registerClient(secondClient, createMockSocket())
+    service.registerClient(secondClient, createMockSocket(), 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb')
     await vi.waitFor(() => expect(counts).toContain(2))
 
     secondClient.emit('close')
