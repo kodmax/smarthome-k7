@@ -1,6 +1,6 @@
 import type { Logger } from '@repo/logger'
 import type { CronJobPolicy } from '@repo/chronos'
-import type { CacheEntry, Snapshot } from '../Cache'
+import type { CacheEntry } from '../Cache'
 import { FeedEvents } from '../FeedComposer'
 import type {
   DataSourceCtor,
@@ -59,10 +59,6 @@ abstract class DataSource<T, TCache = T> {
 
   protected abstract fetchData(): Promise<TCache>
 
-  protected isCacheValid(_cached: TCache): boolean {
-    return true
-  }
-
   protected composeContent(cached: TCache): Promise<T> {
     return Promise.resolve(cached as unknown as T)
   }
@@ -111,48 +107,26 @@ abstract class DataSource<T, TCache = T> {
       return this.composeContent(snapshot.getContent())
     }
 
-    return this.fetchAndCompose().promise
+    return this.fetchAndCompose()
   }
 
-  public async getData(forceRefresh = false): Promise<T> {
+  public async refresh(): Promise<T> {
     if (this.updating) {
       return this.updating
     }
 
-    if (!forceRefresh && this.getCacheTTL() > 0) {
-      const snapshot = await this.getFreshSnapshot()
-      if (snapshot !== null) {
-        this.logger.debug({ sourceId: this.getId(), cacheHit: true }, 'Cache hit on data source')
-        return this.composeContent(snapshot.getContent())
-      }
-    }
+    return this.fetchAndCompose()
+  }
 
-    const fetch = this.fetchAndCompose(forceRefresh)
-    const content = await fetch.promise
-
-    if (fetch.initiated) {
-      this.feedEvents.emit('data-update', this.getId())
-    }
-
+  public async refreshAndNotify(): Promise<T> {
+    const content = await this.refresh()
+    await this.push()
     return content
   }
 
-  private async getFreshSnapshot(): Promise<Snapshot<TCache> | null> {
-    if (this.getCacheTTL() <= 0) {
-      return null
-    }
-
-    const snapshot = await this.cacheEntry.getSnapshot()
-    if (snapshot === null) {
-      return null
-    }
-
-    return this.isCacheValid(snapshot.getContent()) ? snapshot : null
-  }
-
-  private fetchAndCompose(forceRefresh = false): { promise: Promise<T>; initiated: boolean } {
+  private fetchAndCompose(): Promise<T> {
     if (this.updating) {
-      return { promise: this.updating, initiated: false }
+      return this.updating
     }
 
     const sourceId = this.getId()
@@ -175,7 +149,7 @@ abstract class DataSource<T, TCache = T> {
           const content = await this.composeContent(cached)
           resolve(content)
 
-          this.logger.debug({ sourceId, forceRefresh, durationMs: Date.now() - start }, 'Data source content refreshed')
+          this.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source content refreshed')
           this.updating = void 0
         })
         .catch(e => {
@@ -188,7 +162,7 @@ abstract class DataSource<T, TCache = T> {
 
     this.updating = promise
 
-    return { promise, initiated: true }
+    return promise
   }
 }
 

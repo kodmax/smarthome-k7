@@ -27,13 +27,13 @@ Shutdown (wired in `apps/service/src/graceful-shutdown.ts`): `DataSourceRegistry
 Create one instance in service and pass it to `DataSourceRegistry`, `FeedComposer`, and Nest `EventsModule`. Pass Pino
 `Logger` via options for operational logging.
 
-| Event             | Payload                        | When                                                 |
-| ----------------- | ------------------------------ | ---------------------------------------------------- |
-| `feed-changed`    | `feedId`                       | Source in feed updated — notify WS clients           |
-| `data-update`     | `sourceId`                     | Source cache changed after push, fetch, or cron      |
-| `refresh`         | `sourceId`                     | Request forced refresh (`getData(true)`) of a source |
-| `error`           | `sourceId`, `error`, `context` | Data source error (handled in service entrypoint)    |
-| `clients-changed` | `count`                        | WebSocket connect/disconnect                         |
+| Event             | Payload                        | When                                                    |
+| ----------------- | ------------------------------ | ------------------------------------------------------- |
+| `feed-changed`    | `feedId`                       | Source in feed updated — notify WS clients              |
+| `data-update`     | `sourceId`                     | Source changed — after `push()` or `refreshAndNotify()` |
+| `refresh`         | `sourceId`                     | Request forced refresh (`refresh()`) of a source        |
+| `error`           | `sourceId`, `error`, `context` | Data source error (handled in service entrypoint)       |
+| `clients-changed` | `count`                        | WebSocket connect/disconnect                            |
 
 ### When to use events vs `onError`
 
@@ -49,15 +49,20 @@ Do **not** route all feeds errors through `FeedEvents` — the event bus is not 
 **REST read** (`getFeedData(feedId)`): every source uses `ensureContent()` — cache hit when available, fetch on miss
 without emitting `data-update`. Concurrent GETs for the same `feedId` share one in-flight composition.
 
-**Push / cron** (`data-update` handler): emits `feed-changed` for each feed containing the updated source. No
-server-side composition for WS — clients fetch via REST after receiving `FEED-UPDATE <feedId>`.
+**Cron / refresh** (`DataSourceRegistry`): calls `refreshAndNotify()` — fetch + cache write + compose + `data-update` →
+WS notify.
+
+**WS notify** (`data-update` handler): also emitted by `push()` after mutations; `FeedComposer` forwards to
+`feed-changed`. Clients fetch via REST after `FEED-UPDATE <feedId>`.
+
+**Silent refresh** (`refresh()` alone): fetch + compose, no WS — used internally when notify is not wanted.
 
 ## Intentional behavior — do not "fix"
 
 - **1 s debounce** on `feed-changed` in `Server` — multi-source feeds update one source at a time; debounce sends one
   notification with the final combined state. Do not add per-source debounce or remove the global timer.
-- **Refresh log at `info`** in `DataSource` — successful fetch is logged at info; cache hit stays at debug. This is
-  deliberate visibility, not a bug.
+- **Refresh log at `info`** in `DataSource` — successful fetch is logged at debug after compose; deliberate visibility
+  for cron paths.
 - **No stale fallback** when `script()` fails — reject and let UI show missing data; do not serve old cache after a
   failed refresh.
 - **Corrupt cache JSON** on disk → `CorruptCacheError` at startup (fail-fast). **ENOENT** → empty cache (normal first

@@ -78,11 +78,11 @@ describe('DataSourceRegistry', () => {
     await registry.add('sourceA', createTestSourceClass({ id: 'refresh-a' }))
 
     const source = registry.get('sourceA')
-    const getData = vi.spyOn(source, 'getData').mockResolvedValue({ value: 42 })
+    const refreshAndNotify = vi.spyOn(source, 'refreshAndNotify').mockResolvedValue({ value: 42 })
 
     feedEvents.emit('refresh', 'refresh-a')
     await vi.waitFor(() => {
-      expect(getData).toHaveBeenCalledWith(true)
+      expect(refreshAndNotify).toHaveBeenCalledOnce()
     })
 
     registry.close()
@@ -95,12 +95,12 @@ describe('DataSourceRegistry', () => {
     await registry.add('sourceA', createTestSourceClass({ id: 'refresh-a' }))
 
     const source = registry.get('sourceA')
-    const getData = vi.spyOn(source, 'getData')
+    const refreshAndNotify = vi.spyOn(source, 'refreshAndNotify')
 
     feedEvents.emit('refresh', 'missing-source')
     await new Promise(resolve => setTimeout(resolve, 0))
 
-    expect(getData).not.toHaveBeenCalled()
+    expect(refreshAndNotify).not.toHaveBeenCalled()
 
     registry.close()
   })

@@ -59,7 +59,7 @@ describe('CvSource', () => {
     registerDependency('openai', openai)
   })
 
-  it('returns cv hash from getData', async () => {
+  it('returns cv hash from ensureContent', async () => {
     db = mockSql([
       {
         scope: CV_SCOPE,
@@ -72,7 +72,7 @@ describe('CvSource', () => {
     registerDependency('db', db)
 
     const source = await createCvSource()
-    const feed = await source.getData()
+    const feed = await source.ensureContent()
 
     expect(feed).toEqual({
       cv: {

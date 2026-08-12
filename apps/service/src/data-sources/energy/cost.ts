@@ -25,10 +25,6 @@ export class EnergyCostSource extends DataSource<EnergyCost> {
     return '0 0 * * *'
   }
 
-  protected isCacheValid(cached: EnergyCost) {
-    return cached.datetime === DateTime.now().getDate()
-  }
-
   static getCacheTTL() {
     return CacheAgeUnit.DAY
   }
