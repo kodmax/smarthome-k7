@@ -25,7 +25,7 @@ export default mergeConfig(
       ],
     },
     test: {
-      environment: 'jsdom',
+      environment: 'happy-dom',
       setupFiles: ['./src/test/setup.ts'],
       exclude: [...configDefaults.exclude, 'dist/**'],
     },
