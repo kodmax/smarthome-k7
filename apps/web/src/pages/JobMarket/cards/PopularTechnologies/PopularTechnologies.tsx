@@ -9,6 +9,7 @@ import { useTranslations } from '@/i18n'
 import { rankCellSx, Skill } from './Skill'
 import { TechnologySearchInput } from './TechnologySearchInput'
 import { useFilteredPopularTechnologies } from './useFilteredPopularTechnologies'
+import { mergePopularTechnologiesWithMySkills } from './mergePopularTechnologiesWithMySkills'
 
 export const PopularTechnologies: FC<Record<string, never>> = () => {
   const [editMode, setEditMode] = useState(false)
@@ -26,7 +27,12 @@ export const PopularTechnologies: FC<Record<string, never>> = () => {
     return map
   }, [mySkillsFeed])
 
-  const filteredTechnologies = useFilteredPopularTechnologies(feed?.popularTechnologies, searchQuery)
+  const technologies = useMemo(
+    () => mergePopularTechnologiesWithMySkills(feed?.popularTechnologies, mySkillsFeed?.skills),
+    [feed?.popularTechnologies, mySkillsFeed?.skills],
+  )
+
+  const filteredTechnologies = useFilteredPopularTechnologies(technologies, searchQuery)
 
   const onEditPreferences = useCallback(() => {
     setEditMode(current => !current)

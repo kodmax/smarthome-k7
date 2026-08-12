@@ -1,6 +1,6 @@
 import { fireEvent, renderWithTheme as render, screen } from '@/test/test-utils'
 import { useCommand, useFeed } from '@repo/feed-client'
-import { JobMarketInsightFeed, JobMarketPopularTechnology } from '@repo/types'
+import { JobMarketInsightFeed, JobMarketPopularTechnology, MySkillsFeed } from '@repo/types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { PopularTechnologies } from './PopularTechnologies'
 
@@ -70,5 +70,28 @@ describe('PopularTechnologies', () => {
     expect(screen.getByText('Vue.js')).toBeInTheDocument()
     expect(screen.getByText('ES6+')).toBeInTheDocument()
     expect(screen.getByText('C#')).toBeInTheDocument()
+  })
+
+  it('shows my skills missing from popular technologies', () => {
+    mockedUseFeed.mockImplementation((topic?: string) => {
+      if (topic === 'my-skills') {
+        return {
+          skills: [{ id: 'java', name: 'Java', level: 'not-interested', comment: null }],
+        } satisfies MySkillsFeed
+      }
+
+      if (topic === 'job-market-insight') {
+        return insightFeed([
+          tech({ id: 'react', name: 'React', offersCount: 14, sharePercent: 3, medianSalary: 15_500 }),
+        ])
+      }
+
+      return undefined
+    })
+
+    render(<PopularTechnologies />)
+
+    expect(screen.getByText('Java')).toBeInTheDocument()
+    expect(screen.getByText('React')).toBeInTheDocument()
   })
 })
