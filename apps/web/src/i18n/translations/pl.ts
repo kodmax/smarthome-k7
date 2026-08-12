@@ -371,7 +371,7 @@ export const pl: Translations = {
       acceptableSalary: {
         label: 'Minimalne wynagrodzenie',
         ariaLabel: 'Minimalne akceptowalne wynagrodzenie',
-        valueAtLeast: '>= {amount} k PLN',
+        valueAtLeast: '{amount} k PLN',
       },
       workplaceType: {
         office: 'Biuro',

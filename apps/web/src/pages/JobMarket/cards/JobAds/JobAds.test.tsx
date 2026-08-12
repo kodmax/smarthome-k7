@@ -86,7 +86,6 @@ describe('JobAds', () => {
   it('shows salary slider only on pending-review view', () => {
     mockJobAdsFeeds({
       ...jobAdsFeed(jobAd({ id: '1', title: 'Open Role', meta: { application: { status: 'pending-review' } } })),
-      salaryRange: { min: 15_000, max: 35_000 },
       acceptableSalary: 24_000,
     })
 

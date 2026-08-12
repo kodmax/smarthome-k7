@@ -72,7 +72,7 @@ export const JobAds: FC<Record<string, never>> = () => {
           isSmUp ? (
             <>
               {adsFilter === 'pending-review' ? (
-                <AcceptableSalarySlider salaryRange={feed.salaryRange} acceptableSalary={feed.acceptableSalary} />
+                <AcceptableSalarySlider acceptableSalary={feed.acceptableSalary} />
               ) : null}
               <ApolloCardAction title={labels.addManualJobAd} onClick={() => setDialogOpen(true)} Icon={PlusIcon} />
               {adsFilter === 'archived' ? (

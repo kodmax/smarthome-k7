@@ -1,6 +1,11 @@
 import { Box, Slider, Typography } from '@mui/material'
 import { useCommand } from '@repo/feed-client'
-import { JobAdsFeed, type JobAdsSetAcceptableSalaryPayload } from '@repo/types'
+import {
+  ACCEPTABLE_SALARY_SLIDER_MAX,
+  ACCEPTABLE_SALARY_SLIDER_MIN,
+  JobAdsFeed,
+  type JobAdsSetAcceptableSalaryPayload,
+} from '@repo/types'
 import { FC, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from '@/i18n'
 
@@ -12,24 +17,21 @@ const isIOS =
 
 const toSliderValue = (newValue: number | number[]): number => (Array.isArray(newValue) ? newValue[0] : newValue)
 
+const clampSalary = (value: number): number =>
+  Math.min(ACCEPTABLE_SALARY_SLIDER_MAX, Math.max(ACCEPTABLE_SALARY_SLIDER_MIN, value))
+
 type Props = {
-  salaryRange: JobAdsFeed['salaryRange']
   acceptableSalary: JobAdsFeed['acceptableSalary']
 }
 
-export const AcceptableSalarySlider: FC<Props> = ({ salaryRange, acceptableSalary }) => {
+export const AcceptableSalarySlider: FC<Props> = ({ acceptableSalary }) => {
   const { t } = useTranslations()
   const labels = t.dashboard.jobAds.acceptableSalary
   const setAcceptableSalary = useCommand('job-ads', 'set-acceptable-salary')
 
-  if (salaryRange === null) {
-    return null
-  }
-
   return (
     <AcceptableSalarySliderInner
       labels={labels}
-      salaryRange={salaryRange}
       acceptableSalary={acceptableSalary}
       setAcceptableSalary={setAcceptableSalary}
     />
@@ -38,18 +40,12 @@ export const AcceptableSalarySlider: FC<Props> = ({ salaryRange, acceptableSalar
 
 type InnerProps = {
   labels: { label: string; ariaLabel: string; valueAtLeast: string }
-  salaryRange: NonNullable<JobAdsFeed['salaryRange']>
   acceptableSalary: JobAdsFeed['acceptableSalary']
   setAcceptableSalary: (payload: JobAdsSetAcceptableSalaryPayload) => void
 }
 
-const AcceptableSalarySliderInner: FC<InnerProps> = ({
-  labels,
-  salaryRange,
-  acceptableSalary,
-  setAcceptableSalary,
-}) => {
-  const committedValue = acceptableSalary ?? salaryRange.min
+const AcceptableSalarySliderInner: FC<InnerProps> = ({ labels, acceptableSalary, setAcceptableSalary }) => {
+  const committedValue = clampSalary(acceptableSalary ?? ACCEPTABLE_SALARY_SLIDER_MIN)
   const [value, setValue] = useState(committedValue)
 
   useEffect(() => {
@@ -75,7 +71,7 @@ const AcceptableSalarySliderInner: FC<InnerProps> = ({
         return
       }
 
-      const next = toSliderValue(newValue)
+      const next = clampSalary(toSliderValue(newValue))
       setValue(next)
       setAcceptableSalary({ value: next })
     },
@@ -91,8 +87,8 @@ const AcceptableSalarySliderInner: FC<InnerProps> = ({
         <Slider
           id='acceptable-salary-slider'
           value={value}
-          min={salaryRange.min}
-          max={salaryRange.max}
+          min={ACCEPTABLE_SALARY_SLIDER_MIN}
+          max={ACCEPTABLE_SALARY_SLIDER_MAX}
           step={1000}
           onChange={onChange}
           onChangeCommitted={onChangeCommitted}

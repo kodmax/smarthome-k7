@@ -7,22 +7,22 @@ vi.mock('@repo/feed-client', () => ({
 }))
 
 describe('AcceptableSalarySlider', () => {
-  it('renders nothing when salary range is unavailable', () => {
-    const { container } = render(<AcceptableSalarySlider salaryRange={null} acceptableSalary={null} />)
-
-    expect(container).toBeEmptyDOMElement()
-  })
-
   it('renders slider with current acceptable salary', () => {
-    render(<AcceptableSalarySlider salaryRange={{ min: 15_000, max: 35_000 }} acceptableSalary={24_000} />)
+    render(<AcceptableSalarySlider acceptableSalary={24_000} />)
 
     expect(screen.getByLabelText('Minimalne akceptowalne wynagrodzenie')).toBeInTheDocument()
-    expect(screen.getByText('>= 24 k PLN')).toBeInTheDocument()
+    expect(screen.getByText('24 k PLN')).toBeInTheDocument()
   })
 
-  it('defaults to salary range min when acceptable salary is unset', () => {
-    render(<AcceptableSalarySlider salaryRange={{ min: 15_000, max: 35_000 }} acceptableSalary={null} />)
+  it('defaults to 5k when acceptable salary is unset', () => {
+    render(<AcceptableSalarySlider acceptableSalary={null} />)
 
-    expect(screen.getByText('>= 15 k PLN')).toBeInTheDocument()
+    expect(screen.getByText('5 k PLN')).toBeInTheDocument()
+  })
+
+  it('clamps stored salary below slider minimum', () => {
+    render(<AcceptableSalarySlider acceptableSalary={3_000} />)
+
+    expect(screen.getByText('5 k PLN')).toBeInTheDocument()
   })
 })

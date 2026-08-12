@@ -1,2 +1,2 @@
-export * from './dedupeJobAdDocuments'
+export * from './jobAdDedupKey'
 export * from './filters'

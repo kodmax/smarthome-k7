@@ -5,6 +5,18 @@ import { sanitizeMonthlySalaryRange } from '../sanitizeMonthlySalary'
 import { toIsoDate } from '../toIsoDate'
 import { digestTheprotocolId } from './digestTheprotocolId'
 
+export const normalizeTheprotocolSalaryBounds = (from: number, to: number): { from: number; to: number } => {
+  if (from <= 0) {
+    return { from, to }
+  }
+
+  if (to <= 0 || to < from) {
+    return { from, to: from }
+  }
+
+  return { from, to }
+}
+
 export const toJobAd = (ad: Ad): JobAd | null => {
   const contractTypes: Contract[] = ad.typesOfContracts
     .filter(item => item.salary !== null)
@@ -16,9 +28,10 @@ export const toJobAd = (ad: Ad): JobAd | null => {
 
       const contractType = salary.kindName === 'brutto' || salary.kindName === 'gross' ? 'permanent' : 'b2b'
       const timeUnit: SalaryUnit = salary.timeUnitId === 0 ? 'Month' : 'Hour'
+      const { from, to } = normalizeTheprotocolSalaryBounds(salary.from, salary.to)
 
       return {
-        salaryRange: getMonthlySalaryAfterTax(contractType, timeUnit, salary.from, salary.to),
+        salaryRange: getMonthlySalaryAfterTax(contractType, timeUnit, from, to),
         type: contractType,
       }
     })

@@ -8,6 +8,7 @@ import * as jjitFetch from './jjit/jjit'
 import * as nfjFetch from './nfj/nfj'
 import * as theprotocolFetch from './theprotocol/theprotocol'
 import { digestJjitId } from './jjit/digestJjitId'
+import { digestNfjId } from './nfj/digestNfjId'
 import { NoFluffJobsAd } from './nfj/types'
 import { Ad } from './theprotocol/types'
 
@@ -116,6 +117,7 @@ describe('syncJobAdsFromSources', () => {
     vi.spyOn(jjitFetch, 'fetchJustJoinAds').mockResolvedValue([sampleJjAd()])
     vi.spyOn(nfjFetch, 'fetchNfjListing').mockResolvedValue({ postings: [sampleNfjAd()], hybridIds: new Set() })
     vi.spyOn(theprotocolFetch, 'fetchTheprotocolOffers').mockResolvedValue([sampleTpAd()])
+    vi.spyOn(jobAdsRepository, 'loadJobAdDedupKeys').mockResolvedValue(new Map())
   })
 
   it('inserts new ads and returns listing ids', async () => {
@@ -148,10 +150,82 @@ describe('syncJobAdsFromSources', () => {
     expect(batchInsertJobAds).not.toHaveBeenCalled()
   })
 
-  it('stores all portal entries with the same company and title', async () => {
+  it('keeps only the highest-priority portal entry for the same company and title', async () => {
+    const jjId = digestJjitId('react-dev-acme')
     const duplicateNfj = { ...sampleNfjAd(), url: 'different-url-same-title', name: 'Acme', title: 'React Dev' }
     vi.spyOn(nfjFetch, 'fetchNfjListing').mockResolvedValue({ postings: [duplicateNfj], hybridIds: new Set() })
     vi.spyOn(theprotocolFetch, 'fetchTheprotocolOffers').mockResolvedValue([])
+
+    vi.spyOn(jobAdsRepository, 'loadExistingJobAdIds').mockResolvedValue(new Set())
+    const batchUpdateLastSeen = vi.spyOn(jobAdsRepository, 'batchUpdateLastSeen').mockResolvedValue(undefined)
+    const batchInsertJobAds = vi.spyOn(jobAdsRepository, 'batchInsertJobAds').mockResolvedValue(undefined)
+
+    const result = await syncJobAdsFromSources(db)
+
+    expect(result.listingIds).toEqual([jjId])
+    expect(batchInsertJobAds.mock.calls[0]?.[1]).toHaveLength(1)
+    expect(batchUpdateLastSeen).toHaveBeenCalledWith(db, [jjId])
+  })
+
+  it('updates last_seen on the canonical id when a duplicate portal entry appears in the same sync', async () => {
+    const jjId = digestJjitId('react-dev-acme')
+    const nfjId = digestNfjId('different-url-same-title')
+    const duplicateNfj = { ...sampleNfjAd(), url: 'different-url-same-title', name: 'Acme', title: 'React Dev' }
+    vi.spyOn(nfjFetch, 'fetchNfjListing').mockResolvedValue({ postings: [duplicateNfj], hybridIds: new Set() })
+    vi.spyOn(theprotocolFetch, 'fetchTheprotocolOffers').mockResolvedValue([])
+
+    vi.spyOn(jobAdsRepository, 'loadExistingJobAdIds').mockResolvedValue(new Set())
+    const batchUpdateLastSeen = vi.spyOn(jobAdsRepository, 'batchUpdateLastSeen').mockResolvedValue(undefined)
+    const batchInsertJobAds = vi.spyOn(jobAdsRepository, 'batchInsertJobAds').mockResolvedValue(undefined)
+
+    await syncJobAdsFromSources(db)
+
+    expect(batchInsertJobAds.mock.calls[0]?.[1]).toHaveLength(1)
+    expect(batchInsertJobAds.mock.calls[0]?.[1]?.[0]?.id).toBe(jjId)
+    expect(batchUpdateLastSeen).toHaveBeenCalledWith(db, expect.arrayContaining([jjId]))
+    expect(batchUpdateLastSeen.mock.calls[0]?.[1]).not.toContain(nfjId)
+  })
+
+  it('rejects a higher-priority portal entry when the dedup key already exists in the database', async () => {
+    const jjId = digestJjitId('react-dev-acme')
+    const nfjId = digestNfjId('existing-nfj-url')
+    const duplicateNfj = { ...sampleNfjAd(), url: 'existing-nfj-url', name: 'Acme', title: 'React Dev' }
+    vi.spyOn(nfjFetch, 'fetchNfjListing').mockResolvedValue({ postings: [duplicateNfj], hybridIds: new Set() })
+    vi.spyOn(theprotocolFetch, 'fetchTheprotocolOffers').mockResolvedValue([])
+
+    vi.spyOn(jobAdsRepository, 'loadExistingJobAdIds').mockResolvedValue(new Set())
+    vi.spyOn(jobAdsRepository, 'loadJobAdDedupKeys').mockResolvedValue(new Map([['acme -- REACT DEV', nfjId]]))
+    const batchUpdateLastSeen = vi.spyOn(jobAdsRepository, 'batchUpdateLastSeen').mockResolvedValue(undefined)
+    const batchInsertJobAds = vi.spyOn(jobAdsRepository, 'batchInsertJobAds').mockResolvedValue(undefined)
+
+    const result = await syncJobAdsFromSources(db)
+
+    expect(result.listingIds).toEqual([])
+    expect(batchInsertJobAds).not.toHaveBeenCalled()
+    expect(batchUpdateLastSeen).toHaveBeenCalledWith(db, [nfjId])
+    expect(batchUpdateLastSeen.mock.calls[0]?.[1]).not.toContain(jjId)
+  })
+
+  it('prefers justjoin over nfj and theprotocol when all three share the same company and title', async () => {
+    const jjId = digestJjitId('shared-title')
+    const sharedCompany = 'Shared Co'
+    const sharedTitle = 'Platform Engineer'
+
+    vi.spyOn(jjitFetch, 'fetchJustJoinAds').mockResolvedValue([
+      { ...sampleJjAd(), slug: 'shared-title', companyName: sharedCompany, title: sharedTitle },
+    ])
+    vi.spyOn(nfjFetch, 'fetchNfjListing').mockResolvedValue({
+      postings: [{ ...sampleNfjAd(), url: 'shared-title-nfj', name: sharedCompany, title: sharedTitle }],
+      hybridIds: new Set(),
+    })
+    vi.spyOn(theprotocolFetch, 'fetchTheprotocolOffers').mockResolvedValue([
+      {
+        ...sampleTpAd(),
+        title: sharedTitle,
+        employer: sharedCompany,
+        offerUrlName: 'shared-title-tp',
+      },
+    ])
 
     vi.spyOn(jobAdsRepository, 'loadExistingJobAdIds').mockResolvedValue(new Set())
     vi.spyOn(jobAdsRepository, 'batchUpdateLastSeen').mockResolvedValue(undefined)
@@ -159,8 +233,9 @@ describe('syncJobAdsFromSources', () => {
 
     const result = await syncJobAdsFromSources(db)
 
-    expect(result.listingIds).toHaveLength(2)
-    expect(batchInsertJobAds.mock.calls[0]?.[1]).toHaveLength(2)
+    expect(result.listingIds).toEqual([jjId])
+    expect(batchInsertJobAds.mock.calls[0]?.[1]).toHaveLength(1)
+    expect(batchInsertJobAds.mock.calls[0]?.[1]?.[0]?.id).toBe(jjId)
   })
 })
 

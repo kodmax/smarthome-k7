@@ -359,10 +359,8 @@ export type JobAdsFeedItem = {
   matchAnalysis: JobAdMatchAnalysis | null
 }
 
-export type JobAdsSalaryRange = {
-  min: number
-  max: number
-}
+export const ACCEPTABLE_SALARY_SLIDER_MIN = 5_000
+export const ACCEPTABLE_SALARY_SLIDER_MAX = 35_000
 
 export type JobAdsHourlySalaryCalculation = {
   vacationDaysPerYear: number
@@ -375,7 +373,6 @@ export type JobAdsHourlySalaryCalculation = {
 
 export type JobAdsFeed = {
   ads: JobAdsFeedItem[]
-  salaryRange: JobAdsSalaryRange | null
   acceptableSalary: number | null
 }
 

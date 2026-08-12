@@ -2,6 +2,7 @@ import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { JobAdApplicationMeta, JobAdDocument } from '@repo/types'
 import type { Sql } from '@repo/db'
 import { CV_MATCH_SCOPE } from './cvMatchDocument'
+import { buildJobAdDedupKey } from './filters/jobAdDedupKey'
 import { isManualJobAdDocument } from './manual/applyManualJobAdContentUpdate'
 import {
   createJobAdDocument,
@@ -18,6 +19,38 @@ export { isManualJobAdDocument } from './manual/applyManualJobAdContentUpdate'
 type JobAdRow = {
   id: string
   data: unknown
+}
+
+type JobAdDedupDbRow = {
+  id: string
+  company_name: string | null
+  title: string | null
+}
+
+export async function loadJobAdDedupKeys(db: Sql): Promise<Map<string, string>> {
+  const rows = await observeDbQuery(
+    'select',
+    'job_ads',
+    () =>
+      db<JobAdDedupDbRow[]>`
+      select
+        id,
+        data->'content'->>'companyName' as company_name,
+        data->'content'->>'title' as title
+      from job_ads
+    `,
+  )
+
+  const dedupKeyToId = new Map<string, string>()
+  for (const row of rows) {
+    if (row.company_name === null || row.title === null) {
+      continue
+    }
+
+    dedupKeyToId.set(buildJobAdDedupKey(row.company_name, row.title), row.id)
+  }
+
+  return dedupKeyToId
 }
 
 export async function loadExistingJobAdIds(db: Sql, ids: string[]): Promise<Set<string>> {

@@ -4,6 +4,8 @@ import type { Sql } from '@repo/db'
 import DateTime from '@/DateTime'
 import { Inject } from '@/di'
 import { loadJobAdsForMarketInsight } from '../job-ads/loadJobAdsForMarketInsight'
+import { filterJobAdsByNotInterestedSkills } from '../job-ads/filters'
+import { loadNotInterestedSkillIds } from '../my-skills/loadNotInterestedSkillIds'
 import { averageJobMarketInsightSnapshotMetrics } from './averageJobMarketInsightSnapshotMetrics'
 import { buildJobMarketInsightFeed } from './buildJobMarketInsightFeed'
 import { buildJobMarketInsightFeedWithComparison } from './buildJobMarketInsightFeedWithComparison'
@@ -39,7 +41,11 @@ export class JobMarketInsightSource extends DataSource<JobMarketInsightFeed, Job
   }
 
   protected async fetchData(): Promise<JobMarketInsightCachedFeed> {
-    const ads = await loadJobAdsForMarketInsight(this.db)
+    const [rawAds, notInterestedSkillIds] = await Promise.all([
+      loadJobAdsForMarketInsight(this.db),
+      loadNotInterestedSkillIds(this.db),
+    ])
+    const ads = filterJobAdsByNotInterestedSkills(rawAds, notInterestedSkillIds)
     const live = buildJobMarketInsightFeed(ads)
 
     await persistDailyJobMarketInsightSnapshot(this.db, live)

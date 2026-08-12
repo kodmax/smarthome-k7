@@ -2,7 +2,7 @@ import { type JobAdsFeed } from '@repo/types'
 import { jobAd } from './jobAd'
 
 export function jobAdsFeed(...ads: JobAdsFeed['ads']): JobAdsFeed {
-  return { ads, salaryRange: null, acceptableSalary: null }
+  return { ads, acceptableSalary: null }
 }
 
 export function jobAdsFeedWithDefaults(count = 1): JobAdsFeed {

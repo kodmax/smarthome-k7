@@ -18,6 +18,7 @@ export type JobMarketMetricCardProps = {
   previous?: number | null
   variant: JobMarketMetricVariant
   headingInfo?: ReactNode
+  showComparison?: boolean
 }
 
 const changeToneColor = (tone: ReturnType<typeof getChangeTone>): string => {
@@ -39,9 +40,10 @@ export const JobMarketMetricCard: FC<JobMarketMetricCardProps> = ({
   previous,
   variant,
   headingInfo,
+  showComparison = true,
 }) => {
   const { t } = useTranslations()
-  const hasChange = value != null && previous != null
+  const hasChange = showComparison && value != null && previous != null
   const changeAbsolute = hasChange ? getAbsoluteChange(value, previous) : 0
 
   return (
@@ -50,9 +52,9 @@ export const JobMarketMetricCard: FC<JobMarketMetricCardProps> = ({
       icon={icon}
       title={title}
       primary={value != null ? formatMetricValue(value, variant) : '--'}
-      secondary={hasChange ? formatMetricChange(value, previous, variant) : '--'}
+      secondary={hasChange ? formatMetricChange(value, previous, variant) : showComparison ? '--' : undefined}
       secondaryColor={changeToneColor(getChangeTone(changeAbsolute))}
-      tertiary={t.jobMarket.summary.vsPreviousPeriod}
+      tertiary={showComparison ? t.jobMarket.summary.vsPreviousPeriod : undefined}
       headingInfo={headingInfo}
     />
   )

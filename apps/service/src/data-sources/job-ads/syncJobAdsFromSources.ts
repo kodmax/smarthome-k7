@@ -10,7 +10,8 @@ import { fetchTheprotocolOffers } from './theprotocol/theprotocol'
 import { digestTheprotocolId } from './theprotocol/digestTheprotocolId'
 import { toJobAd as toTheprotocolJobAd } from './theprotocol/toJobAd'
 import { createJobAdDocument } from './jobAdDocument'
-import { batchInsertJobAds, batchUpdateLastSeen, loadExistingJobAdIds } from './jobAdsRepository'
+import { buildJobAdDedupKey } from './filters/jobAdDedupKey'
+import { batchInsertJobAds, batchUpdateLastSeen, loadExistingJobAdIds, loadJobAdDedupKeys } from './jobAdsRepository'
 
 type SyncListingEntry = {
   id: string
@@ -52,26 +53,54 @@ async function collectListingEntries(): Promise<SyncListingEntry[]> {
 
 export async function syncJobAdsFromSources(db: Sql): Promise<JobAdsCachedFeed> {
   const listingEntries = await collectListingEntries()
-  const listingIds = listingEntries.map(entry => entry.id)
 
-  if (listingIds.length === 0) {
+  if (listingEntries.length === 0) {
     return { listingIds: [] }
   }
 
-  const existingIds = await loadExistingJobAdIds(db, listingIds)
-  const existingListingIds = listingIds.filter(id => existingIds.has(id))
-  const newEntries = listingEntries.filter(entry => !existingIds.has(entry.id))
+  const scrapedIds = listingEntries.map(entry => entry.id)
+  const [existingIds, dedupKeyToId] = await Promise.all([loadExistingJobAdIds(db, scrapedIds), loadJobAdDedupKeys(db)])
 
-  if (existingListingIds.length > 0) {
-    await batchUpdateLastSeen(db, existingListingIds)
+  const canonicalListingIds: string[] = []
+  const lastSeenIds = new Set<string>()
+  const toInsert: Array<{ id: string; document: ReturnType<typeof createJobAdDocument> }> = []
+  const batchDedupKeyToId = new Map<string, string>()
+
+  for (const entry of listingEntries) {
+    if (existingIds.has(entry.id)) {
+      canonicalListingIds.push(entry.id)
+      lastSeenIds.add(entry.id)
+      continue
+    }
+
+    const document = entry.insertDocument()
+    const dedupKey = buildJobAdDedupKey(document.content.companyName, document.content.title)
+    const existingCanonicalId = dedupKeyToId.get(dedupKey)
+    if (existingCanonicalId !== undefined) {
+      lastSeenIds.add(existingCanonicalId)
+      continue
+    }
+
+    const batchCanonicalId = batchDedupKeyToId.get(dedupKey)
+    if (batchCanonicalId !== undefined) {
+      lastSeenIds.add(batchCanonicalId)
+      continue
+    }
+
+    toInsert.push({ id: entry.id, document })
+    batchDedupKeyToId.set(dedupKey, entry.id)
+    dedupKeyToId.set(dedupKey, entry.id)
+    canonicalListingIds.push(entry.id)
+    continue
   }
 
-  if (newEntries.length > 0) {
-    await batchInsertJobAds(
-      db,
-      newEntries.map(entry => ({ id: entry.id, document: entry.insertDocument() })),
-    )
+  if (lastSeenIds.size > 0) {
+    await batchUpdateLastSeen(db, [...lastSeenIds])
   }
 
-  return { listingIds }
+  if (toInsert.length > 0) {
+    await batchInsertJobAds(db, toInsert)
+  }
+
+  return { listingIds: canonicalListingIds }
 }

@@ -15,8 +15,8 @@ export const ActiveOffers: FC<Record<string, never>> = () => {
       icon={JobMarketActiveOffersIcon}
       title={t.jobMarket.summary.activeOffers}
       value={feed?.adsCount.value}
-      previous={feed?.adsCount.previous}
       variant='count'
+      showComparison={false}
     />
   )
 }

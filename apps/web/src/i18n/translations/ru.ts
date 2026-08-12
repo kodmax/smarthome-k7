@@ -371,7 +371,7 @@ export const ru: Translations = {
       acceptableSalary: {
         label: 'Минимальная зарплата',
         ariaLabel: 'Минимально приемлемая зарплата',
-        valueAtLeast: '>= {amount} k PLN',
+        valueAtLeast: '{amount} k PLN',
       },
       workplaceType: {
         office: 'Офис',

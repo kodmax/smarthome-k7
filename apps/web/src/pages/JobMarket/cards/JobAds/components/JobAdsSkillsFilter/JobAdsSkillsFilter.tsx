@@ -14,7 +14,7 @@ export const JobAdsSkillsFilter: FC<Props> = ({ options, value, onChange }) => {
   const labels = t.dashboard.jobAds.filters
 
   return (
-    <FormControl size='small' sx={{ minWidth: 200, maxWidth: 320 }}>
+    <FormControl size='small' sx={{ minWidth: 150, maxWidth: 220 }}>
       <Autocomplete
         multiple
         size='small'

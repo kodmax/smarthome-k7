@@ -35,7 +35,7 @@ describe('buildJobMarketInsightFeedWithComparison', () => {
   it('builds change metrics from snapshot averages and live lists from current metrics', () => {
     const feed = buildJobMarketInsightFeedWithComparison(snapshotMetrics(100), snapshotMetrics(80), live)
 
-    expect(feed.adsCount).toEqual({ value: 100, previous: 80 })
+    expect(feed.adsCount).toEqual({ value: live.adsCount, previous: null })
     expect(feed.popularTechnologies).toBe(live.popularTechnologies)
     expect(feed.salaryDistribution).toBe(live.salaryDistribution)
   })
@@ -43,7 +43,7 @@ describe('buildJobMarketInsightFeedWithComparison', () => {
   it('uses null values when snapshot averages are unavailable', () => {
     const feed = buildJobMarketInsightFeedWithComparison(null, null, live)
 
-    expect(feed.adsCount).toEqual({ value: null, previous: null })
+    expect(feed.adsCount).toEqual({ value: live.adsCount, previous: null })
     expect(feed.popularTechnologies).toBe(live.popularTechnologies)
   })
 })

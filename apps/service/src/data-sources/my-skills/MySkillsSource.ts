@@ -5,6 +5,8 @@ import { Inject } from '@/di'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 
 import { normalizeSkillComment, skillRowToMySkill, type SkillRecordRow } from './skillRecord'
+import { JobAdsSource } from '../job-ads/JobAdsSource'
+import { JobMarketInsightSource } from '../job-market-insight/JobMarketInsightSource'
 
 type MySkillsCachedFeed = Record<string, never>
 
@@ -54,6 +56,8 @@ export class MySkillsSource extends DataSource<MySkillsFeed, MySkillsCachedFeed>
 
   public async setSkillLevel(input: MySkillsSetSkillLevelPayload): Promise<void> {
     await this.upsertSkillLevel(input)
+    this.requestRefresh(JobAdsSource.getId())
+    this.requestRefresh(JobMarketInsightSource.getId())
     void this.push()
   }
 

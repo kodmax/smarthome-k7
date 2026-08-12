@@ -6,7 +6,7 @@ export const buildJobMarketInsightFeedWithComparison = (
   previous: JobMarketInsightSnapshotMetrics | null,
   live: JobMarketInsightMetrics,
 ): JobMarketInsightFeed => ({
-  adsCount: { value: recent?.adsCount ?? null, previous: previous?.adsCount ?? null },
+  adsCount: { value: live.adsCount, previous: null },
   newOffersCount: { value: recent?.newOffersCount ?? null, previous: previous?.newOffersCount ?? null },
   medianSalary: { value: recent?.medianSalary ?? null, previous: previous?.medianSalary ?? null },
   p90Salary: { value: recent?.p90Salary ?? null, previous: previous?.p90Salary ?? null },

@@ -13,8 +13,7 @@ import {
   jobAdApplicationFromMeta,
 } from '@repo/types'
 import { getTakeHomeHourlyRate } from './getTakeHomeHourlyRate'
-import { filterJobAdsByAcceptableSalary, dedupeJobAdDocuments } from './filters'
-import { computeJobAdsSalaryRange } from './computeJobAdsSalaryRange'
+import { filterJobAdsByAcceptableSalary, filterJobAdsFeedItemsByNotInterestedSkills } from './filters'
 import { loadAcceptableSalary, loadHourlySalaryCalculation, saveAcceptableSalary } from './jobAdsPreferences'
 import {
   applyStatusChange,
@@ -45,6 +44,7 @@ import { JobMarketInsightSource } from '../job-market-insight/JobMarketInsightSo
 import { applyManualJobAdContentUpdate } from './manual/applyManualJobAdContentUpdate'
 import { buildManualJobAdDocument } from './manual/buildManualJobAdDocument'
 import { syncJobAdsFromSources } from './syncJobAdsFromSources'
+import { loadNotInterestedSkillIds } from '../my-skills/loadNotInterestedSkillIds'
 
 const STALE_APPLIED_ARCHIVE_AFTER_DAYS = 7
 
@@ -148,16 +148,16 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     const listingIdSet = new Set(cached.listingIds)
     const allListingIds = [...cached.listingIds, ...manualIds.filter(id => !listingIdSet.has(id))]
     const documentsById = await loadJobAdsByIds(this.db, allListingIds)
-    const [acceptableSalary, hourlySalaryCalculation] = await Promise.all([
+    const [acceptableSalary, hourlySalaryCalculation, notInterestedSkillIds] = await Promise.all([
       loadAcceptableSalary(this.db),
       loadHourlySalaryCalculation(this.db),
+      loadNotInterestedSkillIds(this.db),
     ])
-    const documents = dedupeJobAdDocuments(
-      allListingIds.flatMap(id => {
-        const document = documentsById.get(id)
-        return document !== undefined ? [document] : []
-      }),
-    )
+    const loadedDocuments = allListingIds.flatMap(id => {
+      const document = documentsById.get(id)
+      return document !== undefined ? [document] : []
+    })
+    const enrichedDocuments = loadedDocuments
       .map(document => ({
         ...document,
         content: {
@@ -171,12 +171,13 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
       }))
       .sort((a, b) => (b.content.takeHomeHourlyRate ?? 0) - (a.content.takeHomeHourlyRate ?? 0))
 
-    const salaryRange = computeJobAdsSalaryRange(documents.map(document => document.content))
-    const ads = await this.toFeedItems(documents)
+    const ads = filterJobAdsFeedItemsByNotInterestedSkills(
+      filterJobAdsByAcceptableSalary(await this.toFeedItems(enrichedDocuments), acceptableSalary),
+      notInterestedSkillIds,
+    )
 
     return {
-      ads: filterJobAdsByAcceptableSalary(ads, acceptableSalary),
-      salaryRange,
+      ads,
       acceptableSalary,
     }
   }
