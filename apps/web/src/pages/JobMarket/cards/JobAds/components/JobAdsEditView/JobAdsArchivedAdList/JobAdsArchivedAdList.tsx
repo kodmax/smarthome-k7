@@ -10,7 +10,6 @@ import { JobAdsEditAdList } from '../JobAdsEditAdList'
 
 type Props = {
   groups: ArchivedJobAdsGroup[]
-  zoom: boolean
   expandedAdId?: string | null
   onToggleExpand?: (id: string) => void
   onChangeApplicationState?: (payload: JobAdsChangeStatePayload) => void
@@ -24,7 +23,6 @@ const sectionRowInsetRight = designTokens.space[2]
 
 export const JobAdsArchivedAdList: FC<Props> = ({
   groups,
-  zoom,
   expandedAdId = null,
   onToggleExpand,
   onChangeApplicationState,
@@ -100,7 +98,6 @@ export const JobAdsArchivedAdList: FC<Props> = ({
             >
               <JobAdsEditAdList
                 ads={group.ads}
-                zoom={zoom}
                 showApplyStatusIndicator={false}
                 expandedAdId={expandedAdId}
                 onToggleExpand={onToggleExpand}

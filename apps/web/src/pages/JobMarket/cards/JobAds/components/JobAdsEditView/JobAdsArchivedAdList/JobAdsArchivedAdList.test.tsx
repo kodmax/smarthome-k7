@@ -20,7 +20,6 @@ describe('JobAdsArchivedAdList', () => {
             ads: [jobAd({ id: '2', title: 'Rejected Role A' }), jobAd({ id: '3', title: 'Rejected Role B' })],
           },
         ]}
-        zoom={true}
         onFav={noop}
         onUnfav={noop}
         onAnalyzeCvMatch={noop}
@@ -46,7 +45,6 @@ describe('JobAdsArchivedAdList', () => {
             ads: [jobAd({ id: '2', title: 'Skipped Role' })],
           },
         ]}
-        zoom={true}
         onFav={noop}
         onUnfav={noop}
         onAnalyzeCvMatch={noop}
@@ -67,7 +65,6 @@ describe('JobAdsArchivedAdList', () => {
             ads: [jobAd({ id: '4', title: 'No Response Role' })],
           },
         ]}
-        zoom={true}
         onFav={noop}
         onUnfav={noop}
         onAnalyzeCvMatch={noop}

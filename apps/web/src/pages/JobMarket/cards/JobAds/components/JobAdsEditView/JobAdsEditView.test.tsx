@@ -13,7 +13,6 @@ describe('JobAdsEditView archived filter', () => {
   it('renders archived ads grouped by archive reason', () => {
     renderWithTheme(
       <JobAdsEditView
-        zoom={true}
         filter='archived'
         ads={[
           jobAd({
@@ -40,7 +39,6 @@ describe('JobAdsEditView archived filter', () => {
   it('filters ads by required skills within the active status view', () => {
     renderWithTheme(
       <JobAdsEditView
-        zoom={true}
         filter='pending-review'
         skillsFilter={['TypeScript', 'PostgreSQL']}
         ads={[
@@ -67,7 +65,6 @@ describe('JobAdsEditView archived filter', () => {
   it('filters archived ads by appliedAt when onlyAppliedArchived is enabled', () => {
     renderWithTheme(
       <JobAdsEditView
-        zoom={true}
         filter='archived'
         onlyAppliedArchived={true}
         ads={[

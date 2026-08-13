@@ -16,13 +16,12 @@ import { JobAdsEditAdList } from './JobAdsEditAdList'
 
 type Props = {
   ads: JobAdsFeedItem[] | undefined
-  zoom: boolean
   filter: JobAdsFilter
   skillsFilter?: string[]
   onlyAppliedArchived?: boolean
 }
 
-export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter, skillsFilter = [], onlyAppliedArchived = false }) => {
+export const JobAdsEditView: FC<Props> = ({ ads, filter, skillsFilter = [], onlyAppliedArchived = false }) => {
   const { t } = useTranslations()
   const [expandedAdId, setExpandedAdId] = useState<string | null>(null)
 
@@ -65,7 +64,6 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter, skillsFilter = []
   return filter === 'archived' && archivedGroups !== null ? (
     <JobAdsArchivedAdList
       groups={archivedGroups}
-      zoom={zoom}
       expandedAdId={expandedAdId}
       onToggleExpand={onToggleExpand}
       onChangeApplicationState={onChangeApplicationState}
@@ -76,7 +74,6 @@ export const JobAdsEditView: FC<Props> = ({ ads, zoom, filter, skillsFilter = []
   ) : (
     <JobAdsEditAdList
       ads={filteredAds}
-      zoom={zoom}
       expandedAdId={expandedAdId}
       onToggleExpand={onToggleExpand}
       onChangeApplicationState={onChangeApplicationState}

@@ -1,4 +1,4 @@
-export const DEVICE_ID_STORAGE_KEY = 'smarthome-device-id'
+export const DEVICE_ID_STORAGE_KEY = isSecureContext ? 'smarthome-device-id' : 'dev-device-id'
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
@@ -18,7 +18,7 @@ const writeCookie = (name: string, value: string): void => {
     return
   }
 
-  const secure = typeof location !== 'undefined' && location.protocol === 'https:' ? '; Secure' : ''
+  const secure = isSecureContext ? '; Secure' : ''
   const maxAge = 10 * 365 * 24 * 60 * 60
   document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`
 }
@@ -49,7 +49,7 @@ export const ensureDeviceId = (): string => {
     return existing
   }
 
-  const deviceId = crypto.randomUUID()
+  const deviceId = isSecureContext ? crypto.randomUUID() : `${Math.random()}`
   localStorage.setItem(DEVICE_ID_STORAGE_KEY, deviceId)
   writeCookie(DEVICE_ID_STORAGE_KEY, deviceId)
   return deviceId

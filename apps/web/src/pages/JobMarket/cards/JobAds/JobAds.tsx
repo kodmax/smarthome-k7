@@ -89,7 +89,6 @@ export const JobAds: FC<Record<string, never>> = () => {
       >
         <JobAdsEditView
           ads={feed.ads}
-          zoom={true}
           filter={adsFilter}
           skillsFilter={selectedSkills}
           onlyAppliedArchived={onlyAppliedArchived}

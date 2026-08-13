@@ -1,5 +1,5 @@
 import { JobAdsFeedItem } from '@repo/types'
-import { Box } from '@mui/material'
+import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { FC, ReactNode, useMemo } from 'react'
 import { ReadingValue } from '@/card-components'
 import { HourlySalaryCellXsOnly, MonthlySalaryRangeCell, Salary } from '../styled'
@@ -13,26 +13,35 @@ type Props = {
   showHourlySalaryOnXs?: boolean
 }
 
-const SalaryCellContent: FC<{ ad: JobAdsFeedItem; children: ReactNode }> = ({ ad, children }) => (
-  <Box
-    sx={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'flex-end',
-      gap: 0.5,
-      width: '100%',
-      minWidth: 0,
-    }}
-  >
-    <Box sx={{ flex: '0 0 16px' }}>
-      <WorkplaceTypeIndicator workplaceType={ad.content.workplaceType} />
+const SalaryCellContent: FC<{ ad: JobAdsFeedItem; children: ReactNode }> = ({ ad, children }) => {
+  const theme = useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+
+  return (
+    <Box
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: 0.5,
+        width: '100%',
+        minWidth: 0,
+      }}
+    >
+      {isSmallScreen ? null : (
+        <>
+          <Box sx={{ flex: '0 0 16px' }}>
+            <WorkplaceTypeIndicator workplaceType={ad.content.workplaceType} />
+          </Box>
+          <Box sx={{ flex: '0 0 16px' }}>
+            <EmploymentTypeIndicator employmentType={ad.content.employmentType} />
+          </Box>
+        </>
+      )}
+      <Box sx={{ flex: '0 0 88px' }}>{children}</Box>
     </Box>
-    <Box sx={{ flex: '0 0 16px' }}>
-      <EmploymentTypeIndicator employmentType={ad.content.employmentType} />
-    </Box>
-    <Box sx={{ flex: '0 0 88px' }}>{children}</Box>
-  </Box>
-)
+  )
+}
 
 export const AdSalaryCells: FC<Props> = ({ ad, zoom, showHourlySalaryOnXs = false }) => {
   const { monthlySalaryTo, b2bHourlyRateEquivalent } = useMemo(() => formatJobSalary(ad.content), [ad.content])

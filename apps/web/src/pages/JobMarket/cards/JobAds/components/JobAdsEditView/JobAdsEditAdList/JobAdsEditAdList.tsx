@@ -10,7 +10,6 @@ const cardTableFontSize = designTokens.font.body.size
 
 type Props = {
   ads: JobAdsFeedItem[]
-  zoom: boolean
   expandedAdId?: string | null
   onToggleExpand?: (id: string) => void
   onChangeApplicationState?: (payload: JobAdsChangeStatePayload) => void
@@ -22,7 +21,6 @@ type Props = {
 
 export const JobAdsEditAdList: FC<Props> = ({
   ads,
-  zoom,
   expandedAdId = null,
   onToggleExpand,
   onChangeApplicationState,
@@ -46,7 +44,7 @@ export const JobAdsEditAdList: FC<Props> = ({
           <Ad
             key={ad.content.id}
             ad={ad}
-            zoom={zoom}
+            zoom={true}
             editMode={true}
             expanded={expandedAdId === ad.content.id}
             onToggleExpand={onToggleExpand ?? (() => undefined)}
