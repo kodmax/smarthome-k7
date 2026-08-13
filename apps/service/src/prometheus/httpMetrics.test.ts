@@ -10,7 +10,7 @@ describe('observeHttpFetch', () => {
     const { FetchError } = await import('@/fetch/FetchError')
     await expect(
       observeHttpFetch('https://example.com/page', 'json', async () => {
-        throw new FetchError('Not Found', 404)
+        throw new FetchError('https://example.com/page', 'Not Found', 404)
       }),
     ).rejects.toThrow(FetchError)
   })

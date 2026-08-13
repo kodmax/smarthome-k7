@@ -21,7 +21,7 @@ export async function yahooFetch(url: string): Promise<Document> {
   )
 
   if (!req.ok) {
-    throw new FetchError(req.statusText, req.status, await req.text())
+    throw new FetchError(url, req.statusText, req.status, await req.text())
   }
 
   return parseHtmlDocument(await req.text())
