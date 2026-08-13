@@ -7,6 +7,12 @@
   "exports": {
     ".": {
       "types": "./src/index.ts",
+      "browser": {
+        "types": "./src/client.ts",
+        "import": "./src/client.ts",
+        "default": "./src/client.ts"
+      },
+      "import": "./src/index.ts",
       "default": "./dist/index.js"
     }
   },
@@ -21,6 +27,7 @@
     "@repo/typescript-config": "*",
     "@types/node": "^17.0.35",
     "eslint": "^8.57.0",
-    "typescript": "5.5.4"
+    "typescript": "5.5.4",
+    "vite": "^8.1.0"
   }
 }

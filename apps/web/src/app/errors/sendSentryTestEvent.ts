@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react'
-import { isProduction } from '@/env'
+import { isProduction } from '@repo/env'
 
 export function isSentryEnabled(): boolean {
   return isProduction && Boolean(import.meta.env.VITE_SENTRY_DSN)

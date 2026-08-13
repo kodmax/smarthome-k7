@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/react'
 import { type FC, type ReactNode } from 'react'
-import { isDevelopment } from '@/env'
+import { isDevelopment } from '@repo/env'
 import { GlobalErrorFallback } from './GlobalErrorFallback'
 
 type GlobalErrorBoundaryProps = {

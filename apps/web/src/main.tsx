@@ -7,7 +7,7 @@ import { registerServiceWorker } from './app/registerServiceWorker'
 import { AppThemeProvider } from './app/theme/AppThemeProvider'
 import { router } from './app/router'
 import { I18nProvider } from '@/i18n'
-import { isDevelopment } from '@/env'
+import { isDevelopment } from '@repo/env'
 
 if (isDevelopment) {
   console.info(`[app] ${import.meta.env.MODE} mode`)

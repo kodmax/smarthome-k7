@@ -1,6 +1,7 @@
 {
   "extends": "./base.json",
   "compilerOptions": {
+    "customConditions": ["browser"],
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",

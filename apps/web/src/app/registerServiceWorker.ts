@@ -1,5 +1,5 @@
 import { registerSW } from 'virtual:pwa-register'
-import { isDevelopment } from '@/env'
+import { isDevelopment } from '@repo/env'
 
 export function registerServiceWorker(): void {
   if (!('serviceWorker' in navigator)) {

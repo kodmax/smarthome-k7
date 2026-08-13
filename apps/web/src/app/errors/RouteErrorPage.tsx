@@ -1,6 +1,6 @@
 import { type FC, useEffect } from 'react'
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
-import { isDevelopment } from '@/env'
+import { isDevelopment } from '@repo/env'
 import { captureProductionError } from './captureProductionError'
 import { GlobalErrorFallback } from './GlobalErrorFallback'
 

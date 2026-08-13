@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react'
 import { useEffect } from 'react'
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from 'react-router-dom'
-import { isDevelopment } from '@/env'
+import { isDevelopment } from '@repo/env'
 
 export function initSentry(): void {
   if (isDevelopment) {
