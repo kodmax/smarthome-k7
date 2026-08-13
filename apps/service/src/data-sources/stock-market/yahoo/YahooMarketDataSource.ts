@@ -1,9 +1,13 @@
 import { DataSource, CacheAgeUnit } from '@repo/feeds'
+import type { Sql } from '@repo/db'
+import { Inject } from '@/di'
+import { loadStockMarketTickers } from '../stockMarketTickers'
 import { getTickerData, sleep } from './src'
-import { tickerList } from '../tickerList'
 import { YahooTickerData } from './types'
 
 export class YahooMarketDataSource extends DataSource<YahooTickerData[]> {
+  @Inject('db')
+  declare private db: Sql
   static getId() {
     return 'yahoo-stock-market'
   }
@@ -21,8 +25,9 @@ export class YahooMarketDataSource extends DataSource<YahooTickerData[]> {
   }
 
   protected async fetchData() {
+    const tickers = await loadStockMarketTickers(this.db)
     const yahooTickerData: YahooTickerData[] = []
-    for (const ticker of tickerList) {
+    for (const ticker of tickers) {
       yahooTickerData.push(await getTickerData(ticker))
       await sleep(1000)
     }

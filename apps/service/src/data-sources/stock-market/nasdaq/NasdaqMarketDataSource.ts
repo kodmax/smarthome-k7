@@ -1,9 +1,13 @@
 import { DataSource, CacheAgeUnit } from '@repo/feeds'
-import { tickerList } from '../tickerList'
+import type { Sql } from '@repo/db'
+import { Inject } from '@/di'
+import { loadStockMarketTickers } from '../stockMarketTickers'
 import { NasdaqMarketData } from './types'
 import { getMarketInfo, getTickerData } from './src'
 
 export class NasdaqMarketDataSource extends DataSource<NasdaqMarketData> {
+  @Inject('db')
+  declare private db: Sql
   static getId() {
     return 'nasdaq-stock-market'
   }
@@ -21,8 +25,9 @@ export class NasdaqMarketDataSource extends DataSource<NasdaqMarketData> {
   }
 
   protected async fetchData() {
-    const [marketInfo, tickers] = await Promise.all([getMarketInfo(), Promise.all(tickerList.map(getTickerData))])
+    const tickers = await loadStockMarketTickers(this.db)
+    const [marketInfo, tickerData] = await Promise.all([getMarketInfo(), Promise.all(tickers.map(getTickerData))])
 
-    return { marketInfo, tickers }
+    return { marketInfo, tickers: tickerData }
   }
 }

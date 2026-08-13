@@ -2,8 +2,6 @@ import { DataSourceRegistry, FeedComposer } from '@repo/feeds'
 import { StockMarketFeed, TickerData } from '@repo/types'
 import { YahooTickerData } from '@/data-sources/stock-market/yahoo/types'
 import { DataSourceRegistryType } from '@/data-sources'
-import { NasdaqTickerData } from '@/data-sources/stock-market/nasdaq/types'
-import { tickerList } from '@/data-sources/stock-market/tickerList'
 
 export const addStockMarketFeed = (
   feeds: FeedComposer,
@@ -18,21 +16,12 @@ export const addStockMarketFeed = (
         yahooMap.set(data.ticker, data)
       }
 
-      const nasdaqMap: Map<string, NasdaqTickerData> = new Map()
-      for (const data of nasdaqMarketData.tickers) {
-        nasdaqMap.set(data.ticker, data)
-      }
-
       const tickers: TickerData[] = []
-      for (const symbol of tickerList) {
+      for (const nasdaq of nasdaqMarketData.tickers) {
+        const symbol = nasdaq.ticker
         const yahoo = yahooMap.get(symbol)
         if (yahoo === undefined) {
           throw new Error(`Missing Yahoo ticker data for ${symbol}`)
-        }
-
-        const nasdaq = nasdaqMap.get(symbol)
-        if (nasdaq === undefined) {
-          throw new Error(`Missing Nasdaq ticker data for ${symbol}`)
         }
 
         const priceTarget =
