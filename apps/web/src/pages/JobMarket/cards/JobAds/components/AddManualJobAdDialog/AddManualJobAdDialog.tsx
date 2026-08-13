@@ -16,24 +16,13 @@ import {
   Typography,
   type SelectChangeEvent,
 } from '@mui/material'
-import {
-  JobApplyStatus,
-  JobAdsFeedItem,
-  type JobAdsAddManualPayload,
-  type JobAdsEditManualPayload,
-  WorkplaceType,
-} from '@repo/types'
-import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { JobAdsFeedItem, type JobAdsAddManualPayload, type JobAdsEditManualPayload, WorkplaceType } from '@repo/types'
+import { type FC, useCallback, useMemo } from 'react'
 import { useTranslations } from '@/i18n'
 import { dedupeSkillsById } from '../../requiredSkills'
-import { reverseManualJobAdSalary } from './manualJobAdSalary'
+import { MANUAL_APPLY_STATUSES } from './manualJobAdFormState'
+import { useManualJobAdForm } from './useManualJobAdForm'
 
-const MANUAL_APPLY_STATUSES = [
-  'pending-review',
-  'consider',
-  'applied',
-  'interview',
-] as const satisfies readonly JobApplyStatus[]
 const WORKPLACE_TYPES = ['office', 'remote', 'hybrid'] as const satisfies readonly WorkplaceType[]
 const EMPLOYMENT_TYPES = ['permanent', 'b2b'] as const
 
@@ -94,10 +83,6 @@ function toAppliedAtIso(dateValue: string): string | undefined {
   return parsed.toISOString()
 }
 
-function formatSalaryInput(value: number | undefined): string {
-  return value === undefined ? '' : String(value)
-}
-
 function parseOptionalPaidVacationDaysInput(value: string): number | undefined {
   const trimmed = value.trim()
   if (trimmed.length === 0) {
@@ -119,62 +104,20 @@ export const ManualJobAdDialog: FC<Props> = props => {
   const labels = t.dashboard.jobAds
   const isAddMode = mode === 'add'
 
-  const [title, setTitle] = useState('')
-  const [companyName, setCompanyName] = useState('')
-  const [advertUrl, setAdvertUrl] = useState('')
-  const [workplaceType, setWorkplaceType] = useState<WorkplaceType>('remote')
-  const [employmentType, setEmploymentType] = useState<'permanent' | 'b2b'>('permanent')
-  const [salaryFrom, setSalaryFrom] = useState('')
-  const [salaryTo, setSalaryTo] = useState('')
-  const [applyStatus, setApplyStatus] = useState<(typeof MANUAL_APPLY_STATUSES)[number]>('pending-review')
-  const [appliedAt, setAppliedAt] = useState('')
-  const [requiredSkills, setRequiredSkills] = useState<string[]>([])
-  const [paidVacationDays, setPaidVacationDays] = useState('')
-
-  const resetAddForm = useCallback(() => {
-    setTitle('')
-    setCompanyName('')
-    setAdvertUrl('')
-    setWorkplaceType('remote')
-    setEmploymentType('permanent')
-    setSalaryFrom('')
-    setSalaryTo('')
-    setApplyStatus('pending-review')
-    setAppliedAt('')
-    setRequiredSkills([])
-    setPaidVacationDays('')
-  }, [])
-
-  const resetEditForm = useCallback((ad: JobAdsFeedItem) => {
-    const employmentTypeValue = ad.content.employmentType === 'b2b' ? 'b2b' : 'permanent'
-    const reversedSalary = reverseManualJobAdSalary(
-      employmentTypeValue,
-      ad.content.monthlySalaryRangeAfterTaxes,
-      ad.content.paidVacationDays,
-    )
-
-    setWorkplaceType(ad.content.workplaceType)
-    setEmploymentType(employmentTypeValue)
-    setSalaryFrom(formatSalaryInput(reversedSalary.salaryFrom))
-    setSalaryTo(formatSalaryInput(reversedSalary.salaryTo))
-    setRequiredSkills(dedupeSkillsById(ad.content.requiredSkills))
-    setPaidVacationDays(formatSalaryInput(ad.content.paidVacationDays))
-  }, [])
-
-  useEffect(() => {
-    if (!open) {
-      return
-    }
-
-    if (isAddMode) {
-      resetAddForm()
-      return
-    }
-
-    if (editAd !== undefined) {
-      resetEditForm(editAd)
-    }
-  }, [editAd, isAddMode, open, resetAddForm, resetEditForm])
+  const { form, dispatch } = useManualJobAdForm({ open, isAddMode, editAd })
+  const {
+    title,
+    companyName,
+    advertUrl,
+    workplaceType,
+    employmentType,
+    salaryFrom,
+    salaryTo,
+    applyStatus,
+    appliedAt,
+    requiredSkills,
+    paidVacationDays,
+  } = form
 
   const handleClose = useCallback(() => {
     onClose()
@@ -237,7 +180,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
       }
 
       onSubmit(payload)
-      resetAddForm()
+      dispatch({ type: 'reset-add' })
       return
     }
 
@@ -279,21 +222,21 @@ export const ManualJobAdDialog: FC<Props> = props => {
               <TextField
                 label={labels.addManualJobAdUrl}
                 value={advertUrl}
-                onChange={event => setAdvertUrl(event.target.value)}
+                onChange={event => dispatch({ type: 'patch', patch: { advertUrl: event.target.value } })}
                 required
                 fullWidth
               />
               <TextField
                 label={labels.jobTitle}
                 value={title}
-                onChange={event => setTitle(event.target.value)}
+                onChange={event => dispatch({ type: 'patch', patch: { title: event.target.value } })}
                 required
                 fullWidth
               />
               <TextField
                 label={labels.company}
                 value={companyName}
-                onChange={event => setCompanyName(event.target.value)}
+                onChange={event => dispatch({ type: 'patch', patch: { companyName: event.target.value } })}
                 required
                 fullWidth
               />
@@ -312,7 +255,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
             freeSolo
             options={skillOptions}
             value={requiredSkills}
-            onChange={(_, value) => setRequiredSkills(dedupeSkillsById(value.map(String)))}
+            onChange={(_, value) => dispatch({ type: 'set-required-skills', skills: value.map(String) })}
             renderValue={(value, getTagProps) =>
               value.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index })
@@ -328,7 +271,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
               value={workplaceType}
               label={labels.workplaceTypeLabel}
               onChange={(event: SelectChangeEvent<WorkplaceType>) =>
-                setWorkplaceType(event.target.value as WorkplaceType)
+                dispatch({ type: 'patch', patch: { workplaceType: event.target.value as WorkplaceType } })
               }
             >
               {WORKPLACE_TYPES.map(type => (
@@ -344,13 +287,12 @@ export const ManualJobAdDialog: FC<Props> = props => {
               labelId='manual-job-ad-employment-type'
               value={employmentType}
               label={labels.employmentType.label}
-              onChange={(event: SelectChangeEvent<'permanent' | 'b2b'>) => {
-                const nextEmploymentType = event.target.value as 'permanent' | 'b2b'
-                setEmploymentType(nextEmploymentType)
-                if (nextEmploymentType === 'permanent') {
-                  setPaidVacationDays('')
-                }
-              }}
+              onChange={(event: SelectChangeEvent<'permanent' | 'b2b'>) =>
+                dispatch({
+                  type: 'set-employment-type',
+                  employmentType: event.target.value as 'permanent' | 'b2b',
+                })
+              }
             >
               {EMPLOYMENT_TYPES.map(type => (
                 <MenuItem key={type} value={type}>
@@ -362,7 +304,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
           <TextField
             label={labels.salaryFrom}
             value={salaryFrom}
-            onChange={event => setSalaryFrom(event.target.value)}
+            onChange={event => dispatch({ type: 'patch', patch: { salaryFrom: event.target.value } })}
             type='number'
             inputProps={{ min: 1 }}
             helperText={salaryHint}
@@ -371,7 +313,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
           <TextField
             label={labels.salaryTo}
             value={salaryTo}
-            onChange={event => setSalaryTo(event.target.value)}
+            onChange={event => dispatch({ type: 'patch', patch: { salaryTo: event.target.value } })}
             type='number'
             inputProps={{ min: 1 }}
             helperText={salaryHint}
@@ -381,7 +323,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
             <TextField
               label={labels.paidVacationDaysLabel}
               value={paidVacationDays}
-              onChange={event => setPaidVacationDays(event.target.value)}
+              onChange={event => dispatch({ type: 'patch', patch: { paidVacationDays: event.target.value } })}
               type='number'
               inputProps={{ min: 0, max: 50, step: 1 }}
               helperText={labels.paidVacationDaysHint}
@@ -397,7 +339,10 @@ export const ManualJobAdDialog: FC<Props> = props => {
                   value={applyStatus}
                   label={labels.newApplicationStatus}
                   onChange={(event: SelectChangeEvent<(typeof MANUAL_APPLY_STATUSES)[number]>) =>
-                    setApplyStatus(event.target.value as (typeof MANUAL_APPLY_STATUSES)[number])
+                    dispatch({
+                      type: 'patch',
+                      patch: { applyStatus: event.target.value as (typeof MANUAL_APPLY_STATUSES)[number] },
+                    })
                   }
                 >
                   {MANUAL_APPLY_STATUSES.map(status => (
@@ -412,7 +357,7 @@ export const ManualJobAdDialog: FC<Props> = props => {
                   label={labels.applicationDate}
                   type='date'
                   value={appliedAt}
-                  onChange={event => setAppliedAt(event.target.value)}
+                  onChange={event => dispatch({ type: 'patch', patch: { appliedAt: event.target.value } })}
                   InputLabelProps={{ shrink: true }}
                   fullWidth
                 />

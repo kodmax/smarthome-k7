@@ -1,11 +1,12 @@
 import { type JobAdsFeedItem } from '@repo/types'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useReducer } from 'react'
 import {
   formatMatchAnalysisStaleNotice,
   formatMatchAnalysisText,
   formatMatchAnalysisTitle,
 } from '@/pages/JobMarket/cards/JobAds/shared-components/formatMatchAnalysisText'
 import { useTranslations } from '@/i18n'
+import { cvMatchAnalysisReducer, initialCvMatchAnalysisState } from './cvMatchAnalysisReducer'
 
 const MATCH_ANALYSIS_TIMEOUT_MS = 120_000
 
@@ -19,20 +20,11 @@ type UseCvMatchAnalysisOptions = {
 export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: UseCvMatchAnalysisOptions) {
   const { t } = useTranslations()
   const labels = t.dashboard.jobAds
-  const [analyzing, setAnalyzing] = useState(false)
-  const [pendingAnalysisAt, setPendingAnalysisAt] = useState<string | null>(null)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogTitle, setDialogTitle] = useState<string | null>(null)
-  const [dialogText, setDialogText] = useState<string | null>(null)
-  const [dialogNotice, setDialogNotice] = useState<string | null>(null)
+  const [state, dispatch] = useReducer(cvMatchAnalysisReducer, initialCvMatchAnalysisState)
+  const { analyzing, pendingAnalysisAt, dialogOpen, dialogTitle, dialogText, dialogNotice } = state
 
   useEffect(() => {
-    setAnalyzing(false)
-    setPendingAnalysisAt(null)
-    setDialogOpen(false)
-    setDialogTitle(null)
-    setDialogText(null)
-    setDialogNotice(null)
+    dispatch({ type: 'reset' })
   }, [ad.content.id, resetWhen])
 
   useEffect(() => {
@@ -51,12 +43,12 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
       return
     }
 
-    setDialogTitle(formatMatchAnalysisTitle(matchAnalysis, labels))
-    setDialogNotice(formatMatchAnalysisStaleNotice(ad.meta.isCurrentCVUsed, labels))
-    setDialogText(formatMatchAnalysisText(matchAnalysis, labels))
-    setDialogOpen(true)
-    setAnalyzing(false)
-    setPendingAnalysisAt(null)
+    dispatch({
+      type: 'show-result',
+      title: formatMatchAnalysisTitle(matchAnalysis, labels),
+      notice: formatMatchAnalysisStaleNotice(ad.meta.isCurrentCVUsed, labels),
+      text: formatMatchAnalysisText(matchAnalysis, labels),
+    })
   }, [ad, analyzing, labels, pendingAnalysisAt])
 
   useEffect(() => {
@@ -65,8 +57,7 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
     }
 
     const timeout = setTimeout(() => {
-      setAnalyzing(false)
-      setPendingAnalysisAt(null)
+      dispatch({ type: 'timeout' })
     }, MATCH_ANALYSIS_TIMEOUT_MS)
 
     return () => clearTimeout(timeout)
@@ -77,13 +68,12 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
       return
     }
 
-    setPendingAnalysisAt(ad.matchAnalysis?.analyzedAt ?? null)
-    setAnalyzing(true)
+    dispatch({ type: 'start-analysis', pendingAnalysisAt: ad.matchAnalysis?.analyzedAt ?? null })
     onAnalyze(ad.content.id)
   }, [ad.content.id, ad.matchAnalysis?.analyzedAt, analyzing, canAnalyze, onAnalyze])
 
   const closeDialog = useCallback(() => {
-    setDialogOpen(false)
+    dispatch({ type: 'close-dialog' })
   }, [])
 
   return {
