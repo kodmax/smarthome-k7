@@ -11,7 +11,7 @@ export const AdExpandedEditorRow: FC<{
   onSave: (state: SaveApplicationState) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
-  onAnalyzeCvMatch: (id: string) => void
+  onAnalyzeCvMatch: (id: string) => Promise<void>
 }> = ({ ad, columnCount, onSave, onFav, onUnfav, onAnalyzeCvMatch }) => (
   <ApolloTableRow sx={{ height: 'auto' }}>
     <ApolloTableCell

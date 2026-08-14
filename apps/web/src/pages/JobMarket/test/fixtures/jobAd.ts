@@ -1,6 +1,7 @@
 import {
   type JobAdApplication,
   type JobAdMatchAnalysis,
+  type JobAdMatchAnalysisSummary,
   type JobAdMeta,
   type JobAdsFeedItem,
   emptyJobAdMeta,
@@ -11,7 +12,7 @@ type JobAdOverrides = Partial<Omit<JobAdsFeedItem['content'], 'id' | 'title'>> &
     meta?: Partial<Omit<JobAdMeta, 'application'>> & {
       application?: Partial<JobAdApplication>
     }
-    matchAnalysis?: JobAdMatchAnalysis | null
+    matchAnalysisSummary?: JobAdMatchAnalysisSummary | null
   }
 
 export function matchAnalysis(
@@ -28,8 +29,15 @@ export function matchAnalysis(
   }
 }
 
+export function matchAnalysisSummary(overrides: Partial<JobAdMatchAnalysisSummary> = {}): JobAdMatchAnalysisSummary {
+  return {
+    score: 80,
+    ...overrides,
+  }
+}
+
 export function jobAd(overrides: JobAdOverrides): JobAdsFeedItem {
-  const { meta, matchAnalysis = null, id, title, ...restAd } = overrides
+  const { meta, matchAnalysisSummary = null, id, title, ...restAd } = overrides
 
   return {
     content: {
@@ -45,10 +53,10 @@ export function jobAd(overrides: JobAdOverrides): JobAdsFeedItem {
       title,
       ...restAd,
     },
-    matchAnalysis,
+    matchAnalysisSummary,
     meta: {
       ...emptyJobAdMeta(),
-      ...(matchAnalysis !== null ? { isCurrentCVUsed: true } : {}),
+      ...(matchAnalysisSummary !== null ? { isCurrentCVUsed: true } : {}),
       ...meta,
       application: {
         ...emptyJobAdMeta().application,

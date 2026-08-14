@@ -1,55 +1,31 @@
 import { type JobAdsFeedItem } from '@repo/types'
-import { useCallback, useEffect, useReducer } from 'react'
-import {
-  formatMatchAnalysisStaleNotice,
-  formatMatchAnalysisText,
-  formatMatchAnalysisTitle,
-} from '@/pages/JobMarket/cards/JobAds/shared-components/formatMatchAnalysisText'
-import { useTranslations } from '@/i18n'
+import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { cvMatchAnalysisReducer, initialCvMatchAnalysisState } from './cvMatchAnalysisReducer'
 
 const MATCH_ANALYSIS_TIMEOUT_MS = 120_000
 
 type UseCvMatchAnalysisOptions = {
-  ad: Pick<JobAdsFeedItem, 'content' | 'matchAnalysis' | 'meta'>
+  ad: Pick<JobAdsFeedItem, 'content' | 'meta'>
   canAnalyze: boolean
-  onAnalyze: (adId: string) => void
+  onAnalyze: (adId: string) => Promise<void>
   resetWhen?: unknown
 }
 
 export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: UseCvMatchAnalysisOptions) {
-  const { t } = useTranslations()
-  const labels = t.dashboard.jobAds
   const [state, dispatch] = useReducer(cvMatchAnalysisReducer, initialCvMatchAnalysisState)
-  const { analyzing, pendingAnalysisAt, dialogOpen, dialogTitle, dialogText, dialogNotice } = state
+  const { analyzing, dialogOpen } = state
+  const isMountedRef = useRef(true)
+
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
 
   useEffect(() => {
     dispatch({ type: 'reset' })
   }, [ad.content.id, resetWhen])
-
-  useEffect(() => {
-    if (!analyzing) {
-      return
-    }
-
-    const matchAnalysis = ad.matchAnalysis
-    if (matchAnalysis === null) {
-      return
-    }
-
-    const isUpdated = pendingAnalysisAt === null ? true : matchAnalysis.analyzedAt !== pendingAnalysisAt
-
-    if (!isUpdated) {
-      return
-    }
-
-    dispatch({
-      type: 'show-result',
-      title: formatMatchAnalysisTitle(matchAnalysis, labels),
-      notice: formatMatchAnalysisStaleNotice(ad.meta.isCurrentCVUsed, labels),
-      text: formatMatchAnalysisText(matchAnalysis, labels),
-    })
-  }, [ad, analyzing, labels, pendingAnalysisAt])
 
   useEffect(() => {
     if (!analyzing) {
@@ -68,9 +44,23 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
       return
     }
 
-    dispatch({ type: 'start-analysis', pendingAnalysisAt: ad.matchAnalysis?.analyzedAt ?? null })
-    onAnalyze(ad.content.id)
-  }, [ad.content.id, ad.matchAnalysis?.analyzedAt, analyzing, canAnalyze, onAnalyze])
+    dispatch({ type: 'start-analysis' })
+    void onAnalyze(ad.content.id)
+      .then(() => {
+        if (!isMountedRef.current) {
+          return
+        }
+
+        dispatch({ type: 'open-dialog' })
+      })
+      .catch(() => {
+        if (!isMountedRef.current) {
+          return
+        }
+
+        dispatch({ type: 'analysis-failed' })
+      })
+  }, [ad.content.id, analyzing, canAnalyze, onAnalyze])
 
   const closeDialog = useCallback(() => {
     dispatch({ type: 'close-dialog' })
@@ -79,9 +69,6 @@ export function useCvMatchAnalysis({ ad, canAnalyze, onAnalyze, resetWhen }: Use
   return {
     analyzing,
     dialogOpen,
-    dialogTitle,
-    dialogText,
-    dialogNotice,
     closeDialog,
     requestAnalysis,
   }

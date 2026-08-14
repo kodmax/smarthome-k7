@@ -37,7 +37,7 @@ export const Cv: FC<Record<string, never>> = () => {
       const previousModifiedAt = feed?.cv?.modifiedAt ?? null
       const base64 = await readFileAsBase64(file)
       const feedUpdate = waitForCvFeedUpdate(previousModifiedAt)
-      upload({ base64 })
+      await upload({ base64 })
       await feedUpdate
     } finally {
       setUploading(false)

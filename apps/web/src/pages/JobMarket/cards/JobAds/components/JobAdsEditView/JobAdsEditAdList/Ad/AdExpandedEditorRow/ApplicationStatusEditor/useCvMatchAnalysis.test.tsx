@@ -2,24 +2,8 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { type ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { I18nProvider } from '@/i18n'
-import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
-import { formatMatchAnalysisText } from '@/pages/JobMarket/cards/JobAds/shared-components/formatMatchAnalysisText'
+import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { useCvMatchAnalysis } from './useCvMatchAnalysis'
-
-const sectionLabels = {
-  matchAnalysisSummarySection: 'Podsumowanie',
-  matchAnalysisStrengthsSection: 'Mocne strony',
-  matchAnalysisGapsSection: 'Luki',
-  matchAnalysisMustHaveGapsSection: 'Brakujące wymagania must-have',
-  matchAnalysisMustHaveGapsEmpty: 'brak',
-  matchAnalysisObservationsSection: 'Obserwacje',
-  matchAnalysisConclusionSection: 'Wnioski',
-}
-
-const expectedDialogText = formatMatchAnalysisText(
-  matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z' }),
-  sectionLabels,
-)
 
 function TestWrapper({ children }: { children: ReactNode }) {
   return <I18nProvider initialLocale='pl'>{children}</I18nProvider>
@@ -33,11 +17,11 @@ function renderUseCvMatchAnalysis(props: Parameters<typeof useCvMatchAnalysis>[0
 }
 
 describe('useCvMatchAnalysis', () => {
-  it('opens dialog when ad receives a new match analysis while analyzing', async () => {
-    const onAnalyze = vi.fn()
+  it('opens dialog after analyze command resolves', async () => {
+    const onAnalyze = vi.fn().mockResolvedValue(undefined)
     const initialAd = jobAd({ id: '1', title: 'Role' })
 
-    const { result, rerender } = renderUseCvMatchAnalysis({
+    const { result } = renderUseCvMatchAnalysis({
       ad: initialAd,
       canAnalyze: true,
       onAnalyze,
@@ -50,36 +34,17 @@ describe('useCvMatchAnalysis', () => {
     expect(onAnalyze).toHaveBeenCalledWith('1')
     expect(result.current.analyzing).toBe(true)
 
-    rerender({
-      ad: jobAd({
-        id: '1',
-        title: 'Role',
-        matchAnalysis: matchAnalysis({
-          analyzedAt: '2026-01-02T00:00:00.000Z',
-          summary: 'Dobre dopasowanie.',
-        }),
-      }),
-    })
-
     await waitFor(() => {
       expect(result.current.dialogOpen).toBe(true)
     })
-    expect(result.current.dialogText).toBe(expectedDialogText)
-    expect(result.current.dialogNotice).toBeNull()
-    expect(result.current.dialogTitle).toBe('Analiza dopasowania CV — 80%')
     expect(result.current.analyzing).toBe(false)
   })
 
-  it('ignores match analysis until analyzedAt changes on re-analysis', async () => {
-    const onAnalyze = vi.fn()
-    const analyzedAt = '2026-01-01T00:00:00.000Z'
-    const initialAd = jobAd({
-      id: '2',
-      title: 'Role',
-      matchAnalysis: matchAnalysis({ analyzedAt, summary: 'Stara analiza.' }),
-    })
+  it('does not open dialog when analyze command rejects', async () => {
+    const onAnalyze = vi.fn().mockRejectedValue(new Error('failed'))
+    const initialAd = jobAd({ id: '2', title: 'Role' })
 
-    const { result, rerender } = renderUseCvMatchAnalysis({
+    const { result } = renderUseCvMatchAnalysis({
       ad: initialAd,
       canAnalyze: true,
       onAnalyze,
@@ -89,46 +54,14 @@ describe('useCvMatchAnalysis', () => {
       result.current.requestAnalysis()
     })
 
-    rerender({
-      ad: jobAd({
-        id: '2',
-        title: 'Role',
-        matchAnalysis: matchAnalysis({ analyzedAt, summary: 'Stara analiza.' }),
-      }),
-    })
-
-    expect(result.current.dialogOpen).toBe(false)
-    expect(result.current.analyzing).toBe(true)
-
-    rerender({
-      ad: jobAd({
-        id: '2',
-        title: 'Role',
-        matchAnalysis: matchAnalysis({
-          analyzedAt: '2026-01-02T00:00:00.000Z',
-          summary: 'Nowa analiza.',
-        }),
-      }),
-    })
-
     await waitFor(() => {
-      expect(result.current.dialogOpen).toBe(true)
+      expect(result.current.analyzing).toBe(false)
     })
-    expect(result.current.dialogText).toBe(
-      formatMatchAnalysisText(
-        matchAnalysis({
-          analyzedAt: '2026-01-02T00:00:00.000Z',
-          summary: 'Nowa analiza.',
-        }),
-        sectionLabels,
-      ),
-    )
-    expect(result.current.dialogNotice).toBeNull()
-    expect(result.current.dialogTitle).toBe('Analiza dopasowania CV — 80%')
+    expect(result.current.dialogOpen).toBe(false)
   })
 
   it('resets state when resetWhen changes', () => {
-    const onAnalyze = vi.fn()
+    const onAnalyze = vi.fn().mockResolvedValue(undefined)
     const initialAd = jobAd({ id: '3', title: 'Role' })
 
     const { result, rerender } = renderHook(

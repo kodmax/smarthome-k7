@@ -45,26 +45,28 @@ export const CardContent: FC<{ feed: EnergyFeed }> = ({ feed }) => {
 
   const onStart = useCallback(() => {
     setStatus('started')
-    start()
+    void start()
   }, [start])
 
   const onStop = useCallback(() => {
     setStatus('stopped')
-    stop()
+    void stop()
   }, [stop])
 
   const onReset = useCallback(() => {
     setStatus('reset')
-    reset()
+    void reset()
   }, [reset])
 
   useEffect(() => {
-    reset()
+    void reset()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- mount only
   }, [])
 
   useEffect(() => {
-    const id = setInterval(() => requestReadings(), REFRESH_INTERVAL)
+    const id = setInterval(() => {
+      void requestReadings()
+    }, REFRESH_INTERVAL)
     return () => {
       clearInterval(id)
     }

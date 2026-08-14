@@ -22,7 +22,7 @@ export const Ad: FC<{
   onChangeApplicationState: (payload: JobAdsChangeStatePayload) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
-  onAnalyzeCvMatch: (id: string) => void
+  onAnalyzeCvMatch: (id: string) => Promise<void>
   showApplyStatusIndicator?: boolean
 }> = ({
   ad,

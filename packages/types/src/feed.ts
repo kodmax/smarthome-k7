@@ -331,6 +331,11 @@ export type JobAdMatchAnalysis = {
   conclusion: string
 }
 
+export type JobAdMatchAnalysisSummary = {
+  score: number
+  mustHaveGapsCount?: number
+}
+
 export type JobAdMeta = {
   application: JobAdApplication
   fav: boolean
@@ -357,7 +362,7 @@ export type JobAd = {
 export type JobAdsFeedItem = {
   content: JobAd
   meta: JobAdMeta
-  matchAnalysis: JobAdMatchAnalysis | null
+  matchAnalysisSummary: JobAdMatchAnalysisSummary | null
 }
 
 export const ACCEPTABLE_SALARY_SLIDER_MIN = 5_000

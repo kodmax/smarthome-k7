@@ -18,20 +18,16 @@ const indicatorStyle = {
   lineHeight: 1,
 } as const
 
-function formatMustHaveGapsTooltip(gaps: string[]): string {
-  return gaps.map(gap => `- ${gap}`).join('\n')
-}
-
-export const MustHaveGapsIndicator: FC<{ ad: Pick<JobAdsFeedItem, 'matchAnalysis'> }> = ({ ad }) => {
+export const MustHaveGapsIndicator: FC<{ ad: Pick<JobAdsFeedItem, 'matchAnalysisSummary'> }> = ({ ad }) => {
   const { t } = useTranslations()
   const labels = t.dashboard.jobAds
-  const mustHaveGaps = ad.matchAnalysis?.mustHaveGaps
+  const mustHaveGapsCount = ad.matchAnalysisSummary?.mustHaveGapsCount
 
-  if (mustHaveGaps === undefined) {
+  if (mustHaveGapsCount === undefined) {
     return null
   }
 
-  if (mustHaveGaps.length === 0) {
+  if (mustHaveGapsCount === 0) {
     return (
       <Tooltip title={labels.matchAnalysisMustHaveGapsClearLabel}>
         <span aria-label={labels.matchAnalysisMustHaveGapsClearLabel} style={indicatorStyle}>
@@ -49,10 +45,10 @@ export const MustHaveGapsIndicator: FC<{ ad: Pick<JobAdsFeedItem, 'matchAnalysis
     )
   }
 
-  const countLabel = labels.matchAnalysisMustHaveGapsIndicatorLabel.replace('{count}', String(mustHaveGaps.length))
+  const countLabel = labels.matchAnalysisMustHaveGapsIndicatorLabel.replace('{count}', String(mustHaveGapsCount))
 
   return (
-    <Tooltip title={formatMustHaveGapsTooltip(mustHaveGaps)}>
+    <Tooltip title={countLabel}>
       <span aria-label={countLabel} style={indicatorStyle}>
         <CircleAlert
           size={jobTitleIconSize}
@@ -63,7 +59,7 @@ export const MustHaveGapsIndicator: FC<{ ad: Pick<JobAdsFeedItem, 'matchAnalysis
             flexShrink: 0,
           }}
         />
-        <span style={{ color: MUST_HAVE_GAPS_COLOR, fontSize: 'inherit' }}>{mustHaveGaps.length}</span>
+        <span style={{ color: MUST_HAVE_GAPS_COLOR, fontSize: 'inherit' }}>{mustHaveGapsCount}</span>
       </span>
     </Tooltip>
   )

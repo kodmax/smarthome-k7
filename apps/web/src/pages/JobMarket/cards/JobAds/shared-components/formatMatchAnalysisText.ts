@@ -25,11 +25,18 @@ function formatMustHaveGapsSection(label: string, emptyLabel: string, items: str
   return `${label}\n${items.map(item => `- ${item}`).join('\n')}`
 }
 
+export function formatMatchAnalysisScoreValue(
+  score: number,
+  labels: Pick<FormatMatchAnalysisLabels, 'matchAnalysisScore'>,
+): string {
+  return labels.matchAnalysisScore.replace('{score}', String(score))
+}
+
 export function formatMatchAnalysisScore(
   matchAnalysis: JobAdMatchAnalysis,
   labels: Pick<FormatMatchAnalysisLabels, 'matchAnalysisScore'>,
 ): string {
-  return labels.matchAnalysisScore.replace('{score}', String(matchAnalysis.score))
+  return formatMatchAnalysisScoreValue(matchAnalysis.score, labels)
 }
 
 export function formatMatchAnalysisTitle(

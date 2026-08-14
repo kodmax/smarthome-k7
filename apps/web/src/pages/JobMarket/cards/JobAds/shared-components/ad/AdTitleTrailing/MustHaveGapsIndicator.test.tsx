@@ -1,20 +1,17 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
+import { jobAd, matchAnalysisSummary } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { renderWithTheme } from '@/test/test-utils'
 import { MustHaveGapsIndicator } from './MustHaveGapsIndicator'
 
 describe('MustHaveGapsIndicator', () => {
-  it('renders icon and count when mustHaveGaps has items', () => {
+  it('renders icon and count when mustHaveGapsCount is greater than zero', () => {
     renderWithTheme(
       <MustHaveGapsIndicator
         ad={jobAd({
           id: '1',
           title: 'Role',
-          matchAnalysis: matchAnalysis({
-            analyzedAt: '2026-01-01T00:00:00.000Z',
-            mustHaveGaps: ['Req A', 'Req B'],
-          }),
+          matchAnalysisSummary: matchAnalysisSummary({ mustHaveGapsCount: 2 }),
         })}
       />,
     )
@@ -23,13 +20,13 @@ describe('MustHaveGapsIndicator', () => {
     expect(screen.getByText('2')).toBeInTheDocument()
   })
 
-  it('returns null when mustHaveGaps is undefined', () => {
+  it('returns null when mustHaveGapsCount is undefined', () => {
     const { container } = renderWithTheme(
       <MustHaveGapsIndicator
         ad={jobAd({
           id: '1',
           title: 'Role',
-          matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z' }),
+          matchAnalysisSummary: matchAnalysisSummary(),
         })}
       />,
     )
@@ -37,16 +34,13 @@ describe('MustHaveGapsIndicator', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders green checkmark when mustHaveGaps is empty', () => {
+  it('renders green checkmark when mustHaveGapsCount is zero', () => {
     renderWithTheme(
       <MustHaveGapsIndicator
         ad={jobAd({
           id: '1',
           title: 'Role',
-          matchAnalysis: matchAnalysis({
-            analyzedAt: '2026-01-01T00:00:00.000Z',
-            mustHaveGaps: [],
-          }),
+          matchAnalysisSummary: matchAnalysisSummary({ mustHaveGapsCount: 0 }),
         })}
       />,
     )
@@ -55,13 +49,13 @@ describe('MustHaveGapsIndicator', () => {
     expect(screen.queryByText('0')).not.toBeInTheDocument()
   })
 
-  it('returns null when matchAnalysis is null', () => {
+  it('returns null when matchAnalysisSummary is null', () => {
     const { container } = renderWithTheme(
       <MustHaveGapsIndicator
         ad={jobAd({
           id: '1',
           title: 'Role',
-          matchAnalysis: null,
+          matchAnalysisSummary: null,
         })}
       />,
     )

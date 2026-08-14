@@ -8,7 +8,7 @@ import { MustHaveGapsIndicator } from './MustHaveGapsIndicator'
 import { trailingGroupStyle } from './trailingGroupStyle'
 
 function hasAdTitleTrailingContent(
-  ad: Pick<JobAdsFeedItem, 'meta' | 'matchAnalysis'>,
+  ad: Pick<JobAdsFeedItem, 'meta' | 'matchAnalysisSummary'>,
   zoom: boolean,
   showApplyStatusIndicator: boolean,
 ): boolean {
@@ -18,7 +18,7 @@ function hasAdTitleTrailingContent(
 
   const showsStatusIndicator = showApplyStatusIndicator && ad.meta.application.status !== 'pending-review'
 
-  return ad.meta.fav || showsStatusIndicator || isJobAdApplied(ad) || ad.matchAnalysis !== null
+  return ad.meta.fav || showsStatusIndicator || isJobAdApplied(ad) || ad.matchAnalysisSummary !== null
 }
 
 export const AdTitleTrailing: FC<{

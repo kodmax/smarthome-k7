@@ -28,14 +28,14 @@ export const JobAdDetailsActions: FC<Props> = ({ ad }) => {
 
   const handleEditSubmit = useCallback(
     (payload: JobAdsEditManualPayload) => {
-      editManualJobAd(payload)
+      void editManualJobAd(payload)
       setEditOpen(false)
     },
     [editManualJobAd],
   )
 
   const handleDeleteConfirm = useCallback(() => {
-    deleteManualJobAd({ id: ad.content.id })
+    void deleteManualJobAd({ id: ad.content.id })
     setDeleteOpen(false)
   }, [ad.content.id, deleteManualJobAd])
 

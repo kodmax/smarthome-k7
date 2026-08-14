@@ -32,7 +32,7 @@ const adWithStatus = (
     id: `${status}-${salary?.to ?? 'none'}`,
     monthlySalaryRangeAfterTaxes: salary,
   },
-  matchAnalysis: null,
+  matchAnalysisSummary: null,
   meta: {
     ...emptyJobAdMeta(),
     application: jobAdApplicationFromMeta({

@@ -5,6 +5,7 @@ import { afterEach, vi } from 'vitest'
 vi.mock('@repo/feed-client', () => ({
   useFeed: vi.fn(),
   useCommand: vi.fn(() => vi.fn()),
+  fetchJobAdCvMatch: vi.fn(),
 }))
 
 afterEach(() => {

@@ -4,7 +4,7 @@ import { jobAd } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { renderWithTheme } from '@/test/test-utils'
 import { JobAdsArchivedAdList } from './JobAdsArchivedAdList'
 
-const noop = () => undefined
+const noop = async () => undefined
 
 describe('JobAdsArchivedAdList', () => {
   it('renders grouped sections with labels and counts', () => {

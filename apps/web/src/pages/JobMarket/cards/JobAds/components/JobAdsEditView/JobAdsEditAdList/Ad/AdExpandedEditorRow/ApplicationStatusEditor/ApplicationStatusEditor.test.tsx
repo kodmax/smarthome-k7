@@ -1,13 +1,14 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useFeed } from '@repo/feed-client'
-import { jobAd, matchAnalysis } from '@/pages/JobMarket/test/fixtures/jobAd'
+import { fetchJobAdCvMatch, useFeed } from '@repo/feed-client'
+import { jobAd, matchAnalysis, matchAnalysisSummary } from '@/pages/JobMarket/test/fixtures/jobAd'
 import { renderWithTheme } from '@/test/test-utils'
 import { ApplicationStatusEditor } from './ApplicationStatusEditor'
 
 vi.mock('@repo/feed-client', () => ({
   useFeed: vi.fn(),
   useCommand: vi.fn(() => vi.fn()),
+  fetchJobAdCvMatch: vi.fn(),
 }))
 
 const mockedUseFeed = vi.mocked(useFeed)
@@ -451,14 +452,14 @@ describe('ApplicationStatusEditor', () => {
   })
 
   it('enables check cv match when analysis is current', () => {
-    const onAnalyzeCvMatch = vi.fn()
+    const onAnalyzeCvMatch = vi.fn().mockResolvedValue(undefined)
 
     renderWithTheme(
       <ApplicationStatusEditor
         ad={jobAd({
           id: '12',
           title: 'Role',
-          matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z' }),
+          matchAnalysisSummary: matchAnalysisSummary(),
         })}
         onSave={vi.fn()}
         onFav={vi.fn()}
@@ -479,7 +480,7 @@ describe('ApplicationStatusEditor', () => {
         ad={jobAd({
           id: '13',
           title: 'Role',
-          matchAnalysis: matchAnalysis({ analyzedAt: '2026-01-01T00:00:00.000Z' }),
+          matchAnalysisSummary: matchAnalysisSummary(),
           meta: { isCurrentCVUsed: false },
         })}
         onSave={vi.fn()}
@@ -492,11 +493,16 @@ describe('ApplicationStatusEditor', () => {
     expect(screen.getByRole('button', { name: 'Sprawdź dopasowanie' })).toBeEnabled()
   })
 
-  it('shows loader and opens match analysis dialog after ad update', async () => {
+  it('shows loader and opens match analysis dialog after analyze resolves', async () => {
     const feedAd = jobAd({ id: '11', title: 'Role' })
-    const onAnalyzeCvMatch = vi.fn()
+    const onAnalyzeCvMatch = vi.fn().mockResolvedValue(undefined)
+    const updatedAnalysis = matchAnalysis({
+      analyzedAt: '2026-01-02T00:00:00.000Z',
+      summary: 'Dobre dopasowanie do roli.',
+    })
+    vi.mocked(fetchJobAdCvMatch).mockResolvedValueOnce(updatedAnalysis)
 
-    const { rerender } = renderWithTheme(
+    renderWithTheme(
       <ApplicationStatusEditor
         ad={feedAd}
         onSave={vi.fn()}
@@ -510,25 +516,6 @@ describe('ApplicationStatusEditor', () => {
 
     expect(onAnalyzeCvMatch).toHaveBeenCalledWith('11')
     expect(screen.getByRole('button', { name: 'Sprawdź dopasowanie' })).toBeDisabled()
-
-    const updatedAnalysis = matchAnalysis({
-      analyzedAt: '2026-01-02T00:00:00.000Z',
-      summary: 'Dobre dopasowanie do roli.',
-    })
-
-    rerender(
-      <ApplicationStatusEditor
-        ad={jobAd({
-          id: '11',
-          title: 'Role',
-          matchAnalysis: updatedAnalysis,
-        })}
-        onSave={vi.fn()}
-        onFav={vi.fn()}
-        onUnfav={vi.fn()}
-        onAnalyzeCvMatch={onAnalyzeCvMatch}
-      />,
-    )
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()

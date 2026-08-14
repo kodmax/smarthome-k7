@@ -15,7 +15,7 @@ type Props = {
   onChangeApplicationState?: (payload: JobAdsChangeStatePayload) => void
   onFav?: (id: string) => void
   onUnfav?: (id: string) => void
-  onAnalyzeCvMatch?: (id: string) => void
+  onAnalyzeCvMatch?: (id: string) => Promise<void>
 }
 
 const sectionRowInsetLeft = designTokens.space[4]

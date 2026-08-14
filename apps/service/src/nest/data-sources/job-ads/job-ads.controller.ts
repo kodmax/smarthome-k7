@@ -1,4 +1,5 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, HttpStatus, NotFoundException, Param, Post } from '@nestjs/common'
+import { type JobAdMatchAnalysis } from '@repo/types'
 import { DataSourceRegistry } from '@repo/feeds'
 import { JobAdsSource } from '@/data-sources/job-ads/JobAdsSource'
 import { DataSourceRegistryType } from '@/data-sources'
@@ -18,6 +19,16 @@ export class JobAdsController {
 
   private source(): JobAdsSource {
     return this.dataSources.get('jobAds')
+  }
+
+  @Get('cv-match/:adId')
+  async getCvMatch(@Param('adId') adId: string): Promise<JobAdMatchAnalysis> {
+    const match = await this.source().getCvMatch(adId)
+    if (match === null) {
+      throw new NotFoundException()
+    }
+
+    return match
   }
 
   @Post('command/change-state')

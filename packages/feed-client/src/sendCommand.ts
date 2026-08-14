@@ -23,10 +23,10 @@ export function sendCommand<S extends keyof CommandPayloadRegistry, N extends ke
   sourceId: S,
   name: N,
   payload: CommandPayloadRegistry[S][N],
-): void {
+): Promise<void> {
   const { url, body } = buildCommandRequest(apiBaseUrl, sourceId, name, payload)
 
-  void fetch(url, {
+  return fetch(url, {
     method: 'POST',
     headers: body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
     body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -44,8 +44,14 @@ export function sendCommand<S extends keyof CommandPayloadRegistry, N extends ke
         url,
         responseBody,
       })
+      throw new Error(`Command failed: ${String(sourceId)}.${String(name)} (${response.status})`)
     })
     .catch(error => {
+      if (error instanceof Error && error.message.startsWith('Command failed:')) {
+        throw error
+      }
+
       logCommandError('[feed-client] command error', { sourceId, name, url, error })
+      throw error
     })
 }

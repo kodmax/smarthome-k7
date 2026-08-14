@@ -42,7 +42,7 @@ export const JobAdsEditView: FC<Props> = ({ ads, filter, skillsFilter = [], only
 
   const onChangeApplicationState = useCallback(
     ({ id, applyStatus, archiveReason, comment }: JobAdsChangeStatePayload) => {
-      changeState({
+      void changeState({
         id,
         applyStatus,
         archiveReason,

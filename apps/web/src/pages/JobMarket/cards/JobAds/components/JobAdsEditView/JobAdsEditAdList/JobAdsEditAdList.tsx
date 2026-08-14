@@ -15,7 +15,7 @@ type Props = {
   onChangeApplicationState?: (payload: JobAdsChangeStatePayload) => void
   onFav?: (id: string) => void
   onUnfav?: (id: string) => void
-  onAnalyzeCvMatch?: (id: string) => void
+  onAnalyzeCvMatch?: (id: string) => Promise<void>
   showApplyStatusIndicator?: boolean
 }
 
@@ -51,7 +51,7 @@ export const JobAdsEditAdList: FC<Props> = ({
             onChangeApplicationState={onChangeApplicationState ?? (() => undefined)}
             onFav={onFav ?? (() => undefined)}
             onUnfav={onUnfav ?? (() => undefined)}
-            onAnalyzeCvMatch={onAnalyzeCvMatch ?? (() => undefined)}
+            onAnalyzeCvMatch={onAnalyzeCvMatch ?? (async () => undefined)}
             showApplyStatusIndicator={showApplyStatusIndicator}
           />
         ))}

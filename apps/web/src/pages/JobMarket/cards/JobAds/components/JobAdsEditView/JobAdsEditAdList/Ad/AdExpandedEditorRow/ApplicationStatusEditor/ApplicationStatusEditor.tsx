@@ -18,6 +18,7 @@ import { designTokens } from '@repo/design-tokens'
 import { Star } from 'lucide-react'
 import { FC, useEffect, useMemo, useState, type CSSProperties, type SyntheticEvent } from 'react'
 import { TagGroup } from '@/card-components'
+import { JobAdCvMatchDialog } from '@/pages/JobMarket/cards/JobAds/shared-components/JobAdCvMatchDialog'
 import { CvPreviewDialog } from '@/pages/JobMarket/cards/Cv/CvPreviewDialog'
 import { useLocale, useTranslations } from '@/i18n'
 import { ApplyStatusIcon } from '../../../../../../shared-components'
@@ -42,7 +43,7 @@ export const ApplicationStatusEditor: FC<{
   onSave: (state: SaveApplicationState) => void
   onFav: (id: string) => void
   onUnfav: (id: string) => void
-  onAnalyzeCvMatch: (id: string) => void
+  onAnalyzeCvMatch: (id: string) => Promise<void>
 }> = ({ ad, onSave, onFav, onUnfav, onAnalyzeCvMatch }) => {
   const { t } = useTranslations()
   const { locale } = useLocale()
@@ -80,9 +81,6 @@ export const ApplicationStatusEditor: FC<{
   const {
     analyzing: analyzingCvMatch,
     dialogOpen: matchAnalysisDialogOpen,
-    dialogTitle: matchAnalysisTitle,
-    dialogText: matchAnalysisText,
-    dialogNotice: matchAnalysisNotice,
     closeDialog: closeMatchAnalysisDialog,
     requestAnalysis: handleAnalyzeCvMatch,
   } = useCvMatchAnalysis({
@@ -186,11 +184,11 @@ export const ApplicationStatusEditor: FC<{
 
   const handleFavToggle = () => {
     if (ad.meta.fav) {
-      onUnfav(ad.content.id)
+      void onUnfav(ad.content.id)
       return
     }
 
-    onFav(ad.content.id)
+    void onFav(ad.content.id)
   }
 
   return (
@@ -438,13 +436,12 @@ export const ApplicationStatusEditor: FC<{
           text={labels.cvMatchUnavailableTheProtocolNotice}
         />
       ) : null}
-      {matchAnalysisText !== null && matchAnalysisTitle !== null ? (
-        <CvPreviewDialog
+      {matchAnalysisDialogOpen ? (
+        <JobAdCvMatchDialog
           open={matchAnalysisDialogOpen}
           onClose={closeMatchAnalysisDialog}
-          title={matchAnalysisTitle}
-          notice={matchAnalysisNotice}
-          text={matchAnalysisText}
+          adId={ad.content.id}
+          isCurrentCVUsed={ad.meta.isCurrentCVUsed}
         />
       ) : null}
     </Box>

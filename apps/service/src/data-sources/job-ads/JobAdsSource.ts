@@ -7,6 +7,8 @@ import {
   JobAdsCachedFeed,
   JobAdsFeed,
   JobAdsFeedItem,
+  type JobAdMatchAnalysis,
+  type JobAdMatchAnalysisSummary,
   type JobAdsEditManualPayload,
   type JobAdsChangeStatePayload,
   emptyJobAdMeta,
@@ -47,6 +49,17 @@ import { syncJobAdsFromSources } from './syncJobAdsFromSources'
 import { loadNotInterestedSkillIds } from '../my-skills/loadNotInterestedSkillIds'
 
 const STALE_APPLIED_ARCHIVE_AFTER_DAYS = 7
+
+function toMatchAnalysisSummary(analysis: JobAdMatchAnalysis | undefined): JobAdMatchAnalysisSummary | null {
+  if (analysis === undefined) {
+    return null
+  }
+
+  return {
+    score: analysis.score,
+    mustHaveGapsCount: analysis.mustHaveGaps?.length,
+  }
+}
 
 export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
   @Inject('db')
@@ -97,6 +110,11 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
       loadAdUrl: itemId => loadJobAdAdvertUrl(this.db, itemId),
     })
     void this.push()
+  }
+
+  public async getCvMatch(adId: string): Promise<JobAdMatchAnalysis | null> {
+    const matches = await loadCvMatchesByAdIds(this.db, [adId])
+    return matches.get(adId)?.analysis ?? null
   }
 
   public async addManualJobAd(input: Parameters<typeof buildManualJobAdDocument>[0]): Promise<void> {
@@ -224,7 +242,7 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
           ...content,
           publishedAt: meta.firstPublishedAt,
         },
-        matchAnalysis: loadedMatchAnalysis?.analysis ?? null,
+        matchAnalysisSummary: toMatchAnalysisSummary(loadedMatchAnalysis?.analysis),
         meta: {
           ...emptyJobAdMeta(),
           application: jobAdApplicationFromMeta({
