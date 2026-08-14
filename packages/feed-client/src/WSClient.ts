@@ -6,9 +6,7 @@ const isWebSocketOpen = (ws: WebSocket): boolean => ws.readyState === WebSocket.
 
 export class WSClient {
   private readonly topics: Set<string> = new Set<string>()
-  private readonly pendingSubscribes: Set<string> = new Set<string>()
-  private readonly pendingUnsubscribes: Set<string> = new Set<string>()
-  private flushScheduled = false
+  private syncScheduled = false
   private ws: WebSocket
 
   constructor(uri: string, onFeedChanged: OnFeedChanged) {
@@ -19,9 +17,7 @@ export class WSClient {
     const ws = new WebSocket(uri)
 
     ws.addEventListener('open', () => {
-      if (this.topics.size > 0) {
-        ws.send(`subscribe ${[...this.topics].join(' ')}`)
-      }
+      this.syncSubscriptions()
     })
 
     ws.addEventListener('message', (ev: MessageEvent<string>) => {
@@ -31,9 +27,7 @@ export class WSClient {
     })
 
     ws.addEventListener('close', () => {
-      this.pendingSubscribes.clear()
-      this.pendingUnsubscribes.clear()
-      this.flushScheduled = false
+      this.syncScheduled = false
       this.ws = this.connect(uri, onFeedChanged)
     })
 
@@ -41,67 +35,40 @@ export class WSClient {
   }
 
   subscribe(topic: string): void {
-    const isNew = !this.topics.has(topic)
+    if (this.topics.has(topic)) {
+      return
+    }
+
     this.topics.add(topic)
-
-    if (!isNew || !isWebSocketOpen(this.ws)) {
-      return
-    }
-
-    if (this.pendingUnsubscribes.delete(topic)) {
-      return
-    }
-
-    this.pendingSubscribes.add(topic)
-    this.scheduleFlush()
+    this.scheduleSync()
   }
 
   unsubscribe(topic: string): void {
-    if (!this.topics.has(topic)) {
+    if (!this.topics.delete(topic)) {
       return
     }
 
-    this.topics.delete(topic)
-
-    if (!isWebSocketOpen(this.ws)) {
-      return
-    }
-
-    if (this.pendingSubscribes.delete(topic)) {
-      return
-    }
-
-    this.pendingUnsubscribes.add(topic)
-    this.scheduleFlush()
+    this.scheduleSync()
   }
 
-  private scheduleFlush(): void {
-    if (this.flushScheduled) {
+  private scheduleSync(): void {
+    if (this.syncScheduled) {
       return
     }
 
-    this.flushScheduled = true
+    this.syncScheduled = true
     queueMicrotask(() => {
-      this.flushScheduled = false
-      this.flushPending()
+      this.syncScheduled = false
+      this.syncSubscriptions()
     })
   }
 
-  private flushPending(): void {
+  private syncSubscriptions(): void {
     if (!isWebSocketOpen(this.ws)) {
-      this.pendingSubscribes.clear()
-      this.pendingUnsubscribes.clear()
       return
     }
 
-    if (this.pendingSubscribes.size > 0) {
-      this.ws.send(`subscribe ${[...this.pendingSubscribes].join(' ')}`)
-      this.pendingSubscribes.clear()
-    }
-
-    if (this.pendingUnsubscribes.size > 0) {
-      this.ws.send(`unsubscribe ${[...this.pendingUnsubscribes].join(' ')}`)
-      this.pendingUnsubscribes.clear()
-    }
+    const payload = [...this.topics].join(' ')
+    this.ws.send(payload.length > 0 ? `subscribe ${payload}` : 'subscribe')
   }
 }

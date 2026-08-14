@@ -54,7 +54,7 @@ describe('WSClient', () => {
     vi.unstubAllGlobals()
   })
 
-  it('batches subscribe messages in the same microtask', async () => {
+  it('sends a full subscription snapshot in the same microtask', async () => {
     const client = new WSClient('ws://test', vi.fn())
     client.subscribe('weather')
     client.subscribe('energy')
@@ -64,7 +64,7 @@ describe('WSClient', () => {
     expect(sent).toEqual(['subscribe weather energy'])
   })
 
-  it('batches unsubscribe messages in the same microtask', async () => {
+  it('sends a full snapshot after local unsubscribes', async () => {
     const client = new WSClient('ws://test', vi.fn())
     client.subscribe('weather')
     client.subscribe('energy')
@@ -78,10 +78,10 @@ describe('WSClient', () => {
 
     await flushMicrotasks()
 
-    expect(sent).toEqual(['unsubscribe weather energy indoor'])
+    expect(sent).toEqual(['subscribe'])
   })
 
-  it('drops topic from reconnect set after unsubscribe', async () => {
+  it('resubscribes the remaining topics after reconnect', async () => {
     const client = new WSClient('ws://test', vi.fn())
     client.subscribe('weather')
     client.subscribe('energy')
@@ -90,14 +90,15 @@ describe('WSClient', () => {
 
     client.unsubscribe('weather')
     await flushMicrotasks()
+    sent.length = 0
 
     closeHandler?.()
     openHandler?.()
 
-    expect(sent).toEqual(['unsubscribe weather', 'subscribe energy'])
+    expect(sent).toEqual(['subscribe energy'])
   })
 
-  it('skips wire updates when subscribe and unsubscribe cancel out in the same batch', async () => {
+  it('keeps a topic subscribed when unsubscribe and subscribe happen in the same batch', async () => {
     const client = new WSClient('ws://test', vi.fn())
     client.subscribe('weather')
     await flushMicrotasks()
@@ -108,30 +109,55 @@ describe('WSClient', () => {
 
     await flushMicrotasks()
 
-    expect(sent).toEqual([])
+    expect(sent).toEqual(['subscribe weather'])
+  })
+
+  it('syncs job-ads after a navigation-style handoff in one batch', async () => {
+    const client = new WSClient('ws://test', vi.fn())
+    client.subscribe('job-market-insight')
+    client.subscribe('my-skills')
+    client.subscribe('cv')
+    client.subscribe('job-ads')
+    await flushMicrotasks()
+    sent.length = 0
+
+    client.unsubscribe('my-skills')
+    client.unsubscribe('job-market-insight')
+    client.unsubscribe('cv')
+    client.subscribe('energy')
+    client.subscribe('weather')
+
+    await flushMicrotasks()
+
+    expect(sent).toEqual(['subscribe job-ads energy weather'])
   })
 
   it('forwards FEED-UPDATE messages to onFeedChanged', () => {
     const onFeedChanged = vi.fn()
-    new WSClient('ws://test', onFeedChanged)
+    const client = new WSClient('ws://test', onFeedChanged)
+    client.subscribe('weather')
 
     messageHandler?.({ data: 'FEED-UPDATE weather' } as MessageEvent<string>)
 
     expect(onFeedChanged).toHaveBeenCalledWith('weather')
   })
 
-  it('sends subscribe after open when topics were empty on connect', async () => {
+  it('sends subscribe after open when topics were added while connecting', async () => {
     readyState = 0
 
     const client = new WSClient('ws://test', vi.fn())
+    client.subscribe('job-market-insight')
+    client.subscribe('cv')
     readyState = 1
     openHandler?.()
-    expect(sent).toEqual([])
 
+    expect(sent).toEqual(['subscribe job-market-insight cv'])
+
+    sent.length = 0
     client.subscribe('job-ads')
 
     await flushMicrotasks()
 
-    expect(sent).toEqual(['subscribe job-ads'])
+    expect(sent).toEqual(['subscribe job-market-insight cv job-ads'])
   })
 })

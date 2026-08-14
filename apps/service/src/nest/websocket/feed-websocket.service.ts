@@ -81,11 +81,8 @@ export class FeedWebSocketService implements OnModuleInit, OnModuleDestroy {
       const [cmd, ...params] = data.toString('utf-8').split(' ')
 
       if (cmd === 'subscribe') {
-        params.forEach(sub => client.subscriptions.add(sub))
-        this.logger.info({ deviceId, clientIp: ip, feedIds: params }, 'Client subscribed')
-      } else if (cmd === 'unsubscribe') {
-        params.forEach(sub => client.subscriptions.delete(sub))
-        this.logger.info({ deviceId, clientIp: ip, feedIds: params }, 'Client unsubscribed')
+        client.subscriptions = new Set(params.filter(sub => sub.length > 0))
+        this.logger.info({ deviceId, clientIp: ip, feedIds: [...client.subscriptions] }, 'Client subscribed')
       } else {
         this.logger.info({ deviceId, clientIp: ip, cmd }, 'Client sent unknown command')
       }

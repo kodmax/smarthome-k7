@@ -79,9 +79,24 @@ describe('FeedWebSocketService', () => {
     expect(ws.sent).toEqual(['FEED-UPDATE my-feed'])
   })
 
-  it('stops broadcasting after client unsubscribes', async () => {
+  it('replaces subscriptions when client sends a new subscribe snapshot', async () => {
+    ws.emit('message', Buffer.from('subscribe my-feed other-feed'))
+    ws.emit('message', Buffer.from('subscribe other-feed'))
+    await new Promise(resolve => setTimeout(resolve, 20))
+
+    feedEvents.emit('feed-changed', 'my-feed')
+    await new Promise(resolve => setTimeout(resolve, 1100))
+    expect(ws.sent).toEqual([])
+
+    feedEvents.emit('feed-changed', 'other-feed')
+    await new Promise(resolve => setTimeout(resolve, 1100))
+
+    expect(ws.sent).toEqual(['FEED-UPDATE other-feed'])
+  })
+
+  it('clears subscriptions when client sends subscribe with no feeds', async () => {
     ws.emit('message', Buffer.from('subscribe my-feed'))
-    ws.emit('message', Buffer.from('unsubscribe my-feed'))
+    ws.emit('message', Buffer.from('subscribe'))
     await new Promise(resolve => setTimeout(resolve, 20))
 
     feedEvents.emit('feed-changed', 'my-feed')

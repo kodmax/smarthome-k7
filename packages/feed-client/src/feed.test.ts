@@ -77,7 +77,7 @@ describe('subscribe', () => {
     await vi.waitFor(() => expect(fetchFeed).toHaveBeenCalledWith('weather'))
   })
 
-  it('sends ws unsubscribe when last subscriber leaves', async () => {
+  it('syncs ws subscriptions when last subscriber leaves', async () => {
     const { subscribe } = await import('./feed')
 
     const unsubscribe = subscribe('weather', noopSubscriber)
