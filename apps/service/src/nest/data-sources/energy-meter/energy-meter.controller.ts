@@ -3,33 +3,33 @@ import { DataSourceRegistry } from '@repo/feeds'
 import { EnergyMeterSource } from '@/data-sources/knx/EnergyMeterSource'
 import { DataSourceRegistryType } from '@/data-sources'
 
-@Controller('data-sources/energy.meter/command')
-export class EnergyMeterCommandsController {
+@Controller('data-sources/energy.meter')
+export class EnergyMeterController {
   constructor(private readonly dataSources: DataSourceRegistry<DataSourceRegistryType>) {}
 
   private source(): EnergyMeterSource {
     return this.dataSources.get('energyMeter')
   }
 
-  @Post('reset')
+  @Post('command/reset')
   @HttpCode(HttpStatus.NO_CONTENT)
   reset(): Promise<void> {
     return this.source().resetMeter()
   }
 
-  @Post('start')
+  @Post('command/start')
   @HttpCode(HttpStatus.NO_CONTENT)
   start(): Promise<void> {
     return this.source().startMeter()
   }
 
-  @Post('stop')
+  @Post('command/stop')
   @HttpCode(HttpStatus.NO_CONTENT)
   stop(): Promise<void> {
     return this.source().stopMeter()
   }
 
-  @Post('request-readings')
+  @Post('command/request-readings')
   @HttpCode(HttpStatus.NO_CONTENT)
   requestReadings(): Promise<void> {
     return this.source().requestReadings()

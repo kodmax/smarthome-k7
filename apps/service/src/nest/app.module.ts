@@ -3,7 +3,6 @@ import { AppService } from './app.service'
 import { LoggerModule } from './logger/logger.module'
 import { DataSourceRegistry, FeedComposer, FeedEvents, type ErrorHandler } from '@repo/feeds'
 import { DataSourceRegistryType } from '@/data-sources'
-import { CommandsModule } from './commands/commands.module'
 import { DataSourcesModule } from './data-sources/data-sources.module'
 import { FeedModule } from './feed/feed.module'
 import { EventsModule } from './websocket/events.module'
@@ -25,7 +24,6 @@ export class AppModule {
         FeedModule.forRoot(feeds),
         DataSourcesModule.forRoot(dataSources),
         EventsModule.forRoot({ feedEvents, onError }),
-        CommandsModule,
       ],
       providers: [AppService],
     }

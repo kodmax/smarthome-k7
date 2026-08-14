@@ -10,59 +10,59 @@ import {
   EditManualJobAdDto,
   ItemIdDto,
   SetAcceptableSalaryDto,
-} from './job-ads.commands.dto'
+} from './job-ads.dto'
 
-@Controller('data-sources/job-ads/command')
-export class JobAdsCommandsController {
+@Controller('data-sources/job-ads')
+export class JobAdsController {
   constructor(private readonly dataSources: DataSourceRegistry<DataSourceRegistryType>) {}
 
   private source(): JobAdsSource {
     return this.dataSources.get('jobAds')
   }
 
-  @Post('change-state')
+  @Post('command/change-state')
   @HttpCode(HttpStatus.NO_CONTENT)
   changeState(@Body() dto: ChangeStateDto): Promise<void> {
     return this.source().changeState(dto)
   }
 
-  @Post('fav')
+  @Post('command/fav')
   @HttpCode(HttpStatus.NO_CONTENT)
   fav(@Body() dto: ItemIdDto): Promise<void> {
     return this.source().fav(dto.itemId)
   }
 
-  @Post('unfav')
+  @Post('command/unfav')
   @HttpCode(HttpStatus.NO_CONTENT)
   unfav(@Body() dto: ItemIdDto): Promise<void> {
     return this.source().unfav(dto.itemId)
   }
 
-  @Post('set-acceptable-salary')
+  @Post('command/set-acceptable-salary')
   @HttpCode(HttpStatus.NO_CONTENT)
   setAcceptableSalary(@Body() dto: SetAcceptableSalaryDto): Promise<void> {
     return this.source().setAcceptableSalary(dto.value)
   }
 
-  @Post('analyze-cv-match')
+  @Post('command/analyze-cv-match')
   @HttpCode(HttpStatus.NO_CONTENT)
   analyzeCvMatch(@Body() dto: AnalyzeCvMatchDto): Promise<void> {
     return this.source().analyzeCvMatch(dto.adId)
   }
 
-  @Post('add-manual')
+  @Post('command/add-manual')
   @HttpCode(HttpStatus.NO_CONTENT)
   addManual(@Body() dto: AddManualJobAdDto): Promise<void> {
     return this.source().addManualJobAd(dto)
   }
 
-  @Post('edit-manual')
+  @Post('command/edit-manual')
   @HttpCode(HttpStatus.NO_CONTENT)
   editManual(@Body() dto: EditManualJobAdDto): Promise<void> {
     return this.source().editManualJobAd(dto)
   }
 
-  @Post('delete-manual')
+  @Post('command/delete-manual')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteManual(@Body() dto: DeleteManualJobAdDto): Promise<void> {
     return this.source().deleteManualJobAd(dto.id)
