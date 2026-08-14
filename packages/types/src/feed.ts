@@ -326,6 +326,7 @@ export type JobAdMatchAnalysis = {
   summary: string
   strengths: string
   gaps: string
+  mustHaveGaps?: string[]
   observations: string
   conclusion: string
 }

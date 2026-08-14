@@ -4,6 +4,7 @@ import { ApplyStatusIndicator } from './ApplyStatusIndicator'
 import { AppliedIndicator } from './AppliedIndicator'
 import { JobFavIndicator } from './JobFavIndicator'
 import { MatchAnalysisIndicator } from './MatchAnalysisIndicator'
+import { MustHaveGapsIndicator } from './MustHaveGapsIndicator'
 import { trailingGroupStyle } from './trailingGroupStyle'
 
 function hasAdTitleTrailingContent(
@@ -36,6 +37,7 @@ export const AdTitleTrailing: FC<{
       <AppliedIndicator ad={ad} />
       {showApplyStatusIndicator ? <ApplyStatusIndicator ad={ad} /> : null}
       <MatchAnalysisIndicator ad={ad} />
+      <MustHaveGapsIndicator ad={ad} />
       {children}
     </span>
   )

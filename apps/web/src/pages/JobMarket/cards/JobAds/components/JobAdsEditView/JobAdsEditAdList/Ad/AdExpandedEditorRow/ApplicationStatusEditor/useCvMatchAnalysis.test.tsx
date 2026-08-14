@@ -10,6 +10,8 @@ const sectionLabels = {
   matchAnalysisSummarySection: 'Podsumowanie',
   matchAnalysisStrengthsSection: 'Mocne strony',
   matchAnalysisGapsSection: 'Luki',
+  matchAnalysisMustHaveGapsSection: 'Brakujące wymagania must-have',
+  matchAnalysisMustHaveGapsEmpty: 'brak',
   matchAnalysisObservationsSection: 'Obserwacje',
   matchAnalysisConclusionSection: 'Wnioski',
 }

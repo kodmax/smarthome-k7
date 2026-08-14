@@ -16,6 +16,29 @@ describe('cvMatchDocument', () => {
     expect(parseCvMatchContent(content)).toEqual(content)
   })
 
+  it('parses cv match content with mustHaveGaps', () => {
+    const withMustHaveGaps = {
+      ...content,
+      mustHaveGaps: ['Minimum 5 lat doświadczenia komercyjnego w React'],
+    }
+
+    expect(parseCvMatchContent(withMustHaveGaps)).toEqual(withMustHaveGaps)
+  })
+
+  it('leaves mustHaveGaps undefined for legacy content without the field', () => {
+    expect(parseCvMatchContent(content)).toEqual(content)
+    expect(parseCvMatchContent(content)?.mustHaveGaps).toBeUndefined()
+  })
+
+  it('returns null for invalid mustHaveGaps', () => {
+    expect(
+      parseCvMatchContent({
+        ...content,
+        mustHaveGaps: ['', 'Valid gap'],
+      }),
+    ).toBeNull()
+  })
+
   it('returns null for legacy content', () => {
     expect(
       parseCvMatchContent({

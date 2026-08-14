@@ -315,6 +315,10 @@ export type Translations = {
       matchAnalysisSummarySection: string
       matchAnalysisStrengthsSection: string
       matchAnalysisGapsSection: string
+      matchAnalysisMustHaveGapsSection: string
+      matchAnalysisMustHaveGapsEmpty: string
+      matchAnalysisMustHaveGapsIndicatorLabel: string
+      matchAnalysisMustHaveGapsClearLabel: string
       matchAnalysisObservationsSection: string
       matchAnalysisConclusionSection: string
       newApplicationStatus: string

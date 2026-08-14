@@ -12,6 +12,7 @@ export type CvMatchContent = {
   summary: string
   strengths: string
   gaps: string
+  mustHaveGaps?: string[]
   observations: string
   conclusion: string
 }
@@ -32,6 +33,26 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
 }
 
+function parseOptionalMustHaveGaps(value: unknown): string[] | null | undefined {
+  if (value === undefined) {
+    return undefined
+  }
+
+  if (!Array.isArray(value)) {
+    return null
+  }
+
+  const items: string[] = []
+  for (const item of value) {
+    if (!isNonEmptyString(item)) {
+      return null
+    }
+    items.push(item.trim())
+  }
+
+  return items
+}
+
 export function digestCvMatchContentHash(content: CvMatchContent): string {
   return createHash('sha256').update(JSON.stringify(content)).digest('hex')
 }
@@ -47,6 +68,7 @@ export function parseCvMatchContent(content: DocumentRow['content']): CvMatchCon
   }
 
   const record = parsed as Record<string, unknown>
+  const parsedMustHaveGaps = parseOptionalMustHaveGaps(record.mustHaveGaps)
   if (
     typeof record.score !== 'number' ||
     !Number.isInteger(record.score) ||
@@ -55,6 +77,7 @@ export function parseCvMatchContent(content: DocumentRow['content']): CvMatchCon
     !isNonEmptyString(record.summary) ||
     !isNonEmptyString(record.strengths) ||
     !isNonEmptyString(record.gaps) ||
+    parsedMustHaveGaps === null ||
     !isNonEmptyString(record.observations) ||
     !isNonEmptyString(record.conclusion)
   ) {
@@ -67,6 +90,7 @@ export function parseCvMatchContent(content: DocumentRow['content']): CvMatchCon
     summary: record.summary.trim(),
     strengths: record.strengths.trim(),
     gaps: record.gaps.trim(),
+    ...(parsedMustHaveGaps !== undefined ? { mustHaveGaps: parsedMustHaveGaps } : {}),
     observations: record.observations.trim(),
     conclusion: record.conclusion.trim(),
   }
@@ -79,6 +103,7 @@ export function cvMatchContentToMatchAnalysis(content: CvMatchContent): JobAdMat
     summary: content.summary,
     strengths: content.strengths,
     gaps: content.gaps,
+    ...(content.mustHaveGaps !== undefined ? { mustHaveGaps: content.mustHaveGaps } : {}),
     observations: content.observations,
     conclusion: content.conclusion,
   }

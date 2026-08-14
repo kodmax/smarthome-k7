@@ -14,6 +14,7 @@ import {
   type CvTextContent,
   type DocumentRecordRow,
 } from './documentRecord'
+import { JobAdsSource } from '../job-ads/JobAdsSource'
 import { extractPdfText } from './extractPdfText'
 
 export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
@@ -30,6 +31,7 @@ export class CvSource extends DataSource<CvFeed, CvCachedFeed> {
 
     await this.touchCvTextModifiedAt()
     void this.push()
+    this.feedEvents.emit('data-update', JobAdsSource.getId())
   }
 
   static getId() {

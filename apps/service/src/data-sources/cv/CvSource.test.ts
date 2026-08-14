@@ -8,6 +8,7 @@ import { createSilentLogger } from '@repo/logger'
 import { registerDependency } from '@/di'
 import { mockSql } from '@/test/mockSql'
 import { CV_SCOPE, CV_TEXT_ID, digestCvPdfSourceHash, digestDocumentContentHash } from './documentRecord'
+import { JobAdsSource } from '../job-ads/JobAdsSource'
 import { CvSource } from './CvSource'
 
 vi.mock('./extractPdfText', () => ({
@@ -94,6 +95,7 @@ describe('CvSource', () => {
     expect(extractPdfText).not.toHaveBeenCalled()
     expect(db).toHaveBeenCalledTimes(2)
     expect(emitSpy).toHaveBeenCalledWith('data-update', 'cv')
+    expect(emitSpy).toHaveBeenCalledWith('data-update', JobAdsSource.getId())
   })
 
   it('extracts and upserts cv-text when source_hash differs', async () => {
@@ -106,5 +108,6 @@ describe('CvSource', () => {
     expect(extractPdfText).toHaveBeenCalledWith(openai, pdfBase64)
     expect(db).toHaveBeenCalledTimes(3)
     expect(emitSpy).toHaveBeenCalledWith('data-update', 'cv')
+    expect(emitSpy).toHaveBeenCalledWith('data-update', JobAdsSource.getId())
   })
 })

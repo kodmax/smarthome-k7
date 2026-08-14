@@ -160,6 +160,56 @@ describe('Ad', () => {
     expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
   })
 
+  it('shows must-have gaps indicator with count when mustHaveGaps has items', () => {
+    renderAd(
+      jobAd({
+        id: '8a',
+        title: 'Analyzed Role With Gaps',
+        matchAnalysis: matchAnalysis({
+          analyzedAt: '2026-01-01T00:00:00.000Z',
+          mustHaveGaps: ['Req A', 'Req B'],
+        }),
+      }),
+      true,
+    )
+
+    expect(screen.getByLabelText('2 brakujących wymagań must-have')).toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.getByLabelText('Pokaż analizę dopasowania CV')).toBeInTheDocument()
+  })
+
+  it('does not show must-have gaps indicator when mustHaveGaps is undefined', () => {
+    renderAd(
+      jobAd({
+        id: '8b',
+        title: 'Analyzed Role Without Gaps Field',
+        matchAnalysis: matchAnalysis({
+          analyzedAt: '2026-01-01T00:00:00.000Z',
+        }),
+      }),
+      true,
+    )
+
+    expect(screen.queryByLabelText(/brakujących wymagań must-have/)).not.toBeInTheDocument()
+  })
+
+  it('shows green checkmark when mustHaveGaps is empty', () => {
+    renderAd(
+      jobAd({
+        id: '8c',
+        title: 'Analyzed Role With Empty Gaps',
+        matchAnalysis: matchAnalysis({
+          analyzedAt: '2026-01-01T00:00:00.000Z',
+          mustHaveGaps: [],
+        }),
+      }),
+      true,
+    )
+
+    expect(screen.getByLabelText('Brak luk must-have')).toBeInTheDocument()
+    expect(screen.queryByLabelText(/brakujących wymagań must-have/)).not.toBeInTheDocument()
+  })
+
   it('shows abbreviated applied days after the title in edit mode', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-07-19T12:00:00'))

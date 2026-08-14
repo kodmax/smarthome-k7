@@ -75,7 +75,7 @@ export const ApplicationStatusEditor: FC<{
   const canSubmit = hasValidStatusSelection || comment.trim() !== savedComment.trim()
   const isTheProtocolAd = ad.content.origin === 'theprotocol'
   const isManualAd = ad.content.origin === 'manual'
-  const canAnalyzeCvMatch = !isTheProtocolAd && !isManualAd && !ad.meta.isCurrentCVUsed
+  const canAnalyzeCvMatch = !isTheProtocolAd && !isManualAd
   const [theProtocolInfoOpen, setTheProtocolInfoOpen] = useState(false)
   const {
     analyzing: analyzingCvMatch,

@@ -11,6 +11,8 @@ const sectionLabels = {
   matchAnalysisSummarySection: 'Podsumowanie',
   matchAnalysisStrengthsSection: 'Mocne strony',
   matchAnalysisGapsSection: 'Luki',
+  matchAnalysisMustHaveGapsSection: 'Brakujące wymagania must-have',
+  matchAnalysisMustHaveGapsEmpty: 'brak',
   matchAnalysisObservationsSection: 'Obserwacje',
   matchAnalysisConclusionSection: 'Wnioski',
 }
@@ -63,5 +65,38 @@ describe('formatMatchAnalysisStaleNotice', () => {
 describe('formatMatchAnalysisText', () => {
   it('returns all sections in order with labels', () => {
     expect(formatMatchAnalysisText(matchAnalysis, sectionLabels)).toBe(matchAnalysisBody)
+  })
+
+  it('omits mustHaveGaps section when undefined', () => {
+    expect(formatMatchAnalysisText(matchAnalysis, sectionLabels)).not.toContain('Brakujące wymagania must-have')
+  })
+
+  it('renders mustHaveGaps as a list below gaps', () => {
+    const text = formatMatchAnalysisText(
+      {
+        ...matchAnalysis,
+        mustHaveGaps: ['Minimum 5 lat doświadczenia komercyjnego w React', 'Znajomość Kubernetes'],
+      },
+      sectionLabels,
+    )
+
+    expect(text).toContain('Luki\nBrak doświadczenia w GraphQL.')
+    expect(text).toContain(
+      'Brakujące wymagania must-have\n- Minimum 5 lat doświadczenia komercyjnego w React\n- Znajomość Kubernetes',
+    )
+    expect(text.indexOf('Luki')).toBeLessThan(text.indexOf('Brakujące wymagania must-have'))
+    expect(text.indexOf('Brakujące wymagania must-have')).toBeLessThan(text.indexOf('Obserwacje'))
+  })
+
+  it('renders "brak" when mustHaveGaps is empty', () => {
+    const text = formatMatchAnalysisText(
+      {
+        ...matchAnalysis,
+        mustHaveGaps: [],
+      },
+      sectionLabels,
+    )
+
+    expect(text).toContain('Brakujące wymagania must-have\nbrak')
   })
 })

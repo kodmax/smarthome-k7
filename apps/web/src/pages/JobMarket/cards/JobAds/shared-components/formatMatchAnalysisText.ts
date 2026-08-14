@@ -7,12 +7,22 @@ type FormatMatchAnalysisLabels = {
   matchAnalysisSummarySection: string
   matchAnalysisStrengthsSection: string
   matchAnalysisGapsSection: string
+  matchAnalysisMustHaveGapsSection: string
+  matchAnalysisMustHaveGapsEmpty: string
   matchAnalysisObservationsSection: string
   matchAnalysisConclusionSection: string
 }
 
 function formatSection(label: string, text: string): string {
   return `${label}\n${text}`
+}
+
+function formatMustHaveGapsSection(label: string, emptyLabel: string, items: string[]): string {
+  if (items.length === 0) {
+    return formatSection(label, emptyLabel)
+  }
+
+  return `${label}\n${items.map(item => `- ${item}`).join('\n')}`
 }
 
 export function formatMatchAnalysisScore(
@@ -43,6 +53,8 @@ export function formatMatchAnalysisText(
     | 'matchAnalysisSummarySection'
     | 'matchAnalysisStrengthsSection'
     | 'matchAnalysisGapsSection'
+    | 'matchAnalysisMustHaveGapsSection'
+    | 'matchAnalysisMustHaveGapsEmpty'
     | 'matchAnalysisObservationsSection'
     | 'matchAnalysisConclusionSection'
   >,
@@ -51,9 +63,22 @@ export function formatMatchAnalysisText(
     formatSection(labels.matchAnalysisSummarySection, matchAnalysis.summary),
     formatSection(labels.matchAnalysisStrengthsSection, matchAnalysis.strengths),
     formatSection(labels.matchAnalysisGapsSection, matchAnalysis.gaps),
+  ]
+
+  if (matchAnalysis.mustHaveGaps !== undefined) {
+    sections.push(
+      formatMustHaveGapsSection(
+        labels.matchAnalysisMustHaveGapsSection,
+        labels.matchAnalysisMustHaveGapsEmpty,
+        matchAnalysis.mustHaveGaps,
+      ),
+    )
+  }
+
+  sections.push(
     formatSection(labels.matchAnalysisObservationsSection, matchAnalysis.observations),
     formatSection(labels.matchAnalysisConclusionSection, matchAnalysis.conclusion),
-  ]
+  )
 
   return sections.join('\n\n')
 }

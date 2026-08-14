@@ -450,7 +450,7 @@ describe('ApplicationStatusEditor', () => {
     expect(screen.getByRole('dialog')).toHaveTextContent('Ta oferta pochodzi z portalu The Protocol.')
   })
 
-  it('disables check cv match when analysis is current', () => {
+  it('enables check cv match when analysis is current', () => {
     const onAnalyzeCvMatch = vi.fn()
 
     renderWithTheme(
@@ -468,9 +468,9 @@ describe('ApplicationStatusEditor', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Sprawdź dopasowanie' })
-    expect(button).toBeDisabled()
+    expect(button).toBeEnabled()
     fireEvent.click(button)
-    expect(onAnalyzeCvMatch).not.toHaveBeenCalled()
+    expect(onAnalyzeCvMatch).toHaveBeenCalledWith('12')
   })
 
   it('enables check cv match when analysis is stale', () => {
@@ -537,7 +537,7 @@ describe('ApplicationStatusEditor', () => {
     expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
     expect(screen.getByRole('dialog')).toHaveTextContent('Dobre dopasowanie do roli.')
     expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
-    expect(screen.getByRole('button', { name: 'Sprawdź dopasowanie', hidden: true })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Sprawdź dopasowanie', hidden: true })).toBeEnabled()
   })
 
   it('returns to read-only view when change is cancelled', () => {
