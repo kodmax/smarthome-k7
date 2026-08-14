@@ -2,6 +2,8 @@ import { OnFeedChanged } from './types'
 
 const FEED_UPDATE_PREFIX = 'FEED-UPDATE '
 
+const isWebSocketOpen = (ws: WebSocket): boolean => ws.readyState === WebSocket.OPEN
+
 export class WSClient {
   private readonly topics: Set<string> = new Set<string>()
   private readonly pendingSubscribes: Set<string> = new Set<string>()
@@ -42,7 +44,7 @@ export class WSClient {
     const isNew = !this.topics.has(topic)
     this.topics.add(topic)
 
-    if (!isNew || this.ws.readyState !== this.ws.OPEN) {
+    if (!isNew || !isWebSocketOpen(this.ws)) {
       return
     }
 
@@ -61,7 +63,7 @@ export class WSClient {
 
     this.topics.delete(topic)
 
-    if (this.ws.readyState !== this.ws.OPEN) {
+    if (!isWebSocketOpen(this.ws)) {
       return
     }
 
@@ -86,7 +88,7 @@ export class WSClient {
   }
 
   private flushPending(): void {
-    if (this.ws.readyState !== this.ws.OPEN) {
+    if (!isWebSocketOpen(this.ws)) {
       this.pendingSubscribes.clear()
       this.pendingUnsubscribes.clear()
       return
