@@ -26,8 +26,13 @@ export function initPrometheus(logger: Logger): void {
       return
     }
 
-    const [promMetrics, otelMetrics] = await Promise.all([register.metrics(), collectOtelPrometheusMetrics()])
-    const body = otelMetrics.length > 0 ? `${promMetrics}\n${otelMetrics}` : promMetrics
+    const [promMetrics, otelCollection] = await Promise.all([register.metrics(), collectOtelPrometheusMetrics()])
+
+    if (otelCollection.errors.length > 0) {
+      logger.warn({ errors: otelCollection.errors }, 'OpenTelemetry metrics collection errors')
+    }
+
+    const body = otelCollection.metrics.length > 0 ? `${promMetrics}\n${otelCollection.metrics}` : promMetrics
 
     res.setHeader('Content-Type', register.contentType)
     res.end(body)

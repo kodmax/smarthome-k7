@@ -16,7 +16,8 @@ import { createNestApp } from './nest/nest-bootstrap'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
 import { initPrometheus, registerWsMetrics, observeDataSourceRefresh } from './prometheus'
-import { initSentry, captureProductionError } from './sentry'
+import { getOpenTelemetryServiceName, isOpenTelemetryStarted } from './otel-instrumentation'
+import { captureProductionError, isSentryEnabled } from './sentry'
 import { DataSourceRegistryType } from './data-sources'
 import { PostgresCronJobLastSuccessStore } from './cron/postgresCronJobLastSuccessStore'
 import { initKnxCronJobs } from '@repo/cron-scripts'
@@ -28,8 +29,16 @@ const main = async () => {
     serviceLogger.info({ appMode }, 'App mode')
   }
 
-  initSentry(serviceLogger)
   initPrometheus(serviceLogger)
+
+  if (isOpenTelemetryStarted()) {
+    serviceLogger.info({ serviceName: getOpenTelemetryServiceName() }, 'OpenTelemetry enabled')
+  }
+
+  if (isSentryEnabled()) {
+    serviceLogger.info({ environment: appMode, release: process.env.SENTRY_RELEASE }, 'Sentry enabled')
+  }
+
   setupGracefulShutdown(serviceLogger)
 
   const reportProductionError = (error: unknown, context: string) => {

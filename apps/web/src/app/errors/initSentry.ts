@@ -1,6 +1,4 @@
 import * as Sentry from '@sentry/react'
-import { useEffect } from 'react'
-import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from 'react-router-dom'
 import { isDevelopment } from '@repo/env'
 
 export function initSentry(): void {
@@ -19,15 +17,5 @@ export function initSentry(): void {
     dsn,
     environment: mode,
     release: import.meta.env.VITE_SENTRY_RELEASE,
-    integrations: [
-      Sentry.reactRouterBrowserTracingIntegration({
-        useEffect,
-        useLocation,
-        useNavigationType,
-        createRoutesFromChildren,
-        matchRoutes,
-      }),
-    ],
-    tracesSampleRate: 0.2,
   })
 }

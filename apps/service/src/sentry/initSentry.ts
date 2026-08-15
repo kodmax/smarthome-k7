@@ -1,30 +1,24 @@
 import * as Sentry from '@sentry/node'
-import type { Logger } from '@repo/logger'
 import { appMode, isDevelopment } from '@repo/env'
 
-export function initSentry(logger: Logger): void {
-  if (isDevelopment) {
-    return
-  }
+const dsn = process.env.SENTRY_DSN
+const sentryEnabled = !isDevelopment && dsn !== undefined && dsn.length > 0
 
-  const dsn = process.env.SENTRY_DSN
-  if (!dsn) {
-    logger.info({ appMode }, 'Sentry disabled (missing SENTRY_DSN)')
-    return
-  }
-
+if (sentryEnabled) {
   Sentry.init({
     dsn,
     environment: appMode,
     release: process.env.SENTRY_RELEASE,
-    tracesSampleRate: 0.2,
+    skipOpenTelemetrySetup: true,
   })
+}
 
-  logger.info({ dsn }, 'Sentry enabled')
+export function isSentryEnabled(): boolean {
+  return sentryEnabled
 }
 
 export async function closeSentry(timeoutMs = 2000): Promise<void> {
-  if (isDevelopment || !process.env.SENTRY_DSN) {
+  if (!sentryEnabled) {
     return
   }
 

@@ -69,10 +69,21 @@ const closeConnections = async (logger: Logger): Promise<void> => {
   await closePrometheus()
   logger.info({ step: 'metrics' }, 'Shutdown step complete')
 
-  await closeOpenTelemetry()
+  try {
+    await closeOpenTelemetry()
+    logger.info({ step: 'open-telemetry' }, 'Shutdown step complete')
+  } catch (err) {
+    logger.error({ err, step: 'open-telemetry' }, 'OpenTelemetry shutdown failed')
+    captureProductionError(err)
+  }
 
-  await closeSentry()
-  logger.info({ step: 'sentry' }, 'Shutdown step complete')
+  try {
+    await closeSentry()
+    logger.info({ step: 'sentry' }, 'Shutdown step complete')
+  } catch (err) {
+    logger.error({ err, step: 'sentry' }, 'Sentry shutdown failed')
+    captureProductionError(err)
+  }
 }
 
 export const setupGracefulShutdown = (logger: Logger): void => {

@@ -18,4 +18,4 @@ for attempt in $(seq 1 30); do
 done
 
 cd /app/apps/service
-exec node -r ./dist/otel-instrumentation.js ./dist/index.js
+exec node -r ./dist/preload.js ./dist/index.js

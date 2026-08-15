@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router-dom'
 import './style.css'
 import { preventPinchZoom } from './preventPinchZoom'
 import { GlobalErrorBoundary, initSentry } from './app/errors'
+import { initOpenTelemetry } from './telemetry/initOpenTelemetry'
 import { registerServiceWorker } from './app/registerServiceWorker'
 import { AppThemeProvider } from './app/theme/AppThemeProvider'
 import { router } from './app/router'
@@ -13,6 +14,7 @@ if (isDevelopment) {
   console.info(`[app] ${import.meta.env.MODE} mode`)
 }
 
+initOpenTelemetry()
 initSentry()
 preventPinchZoom()
 registerServiceWorker()

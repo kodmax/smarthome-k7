@@ -54,7 +54,7 @@ const compileService = () => {
 const startNode = () => {
   nodeProcess?.kill('SIGTERM')
 
-  nodeProcess = spawn('node', ['-r', './dist/otel-instrumentation.js', './dist/index.js'], {
+  nodeProcess = spawn('node', ['-r', './dist/preload.js', './dist/index.js'], {
     cwd: serviceRoot,
     stdio: 'inherit',
   })

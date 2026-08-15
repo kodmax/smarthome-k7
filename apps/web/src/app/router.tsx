@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppLayout } from './AppLayout'
 import { RouteErrorPage } from './errors'
@@ -10,9 +9,7 @@ import { NotFound } from '@/pages/NotFound/NotFound'
 import { Offline } from '@/pages/Offline/Offline'
 import { StockMarket } from '@/pages/StockMarket/StockMarket'
 
-const createRouter = Sentry.wrapCreateBrowserRouter(createBrowserRouter)
-
-export const router = createRouter([
+export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppLayout />,

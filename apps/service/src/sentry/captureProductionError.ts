@@ -1,6 +1,6 @@
-import * as Sentry from '@sentry/node'
 import { isProduction } from '@repo/env'
 import { incKnxReadTimeout } from '@/prometheus/knxMetrics'
+import { captureSentryException } from '@/telemetry/enrichSentryWithTraceContext'
 import { isKnxReadTimeout, shouldCaptureKnxError } from './knxError'
 
 export function captureProductionError(error: unknown): void {
@@ -16,5 +16,5 @@ export function captureProductionError(error: unknown): void {
     }
   }
 
-  Sentry.captureException(error)
+  captureSentryException(error)
 }

@@ -33,6 +33,32 @@ yarn workspace service start      # production (after build)
 
 HTTP API and WebSocket share port **3679** (`API_PORT`). WebSocket path: `/ws`.
 
+## Telemetry
+
+Process starts with Node preload [`src/preload.ts`](src/preload.ts): `load-env` → Sentry → OpenTelemetry.
+
+```sh
+node -r ./dist/preload.js ./dist/index.js
+```
+
+Traces export via env auto-config (NodeSDK reads `OTEL_*`); metrics also merge into `/metrics` (Prometheus + OTEL).
+
+| Variable                      | Production                           | Local dev (`.env`) |
+| ----------------------------- | ------------------------------------ | ------------------ |
+| `OTEL_SERVICE_NAME`           | `apollo-daemon`                      | default in code    |
+| `OTEL_TRACES_EXPORTER`        | `otlp`                               | `none`             |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | `http/protobuf`                      | —                  |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | e.g. `http://127.0.0.1:4318` (Alloy) | unset              |
+| `OTEL_TRACES_SAMPLER`         | `parentbased_traceidratio`           | —                  |
+| `OTEL_TRACES_SAMPLER_ARG`     | `0.2`                                | —                  |
+| `OTEL_METRICS_EXPORTER`       | unset (Prometheus in code)           | `none`             |
+
+**Sentry** (errors only, no performance traces): initialized in preload before OpenTelemetry, with
+`skipOpenTelemetrySetup: true`. Exceptions get `trace_id` / `span_id` tags from the active OTEL span for lookup in
+Grafana/Tempo.
+
+**Pino** logs include `trace_id`, `span_id`, and `trace_flags` when emitted inside an active span.
+
 ## Environment variables
 
 Copy `.env.example` and fill in:

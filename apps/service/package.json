@@ -11,7 +11,9 @@
     "@nestjs/websockets": "^11.1.29",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/auto-instrumentations-node": "^0.67.0",
+    "@opentelemetry/core": "^2.10.0",
     "@opentelemetry/exporter-prometheus": "^0.221.0",
+    "@opentelemetry/instrumentation-pino": "^0.67.0",
     "@opentelemetry/sdk-node": "^0.221.0",
     "@repo/chronos": "*",
     "@repo/common": "*",
@@ -39,10 +41,10 @@
     "ws": "^8.21.3"
   },
   "devDependencies": {
-    "@swc/cli": "^0.7.10",
-    "@swc/core": "^1.15.8",
     "@repo/typescript-config": "*",
     "@sentry/cli": "^2.58.6",
+    "@swc/cli": "^0.7.10",
+    "@swc/core": "^1.15.8",
     "@types/node": "^17.0.36",
     "@types/suncalc": "^1.8.1",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
@@ -61,7 +63,7 @@
   "scripts": {
     "transpile": "rm -rf dist && swc src -d dist --strip-leading-paths --config-file .swcrc && tsc-alias -p tsconfig.json",
     "dev": "node scripts/dev.mjs",
-    "start": "node -r ./dist/otel-instrumentation.js ./dist/index.js",
+    "start": "node -r ./dist/preload.js ./dist/index.js",
     "build": "rm -rf dist && tsc && tsc-alias && node scripts/sentry-sourcemaps.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\"",

@@ -1,20 +1,20 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { KnxLinkException } from 'js-knx'
 
-const { captureException } = vi.hoisted(() => ({
-  captureException: vi.fn(),
+const { captureSentryException } = vi.hoisted(() => ({
+  captureSentryException: vi.fn(),
 }))
 
 const { incKnxReadTimeout } = vi.hoisted(() => ({
   incKnxReadTimeout: vi.fn(),
 }))
 
-vi.mock('@sentry/node', () => ({
-  captureException,
-}))
-
 vi.mock('@repo/env', () => ({
   isProduction: true,
+}))
+
+vi.mock('@/telemetry/enrichSentryWithTraceContext', () => ({
+  captureSentryException,
 }))
 
 vi.mock('@/prometheus/knxMetrics', () => ({
@@ -32,7 +32,7 @@ const readTimeout = (consecutiveReadTimeouts: number): KnxLinkException =>
 
 describe('captureProductionError', () => {
   afterEach(() => {
-    captureException.mockClear()
+    captureSentryException.mockClear()
     incKnxReadTimeout.mockClear()
   })
 
@@ -40,14 +40,14 @@ describe('captureProductionError', () => {
     captureProductionError(readTimeout(1))
 
     expect(incKnxReadTimeout).toHaveBeenCalledWith('5/2/2')
-    expect(captureException).not.toHaveBeenCalled()
+    expect(captureSentryException).not.toHaveBeenCalled()
   })
 
   it('does not report KNX read timeouts below threshold to Sentry', () => {
     captureProductionError(readTimeout(4))
 
     expect(incKnxReadTimeout).toHaveBeenCalledWith('5/2/2')
-    expect(captureException).not.toHaveBeenCalled()
+    expect(captureSentryException).not.toHaveBeenCalled()
   })
 
   it('reports KNX read timeouts at threshold to Sentry', () => {
@@ -56,8 +56,8 @@ describe('captureProductionError', () => {
     captureProductionError(error)
 
     expect(incKnxReadTimeout).toHaveBeenCalledWith('5/2/2')
-    expect(captureException).toHaveBeenCalledTimes(1)
-    expect(captureException).toHaveBeenCalledWith(error)
+    expect(captureSentryException).toHaveBeenCalledTimes(1)
+    expect(captureSentryException).toHaveBeenCalledWith(error)
   })
 
   it('reports non-KNX errors to Sentry without metric', () => {
@@ -66,7 +66,7 @@ describe('captureProductionError', () => {
     captureProductionError(error)
 
     expect(incKnxReadTimeout).not.toHaveBeenCalled()
-    expect(captureException).toHaveBeenCalledWith(error)
+    expect(captureSentryException).toHaveBeenCalledWith(error)
   })
 
   it('reports other KnxLinkException codes to Sentry without metric', () => {
@@ -75,6 +75,6 @@ describe('captureProductionError', () => {
     captureProductionError(error)
 
     expect(incKnxReadTimeout).not.toHaveBeenCalled()
-    expect(captureException).toHaveBeenCalledWith(error)
+    expect(captureSentryException).toHaveBeenCalledWith(error)
   })
 })
