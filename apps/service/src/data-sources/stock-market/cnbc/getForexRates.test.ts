@@ -76,7 +76,8 @@ describe('getForexRates', () => {
     })
 
     const resultPromise = getForexRates()
-    await vi.runAllTimersAsync()
+    await vi.advanceTimersByTimeAsync(3000)
+    await vi.advanceTimersByTimeAsync(6000)
     await expect(resultPromise).resolves.toEqual({
       usdPln: {
         symbol: 'PLN=',
@@ -101,8 +102,9 @@ describe('getForexRates', () => {
 
     const resultPromise = getForexRates()
     const expectation = expect(resultPromise).rejects.toBeInstanceOf(FetchError)
-    await vi.runAllTimersAsync()
+    await vi.advanceTimersByTimeAsync(3000)
+    await vi.advanceTimersByTimeAsync(6000)
     await expectation
-    expect(fetchDocument).toHaveBeenCalledTimes(6)
+    expect(fetchDocument).toHaveBeenCalledTimes(3)
   })
 })
