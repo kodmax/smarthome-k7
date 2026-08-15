@@ -28,7 +28,7 @@
     "@repo/knx-schema": "*",
     "@repo/logger": "*",
     "dotenv": "^17.4.2",
-    "js-knx": "^3.4.0",
+    "js-knx": "^3.4.1",
     "sony-bravia-ip-control": "^1.1.0"
   },
   "devDependencies": {

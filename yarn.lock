@@ -6686,10 +6686,10 @@ joycon@^3.1.1:
   resolved "https://registry.npmjs.org/joycon/-/joycon-3.1.1.tgz"
   integrity sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==
 
-js-knx@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/js-knx/-/js-knx-3.4.0.tgz#49be08488b850f7721ecf9ca8f4d6db3d7fdb41e"
-  integrity sha512-5OoF2OTh9Ih/EBKpj0nkaLPBUgi19qKxDe/XQDhihAdzyY+VmZwpCIw0Nv8VzGkuqZcSB/t+oMMr7l9rUhHhJw==
+js-knx@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/js-knx/-/js-knx-3.4.1.tgz#46dd307efad78976c17fdec823a3cdd2212ea749"
+  integrity sha512-+oFlofsnik95z8zA0+mimYi9gW+GgX/uE8Q+B+930ZdzYUdEzd+txirThfQ6vdyWKQMHKT/QPiKredseetEwCw==
   dependencies:
     "@opentelemetry/api" "^1.9.0"
 
