@@ -2,6 +2,7 @@ import type { DataSourceDataTypes, Feed, FeedSources, FeedsOptions, SourceRegist
 import { AnyDataSource } from '../DataSource'
 import { FeedEvents } from './FeedEvents'
 import { FeedNotFound } from './Errors'
+import { setActiveSpanAttributes, withSpan } from '../tracing'
 
 export type { DataSourceDataTypes, FeedsOptions } from './types'
 
@@ -40,7 +41,19 @@ export class FeedComposer {
     read: (src: SourceRegistration['dataSource']) => Promise<unknown>,
   ): Promise<Record<string, unknown>> {
     const entries = await Promise.all(
-      [...feed.sources.entries()].map(async ([srcName, src]) => [srcName, await read(src)] as const),
+      [...feed.sources.entries()].map(async ([srcName, src]) => {
+        const content = await withSpan(
+          'feed.source.ensure_content',
+          {
+            'feed.id': feed.feedId,
+            'feed.source.name': srcName,
+            'datasource.id': src.getId(),
+          },
+          () => read(src),
+        )
+
+        return [srcName, content] as const
+      }),
     )
 
     return Object.fromEntries(entries)
@@ -52,13 +65,17 @@ export class FeedComposer {
 
   /** REST GET — read from cache when available; fetch without emitting data-update on miss. */
   private async composeFeedForRead(feedId: string): Promise<unknown> {
-    const feed = this.getRegisteredFeed(feedId)
-    const data = await this.collectSourceContents(feed, src => src.ensureContent())
+    return withSpan('feed.compose', { 'feed.id': feedId }, async () => {
+      const feed = this.getRegisteredFeed(feedId)
+      const data = await this.collectSourceContents(feed, src => src.ensureContent())
 
-    return feed.cb(data)
+      return withSpan('feed.callback', { 'feed.id': feedId }, () => Promise.resolve(feed.cb(data)))
+    })
   }
 
   public getFeedData(feedId: string): Promise<unknown> {
+    setActiveSpanAttributes({ 'feed.id': feedId })
+
     const existing = this.getFeedDataInFlight.get(feedId)
     if (existing !== undefined) {
       return existing

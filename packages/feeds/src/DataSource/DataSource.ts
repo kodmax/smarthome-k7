@@ -2,6 +2,7 @@ import type { Logger } from '@repo/logger'
 import type { CronJobPolicy } from '@repo/chronos'
 import type { CacheEntry } from '../Cache'
 import { FeedEvents } from '../FeedComposer'
+import { withSpan } from '../tracing'
 import type {
   DataSourceCtor,
   DataSourceParams,
@@ -98,21 +99,27 @@ abstract class DataSource<T, TCache = T> {
       return null
     }
 
-    return this.composeContent(snapshot.getContent())
+    return this.composeContentWithSpan(snapshot.getContent())
   }
 
   public async ensureContent(): Promise<T> {
-    const snapshot = await this.cacheEntry.getSnapshot()
-    if (snapshot !== null) {
-      return this.composeContent(snapshot.getContent())
-    }
+    const sourceId = this.getId()
 
-    return this.fetchAndCompose()
+    return withSpan('datasource.ensure_content', { 'datasource.id': sourceId }, async span => {
+      const snapshot = await this.cacheEntry.getSnapshot()
+      if (snapshot !== null) {
+        span.setAttribute('cache.hit', true)
+        return this.composeContentWithSpan(snapshot.getContent())
+      }
+
+      span.setAttribute('cache.hit', false)
+      return this.fetchAndCompose()
+    })
   }
 
   public async refresh(): Promise<T> {
     if (this.updating) {
-      return this.updating
+      return this.awaitInFlightFetch(this.updating)
     }
 
     return this.fetchAndCompose()
@@ -124,9 +131,24 @@ abstract class DataSource<T, TCache = T> {
     return content
   }
 
+  private composeContentWithSpan(cached: TCache): Promise<T> {
+    return withSpan('datasource.compose', { 'datasource.id': this.getId() }, () => this.composeContent(cached))
+  }
+
+  private awaitInFlightFetch(promise: Promise<T>): Promise<T> {
+    return withSpan(
+      'datasource.fetch',
+      {
+        'datasource.id': this.getId(),
+        'datasource.awaiting_in_flight': true,
+      },
+      () => promise,
+    )
+  }
+
   private fetchAndCompose(): Promise<T> {
     if (this.updating) {
-      return this.updating
+      return this.awaitInFlightFetch(this.updating)
     }
 
     const sourceId = this.getId()
@@ -142,23 +164,31 @@ abstract class DataSource<T, TCache = T> {
       return fetchData()
     }
 
-    const promise = new Promise<T>((resolve, reject) => {
-      runFetchData()
-        .then(async cached => {
-          await this.cacheEntry.write(cached)
-          const content = await this.composeContent(cached)
-          resolve(content)
+    const promise = withSpan(
+      'datasource.fetch',
+      {
+        'datasource.id': sourceId,
+        'datasource.awaiting_in_flight': false,
+      },
+      () =>
+        new Promise<T>((resolve, reject) => {
+          runFetchData()
+            .then(async cached => {
+              await this.cacheEntry.write(cached)
+              const content = await this.composeContentWithSpan(cached)
+              resolve(content)
 
-          this.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source content refreshed')
-          this.updating = void 0
-        })
-        .catch(e => {
-          this.logger.warn({ err: e, sourceId }, 'Data source update error')
-          this.onError(e, 'Data source update error')
-          this.updating = void 0
-          reject(e)
-        })
-    })
+              this.logger.debug({ sourceId, durationMs: Date.now() - start }, 'Data source content refreshed')
+              this.updating = void 0
+            })
+            .catch(e => {
+              this.logger.warn({ err: e, sourceId }, 'Data source update error')
+              this.onError(e, 'Data source update error')
+              this.updating = void 0
+              reject(e)
+            })
+        }),
+    )
 
     this.updating = promise
 

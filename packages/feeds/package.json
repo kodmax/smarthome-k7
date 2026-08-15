@@ -21,6 +21,7 @@
   "author": "Marcin Malinowski <mm.kodmax@gmail.com>",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
     "@repo/chronos": "*",
     "@repo/logger": "*"
   },

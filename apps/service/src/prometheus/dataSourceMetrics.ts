@@ -1,4 +1,5 @@
 import type { SourceMetricType } from '@repo/feeds'
+import { SpanStatusCode, trace } from '@opentelemetry/api'
 import { Counter, Gauge, Histogram, register } from 'prom-client'
 import { isMetricsEnabled } from './metricsEnabled'
 
@@ -7,6 +8,8 @@ type MetricsBundle = {
   refreshDuration: Histogram<'source'>
   lastSuccess: Gauge<'source'>
 }
+
+const refreshTracer = trace.getTracer('apollo-daemon-datasource')
 
 const knxBuckets = [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25]
 const scraperBuckets = [0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 7, 10, 15]
@@ -42,7 +45,7 @@ const refreshMetricsByType: Record<Exclude<SourceMetricType, 'other'>, MetricsBu
   db: createRefreshMetrics('db', dbBuckets),
 }
 
-export const observeDataSourceRefresh = async <T>(
+const recordRefreshMetrics = async <T>(
   metricType: SourceMetricType,
   sourceId: string,
   fn: () => Promise<T>,
@@ -65,4 +68,31 @@ export const observeDataSourceRefresh = async <T>(
   } finally {
     metrics.refreshDuration.observe({ source: sourceId }, (Date.now() - start) / 1000)
   }
+}
+
+export const observeDataSourceRefresh = async <T>(
+  metricType: SourceMetricType,
+  sourceId: string,
+  fn: () => Promise<T>,
+): Promise<T> => {
+  return refreshTracer.startActiveSpan(
+    'datasource.refresh',
+    {
+      attributes: {
+        'datasource.id': sourceId,
+        'datasource.metric_type': metricType,
+      },
+    },
+    async span => {
+      try {
+        return await recordRefreshMetrics(metricType, sourceId, fn)
+      } catch (error) {
+        span.recordException(error instanceof Error ? error : new Error(String(error)))
+        span.setStatus({ code: SpanStatusCode.ERROR })
+        throw error
+      } finally {
+        span.end()
+      }
+    },
+  )
 }
