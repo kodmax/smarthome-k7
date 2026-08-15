@@ -35,6 +35,14 @@ declare module 'process' {
         readonly NO_METRICS?: string
         readonly METRICS_PORT?: string
 
+        readonly OTEL_SDK_DISABLED?: string
+        readonly OTEL_SERVICE_NAME?: string
+        readonly OTEL_TRACES_EXPORTER?: string
+        readonly OTEL_EXPORTER_OTLP_PROTOCOL?: string
+        readonly OTEL_EXPORTER_OTLP_ENDPOINT?: string
+        readonly OTEL_TRACES_SAMPLER?: string
+        readonly OTEL_TRACES_SAMPLER_ARG?: string
+
         readonly API_PORT?: string
       }
     }

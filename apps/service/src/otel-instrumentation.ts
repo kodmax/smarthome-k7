@@ -1,20 +1,29 @@
 import './load-env'
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { rootLogger } from '@repo/logger'
 
-const SERVICE_NAME = 'apollo-daemon'
+const serviceName = process.env.OTEL_SERVICE_NAME ?? 'apollo-daemon'
 
 const logger = rootLogger.child({ name: 'otel-instrumentation' })
 
 const sdk = new NodeSDK({
-  serviceName: SERVICE_NAME,
+  serviceName,
+  instrumentations: [
+    getNodeAutoInstrumentations({
+      '@opentelemetry/instrumentation-fs': { enabled: false },
+      '@opentelemetry/instrumentation-dns': { enabled: false },
+      '@opentelemetry/instrumentation-net': { enabled: false },
+    }),
+  ],
 })
 
 sdk.start()
-logger.info({ serviceName: SERVICE_NAME }, 'OpenTelemetry SDK started')
+logger.info({ serviceName }, 'OpenTelemetry SDK started')
 
 let shuttingDown = false
-const shutdown = async (): Promise<void> => {
+
+export const closeOpenTelemetry = async (): Promise<void> => {
   if (shuttingDown) {
     return
   }
@@ -27,6 +36,3 @@ const shutdown = async (): Promise<void> => {
     logger.error({ error }, 'Failed to shut down OpenTelemetry SDK')
   }
 }
-
-process.once('SIGTERM', () => void shutdown())
-process.once('SIGINT', () => void shutdown())

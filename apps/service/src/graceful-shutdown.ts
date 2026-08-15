@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common'
 import type { Logger } from '@repo/logger'
 import { closeSql } from '@repo/db'
+import { closeOpenTelemetry } from './otel-instrumentation'
 import { closePrometheus } from './prometheus'
 import { captureProductionError, closeSentry } from './sentry'
 import { closeRedisClient } from './redis'
@@ -67,6 +68,8 @@ const closeConnections = async (logger: Logger): Promise<void> => {
 
   await closePrometheus()
   logger.info({ step: 'metrics' }, 'Shutdown step complete')
+
+  await closeOpenTelemetry()
 
   await closeSentry()
   logger.info({ step: 'sentry' }, 'Shutdown step complete')

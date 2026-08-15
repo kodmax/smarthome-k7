@@ -1,9 +1,12 @@
+import { SpanStatusCode, trace } from '@opentelemetry/api'
 import { Counter, Histogram, register } from 'prom-client'
 import { isMetricsEnabled } from './metricsEnabled'
 
 export const SLOW_QUERY_THRESHOLD_SEC = 1
 
 export type DbOperation = 'select' | 'insert' | 'update' | 'delete' | 'replace' | 'call' | 'other'
+
+const dbTracer = trace.getTracer('apollo-daemon-db')
 
 const dbQueryDuration = new Histogram({
   name: 'apollo_daemon_db_query_duration_seconds',
@@ -39,23 +42,40 @@ const recordDbQuery = (operation: DbOperation, table: string, durationSec: numbe
 }
 
 export const observeDbQuery = async <T>(operation: DbOperation, table: string, fn: () => Promise<T>): Promise<T> => {
-  if (!isMetricsEnabled()) {
-    return fn()
-  }
+  return dbTracer.startActiveSpan(
+    'db.query',
+    {
+      attributes: {
+        'db.system': 'postgresql',
+        'db.operation': operation,
+        'db.sql.table': table,
+      },
+    },
+    async span => {
+      const metricsEnabled = isMetricsEnabled()
+      const start = metricsEnabled ? Date.now() : 0
 
-  const start = Date.now()
-
-  try {
-    const result = await fn()
-    recordDbQuery(operation, table, (Date.now() - start) / 1000)
-    return result
-  } catch (error) {
-    recordDbQuery(
-      operation,
-      table,
-      (Date.now() - start) / 1000,
-      error instanceof Error ? error : new Error(String(error)),
-    )
-    throw error
-  }
+      try {
+        const result = await fn()
+        if (metricsEnabled) {
+          recordDbQuery(operation, table, (Date.now() - start) / 1000)
+        }
+        return result
+      } catch (error) {
+        if (metricsEnabled) {
+          recordDbQuery(
+            operation,
+            table,
+            (Date.now() - start) / 1000,
+            error instanceof Error ? error : new Error(String(error)),
+          )
+        }
+        span.recordException(error instanceof Error ? error : new Error(String(error)))
+        span.setStatus({ code: SpanStatusCode.ERROR })
+        throw error
+      } finally {
+        span.end()
+      }
+    },
+  )
 }
