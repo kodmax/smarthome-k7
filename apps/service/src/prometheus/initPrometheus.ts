@@ -1,6 +1,7 @@
 import { createServer, type Server as HttpServer } from 'node:http'
 import { collectDefaultMetrics, register } from 'prom-client'
 import type { Logger } from '@repo/logger'
+import { collectOtelPrometheusMetrics } from '../otel-instrumentation'
 const DEFAULT_PORT = 9464
 
 let metricsServer: HttpServer | undefined
@@ -25,8 +26,11 @@ export function initPrometheus(logger: Logger): void {
       return
     }
 
+    const [promMetrics, otelMetrics] = await Promise.all([register.metrics(), collectOtelPrometheusMetrics()])
+    const body = otelMetrics.length > 0 ? `${promMetrics}\n${otelMetrics}` : promMetrics
+
     res.setHeader('Content-Type', register.contentType)
-    res.end(await register.metrics())
+    res.end(body)
   })
 
   metricsServer.listen(port, () => {
