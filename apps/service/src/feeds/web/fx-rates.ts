@@ -5,5 +5,4 @@ import { DataSourceRegistryType } from '@/data-sources'
 export const addFxRatesFeed = (
   feeds: FeedComposer,
   dataSources: DataSourceRegistry<DataSourceRegistryType>,
-): Promise<void> =>
-  feeds.addFeed('fx-rates', dataSources.getByIds(['cnbcForex']), ({ cnbcForex }): FxRatesFeed => cnbcForex)
+): Promise<void> => feeds.addFeed('fx-rates', dataSources.getByIds(['forex']), ({ forex }): FxRatesFeed => forex)

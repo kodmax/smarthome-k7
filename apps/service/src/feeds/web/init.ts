@@ -11,12 +11,12 @@ import { addTransmissionFeed } from './transmission'
 import { addWeatherFeed } from './weather'
 import { addSentryTestFeed } from './sentry-test'
 import {
-  CnbcForexSource,
-  CnbcMarketIndicesSource,
   CvSource,
   DataSourceRegistryType,
+  ForexSource,
   JobAdsSource,
   JobMarketInsightSource,
+  MarketIndicesSource,
   MySkillsSource,
   NasdaqMarketDataSource,
   NewsSource,
@@ -34,8 +34,8 @@ export const initWebFeeds = async (
   await dataSources.add('weather', WeatherSource)
   await dataSources.add('nasdaqMarketData', NasdaqMarketDataSource)
   await dataSources.add('yahooMarketData', YahooMarketDataSource)
-  await dataSources.add('cnbcMarketIndices', CnbcMarketIndicesSource)
-  await dataSources.add('cnbcForex', CnbcForexSource)
+  await dataSources.add('marketIndices', MarketIndicesSource)
+  await dataSources.add('forex', ForexSource)
   await dataSources.add('news', NewsSource)
   await dataSources.add('jobAds', JobAdsSource)
   await dataSources.add('jobMarketInsight', JobMarketInsightSource)

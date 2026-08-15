@@ -2,14 +2,14 @@ import { type FxRatesFeed } from '@repo/types'
 
 const defaultFxRates: FxRatesFeed = {
   usdPln: {
-    symbol: 'PLN=',
+    symbol: 'USDPLN=X',
     title: 'USD/PLN',
     price: 3.8056,
     netChange: 0.0172,
     percentageChange: 0.45,
   },
   eurPln: {
-    symbol: 'EURPLN=',
+    symbol: 'EURPLN=X',
     title: 'EUR/PLN',
     price: 4.33,
     netChange: 0.0074,

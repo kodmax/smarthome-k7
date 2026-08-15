@@ -26,14 +26,14 @@ const defaultMarketInfo: MarketInfo = {
 
 const defaultMarketIndices: MarketIndices = {
   sp500: {
-    symbol: '.SPX',
+    symbol: '^GSPC',
     title: 'S&P 500',
     price: 7498.96,
     netChange: -10.24,
     percentageChange: -0.14,
   },
   sp500Futures: {
-    symbol: '@SP.1',
+    symbol: 'ES=F',
     title: 'S&P 500 Futures',
     price: 7512.25,
     netChange: -28,

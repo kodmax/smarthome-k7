@@ -1,0 +1,15 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "PLN",
+          "symbol": "EURPLN=X",
+          "regularMarketPrice": 4.3039,
+          "chartPreviousClose": 4.3075
+        }
+      }
+    ],
+    "error": null
+  }
+}

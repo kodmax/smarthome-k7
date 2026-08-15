@@ -1,0 +1,15 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "USD",
+          "symbol": "ES=F",
+          "regularMarketPrice": 7805.0,
+          "chartPreviousClose": 7822.5
+        }
+      }
+    ],
+    "error": null
+  }
+}

@@ -1,3 +1,6 @@
 export * from './nasdaq'
 export * from './yahoo'
-export * from './cnbc'
+export { ForexSource } from './ForexSource'
+export { MarketIndicesSource } from './MarketIndicesSource'
+export { getForexRates } from './getForexRates'
+export { getMarketIndexQuotes } from './getMarketIndexQuotes'

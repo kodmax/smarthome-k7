@@ -1,0 +1,15 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "USD",
+          "symbol": "^GSPC",
+          "regularMarketPrice": 7785.76,
+          "chartPreviousClose": 7798.99
+        }
+      }
+    ],
+    "error": null
+  }
+}

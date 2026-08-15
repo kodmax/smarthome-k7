@@ -1,0 +1,15 @@
+{
+  "chart": {
+    "result": [
+      {
+        "meta": {
+          "currency": "PLN",
+          "symbol": "USDPLN=X",
+          "regularMarketPrice": 3.719,
+          "chartPreviousClose": 3.7358
+        }
+      }
+    ],
+    "error": null
+  }
+}

@@ -1,10 +1,10 @@
 import { DataSource, CacheAgeUnit } from '@repo/feeds'
+import { MarketIndices } from '@repo/types'
 import { getMarketIndexQuotes } from './getMarketIndexQuotes'
-import { CnbcMarketIndicesData } from './types'
 
-export class CnbcMarketIndicesSource extends DataSource<CnbcMarketIndicesData> {
+export class MarketIndicesSource extends DataSource<MarketIndices> {
   static getId() {
-    return 'cnbc-market-indices'
+    return 'market-indices'
   }
 
   static getCron() {
@@ -16,7 +16,7 @@ export class CnbcMarketIndicesSource extends DataSource<CnbcMarketIndicesData> {
   }
 
   protected getSourceMetricType() {
-    return 'scraper' as const
+    return 'api' as const
   }
 
   protected async fetchData() {

@@ -8,7 +8,7 @@ import { JobMarketInsightSource } from './job-market-insight'
 import { MySkillsSource } from './my-skills'
 import { NewsSource } from './news'
 import { SentryTestSource } from './sentry-test'
-import { CnbcForexSource, CnbcMarketIndicesSource, NasdaqMarketDataSource, YahooMarketDataSource } from './stock-market'
+import { ForexSource, MarketIndicesSource, NasdaqMarketDataSource, YahooMarketDataSource } from './stock-market'
 import { TorrentSource } from './the-pirate-bay'
 import { TransmissionSource } from './transmission'
 import { WeatherSource } from './weather'
@@ -40,8 +40,8 @@ export type DataSourceRegistryType = {
   weather: typeof WeatherSource
   nasdaqMarketData: typeof NasdaqMarketDataSource
   yahooMarketData: typeof YahooMarketDataSource
-  cnbcMarketIndices: typeof CnbcMarketIndicesSource
-  cnbcForex: typeof CnbcForexSource
+  marketIndices: typeof MarketIndicesSource
+  forex: typeof ForexSource
   news: typeof NewsSource
   jobAds: typeof JobAdsSource
   mySkills: typeof MySkillsSource

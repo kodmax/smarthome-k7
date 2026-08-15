@@ -1,10 +1,10 @@
 import { DataSource, CacheAgeUnit } from '@repo/feeds'
+import { ForexRates } from '@repo/types'
 import { getForexRates } from './getForexRates'
-import { CnbcForexData } from './types'
 
-export class CnbcForexSource extends DataSource<CnbcForexData> {
+export class ForexSource extends DataSource<ForexRates> {
   static getId() {
-    return 'cnbc-forex'
+    return 'forex'
   }
 
   static getCron() {
@@ -16,7 +16,7 @@ export class CnbcForexSource extends DataSource<CnbcForexData> {
   }
 
   protected getSourceMetricType() {
-    return 'scraper' as const
+    return 'api' as const
   }
 
   protected async fetchData() {

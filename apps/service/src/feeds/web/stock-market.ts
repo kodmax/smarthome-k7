@@ -9,8 +9,8 @@ export const addStockMarketFeed = (
 ): Promise<void> =>
   feeds.addFeed(
     'stock-market',
-    dataSources.getByIds(['nasdaqMarketData', 'yahooMarketData', 'cnbcMarketIndices']),
-    ({ nasdaqMarketData, yahooMarketData, cnbcMarketIndices }): StockMarketFeed => {
+    dataSources.getByIds(['nasdaqMarketData', 'yahooMarketData', 'marketIndices']),
+    ({ nasdaqMarketData, yahooMarketData, marketIndices }): StockMarketFeed => {
       const yahooMap: Map<string, YahooTickerData> = new Map()
       for (const data of yahooMarketData) {
         yahooMap.set(data.ticker, data)
@@ -57,6 +57,6 @@ export const addStockMarketFeed = (
         })
       }
 
-      return { marketInfo: nasdaqMarketData.marketInfo, marketIndices: cnbcMarketIndices, tickers }
+      return { marketInfo: nasdaqMarketData.marketInfo, marketIndices, tickers }
     },
   )

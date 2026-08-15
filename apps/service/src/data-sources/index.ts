@@ -11,6 +11,6 @@ export { JobMarketInsightSource } from './job-market-insight/JobMarketInsightSou
 export { MySkillsSource } from './my-skills/MySkillsSource'
 export { CvSource } from './cv/CvSource'
 export { NewsSource } from './news'
-export { YahooMarketDataSource, NasdaqMarketDataSource, CnbcMarketIndicesSource, CnbcForexSource } from './stock-market'
+export { YahooMarketDataSource, ForexSource, MarketIndicesSource, NasdaqMarketDataSource } from './stock-market'
 export { SentryTestSource } from './sentry-test'
 export * from './registry-type'
