@@ -6,6 +6,10 @@ export function isKnxReadTimeout(error: unknown): error is KnxLinkException & { 
   return error instanceof KnxLinkException && error.code === 'READ_TIMEOUT'
 }
 
+export function isConnectionAborted(error: unknown): error is KnxLinkException & { code: 'CONNECTION_ABORTED' } {
+  return error instanceof KnxLinkException && error.code === 'CONNECTION_ABORTED'
+}
+
 export function shouldCaptureKnxError(error: unknown): boolean {
   if (!isKnxReadTimeout(error)) {
     return true

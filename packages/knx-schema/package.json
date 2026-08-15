@@ -15,7 +15,7 @@
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "eslint": "^8.57.0",
-    "js-knx": "^3.3.0",
+    "js-knx": "^3.4.0",
     "typescript": "5.5.4"
   }
 }

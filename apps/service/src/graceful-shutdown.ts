@@ -8,14 +8,34 @@ import { closeRedisClient } from './redis'
 import type { KnxLink } from 'js-knx'
 
 let knxLink: KnxLink | undefined
+let knxConnectAttempt: KnxLink | undefined
 let knxCron: { stop(): void } | undefined
 let nestApp: INestApplication | undefined
 let dataSourceRegistry: { close(): void } | undefined
 let shuttingDown = false
 let shutdownLogger: Logger | undefined
 
+export class StartupAbortedError extends Error {
+  constructor() {
+    super('Startup aborted during shutdown')
+    this.name = 'StartupAbortedError'
+  }
+}
+
+export function isShuttingDown(): boolean {
+  return shuttingDown
+}
+
 export const registerKnxLink = (link: KnxLink): void => {
   knxLink = link
+}
+
+export const registerKnxConnectAttempt = (link: KnxLink): void => {
+  knxConnectAttempt = link
+}
+
+export const clearKnxConnectAttempt = (): void => {
+  knxConnectAttempt = undefined
 }
 
 export const registerKnxCron = (chronos: { stop(): void }): void => {
@@ -31,6 +51,14 @@ export const registerNestApp = (ctx: INestApplication): void => {
 }
 
 const closeConnections = async (logger: Logger): Promise<void> => {
+  const connectAttempt = knxConnectAttempt
+  knxConnectAttempt = undefined
+
+  if (connectAttempt !== undefined) {
+    connectAttempt.abortConnect()
+    logger.info({ step: 'knx-connect' }, 'KNX connect aborted')
+  }
+
   if (nestApp !== undefined) {
     await nestApp.close()
     logger.info({ step: 'nest' }, 'Shutdown step complete')
@@ -92,7 +120,6 @@ export const setupGracefulShutdown = (logger: Logger): void => {
   const shutdown = (signal: string): void => {
     if (shuttingDown) {
       logger.warn({ signal }, 'Shutdown already in progress')
-      process.exit(1)
       return
     }
     shuttingDown = true

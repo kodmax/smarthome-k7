@@ -11,7 +11,14 @@ import { appMode, isDevelopment } from '@repo/env'
 import { getDependency, registerDependency } from './di'
 import { initKnxFeeds, initWebFeeds } from './feeds'
 import { knxInit } from './knx-init'
-import { registerDataSources, registerKnxCron, registerNestApp, setupGracefulShutdown } from './graceful-shutdown'
+import {
+  registerDataSources,
+  registerKnxCron,
+  registerNestApp,
+  isShuttingDown,
+  setupGracefulShutdown,
+  StartupAbortedError,
+} from './graceful-shutdown'
 import { createNestApp } from './nest/nest-bootstrap'
 import { initOpenAIClient } from './openai'
 import { initRedisClient } from './redis'
@@ -53,6 +60,9 @@ const main = async () => {
 
   if (cacheBackend === 'redis') {
     registerDependency('redis', await initRedisClient(serviceLogger))
+    if (isShuttingDown()) {
+      return
+    }
   }
 
   const feedEvents = new FeedEvents()
@@ -90,25 +100,51 @@ const main = async () => {
   registerWsMetrics(feedEvents)
 
   await initWebFeeds(feeds, dataSources)
+  if (isShuttingDown()) {
+    return
+  }
+
   await dataSourceChronos.runMisfireRecovery()
+  if (isShuttingDown()) {
+    return
+  }
 
   if (!config.knx.disabled) {
-    const knx = await knxInit(serviceLogger)
-    registerDependency('knx', knx)
-    await initKnxFeeds(feeds, dataSources)
+    try {
+      const knx = await knxInit(serviceLogger)
+      if (isShuttingDown()) {
+        return
+      }
 
-    if (!config.cron.disabled) {
-      registerKnxCron(
-        initKnxCronJobs(knx, {
-          logger: serviceLogger.child({ component: 'knx-cron' }, { level: readScopedLogLevel('knx-cron') }),
-          executionStore: cronExecutionStore,
-        }),
-      )
-      serviceLogger.info('KNX cron jobs initialized')
+      registerDependency('knx', knx)
+      await initKnxFeeds(feeds, dataSources)
+      if (isShuttingDown()) {
+        return
+      }
+
+      if (!config.cron.disabled) {
+        registerKnxCron(
+          initKnxCronJobs(knx, {
+            logger: serviceLogger.child({ component: 'knx-cron' }, { level: readScopedLogLevel('knx-cron') }),
+            executionStore: cronExecutionStore,
+          }),
+        )
+        serviceLogger.info('KNX cron jobs initialized')
+      }
+    } catch (error) {
+      if (error instanceof StartupAbortedError) {
+        return
+      }
+
+      throw error
     }
   }
 
   serviceLogger.info({ feedCount: feeds.getFeedCount() }, 'Feeds initialized')
+
+  if (isShuttingDown()) {
+    return
+  }
 
   registerNestApp(
     await createNestApp({

@@ -10,12 +10,15 @@ const swcBin = join(serviceRoot, 'node_modules/.bin/swc')
 const tscAliasBin = join(serviceRoot, 'node_modules/.bin/tsc-alias')
 const DEP_RESTART_DEBOUNCE_MS = 300
 const REBUILD_DEBOUNCE_MS = 150
+const SHUTDOWN_WAIT_MS = 30_000
 
 let nodeProcess
 let hasStarted = false
+let devShuttingDown = false
 let depRestartTimer
 let rebuildTimer
 let rebuildPending = false
+let startNodeChain = Promise.resolve()
 
 const repoPackageNames = () => {
   const pkgJson = JSON.parse(readFileSync(join(serviceRoot, 'package.json'), 'utf8'))
@@ -51,13 +54,38 @@ const compileService = () => {
   }
 }
 
-const startNode = () => {
-  nodeProcess?.kill('SIGTERM')
+const waitForExit = (childProcess, timeoutMs) =>
+  new Promise(resolve => {
+    if (childProcess.exitCode !== null) {
+      resolve()
+      return
+    }
 
-  nodeProcess = spawn('node', ['-r', './dist/preload.js', './dist/index.js'], {
-    cwd: serviceRoot,
-    stdio: 'inherit',
+    const timer = setTimeout(() => {
+      console.warn(`[dev] service did not exit within ${timeoutMs}ms — sending SIGKILL`)
+      childProcess.kill('SIGKILL')
+    }, timeoutMs)
+
+    childProcess.once('exit', () => {
+      clearTimeout(timer)
+      resolve()
+    })
   })
+
+const startNode = async () => {
+  startNodeChain = startNodeChain.then(async () => {
+    if (nodeProcess) {
+      nodeProcess.kill('SIGTERM')
+      await waitForExit(nodeProcess, SHUTDOWN_WAIT_MS)
+    }
+
+    nodeProcess = spawn('node', ['-r', './dist/preload.js', './dist/index.js'], {
+      cwd: serviceRoot,
+      stdio: 'inherit',
+    })
+  })
+
+  await startNodeChain
 }
 
 const rebuildService = ({ immediate = false } = {}) => {
@@ -67,7 +95,7 @@ const rebuildService = ({ immediate = false } = {}) => {
 
   clearTimeout(rebuildTimer)
 
-  const run = () => {
+  const run = async () => {
     rebuildPending = true
 
     try {
@@ -79,11 +107,11 @@ const rebuildService = ({ immediate = false } = {}) => {
 
       if (!hasStarted) {
         hasStarted = true
-        startNode()
+        await startNode()
         console.log('[dev] ready — watching apps/service/src and @repo/*/dist')
       } else {
         console.log('[dev] recompiled — restarting service…')
-        startNode()
+        await startNode()
       }
     } finally {
       rebuildPending = false
@@ -91,11 +119,13 @@ const rebuildService = ({ immediate = false } = {}) => {
   }
 
   if (immediate) {
-    run()
+    void run()
     return
   }
 
-  rebuildTimer = setTimeout(run, REBUILD_DEBOUNCE_MS)
+  rebuildTimer = setTimeout(() => {
+    void run()
+  }, REBUILD_DEBOUNCE_MS)
 }
 
 const scheduleDepRestart = packageName => {
@@ -106,7 +136,7 @@ const scheduleDepRestart = packageName => {
   clearTimeout(depRestartTimer)
   depRestartTimer = setTimeout(() => {
     console.log(`[dev] @repo/${packageName} dist changed — restarting service…`)
-    startNode()
+    void startNode()
   }, DEP_RESTART_DEBOUNCE_MS)
 }
 
@@ -129,10 +159,20 @@ const watchRepoPackageDist = packageName => {
   console.log(`[dev] watching packages/${packageName}/dist`)
 }
 
-const shutdown = signal => {
+const shutdown = async signal => {
+  if (devShuttingDown) {
+    return
+  }
+  devShuttingDown = true
+
   clearTimeout(depRestartTimer)
   clearTimeout(rebuildTimer)
-  nodeProcess?.kill(signal)
+
+  if (nodeProcess) {
+    nodeProcess.kill(signal)
+    await waitForExit(nodeProcess, SHUTDOWN_WAIT_MS)
+  }
+
   process.exit(0)
 }
 
@@ -156,5 +196,9 @@ watch(srcDir, { recursive: true }, (_event, filename) => {
 
 rebuildService({ immediate: true })
 
-process.on('SIGINT', () => shutdown('SIGINT'))
-process.on('SIGTERM', () => shutdown('SIGTERM'))
+process.on('SIGINT', () => {
+  void shutdown('SIGINT')
+})
+process.on('SIGTERM', () => {
+  void shutdown('SIGTERM')
+})
