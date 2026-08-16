@@ -500,7 +500,7 @@ describe('ApplicationStatusEditor', () => {
       analyzedAt: '2026-01-02T00:00:00.000Z',
       summary: 'Dobre dopasowanie do roli.',
     })
-    vi.mocked(fetchJobAdCvMatch).mockResolvedValueOnce(updatedAnalysis)
+    vi.mocked(fetchJobAdCvMatch).mockResolvedValue(updatedAnalysis)
 
     renderWithTheme(
       <ApplicationStatusEditor
@@ -519,11 +519,11 @@ describe('ApplicationStatusEditor', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
+      expect(screen.getByText('Analiza dopasowania CV — 80%')).toBeInTheDocument()
+      expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
+      expect(screen.getByRole('dialog')).toHaveTextContent('Dobre dopasowanie do roli.')
+      expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
     })
-    expect(screen.getByText('Analiza dopasowania CV — 80%')).toBeInTheDocument()
-    expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
-    expect(screen.getByRole('dialog')).toHaveTextContent('Dobre dopasowanie do roli.')
-    expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
     expect(screen.getByRole('button', { name: 'Sprawdź dopasowanie', hidden: true })).toBeEnabled()
   })
 

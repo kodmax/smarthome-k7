@@ -141,7 +141,7 @@ describe('Ad', () => {
       analyzedAt: '2026-01-01T00:00:00.000Z',
       summary: 'Silne dopasowanie do roli TypeScript.',
     })
-    vi.mocked(fetchJobAdCvMatch).mockResolvedValueOnce(analysis)
+    vi.mocked(fetchJobAdCvMatch).mockResolvedValue(analysis)
 
     renderAd(
       jobAd({
@@ -156,12 +156,12 @@ describe('Ad', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
+      expect(screen.getByText('80%')).toBeInTheDocument()
+      expect(screen.getByText('Analiza dopasowania CV — 80%')).toBeInTheDocument()
+      expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
+      expect(screen.getByRole('dialog')).toHaveTextContent('Silne dopasowanie do roli TypeScript.')
+      expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
     })
-    expect(screen.getByText('80%')).toBeInTheDocument()
-    expect(screen.getByText('Analiza dopasowania CV — 80%')).toBeInTheDocument()
-    expect(screen.getByRole('dialog')).toHaveTextContent('Podsumowanie')
-    expect(screen.getByRole('dialog')).toHaveTextContent('Silne dopasowanie do roli TypeScript.')
-    expect(screen.getByRole('dialog')).toHaveTextContent('Wnioski')
   })
 
   it('shows must-have gaps indicator with count when mustHaveGapsCount is greater than zero', () => {
