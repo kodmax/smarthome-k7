@@ -19,6 +19,7 @@ let depRestartTimer
 let rebuildTimer
 let rebuildPending = false
 let startNodeChain = Promise.resolve()
+const expectedChildExits = new WeakSet()
 
 const isChildRunning = childProcess =>
   childProcess !== undefined &&
@@ -102,6 +103,7 @@ const waitForExit = (childProcess, timeoutMs) =>
 const startNode = async () => {
   startNodeChain = startNodeChain.then(async () => {
     if (isChildRunning(nodeProcess)) {
+      expectedChildExits.add(nodeProcess)
       nodeProcess.kill('SIGTERM')
       await waitForExit(nodeProcess, SHUTDOWN_WAIT_MS)
     }
@@ -110,10 +112,23 @@ const startNode = async () => {
       return
     }
 
-    nodeProcess = spawn('node', ['-r', './dist/preload.js', './dist/index.js'], {
+    const childProcess = spawn('node', ['-r', './dist/preload.js', './dist/index.js'], {
       cwd: serviceRoot,
       stdio: 'inherit',
-      detached: true,
+    })
+    nodeProcess = childProcess
+
+    childProcess.once('exit', code => {
+      if (
+        code !== 0 ||
+        devShuttingDown ||
+        expectedChildExits.has(childProcess) ||
+        nodeProcess !== childProcess
+      ) {
+        return
+      }
+
+      setImmediate(() => process.exit(0))
     })
   })
 

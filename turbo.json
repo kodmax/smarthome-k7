@@ -2,6 +2,9 @@
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "stream",
   "concurrency": "15",
+  "futureFlags": {
+    "experimentalTaskCommand": true
+  },
   "globalEnv": ["NODE_ENV"],
   "globalPassThroughEnv": [
     "NODE_ENV",
@@ -30,6 +33,84 @@
       "outputs": ["dist/**"]
     },
     "dev": {
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "service#dev": {
+      "command": ["node", "scripts/dev.mjs"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "web#dev": {
+      "command": ["node", "../../node_modules/vite/bin/vite.js", "--host", "--clearScreen", "false"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/chronos#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/common#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/cron-scripts#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/db#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/di#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/env#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/feeds#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/knx-schema#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/logger#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/transmission#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
+      "dependsOn": ["^transpile"],
+      "cache": false,
+      "persistent": true
+    },
+    "@repo/types#dev": {
+      "command": ["node", "../../scripts/transpile-package.mjs", "--watch"],
       "dependsOn": ["^transpile"],
       "cache": false,
       "persistent": true
