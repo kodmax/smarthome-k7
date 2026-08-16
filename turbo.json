@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "ui": "stream",
   "concurrency": "15",
   "globalEnv": ["NODE_ENV"],
   "globalPassThroughEnv": [

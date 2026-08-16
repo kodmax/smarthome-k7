@@ -23,6 +23,14 @@ vi.mock('./sentry', () => ({
   closeSentry: vi.fn().mockResolvedValue(undefined),
 }))
 
+const createLogger = () => ({
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
+  flush: vi.fn((callback: () => void) => callback()),
+})
+
 const loadGracefulShutdown = async () => {
   vi.resetModules()
   return import('./graceful-shutdown')
@@ -43,7 +51,7 @@ describe('graceful-shutdown', () => {
 
   it('isShuttingDown becomes true after SIGTERM', async () => {
     const { isShuttingDown, setupGracefulShutdown } = await loadGracefulShutdown()
-    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
+    const logger = createLogger()
 
     setupGracefulShutdown(logger as never)
     process.emit('SIGTERM')
@@ -62,7 +70,7 @@ describe('graceful-shutdown', () => {
 
   it('aborts in-flight KNX connect on SIGTERM', async () => {
     const { registerKnxConnectAttempt, setupGracefulShutdown } = await loadGracefulShutdown()
-    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
+    const logger = createLogger()
     const abortConnect = vi.fn()
 
     registerKnxConnectAttempt({ abortConnect } as never)
@@ -74,5 +82,33 @@ describe('graceful-shutdown', () => {
     })
 
     expect(logger.info).toHaveBeenCalledWith({ step: 'knx-connect' }, 'KNX connect aborted')
+  })
+
+  it('flushes logs before exiting on successful shutdown', async () => {
+    const { setupGracefulShutdown } = await loadGracefulShutdown()
+    const logger = createLogger()
+
+    setupGracefulShutdown(logger as never)
+    process.emit('SIGTERM')
+
+    await vi.waitFor(() => {
+      expect(logger.flush).toHaveBeenCalledOnce()
+      expect(exitSpy).toHaveBeenCalledWith(0)
+    })
+  })
+
+  it('ignores duplicate SIGINT while shutdown is in progress', async () => {
+    const { isShuttingDown, setupGracefulShutdown } = await loadGracefulShutdown()
+    const logger = createLogger()
+
+    setupGracefulShutdown(logger as never)
+    process.emit('SIGINT')
+
+    expect(isShuttingDown()).toBe(true)
+
+    process.emit('SIGINT')
+
+    expect(logger.warn).toHaveBeenCalledWith({ signal: 'SIGINT' }, 'Shutdown already in progress')
+    expect(exitSpy).toHaveBeenCalledTimes(0)
   })
 })

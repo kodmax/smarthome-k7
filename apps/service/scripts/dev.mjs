@@ -20,6 +20,11 @@ let rebuildTimer
 let rebuildPending = false
 let startNodeChain = Promise.resolve()
 
+const isChildRunning = childProcess =>
+  childProcess !== undefined &&
+  childProcess.exitCode === null &&
+  childProcess.signalCode === null
+
 const repoPackageNames = () => {
   const pkgJson = JSON.parse(readFileSync(join(serviceRoot, 'package.json'), 'utf8'))
   return Object.keys(pkgJson.dependencies ?? {}).flatMap(name => {
@@ -56,32 +61,59 @@ const compileService = () => {
 
 const waitForExit = (childProcess, timeoutMs) =>
   new Promise(resolve => {
-    if (childProcess.exitCode !== null) {
+    if (!isChildRunning(childProcess)) {
       resolve()
       return
     }
 
-    const timer = setTimeout(() => {
-      console.warn(`[dev] service did not exit within ${timeoutMs}ms — sending SIGKILL`)
-      childProcess.kill('SIGKILL')
-    }, timeoutMs)
-
-    childProcess.once('exit', () => {
+    let settled = false
+    let timer
+    const finish = () => {
+      if (settled) {
+        return
+      }
+      settled = true
       clearTimeout(timer)
+      childProcess.off('exit', onExit)
+      childProcess.off('error', onError)
       resolve()
-    })
+    }
+    const onExit = () => finish()
+    const onError = () => finish()
+
+    childProcess.once('exit', onExit)
+    childProcess.once('error', onError)
+
+    if (!isChildRunning(childProcess)) {
+      finish()
+      return
+    }
+
+    timer = setTimeout(() => {
+      console.warn(`[dev] service did not exit within ${timeoutMs}ms — sending SIGKILL`)
+      if (isChildRunning(childProcess)) {
+        childProcess.kill('SIGKILL')
+      } else {
+        finish()
+      }
+    }, timeoutMs)
   })
 
 const startNode = async () => {
   startNodeChain = startNodeChain.then(async () => {
-    if (nodeProcess) {
+    if (isChildRunning(nodeProcess)) {
       nodeProcess.kill('SIGTERM')
       await waitForExit(nodeProcess, SHUTDOWN_WAIT_MS)
+    }
+
+    if (devShuttingDown) {
+      return
     }
 
     nodeProcess = spawn('node', ['-r', './dist/preload.js', './dist/index.js'], {
       cwd: serviceRoot,
       stdio: 'inherit',
+      detached: true,
     })
   })
 
@@ -89,7 +121,7 @@ const startNode = async () => {
 }
 
 const rebuildService = ({ immediate = false } = {}) => {
-  if (rebuildPending) {
+  if (rebuildPending || devShuttingDown) {
     return
   }
 
@@ -129,7 +161,7 @@ const rebuildService = ({ immediate = false } = {}) => {
 }
 
 const scheduleDepRestart = packageName => {
-  if (!hasStarted) {
+  if (!hasStarted || devShuttingDown) {
     return
   }
 
@@ -168,7 +200,7 @@ const shutdown = async signal => {
   clearTimeout(depRestartTimer)
   clearTimeout(rebuildTimer)
 
-  if (nodeProcess) {
+  if (isChildRunning(nodeProcess)) {
     nodeProcess.kill(signal)
     await waitForExit(nodeProcess, SHUTDOWN_WAIT_MS)
   }

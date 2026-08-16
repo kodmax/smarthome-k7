@@ -117,6 +117,10 @@ const closeConnections = async (logger: Logger): Promise<void> => {
 export const setupGracefulShutdown = (logger: Logger): void => {
   shutdownLogger = logger
 
+  const exitProcess = (code: number): void => {
+    logger.flush(() => process.exit(code))
+  }
+
   const shutdown = (signal: string): void => {
     if (shuttingDown) {
       logger.warn({ signal }, 'Shutdown already in progress')
@@ -130,12 +134,12 @@ export const setupGracefulShutdown = (logger: Logger): void => {
     closeConnections(logger)
       .then(() => {
         logger.info({ signal, durationMs: Date.now() - start }, 'Shutdown complete')
-        process.exit(0)
+        exitProcess(0)
       })
       .catch(err => {
         logger.error({ err, signal, durationMs: Date.now() - start }, 'Failed during shutdown')
         captureProductionError(err)
-        void closeSentry().finally(() => process.exit(1))
+        void closeSentry().finally(() => exitProcess(1))
       })
   }
 

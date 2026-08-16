@@ -56,6 +56,13 @@ export async function closePrometheus(): Promise<void> {
   metricsServer = undefined
 
   await new Promise<void>((resolve, reject) => {
-    server.close(err => (err ? reject(err) : resolve()))
+    server.close(err => {
+      if (err !== undefined && 'code' in err && err.code === 'ERR_SERVER_NOT_RUNNING') {
+        resolve()
+        return
+      }
+
+      err ? reject(err) : resolve()
+    })
   })
 }
