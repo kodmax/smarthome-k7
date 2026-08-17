@@ -26,7 +26,8 @@ export function createStyledIcon(
     ref,
   ) {
     const iconColor = colorOverride ?? color
-    const glowFilter = glow === 'off' ? undefined : iconGlowFilter(glowColor, glow)
+    const effectiveGlowColor = colorOverride !== undefined ? iconColor : glowColor
+    const glowFilter = glow === 'off' ? undefined : iconGlowFilter(effectiveGlowColor, glow)
     const spinStyle = spinning ? { animation: 'repo-icon-spin 1s linear infinite' } : undefined
 
     return (
