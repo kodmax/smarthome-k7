@@ -261,6 +261,29 @@ describe('applicationMeta', () => {
     })
   })
 
+  it('allows interview to archived with no-response', () => {
+    expect(
+      applyStatusChange(
+        {
+          applyStatus: 'interview',
+          archiveReason: null,
+          comment: null,
+          appliedAt: '2026-07-18T12:00:00.000Z',
+          rejectedAt: null,
+          statusChangedAt: null,
+        },
+        { applyStatus: 'archived', archiveReason: 'no-response' },
+      ),
+    ).toEqual({
+      applyStatus: 'archived',
+      archiveReason: 'no-response',
+      comment: null,
+      appliedAt: '2026-07-18T12:00:00.000Z',
+      rejectedAt: null,
+      statusChangedAt: null,
+    })
+  })
+
   it('derives statusChangedAt from meta row timestamp', () => {
     expect(resolveStatusChangedAt('consider', '2026-07-19T15:00:00.000Z')).toBe('2026-07-19T15:00:00.000Z')
     expect(resolveStatusChangedAt('pending-review', '2026-07-19T15:00:00.000Z')).toBeNull()

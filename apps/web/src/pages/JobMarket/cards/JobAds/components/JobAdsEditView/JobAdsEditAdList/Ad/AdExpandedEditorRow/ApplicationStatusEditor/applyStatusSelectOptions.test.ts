@@ -39,7 +39,7 @@ describe('applyArchiveReasonOptions', () => {
   })
 
   it('returns interview archive reasons including offer-accepted', () => {
-    expect(applyArchiveReasonOptions('interview')).toEqual(['rejected', 'withdrawn', 'offer-accepted'])
+    expect(applyArchiveReasonOptions('interview')).toEqual(['rejected', 'withdrawn', 'no-response', 'offer-accepted'])
   })
 
   it('returns rearchive reasons from archived ads', () => {

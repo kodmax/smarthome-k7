@@ -37,6 +37,7 @@ const POST_APPLICATION_ARCHIVE_REASONS = [
 const INTERVIEW_ARCHIVE_REASONS = [
   'rejected',
   'withdrawn',
+  'no-response',
   'offer-accepted',
 ] as const satisfies readonly JobAdArchiveReason[]
 

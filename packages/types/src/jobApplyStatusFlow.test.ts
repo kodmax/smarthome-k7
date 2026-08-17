@@ -45,8 +45,9 @@ describe('jobApplyStatusFlow', () => {
   })
 
   it('allows interview archive reasons including offer-accepted', () => {
-    expect(availableArchiveReasons('interview')).toEqual(['rejected', 'withdrawn', 'offer-accepted'])
+    expect(availableArchiveReasons('interview')).toEqual(['rejected', 'withdrawn', 'no-response', 'offer-accepted'])
     expect(canTransition('interview', 'archived', null, 'offer-accepted')).toBe(true)
+    expect(canTransition('interview', 'archived', null, 'no-response')).toBe(true)
     expect(canTransition('interview', 'applied', null, null)).toBe(false)
   })
 
