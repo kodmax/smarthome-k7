@@ -23,6 +23,8 @@ export const pl: Translations = {
     darkAriaLabel: 'Ciemny motyw',
     language: 'Język',
     languageAriaLabel: 'Język aplikacji',
+    dashboard: 'Dashboard',
+    dashboardJobAdsSalary: 'Pokaż wynagrodzenie w ofertach pracy na dashboardzie',
     sentryTest: 'Sentry',
     sentryTestDescription: 'Wyślij testowy błąd na frontend i backend, żeby sprawdzić source mapy w Sentry.',
     sentryTestButton: 'Wyślij testowy błąd',

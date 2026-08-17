@@ -23,6 +23,8 @@ export const ru: Translations = {
     darkAriaLabel: 'Тёмная тема',
     language: 'Язык',
     languageAriaLabel: 'Язык приложения',
+    dashboard: 'Dashboard',
+    dashboardJobAdsSalary: 'Показывать зарплату в вакансиях на dashboard',
     sentryTest: 'Sentry',
     sentryTestDescription: 'Отправить тестовую ошибку на frontend и backend для проверки source maps в Sentry.',
     sentryTestButton: 'Отправить тестовую ошибку',

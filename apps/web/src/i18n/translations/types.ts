@@ -21,6 +21,8 @@ export type Translations = {
     darkAriaLabel: string
     language: string
     languageAriaLabel: string
+    dashboard: string
+    dashboardJobAdsSalary: string
     sentryTest: string
     sentryTestDescription: string
     sentryTestButton: string

@@ -1,17 +1,19 @@
-import { Box, Button, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Box, Button, FormControlLabel, Switch, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import { useColorScheme } from '@mui/material/styles'
 import { iconStyles, SunMoonIcon } from '@repo/assets'
 import { useCommand } from '@repo/feed-client'
-import { type FC, type MouseEvent, useState } from 'react'
+import { type ChangeEvent, type FC, type MouseEvent, useState } from 'react'
 import { PageHeader } from '@/app/components/PageHeader'
 import { PageWrapper } from '@/app/components/PageWrapper'
 import { isSentryEnabled, sendSentryTestEvent } from '@/app/errors'
+import { useDashboardJobAdsSalaryPreference } from '@/app/preferences'
 import { type AppColorMode } from '@/app/theme/colorMode'
 import { APP_LOCALES, type AppLocale, LOCALE_LABELS, useLocale, useTranslations } from '@/i18n'
 
 export const Appearance: FC<Record<string, never>> = () => {
   const { mode, setMode } = useColorScheme()
   const { locale, setLocale } = useLocale()
+  const { showSalary, setShowSalary } = useDashboardJobAdsSalaryPreference()
   const { t } = useTranslations()
   const [sentryTestSent, setSentryTestSent] = useState(false)
   const sentryEnabled = isSentryEnabled()
@@ -27,6 +29,10 @@ export const Appearance: FC<Record<string, never>> = () => {
     if (value !== null) {
       setLocale(value)
     }
+  }
+
+  const handleShowSalaryChange = (_event: ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    setShowSalary(checked)
   }
 
   const handleSentryTest = () => {
@@ -89,6 +95,16 @@ export const Appearance: FC<Record<string, never>> = () => {
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
+      </Box>
+
+      <Box sx={{ mb: 4 }}>
+        <Typography variant='h3' sx={{ mb: 2 }}>
+          {t.appearance.dashboard}
+        </Typography>
+        <FormControlLabel
+          control={<Switch checked={showSalary} onChange={handleShowSalaryChange} />}
+          label={t.appearance.dashboardJobAdsSalary}
+        />
       </Box>
 
       <Box>

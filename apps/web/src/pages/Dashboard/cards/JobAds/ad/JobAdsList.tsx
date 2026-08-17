@@ -10,14 +10,15 @@ const cardTableFontSize = designTokens.font.body.size
 type Props = {
   ads: JobAdsFeedItem[]
   zoom: boolean
+  showSalary: boolean
 }
 
-export const JobAdsList: FC<Props> = ({ ads, zoom }) => {
+export const JobAdsList: FC<Props> = ({ ads, zoom, showSalary }) => {
   return (
     <ApolloDataTable style={{ fontSize: cardTableFontSize, tableLayout: 'fixed', width: '100%' }}>
       <TableBody>
         {ads.map(ad => (
-          <Ad key={ad.content.id} ad={ad} zoom={zoom} />
+          <Ad key={ad.content.id} ad={ad} zoom={zoom} showSalary={showSalary} />
         ))}
       </TableBody>
     </ApolloDataTable>

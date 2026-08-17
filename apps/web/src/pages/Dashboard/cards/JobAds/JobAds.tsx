@@ -4,6 +4,7 @@ import { BaseCard, useZoom } from '@repo/apollo-card'
 import { useFeed } from '@repo/feed-client'
 import { TableEmptyMessage, TablePlaceholder } from '@/card-components'
 import { JobAdsFeed } from '@repo/types'
+import { useDashboardJobAdsSalaryPreference } from '@/app/preferences'
 import { useTranslations } from '@/i18n'
 import { JobAdsList } from './ad'
 import { filterVisibleJobAds } from './visibleJobAds'
@@ -11,6 +12,7 @@ import { filterVisibleJobAds } from './visibleJobAds'
 export const JobAds: FC<Record<string, never>> = () => {
   const zoom = useZoom('job-ads')
   const feed = useFeed<JobAdsFeed>('job-ads')
+  const { showSalary } = useDashboardJobAdsSalaryPreference()
   const { t } = useTranslations()
   const labels = t.dashboard.jobAds
 
@@ -31,7 +33,7 @@ export const JobAds: FC<Record<string, never>> = () => {
       ) : visibleAds.length === 0 ? (
         <TableEmptyMessage>{t.dashboard.common.emptyMessage}</TableEmptyMessage>
       ) : (
-        <JobAdsList ads={visibleAds} zoom={zoom} />
+        <JobAdsList ads={visibleAds} zoom={zoom} showSalary={showSalary} />
       )}
     </BaseCard>
   )

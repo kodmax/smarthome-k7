@@ -13,7 +13,8 @@ import {
 export const Ad: FC<{
   ad: JobAdsFeedItem
   zoom: boolean
-}> = ({ ad, zoom }) => {
+  showSalary: boolean
+}> = ({ ad, zoom, showSalary }) => {
   return (
     <ApolloTableRow>
       {zoom ? <LinkOpen href={ad.content.advertUrl} /> : null}
@@ -24,7 +25,7 @@ export const Ad: FC<{
           <AdTitleTrailing ad={ad} zoom={zoom} />
         </JobTitleContent>
       </JobTitleCell>
-      <AdSalaryCells ad={ad} zoom={zoom} showHourlySalaryOnXs />
+      {showSalary ? <AdSalaryCells ad={ad} zoom={zoom} showHourlySalaryOnXs /> : null}
     </ApolloTableRow>
   )
 }
