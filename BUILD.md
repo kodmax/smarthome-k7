@@ -54,6 +54,22 @@ turbo dev
 `scripts/dev.mjs` compiles the service, watches its TypeScript sources and the `dist` directories of its `@repo/*`
 dependencies, and restarts the Node process after relevant changes.
 
+### Service `dist` in development vs production
+
+Development and production use different compile pipelines for `apps/service`:
+
+- **`yarn transpile` / dev** — `rm -rf dist`, then SWC, then `tsc-alias`. Three steps, distinct roles:
+  - **SWC** — fast TS-to-JS transpile, no typecheck (dev keeps running on TS errors).
+  - **`tsc-alias`** — rewrites `@/*` and `@/utils/*` imports in emitted `.js` to relative `require()` paths. Required
+    (~100+ source files use these aliases; SWC does not resolve them). This is not typecheck.
+  - Used by `dev.mjs` on every rebuild so `dist` is always a clean SWC output with resolved aliases.
+- **`yarn build`** — `rm -rf dist`, then **`tsc`** (strict typecheck), then `tsc-alias`, then Sentry sourcemaps. For
+  production and `yarn verify` only.
+
+Do not rely on a mixed `dist` (for example, leftovers from `yarn build` with missing SWC outputs). If module-not-found
+errors appear after pull or build-process changes, `dev.mjs` now always runs the full `transpile` script; `turbo dev`
+also runs `service#transpile` before starting the watcher.
+
 ### Direct Turbo task commands
 
 Turbo 2.10.10 supports experimental task command overrides. The root `turbo.json` enables
@@ -64,9 +80,9 @@ Turbo 2.10.10 supports experimental task command overrides. The root `turbo.json
 - the 11 watchable `@repo/*` packages run `node ../../scripts/transpile-package.mjs --watch`.
 
 These commands are argv arrays executed from each package directory without a shell or package manager. Package-scoped
-tasks do not inherit the unscoped `dev` definition, so every override explicitly repeats `dependsOn: ["^transpile"]`,
-`cache: false`, and `persistent: true`. Existing package.json scripts remain available for standalone package commands,
-but Turbo's more-specific overrides take precedence over them.
+tasks do not inherit the unscoped `dev` definition, so every override explicitly repeats `dependsOn: ["^transpile"]`
+(and `service#dev` also depends on `transpile`), `cache: false`, and `persistent: true`. Existing package.json scripts
+remain available for standalone package commands, but Turbo's more-specific overrides take precedence over them.
 
 The finite `^transpile` dependencies still use their package.json scripts and may print Yarn startup output. They finish
 before the dependent persistent tasks start and are no longer present during shutdown; the long-running `dev` tasks

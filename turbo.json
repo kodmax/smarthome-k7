@@ -39,7 +39,7 @@
     },
     "service#dev": {
       "command": ["node", "scripts/dev.mjs"],
-      "dependsOn": ["^transpile"],
+      "dependsOn": ["transpile", "^transpile"],
       "cache": false,
       "persistent": true
     },

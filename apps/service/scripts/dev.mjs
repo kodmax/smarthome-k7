@@ -6,8 +6,6 @@ import { fileURLToPath } from 'node:url'
 const serviceRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
 const repoRoot = join(serviceRoot, '../..')
 const srcDir = join(serviceRoot, 'src')
-const swcBin = join(serviceRoot, 'node_modules/.bin/swc')
-const tscAliasBin = join(serviceRoot, 'node_modules/.bin/tsc-alias')
 const DEP_RESTART_DEBOUNCE_MS = 300
 const REBUILD_DEBOUNCE_MS = 150
 const SHUTDOWN_WAIT_MS = 30_000
@@ -37,22 +35,10 @@ const repoPackageNames = () => {
   })
 }
 
-const runTscAlias = () => {
-  try {
-    execSync(`"${tscAliasBin}" -p tsconfig.json`, { cwd: serviceRoot, stdio: 'inherit' })
-    return true
-  } catch {
-    console.error('[dev] tsc-alias failed — path aliases in dist may be stale')
-    return false
-  }
-}
-
 const compileService = () => {
   try {
-    execSync(`"${swcBin}" src -d dist --strip-leading-paths --config-file .swcrc`, {
-      cwd: serviceRoot,
-      stdio: 'inherit',
-    })
+    // SWC transpile only (yarn transpile) — not tsc, so dev keeps running on TS type errors.
+    execSync('yarn transpile', { cwd: serviceRoot, stdio: 'inherit' })
     return true
   } catch {
     console.error('[dev] compile failed — fix errors above; watcher still running')
@@ -150,8 +136,6 @@ const rebuildService = ({ immediate = false } = {}) => {
         return
       }
 
-      runTscAlias()
-
       if (!hasStarted) {
         hasStarted = true
         await startNode()
@@ -176,7 +160,7 @@ const rebuildService = ({ immediate = false } = {}) => {
 }
 
 const scheduleDepRestart = packageName => {
-  if (!hasStarted || devShuttingDown) {
+  if (!hasStarted || devShuttingDown || rebuildPending) {
     return
   }
 
@@ -227,10 +211,6 @@ console.log('[dev] watching apps/service/src…')
 
 for (const packageName of repoPackageNames()) {
   watchRepoPackageDist(packageName)
-}
-
-if (!existsSync(join(serviceRoot, 'dist/index.js'))) {
-  execSync(`rm -rf dist`, { cwd: serviceRoot, stdio: 'inherit' })
 }
 
 watch(srcDir, { recursive: true }, (_event, filename) => {
