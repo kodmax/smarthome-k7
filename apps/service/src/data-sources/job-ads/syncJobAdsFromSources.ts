@@ -9,6 +9,9 @@ import { toJobAd as toNfjJobAd } from './nfj/toJobAd'
 import { fetchTheprotocolOffers } from './theprotocol/theprotocol'
 import { digestTheprotocolId } from './theprotocol/digestTheprotocolId'
 import { toJobAd as toTheprotocolJobAd } from './theprotocol/toJobAd'
+import { fetchWellfoundAds } from './wellfound/fetchWellfoundAds'
+import { digestWellfoundId } from './wellfound/digestWellfoundId'
+import { toJobAd as toWellfoundJobAd } from './wellfound/toJobAd'
 import { createJobAdDocument } from './jobAdDocument'
 import { buildJobAdDedupKey } from './filters/jobAdDedupKey'
 import { batchInsertJobAds, batchUpdateLastSeen, loadExistingJobAdIds, loadJobAdDedupKeys } from './jobAdsRepository'
@@ -44,6 +47,18 @@ async function collectListingEntries(): Promise<SyncListingEntry[]> {
 
     entries.push({
       id: digestTheprotocolId(ad.offerUrlName),
+      insertDocument: () => createJobAdDocument(jobAd),
+    })
+  }
+
+  for (const listing of await fetchWellfoundAds()) {
+    const jobAd = toWellfoundJobAd(listing)
+    if (jobAd === null) {
+      continue
+    }
+
+    entries.push({
+      id: digestWellfoundId(listing.job.id),
       insertDocument: () => createJobAdDocument(jobAd),
     })
   }

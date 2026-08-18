@@ -15,6 +15,8 @@ import {
   jobAdApplicationFromMeta,
 } from '@repo/types'
 import { getTakeHomeHourlyRate } from './getTakeHomeHourlyRate'
+import { fetchNbpTableARates } from './nbp/fetchNbpTableARates'
+import { resolveMonthlySalaryFromOriginal } from './resolveJobAdSalary'
 import { filterJobAdsByAcceptableSalary, filterJobAdsFeedItemsByNotInterestedSkills } from './filters'
 import { loadAcceptableSalary, loadHourlySalaryCalculation, saveAcceptableSalary } from './jobAdsPreferences'
 import {
@@ -166,27 +168,35 @@ export class JobAdsSource extends DataSource<JobAdsFeed, JobAdsCachedFeed> {
     const listingIdSet = new Set(cached.listingIds)
     const allListingIds = [...cached.listingIds, ...manualIds.filter(id => !listingIdSet.has(id))]
     const documentsById = await loadJobAdsByIds(this.db, allListingIds)
-    const [acceptableSalary, hourlySalaryCalculation, notInterestedSkillIds] = await Promise.all([
+    const [acceptableSalary, hourlySalaryCalculation, notInterestedSkillIds, nbpRates] = await Promise.all([
       loadAcceptableSalary(this.db),
       loadHourlySalaryCalculation(this.db),
       loadNotInterestedSkillIds(this.db),
+      fetchNbpTableARates(),
     ])
     const loadedDocuments = allListingIds.flatMap(id => {
       const document = documentsById.get(id)
       return document !== undefined ? [document] : []
     })
     const enrichedDocuments = loadedDocuments
-      .map(document => ({
-        ...document,
-        content: {
-          ...document.content,
-          takeHomeHourlyRate: getTakeHomeHourlyRate(
-            document.content.monthlySalaryRangeAfterTaxes,
-            document.content.workplaceType,
-            hourlySalaryCalculation,
-          ),
-        },
-      }))
+      .map(document => {
+        const monthlySalaryRangeAfterTaxes =
+          document.content.monthlySalaryRangeAfterTaxes ??
+          resolveMonthlySalaryFromOriginal(document.content.originalSalary, nbpRates)
+
+        return {
+          ...document,
+          content: {
+            ...document.content,
+            monthlySalaryRangeAfterTaxes,
+            takeHomeHourlyRate: getTakeHomeHourlyRate(
+              monthlySalaryRangeAfterTaxes,
+              document.content.workplaceType,
+              hourlySalaryCalculation,
+            ),
+          },
+        }
+      })
       .sort((a, b) => (b.content.takeHomeHourlyRate ?? 0) - (a.content.takeHomeHourlyRate ?? 0))
 
     const ads = filterJobAdsFeedItemsByNotInterestedSkills(

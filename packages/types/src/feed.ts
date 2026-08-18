@@ -297,6 +297,15 @@ export type SalaryRange = {
   to: number
 }
 
+export type JobAdCurrency = 'PLN' | 'USD' | 'EUR' | 'GBP'
+
+export type JobAdOriginalSalary = {
+  from: number
+  to: number
+  period: SalaryUnit
+  currency: JobAdCurrency
+}
+
 export type { JobApplyStatus, JobAdArchiveReason } from './jobApplyStatusFlow'
 export { DEFAULT_JOB_APPLY_STATUS } from './jobApplyStatusFlow'
 import type { JobAdArchiveReason, JobApplyStatus } from './jobApplyStatusFlow'
@@ -353,9 +362,10 @@ export type JobAd = {
   workplaceType: WorkplaceType
   employmentType: EmploymentType
   monthlySalaryRangeAfterTaxes?: SalaryRange
+  originalSalary?: JobAdOriginalSalary
   takeHomeHourlyRate?: number
   paidVacationDays?: number
-  origin: 'jj' | 'nfj' | 'theprotocol' | 'manual'
+  origin: 'jj' | 'nfj' | 'theprotocol' | 'manual' | 'wellfound'
   publishedAt: string
 }
 
