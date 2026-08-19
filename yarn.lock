@@ -1701,6 +1701,13 @@
   resolved "https://registry.npmjs.org/@mui/core-downloads-tracker/-/core-downloads-tracker-7.3.11.tgz"
   integrity sha512-a7I/b/nBTdXYz2cOSlEmkQ9WWE1x8FHpqMhFPp+Y1VPFxcOw91G5ELOHARQAGSPy5V+UCgJua6K/1x70bAtQPw==
 
+"@mui/material-nextjs@^7.0.0":
+  version "7.3.10"
+  resolved "https://registry.yarnpkg.com/@mui/material-nextjs/-/material-nextjs-7.3.10.tgz#74d7c019123dfcbfacf119699fdf42bb93e9dfab"
+  integrity sha512-gJzAFPA3pPg2gg8QUTDEzcI1yLm8A2XLFxis8ejt3DlwCnEt6q1q91dtmeynwsu47XDiJl/l62PVuER6kgFzkA==
+  dependencies:
+    "@babel/runtime" "^7.28.6"
+
 "@mui/material@^7.0.0":
   version "7.3.11"
   resolved "https://registry.npmjs.org/@mui/material/-/material-7.3.11.tgz"

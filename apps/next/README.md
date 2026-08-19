@@ -2,16 +2,19 @@
 
 Minimal Next.js 15 playground (App Router) for experiments — SSR, cookies, hydration, etc.
 
-Not connected to the smarthome dashboard, backend, or shared UI packages.
+Uses shared styling from the monorepo:
+
+- `@repo/styles/reset.css` — global CSS reset
+- `@repo/styles` — MUI `theme`, `AppThemeProvider` (`ssrSafe`)
+- `@repo/design-tokens` — raw token values backing the theme
+
+Next-specific glue (`AppRouterCacheProvider`, `InitColorSchemeScript`, Inter font) stays in this app.
 
 ## Running
 
 ```sh
-# from monorepo root
 yarn workspace next-app dev    # http://localhost:3000
-
-# or with everything else
-turbo dev
+turbo dev                      # with web + service
 ```
 
 ## Scripts
@@ -25,4 +28,4 @@ turbo dev
 | `format` | Prettier              |
 | `verify` | format + lint + build |
 
-The main dashboard stays in [`apps/web`](../web) (Vite SPA on port **5173**).
+Dashboard (Vite SPA): [`apps/web`](../web) on port **5173**.

@@ -41,9 +41,8 @@ yarn install
 yarn dev
 ```
 
-Starts `apps/web` (Vite on port **5173**), `apps/next` (Next.js playground on port **3000**), and `apps/service`
-(HTTP + WebSocket on port **3679**) in parallel. The dashboard connects via `ws(s)://<host>/ws` (Vite dev proxy →
-`:3679`).
+Starts `apps/web` (Vite on port **5173**), `apps/next` (Next.js playground on port **3000**), and `apps/service` (HTTP +
+WebSocket on port **3679**) in parallel. The dashboard connects via `ws(s)://<host>/ws` (Vite dev proxy → `:3679`).
 
 Individually:
 

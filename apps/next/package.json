@@ -8,10 +8,16 @@
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 3000",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "lint": "eslint \"app/**/*.ts?\"",
+    "lint": "eslint \"app/**/*.ts?\" \"app/**/*.tsx\"",
     "verify": "yarn format && yarn lint && yarn build"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^7.0.0",
+    "@mui/material-nextjs": "^7.0.0",
+    "@repo/design-tokens": "*",
+    "@repo/styles": "*",
     "next": "^15.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
