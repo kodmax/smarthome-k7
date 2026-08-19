@@ -1,0 +1,29 @@
+{
+  "name": "next-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0 --port 3000",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "eslint \"app/**/*.ts?\"",
+    "verify": "yarn format && yarn lint && yarn build"
+  },
+  "dependencies": {
+    "next": "^15.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-is": "^18.3.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^15.1.0",
+    "typescript": "5.5.4"
+  }
+}

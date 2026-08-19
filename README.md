@@ -8,6 +8,7 @@ WebSocket.
 | Directory                                                  | Description                                       |
 | ---------------------------------------------------------- | ------------------------------------------------- |
 | [`apps/web`](apps/web)                                     | React dashboard (Vite, MUI)                       |
+| [`apps/next`](apps/next)                                   | Next.js playground (experiments, port 3000)       |
 | [`apps/service`](apps/service)                             | Backend — feeds, cache, WebSocket                 |
 | [`apps/mcp`](apps/mcp)                                     | MCP server for Cursor (dashboard tools)           |
 | [`packages/feeds`](packages/feeds)                         | Data sources, cache, registry, feed composer      |
@@ -40,13 +41,15 @@ yarn install
 yarn dev
 ```
 
-Starts `apps/web` (Vite) and `apps/service` (HTTP + WebSocket on port **3679**) in parallel. The frontend connects via
-`ws(s)://<host>/ws` (Vite dev proxy → `:3679`).
+Starts `apps/web` (Vite on port **5173**), `apps/next` (Next.js playground on port **3000**), and `apps/service`
+(HTTP + WebSocket on port **3679**) in parallel. The dashboard connects via `ws(s)://<host>/ws` (Vite dev proxy →
+`:3679`).
 
 Individually:
 
 ```sh
 yarn workspace web dev
+yarn workspace next-app dev
 yarn workspace service dev
 ```
 
