@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import { below2xlSideMenuScaleMediaQuery, scaleBelow2xl } from '@repo/design-tokens'
+import { below2xlSideMenuScaleMediaQuery, scaleBelow2xl } from '@repo/styles'
 import { type FC } from 'react'
 import { SideMenuOpenToggle } from '@/app/SideMenu/SideMenuOpenToggle'
 import { PageHeaderTitleRow } from './PageHeaderTitleRow'

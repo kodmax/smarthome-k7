@@ -1,4 +1,4 @@
-import { theme } from '@repo/design-tokens'
+import { theme } from '@repo/styles'
 import { ThemeProvider } from '@mui/material/styles'
 import { render, type RenderOptions, type RenderResult } from '@testing-library/react'
 import { type ReactElement, type ReactNode } from 'react'

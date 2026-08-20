@@ -10,21 +10,13 @@
     ".": "./index.ts",
     "./tokens": "./tokens.json",
     "./tokens.dark": "./tokens.dark.json",
-    "./tokens.light": "./tokens.light.json",
-    "./theme": "./theme.ts"
+    "./tokens.light": "./tokens.light.json"
   },
   "scripts": {
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
   },
-  "peerDependencies": {
-    "@mui/material": "^7.0.0",
-    "react": "^18.2.0"
-  },
   "devDependencies": {
-    "@mui/material": "^7.0.0",
     "@repo/typescript-config": "*",
-    "@types/react": "^19.0.1",
-    "react": "^18.2.0",
     "typescript": "5.5.4"
   }
 }

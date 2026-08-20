@@ -5,26 +5,27 @@ WebSocket.
 
 ## Structure
 
-| Directory                                                  | Description                                   |
-| ---------------------------------------------------------- | --------------------------------------------- |
-| [`apps/web`](apps/web)                                     | React dashboard (Vite, MUI)                   |
-| [`apps/service`](apps/service)                             | Backend — feeds, cache, WebSocket             |
-| [`apps/mcp`](apps/mcp)                                     | MCP server for Cursor (dashboard tools)       |
-| [`packages/feeds`](packages/feeds)                         | Data sources, cache, registry, feed composer  |
-| [`packages/apollo-card`](packages/apollo-card)             | Zoomable dashboard card shell                 |
-| [`packages/feed-client`](packages/feed-client)             | React hooks for feed subscriptions            |
-| [`packages/types`](packages/types)                         | Shared feed payload types                     |
-| [`packages/knx-schema`](packages/knx-schema)               | KNX group address map                         |
-| [`packages/cron-scripts`](packages/cron-scripts)           | KNX cron job implementations (run in service) |
-| [`packages/chronos`](packages/chronos)                     | Minute-resolution cron scheduler              |
-| [`packages/db`](packages/db)                               | PostgreSQL pool + schema migrations           |
-| [`packages/transmission`](packages/transmission)           | Transmission BitTorrent RPC client            |
-| [`packages/cloudflare`](packages/cloudflare)               | Dynamic DNS (Cloudflare API)                  |
-| [`packages/assets`](packages/assets)                       | Lucide icons, weather SVGs, and other media   |
-| [`packages/design-tokens`](packages/design-tokens)         | Shared design tokens, dark/light MUI theme    |
-| [`packages/i18n`](packages/i18n)                           | Shared translations and locale helpers        |
-| [`packages/eslint-config`](packages/eslint-config)         | Shared ESLint config                          |
-| [`packages/typescript-config`](packages/typescript-config) | Shared TypeScript config                      |
+| Directory                                                  | Description                                       |
+| ---------------------------------------------------------- | ------------------------------------------------- |
+| [`apps/web`](apps/web)                                     | React dashboard (Vite, MUI)                       |
+| [`apps/service`](apps/service)                             | Backend — feeds, cache, WebSocket                 |
+| [`apps/mcp`](apps/mcp)                                     | MCP server for Cursor (dashboard tools)           |
+| [`packages/feeds`](packages/feeds)                         | Data sources, cache, registry, feed composer      |
+| [`packages/apollo-card`](packages/apollo-card)             | Zoomable dashboard card shell                     |
+| [`packages/feed-client`](packages/feed-client)             | React hooks for feed subscriptions                |
+| [`packages/types`](packages/types)                         | Shared feed payload types                         |
+| [`packages/knx-schema`](packages/knx-schema)               | KNX group address map                             |
+| [`packages/cron-scripts`](packages/cron-scripts)           | KNX cron job implementations (run in service)     |
+| [`packages/chronos`](packages/chronos)                     | Minute-resolution cron scheduler                  |
+| [`packages/db`](packages/db)                               | PostgreSQL pool + schema migrations               |
+| [`packages/transmission`](packages/transmission)           | Transmission BitTorrent RPC client                |
+| [`packages/cloudflare`](packages/cloudflare)               | Dynamic DNS (Cloudflare API)                      |
+| [`packages/assets`](packages/assets)                       | Lucide icons, weather SVGs, and other media       |
+| [`packages/design-tokens`](packages/design-tokens)         | Shared design token values (JSON, `designTokens`) |
+| [`packages/styles`](packages/styles)                       | MUI theme, reset CSS, `AppThemeProvider`          |
+| [`packages/i18n`](packages/i18n)                           | Shared translations and locale helpers            |
+| [`packages/eslint-config`](packages/eslint-config)         | Shared ESLint config                              |
+| [`packages/typescript-config`](packages/typescript-config) | Shared TypeScript config                          |
 
 ## Requirements
 

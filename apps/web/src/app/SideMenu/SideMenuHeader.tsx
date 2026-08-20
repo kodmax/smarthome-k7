@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import type { Theme } from '@mui/material/styles'
-import { designTokens, scaleBelow2xl } from '@repo/design-tokens'
+import { designTokens } from '@repo/design-tokens'
+import { scaleBelow2xl } from '@repo/styles'
 import { type FC } from 'react'
 import { sideMenuScaleMedia } from './sideMenuScaleMedia'
 

@@ -1,5 +1,6 @@
 import { Box, Fade, Portal, Slide, Typography } from '@mui/material'
-import { below2xlSideMenuScaleMediaQuery, designTokens, scaleBelow2xl } from '@repo/design-tokens'
+import { designTokens } from '@repo/design-tokens'
+import { below2xlSideMenuScaleMediaQuery, scaleBelow2xl } from '@repo/styles'
 import { apolloCardHintIconSize } from '@repo/apollo-card'
 import { type FC, useEffect, useState } from 'react'
 import { APP_HINT_AUTO_DISMISS_MS, type ActiveAppHint } from './appHintTypes'

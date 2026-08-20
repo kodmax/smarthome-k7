@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import { type StyledLucideIcon } from '@repo/assets'
-import { below2xlSideMenuScaleMediaQuery, designTokens, scaleBelow2xl } from '@repo/design-tokens'
+import { designTokens } from '@repo/design-tokens'
+import { below2xlSideMenuScaleMediaQuery, scaleBelow2xl } from '@repo/styles'
 import { type FC } from 'react'
 import { pageHeaderLayout } from './pageHeaderLayout'
 

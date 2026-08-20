@@ -7,7 +7,7 @@ import { PageHeader } from '@/app/components/PageHeader'
 import { PageWrapper } from '@/app/components/PageWrapper'
 import { isSentryEnabled, sendSentryTestEvent } from '@/app/errors'
 import { useDashboardJobAdsSalaryPreference } from '@/app/preferences'
-import { type AppColorMode } from '@/app/theme/colorMode'
+import { type AppColorMode } from '@repo/styles'
 import { APP_LOCALES, type AppLocale, LOCALE_LABELS, useLocale, useTranslations } from '@/i18n'
 
 export const Appearance: FC<Record<string, never>> = () => {

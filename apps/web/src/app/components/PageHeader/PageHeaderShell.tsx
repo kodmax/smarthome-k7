@@ -1,5 +1,6 @@
 import { Box } from '@mui/material'
-import { designTokens, portraitMobileMediaQuery } from '@repo/design-tokens'
+import { designTokens } from '@repo/design-tokens'
+import { portraitMobileMediaQuery } from '@repo/styles'
 import { type FC, type ReactNode, type Ref } from 'react'
 import { pageHeaderLayout } from './pageHeaderLayout'
 

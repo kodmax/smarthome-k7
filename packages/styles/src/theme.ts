@@ -1,5 +1,5 @@
 import { createTheme, type Theme } from '@mui/material/styles'
-import { tokens } from './tokens'
+import { tokens } from '@repo/design-tokens'
 import './theme.types'
 
 const { shared, schemes } = tokens

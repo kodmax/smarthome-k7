@@ -1,5 +1,5 @@
 import { styled, useMediaQuery } from '@mui/material'
-import { portraitMobileQuery } from '@repo/design-tokens'
+import { portraitMobileQuery } from '@repo/styles'
 import { useContext, useEffect, useMemo, type FC, type ReactNode } from 'react'
 import { ZOOM_CURTAIN_Z_INDEX } from './zoomConstants'
 import { useValue } from './useValue'

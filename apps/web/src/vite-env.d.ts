@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-pwa/client" />
 
-import '@repo/design-tokens/theme'
+import '@repo/styles'
 
 interface ImportMetaEnv {
   readonly VITE_SENTRY_DSN?: string

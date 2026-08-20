@@ -1,5 +1,5 @@
 import { ToggleButton } from '@mui/material'
-import { PillToggleButtonGroup } from '@repo/design-tokens'
+import { PillToggleButtonGroup } from '@repo/styles'
 import { type FC, type MouseEvent, useCallback, useEffect, useState } from 'react'
 import { useTranslations } from '@/i18n'
 import { BorderedPanel, parseTargetTime, SectionField, TargetTimePicker } from './components'
