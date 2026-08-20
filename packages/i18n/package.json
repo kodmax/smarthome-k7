@@ -1,0 +1,21 @@
+{
+  "name": "@repo/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./locale": "./src/locale.ts",
+    "./translations": "./src/translations/index.ts"
+  },
+  "scripts": {
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "eslint": "^8.57.0",
+    "typescript": "5.5.4"
+  }
+}

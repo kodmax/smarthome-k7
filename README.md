@@ -22,7 +22,7 @@ WebSocket.
 | [`packages/cloudflare`](packages/cloudflare)               | Dynamic DNS (Cloudflare API)                  |
 | [`packages/assets`](packages/assets)                       | Lucide icons, weather SVGs, and other media   |
 | [`packages/design-tokens`](packages/design-tokens)         | Shared design tokens, dark/light MUI theme    |
-| [`packages/i18n-react`](packages/i18n-react)               | Lightweight i18n for React                    |
+| [`packages/i18n`](packages/i18n)                           | Shared translations and locale helpers        |
 | [`packages/eslint-config`](packages/eslint-config)         | Shared ESLint config                          |
 | [`packages/typescript-config`](packages/typescript-config) | Shared TypeScript config                      |
 

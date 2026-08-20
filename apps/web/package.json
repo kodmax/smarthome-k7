@@ -31,7 +31,7 @@
     "@repo/design-tokens": "*",
     "@repo/env": "*",
     "@repo/feed-client": "*",
-    "@repo/i18n-react": "*",
+    "@repo/i18n": "*",
     "@sentry/react": "^10.68.0",
     "dotenv": "^17.4.2",
     "react": "^18.2.0",

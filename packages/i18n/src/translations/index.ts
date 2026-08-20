@@ -4,6 +4,9 @@ import { pl } from './pl'
 import { ru } from './ru'
 import { type Translations } from './types'
 
+export { en, pl, ru }
+export type { Translations }
+
 export const translations: Record<AppLocale, Translations> = {
   en,
   pl,
