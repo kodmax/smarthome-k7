@@ -7,8 +7,8 @@
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 3000",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "lint": "eslint \"app/**/*.ts?\" \"app/**/*.tsx\"",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\" --ignore-path .gitignore",
+    "lint": "eslint \"app/**/*.ts?\" \"app/**/*.tsx\" \"i18n/**/*.ts?\" \"i18n/**/*.tsx\"",
     "verify": "yarn format && yarn lint && yarn build"
   },
   "dependencies": {
@@ -16,8 +16,11 @@
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^7.0.0",
     "@mui/material-nextjs": "^7.0.0",
+    "@repo/assets": "*",
     "@repo/design-tokens": "*",
+    "@repo/i18n": "*",
     "@repo/styles": "*",
+    "lucide-react": "^1.23.0",
     "next": "^15.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

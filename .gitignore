@@ -13,3 +13,4 @@ dist-ssr
 .cursor/mysql-mcp.generated.yaml
 server/dist
 public/dist
+**/.next

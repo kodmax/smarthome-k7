@@ -3,6 +3,8 @@ import { COLOR_MODE_STORAGE_KEY } from '@repo/styles/colorMode'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import type { ReactNode } from 'react'
+import { AppShell } from '@/app/shell/AppShell'
+import { getRequestLocale } from '@/i18n/getRequestLocale'
 import { Providers } from './providers'
 import '@repo/styles/reset.css'
 
@@ -12,18 +14,22 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Next.js Playground',
-  description: 'Minimal Next.js sandbox in smarthome-k7 monorepo',
+  title: 'Smarthome',
+  description: 'Smarthome dashboard (Next.js)',
 }
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const locale = await getRequestLocale()
+
   return (
-    <html lang='pl' suppressHydrationWarning>
+    <html lang={locale} className={inter.className} suppressHydrationWarning>
       <head>
         <InitColorSchemeScript modeStorageKey={COLOR_MODE_STORAGE_KEY} defaultMode='system' attribute='class' />
       </head>
-      <body className={inter.className}>
-        <Providers>{children}</Providers>
+      <body>
+        <Providers initialLocale={locale} fontFamily={inter.style.fontFamily}>
+          <AppShell>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   )

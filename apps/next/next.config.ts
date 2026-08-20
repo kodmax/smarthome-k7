@@ -7,7 +7,7 @@ const monorepoRoot = path.join(projectDir, '../..')
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: monorepoRoot,
-  transpilePackages: ['@repo/design-tokens', '@repo/styles'],
+  transpilePackages: ['@repo/design-tokens', '@repo/styles', '@repo/assets', '@repo/i18n'],
 }
 
 export default nextConfig
