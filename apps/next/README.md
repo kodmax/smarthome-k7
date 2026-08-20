@@ -19,13 +19,14 @@ turbo dev                      # with web + service
 
 ## Scripts
 
-| Script   | Description           |
-| -------- | --------------------- |
-| `dev`    | Next dev (:3000)      |
-| `build`  | Production build      |
-| `start`  | Production server     |
-| `lint`   | ESLint                |
-| `format` | Prettier              |
-| `verify` | format + lint + build |
+| Script   | Description                  |
+| -------- | ---------------------------- |
+| `dev`    | Next dev (:3000)             |
+| `build`  | Production build             |
+| `start`  | Production server            |
+| `lint`   | ESLint                       |
+| `test`   | Vitest                       |
+| `format` | Prettier                     |
+| `verify` | format + lint + test + build |
 
 Dashboard (Vite SPA): [`apps/web`](../web) on port **5173**.

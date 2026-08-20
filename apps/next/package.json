@@ -9,7 +9,9 @@
     "start": "next start --hostname 0.0.0.0 --port 3000",
     "format": "prettier --write \"**/*.{ts,tsx,md}\" --ignore-path .gitignore",
     "lint": "eslint \"app/**/*.ts?\" \"app/**/*.tsx\" \"i18n/**/*.ts?\" \"i18n/**/*.tsx\"",
-    "verify": "yarn format && yarn lint && yarn build"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "yarn format && yarn lint && yarn test && yarn build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -29,10 +31,17 @@
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^6.0.3",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.1.0",
-    "typescript": "5.5.4"
+    "happy-dom": "^20.0.10",
+    "typescript": "5.5.4",
+    "vite": "^8.1.0",
+    "vitest": "^4.1.8"
   }
 }
