@@ -1,0 +1,35 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "../..",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/utils/*": ["./src/data-sources/utils/*"],
+      "@repo/chronos": ["../../packages/chronos/src/index.ts"],
+      "@repo/common": ["../../packages/common/src/index.ts"],
+      "@repo/cron-scripts": ["../../packages/cron-scripts/src/knx/schedule.ts"],
+      "@repo/db": ["../../packages/db/src/index.ts"],
+      "@repo/di": ["../../packages/di/src/index.ts"],
+      "@repo/env": ["../../packages/env/src/index.ts"],
+      "@repo/feeds": ["../../packages/feeds/src/index.ts"],
+      "@repo/knx-schema": ["../../packages/knx-schema/src/index.ts"],
+      "@repo/logger": ["../../packages/logger/src/index.ts"],
+      "@repo/transmission": ["../../packages/transmission/src/index.ts"],
+      "@repo/types": ["../../packages/types/src/index.ts"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "../../packages/chronos/src/**/*",
+    "../../packages/common/src/**/*",
+    "../../packages/cron-scripts/src/**/*",
+    "../../packages/db/src/**/*",
+    "../../packages/di/src/**/*",
+    "../../packages/env/src/**/*",
+    "../../packages/feeds/src/**/*",
+    "../../packages/knx-schema/src/**/*",
+    "../../packages/logger/src/**/*",
+    "../../packages/transmission/src/**/*",
+    "../../packages/types/src/**/*"
+  ]
+}

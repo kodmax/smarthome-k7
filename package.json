@@ -3,6 +3,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "echo \"Please use turbo dev instead of yarn dev\"",
+    "dev:next": "yarn workspace next-app dev:next",
     "dev:cleanup": "bash scripts/dev-cleanup.sh",
     "lint": "turbo run lint",
     "test": "turbo run test",
@@ -16,7 +17,6 @@
     "mcp": "yarn workspace mcp build && npx @modelcontextprotocol/inspector node --use-system-ca apps/mcp/dist/index.js"
   },
   "devDependencies": {
-    "esbuild": "^0.27.3",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "turbo": "^2.10.10"

@@ -6,8 +6,6 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json",
-    "transpile": "node ../../scripts/transpile-package.mjs",
-    "dev": "node ../../scripts/transpile-package.mjs --watch",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "eslint \"src/**/*.ts\""
   },

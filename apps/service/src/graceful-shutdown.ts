@@ -118,12 +118,24 @@ export const setupGracefulShutdown = (logger: Logger): void => {
   shutdownLogger = logger
 
   const exitProcess = (code: number): void => {
-    logger.flush(() => process.exit(code))
+    logger.flush(() => {
+      if (process.env.WATCH_PARENT_EXIT === '1' && process.ppid > 1) {
+        try {
+          process.kill(process.ppid, 'SIGTERM')
+        } catch {
+          // watch parent already exiting
+        }
+      }
+      process.exit(code)
+    })
   }
 
   const shutdown = (signal: string): void => {
     if (shuttingDown) {
-      logger.warn({ signal }, 'Shutdown already in progress')
+      logger.warn(
+        { signal },
+        'Duplicate shutdown signal ignored (turbo/node --watch may deliver SIGINT twice per Ctrl+C)',
+      )
       return
     }
     shuttingDown = true

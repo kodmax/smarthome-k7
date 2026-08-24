@@ -43,7 +43,7 @@
   "devDependencies": {
     "@repo/typescript-config": "*",
     "@sentry/cli": "^2.58.6",
-    "@swc/cli": "^0.7.10",
+    "@swc-node/register": "^1.10.10",
     "@swc/core": "^1.15.8",
     "@types/node": "^17.0.36",
     "@types/suncalc": "^1.8.1",
@@ -57,12 +57,12 @@
     "eslint-plugin-promise": "^6.1.1",
     "pino": "^9.6.0",
     "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "5.5.4",
     "vitest": "^4.1.8"
   },
   "scripts": {
-    "transpile": "rm -rf dist && swc src -d dist --strip-leading-paths --config-file .swcrc && tsc-alias -p tsconfig.json",
-    "dev": "node scripts/dev.mjs",
+    "dev": "WATCH_PARENT_EXIT=1 SWC_NODE_PROJECT=tsconfig.dev.json node --watch --watch-path=./src --watch-path=../../packages -r tsconfig-paths/register -r @swc-node/register -r ./src/preload.ts src/index.ts",
     "start": "node -r ./dist/preload.js ./dist/index.js",
     "build": "rm -rf dist && tsc && tsc-alias && node scripts/sentry-sourcemaps.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

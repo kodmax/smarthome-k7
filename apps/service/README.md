@@ -5,7 +5,8 @@ Dashboard backend — aggregates data from KNX, web scrapers, and MariaDB, and p
 ## Stack
 
 - Node.js (CommonJS), TypeScript
-- esbuild (bundling)
+- Dev: Node `--watch` + `@swc-node/register` (source, no dist)
+- Prod: `tsc` + `tsc-alias` + Sentry sourcemaps
 - `@repo/feeds`, `js-knx`, `@repo/db`, `@repo/transmission`, Vitest
 
 ## Startup
@@ -26,8 +27,9 @@ HTTP).
 ```sh
 cp .env.example .env   # fill in values
 
-yarn dev                          # from repo root — web, service, library watchers
-yarn workspace service dev        # service only (no web, no @repo/* watchers)
+turbo dev                         # service + web (from repo root)
+yarn workspace service dev        # service only
+yarn dev:next                     # next-app only (not in turbo dev)
 yarn workspace service start      # production (after build)
 ```
 
@@ -35,11 +37,8 @@ HTTP API and WebSocket share port **3679** (`API_PORT`). WebSocket path: `/ws`.
 
 ## Telemetry
 
-Process starts with Node preload [`src/preload.ts`](src/preload.ts): `load-env` → Sentry → OpenTelemetry.
-
-```sh
-node -r ./dist/preload.js ./dist/index.js
-```
+Process starts with preload [`src/preload.ts`](src/preload.ts): `load-env` → Sentry → OpenTelemetry. In dev, preload is
+required via `-r ./src/preload.ts`; in production via compiled `dist/preload.js`.
 
 Traces export via env auto-config (NodeSDK reads `OTEL_*`); metrics also merge into `/metrics` (Prometheus + OTEL).
 
@@ -90,13 +89,12 @@ KNX cron jobs (energy logging, clock sync, indoor readings) run in-process via `
 
 ## Scripts
 
-| Script                     | Description                     |
-| -------------------------- | ------------------------------- |
-| `dev`                      | Bundle + watch + `node --watch` |
-| `build`                    | `tsc` + esbuild bundle          |
-| `bundle`                   | `esbuild` → `dist/index.js`     |
-| `start`                    | `node dist/index.js`            |
-| `test` / `lint` / `format` | Vitest / ESLint / Prettier      |
+| Script                     | Description                                 |
+| -------------------------- | ------------------------------------------- |
+| `dev`                      | SWC from source, auto-restart on change     |
+| `build`                    | `tsc` + `tsc-alias` + Sentry sourcemaps     |
+| `start`                    | `node -r ./dist/preload.js ./dist/index.js` |
+| `test` / `lint` / `format` | Vitest / ESLint / Prettier                  |
 
 ## Monorepo dependencies
 

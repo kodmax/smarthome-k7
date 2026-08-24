@@ -33,14 +33,14 @@ while read -r line; do
   pid="${line%% *}"
   cmd="${line#* }"
   case "$cmd" in
-    *scripts/dev.mjs*|*./dist/preload.js*)
+    *@swc-node/register*|*scripts/dev.mjs*|*./dist/preload.js*|*src/preload.ts*)
       cwd=$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p' | head -1)
       if [[ "$cwd" == "$SERVICE_DIR" ]]; then
         kill_pid "$pid" "$cmd"
       fi
       ;;
   esac
-done < <(ps ax -o pid=,command= | grep -E 'node.*(scripts/dev\.mjs|-r \./dist/preload\.js)' | grep -v grep || true)
+done < <(ps ax -o pid=,command= | grep -E 'node.*(@swc-node/register|scripts/dev\.mjs|-r \./dist/preload\.js|src/preload\.ts)' | grep -v grep || true)
 
 while read -r pid ppid cmd; do
   [[ "$ppid" == "1" ]] || continue
