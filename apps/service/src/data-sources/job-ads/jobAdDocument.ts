@@ -1,4 +1,13 @@
 import { emptyJobAdStoredMeta, JobAd, JobAdApplicationMeta, JobAdDocument } from '@repo/types'
+import { z } from 'zod'
+
+const jobAdDocumentSchema = z.object({
+  content: z.looseObject({
+    id: z.string(),
+    title: z.string(),
+  }),
+  meta: z.looseObject({}),
+})
 
 export function createJobAdDocument(content: JobAd): JobAdDocument {
   return {
@@ -8,26 +17,14 @@ export function createJobAdDocument(content: JobAd): JobAdDocument {
 }
 
 export function parseJobAdDocument(value: unknown): JobAdDocument | null {
-  if (value === null || typeof value !== 'object') {
-    return null
-  }
-
-  const record = value as Record<string, unknown>
-  const content = record.content
-  const meta = record.meta
-
-  if (content === null || typeof content !== 'object' || meta === null || typeof meta !== 'object') {
-    return null
-  }
-
-  const contentRecord = content as Record<string, unknown>
-  if (typeof contentRecord.id !== 'string' || typeof contentRecord.title !== 'string') {
+  const result = jobAdDocumentSchema.safeParse(value)
+  if (!result.success) {
     return null
   }
 
   return {
-    content: content as JobAd,
-    meta: meta as JobAdDocument['meta'],
+    content: result.data.content as JobAd,
+    meta: result.data.meta as JobAdDocument['meta'],
   }
 }
 

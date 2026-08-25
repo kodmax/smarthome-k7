@@ -1,12 +1,15 @@
 import { createHash } from 'node:crypto'
+import { z } from 'zod'
 import { captureInvalidInput } from '@/sentry'
 
 export const CV_SCOPE = 'job-market'
 export const CV_TEXT_ID = 'cv-text'
 
-export type CvTextContent = {
-  text: string
-}
+export const cvTextContentSchema = z.object({
+  text: z.string(),
+})
+
+export type CvTextContent = z.infer<typeof cvTextContentSchema>
 
 export type DocumentRecordRow = {
   scope: string
@@ -30,27 +33,23 @@ export function digestDocumentContentHash(documentId: string, content: CvTextCon
 }
 
 export function parseCvTextContent(content: CvTextContent | string): CvTextContent | null {
+  let value: unknown = content
   if (typeof content === 'string') {
     try {
-      const parsed = JSON.parse(content) as Record<string, unknown>
-      if (typeof parsed.text !== 'string') {
-        captureInvalidInput('cv: invalid cv text content in row', content)
-        return null
-      }
-
-      return { text: parsed.text }
+      value = JSON.parse(content) as unknown
     } catch (cause) {
       captureInvalidInput('cv: failed to parse cv text content in row', cause)
       return null
     }
   }
 
-  if (typeof content.text !== 'string') {
+  const result = cvTextContentSchema.safeParse(value)
+  if (!result.success) {
     captureInvalidInput('cv: invalid cv text content in row', content)
     return null
   }
 
-  return content
+  return result.data
 }
 
 export function toModifiedAtIso(modifiedAt: Date | string): string {

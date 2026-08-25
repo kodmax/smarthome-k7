@@ -1,5 +1,6 @@
 import type { Sql } from '@repo/db'
 import { rootLogger } from '@repo/logger'
+import { z } from 'zod'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { captureInvalidInput, captureProductionError } from '@/sentry'
 
@@ -23,23 +24,33 @@ type PreferenceRow = {
   value: unknown
 }
 
+const stockMarketTickersSchema = z.array(z.string().min(1)).min(1)
+
 export function parseStockMarketTickers(value: unknown): string[] | null {
-  if (!Array.isArray(value) || value.length === 0) {
-    if (value !== null && value !== undefined) {
-      captureInvalidInput('stock-market: invalid tickers value', value)
+  if (value === null || value === undefined) {
+    return null
+  }
+
+  const result = stockMarketTickersSchema.safeParse(value)
+  if (!result.success) {
+    const itemIssue = result.error.issues.find((issue) => issue.path.length > 0)
+    if (itemIssue !== undefined && Array.isArray(value)) {
+      const index = itemIssue.path[0]
+      captureInvalidInput(
+        'stock-market: invalid ticker symbol',
+        typeof index === 'number' ? value[index] : value,
+      )
+      return null
     }
+
+    captureInvalidInput('stock-market: invalid tickers value', value)
     return null
   }
 
   const seen = new Set<string>()
   const tickers: string[] = []
 
-  for (const item of value) {
-    if (typeof item !== 'string' || item.length === 0) {
-      captureInvalidInput('stock-market: invalid ticker symbol', item)
-      return null
-    }
-
+  for (const item of result.data) {
     const symbol = item.toUpperCase()
     if (seen.has(symbol)) {
       captureInvalidInput('stock-market: duplicate ticker symbol', symbol)

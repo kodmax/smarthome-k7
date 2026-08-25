@@ -1,4 +1,5 @@
 import type OpenAI from 'openai'
+import { cvMatchAnalysisResultSchema } from './cvMatchSchema'
 import { createRandomBoundaryToken } from './promptBoundary'
 import type { JobPostingDetails } from './jobPosting/types'
 
@@ -131,26 +132,6 @@ export function buildAnalyzeCvMatchRequest(
   }
 }
 
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0
-}
-
-function parseMustHaveGaps(value: unknown): string[] | null {
-  if (!Array.isArray(value)) {
-    return null
-  }
-
-  const items: string[] = []
-  for (const item of value) {
-    if (!isNonEmptyString(item)) {
-      return null
-    }
-    items.push(item.trim())
-  }
-
-  return items
-}
-
 function parseCvMatchAnalysisResult(raw: string): CvMatchAnalysisResult {
   const trimmed = raw.trim()
   if (trimmed.length === 0) {
@@ -164,36 +145,12 @@ function parseCvMatchAnalysisResult(raw: string): CvMatchAnalysisResult {
     throw new Error('OpenAI returned invalid CV match analysis JSON')
   }
 
-  if (typeof parsed !== 'object' || parsed === null) {
+  const result = cvMatchAnalysisResultSchema.safeParse(parsed)
+  if (!result.success) {
     throw new Error('OpenAI returned invalid CV match analysis JSON')
   }
 
-  const { score, summary, strengths, gaps, mustHaveGaps, observations, conclusion } = parsed as Record<string, unknown>
-  const parsedMustHaveGaps = parseMustHaveGaps(mustHaveGaps)
-  if (
-    typeof score !== 'number' ||
-    !Number.isInteger(score) ||
-    score < 0 ||
-    score > 100 ||
-    !isNonEmptyString(summary) ||
-    !isNonEmptyString(strengths) ||
-    !isNonEmptyString(gaps) ||
-    parsedMustHaveGaps === null ||
-    !isNonEmptyString(observations) ||
-    !isNonEmptyString(conclusion)
-  ) {
-    throw new Error('OpenAI returned invalid CV match analysis JSON')
-  }
-
-  return {
-    score,
-    summary: summary.trim(),
-    strengths: strengths.trim(),
-    gaps: gaps.trim(),
-    mustHaveGaps: parsedMustHaveGaps,
-    observations: observations.trim(),
-    conclusion: conclusion.trim(),
-  }
+  return result.data
 }
 
 export async function analyzeCvMatch(

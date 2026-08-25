@@ -1,18 +1,18 @@
 import { toSkillId } from '@repo/common'
+import { z } from 'zod'
+
+const requiredSkillsSchema = z.array(z.string())
 
 export function parseRequiredSkills(values: unknown): string[] | null {
-  if (!Array.isArray(values)) {
+  const result = requiredSkillsSchema.safeParse(values)
+  if (!result.success) {
     return null
   }
 
-  const result: string[] = []
+  const skills: string[] = []
   const seen = new Set<string>()
 
-  for (const value of values) {
-    if (typeof value !== 'string') {
-      return null
-    }
-
+  for (const value of result.data) {
     const trimmed = value.trim()
     if (trimmed.length === 0) {
       continue
@@ -24,8 +24,8 @@ export function parseRequiredSkills(values: unknown): string[] | null {
     }
 
     seen.add(id)
-    result.push(trimmed)
+    skills.push(trimmed)
   }
 
-  return result
+  return skills
 }

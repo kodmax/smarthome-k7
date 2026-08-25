@@ -1,13 +1,18 @@
+import { z } from 'zod'
+
 const MAX_PAID_VACATION_DAYS = 50
+
+const paidVacationDaysSchema = z.number().int().min(0).max(MAX_PAID_VACATION_DAYS)
 
 export function parsePaidVacationDays(value: unknown): number | undefined | null {
   if (value === undefined || value === null || value === '') {
     return undefined
   }
 
-  if (typeof value !== 'number' || !Number.isInteger(value) || value < 0 || value > MAX_PAID_VACATION_DAYS) {
+  const result = paidVacationDaysSchema.safeParse(value)
+  if (!result.success) {
     return null
   }
 
-  return value
+  return result.data
 }

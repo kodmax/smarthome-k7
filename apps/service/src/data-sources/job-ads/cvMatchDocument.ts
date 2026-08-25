@@ -2,7 +2,8 @@ import { createHash } from 'node:crypto'
 import type { JobAdMatchAnalysis } from '@repo/types'
 import type { Sql } from '@repo/db'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
-import { CV_SCOPE, CV_TEXT_ID } from '../cv/documentRecord'
+import { CV_SCOPE, CV_TEXT_ID, cvTextContentSchema } from '../cv/documentRecord'
+import { cvMatchContentSchema } from './cvMatchSchema'
 
 export const CV_MATCH_SCOPE = 'cv-match'
 
@@ -29,71 +30,18 @@ type DocumentRow = {
   modified_at: Date | string
 }
 
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0
-}
-
-function parseOptionalMustHaveGaps(value: unknown): string[] | null | undefined {
-  if (value === undefined) {
-    return undefined
-  }
-
-  if (!Array.isArray(value)) {
-    return null
-  }
-
-  const items: string[] = []
-  for (const item of value) {
-    if (!isNonEmptyString(item)) {
-      return null
-    }
-    items.push(item.trim())
-  }
-
-  return items
-}
-
 export function digestCvMatchContentHash(content: CvMatchContent): string {
   return createHash('sha256').update(JSON.stringify(content)).digest('hex')
 }
 
 export function parseCvMatchContent(content: DocumentRow['content']): CvMatchContent | null {
   const parsed = typeof content === 'string' ? (JSON.parse(content) as unknown) : content
-  if (
-    typeof parsed !== 'object' ||
-    parsed === null ||
-    typeof (parsed as { analyzedAt?: unknown }).analyzedAt !== 'string'
-  ) {
+  const result = cvMatchContentSchema.safeParse(parsed)
+  if (!result.success) {
     return null
   }
 
-  const record = parsed as Record<string, unknown>
-  const parsedMustHaveGaps = parseOptionalMustHaveGaps(record.mustHaveGaps)
-  if (
-    typeof record.score !== 'number' ||
-    !Number.isInteger(record.score) ||
-    record.score < 0 ||
-    record.score > 100 ||
-    !isNonEmptyString(record.summary) ||
-    !isNonEmptyString(record.strengths) ||
-    !isNonEmptyString(record.gaps) ||
-    parsedMustHaveGaps === null ||
-    !isNonEmptyString(record.observations) ||
-    !isNonEmptyString(record.conclusion)
-  ) {
-    return null
-  }
-
-  return {
-    analyzedAt: record.analyzedAt as string,
-    score: record.score,
-    summary: record.summary.trim(),
-    strengths: record.strengths.trim(),
-    gaps: record.gaps.trim(),
-    ...(parsedMustHaveGaps !== undefined ? { mustHaveGaps: parsedMustHaveGaps } : {}),
-    observations: record.observations.trim(),
-    conclusion: record.conclusion.trim(),
-  }
+  return result.data
 }
 
 export function cvMatchContentToMatchAnalysis(content: CvMatchContent): JobAdMatchAnalysis {
@@ -184,13 +132,10 @@ export async function loadCV(db: Sql): Promise<LoadedCV | null> {
   }
 
   const parsed = typeof row.content === 'string' ? JSON.parse(row.content) : row.content
-  const text =
-    typeof parsed === 'object' && parsed !== null && typeof (parsed as { text?: unknown }).text === 'string'
-      ? (parsed as { text: string }).text
-      : null
+  const content = cvTextContentSchema.safeParse(parsed)
 
   return {
-    text,
+    text: content.success ? content.data.text : null,
     hash: row.hash,
   }
 }

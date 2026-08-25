@@ -1,6 +1,7 @@
 import type { Sql } from '@repo/db'
 import { rootLogger } from '@repo/logger'
 import type { JobAdsHourlySalaryCalculation } from '@repo/types'
+import { z } from 'zod'
 import { observeDbQuery } from '@/prometheus/dbMetrics'
 import { captureInvalidInput, captureProductionError } from '@/sentry'
 
@@ -21,15 +22,29 @@ export class HourlySalaryCalculationNotConfiguredError extends Error {
   }
 }
 
+const positiveIntegerSchema = z.number().int().positive()
+
+const acceptableSalarySchema = positiveIntegerSchema
+
+const hourlySalaryCalculationSchema = z.object({
+  vacationDaysPerYear: positiveIntegerSchema,
+  workingDaysPerYear: positiveIntegerSchema,
+  workingDaysPerWeek: positiveIntegerSchema,
+  timeSpentRemote: positiveIntegerSchema,
+  timeSpentOffice: positiveIntegerSchema,
+  hybridOfficeDaysPerWeek: positiveIntegerSchema,
+}) satisfies z.ZodType<JobAdsHourlySalaryCalculation>
+
 export function parseAcceptableSalaryValue(value: unknown): number | null {
-  if (typeof value !== 'number' || !Number.isInteger(value) || value <= 0) {
+  const result = acceptableSalarySchema.safeParse(value)
+  if (!result.success) {
     if (value !== null && value !== undefined) {
       captureInvalidInput('job-ads: invalid acceptable salary value', value)
     }
     return null
   }
 
-  return value
+  return result.data
 }
 
 type PreferenceRow = {
@@ -76,45 +91,28 @@ export async function saveAcceptableSalary(db: Sql, value: number): Promise<void
   )
 }
 
-const HOURLY_SALARY_CALCULATION_KEYS = [
-  'vacationDaysPerYear',
-  'workingDaysPerYear',
-  'workingDaysPerWeek',
-  'timeSpentRemote',
-  'timeSpentOffice',
-  'hybridOfficeDaysPerWeek',
-] as const satisfies readonly (keyof JobAdsHourlySalaryCalculation)[]
-
-function parsePositiveIntegerField(value: unknown, field: string): number | null {
-  if (typeof value !== 'number' || !Number.isInteger(value) || value <= 0) {
-    captureInvalidInput(`job-ads: invalid hourly salary calculation field ${field}`, value)
+export function parseHourlySalaryCalculation(value: unknown): JobAdsHourlySalaryCalculation | null {
+  if (value === null || value === undefined) {
     return null
   }
 
-  return value
-}
-
-export function parseHourlySalaryCalculation(value: unknown): JobAdsHourlySalaryCalculation | null {
-  if (value === null || value === undefined || typeof value !== 'object') {
-    if (value !== null && value !== undefined) {
+  const result = hourlySalaryCalculationSchema.safeParse(value)
+  if (!result.success) {
+    const fieldIssue = result.error.issues.find((issue) => issue.path.length > 0)
+    if (fieldIssue !== undefined) {
+      const field = String(fieldIssue.path[0])
+      const record = typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null
+      captureInvalidInput(
+        `job-ads: invalid hourly salary calculation field ${field}`,
+        record?.[field] ?? value,
+      )
+    } else {
       captureInvalidInput('job-ads: invalid hourly salary calculation value', value)
     }
     return null
   }
 
-  const record = value as Record<string, unknown>
-  const parsed: Partial<JobAdsHourlySalaryCalculation> = {}
-
-  for (const key of HOURLY_SALARY_CALCULATION_KEYS) {
-    const fieldValue = parsePositiveIntegerField(record[key], key)
-    if (fieldValue === null) {
-      return null
-    }
-
-    parsed[key] = fieldValue
-  }
-
-  return parsed as JobAdsHourlySalaryCalculation
+  return result.data
 }
 
 export async function loadHourlySalaryCalculation(db: Sql): Promise<JobAdsHourlySalaryCalculation> {
