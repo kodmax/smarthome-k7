@@ -119,13 +119,6 @@ export const setupGracefulShutdown = (logger: Logger): void => {
 
   const exitProcess = (code: number): void => {
     logger.flush(() => {
-      if (process.env.WATCH_PARENT_EXIT === '1' && process.ppid > 1) {
-        try {
-          process.kill(process.ppid, 'SIGTERM')
-        } catch {
-          // watch parent already exiting
-        }
-      }
       process.exit(code)
     })
   }

@@ -62,7 +62,7 @@
     "vitest": "^4.1.8"
   },
   "scripts": {
-    "dev": "WATCH_PARENT_EXIT=1 SWC_NODE_PROJECT=tsconfig.dev.json node --watch --watch-path=./src --watch-path=../../packages -r tsconfig-paths/register -r @swc-node/register -r ./src/preload.ts src/index.ts",
+    "dev": "SWC_NODE_PROJECT=tsconfig.dev.json node --watch --watch-path=./src --watch-path=../../packages -r tsconfig-paths/register -r @swc-node/register -r ./scripts/watch-parent-exit.cjs -r ./src/preload.ts src/index.ts",
     "start": "node -r ./dist/preload.js ./dist/index.js",
     "build": "rm -rf dist && tsc && tsc-alias && node scripts/sentry-sourcemaps.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

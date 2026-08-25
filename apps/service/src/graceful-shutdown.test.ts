@@ -114,28 +114,4 @@ describe('graceful-shutdown', () => {
     )
     expect(exitSpy).toHaveBeenCalledTimes(0)
   })
-
-  it('terminates node --watch parent on exit when WATCH_PARENT_EXIT=1', async () => {
-    const killSpy = vi.spyOn(process, 'kill').mockImplementation((() => true) as never)
-    vi.stubEnv('WATCH_PARENT_EXIT', '1')
-    const ppidDescriptor = Object.getOwnPropertyDescriptor(process, 'ppid')
-    Object.defineProperty(process, 'ppid', { configurable: true, value: 4242 })
-
-    const { setupGracefulShutdown } = await loadGracefulShutdown()
-    const logger = createLogger()
-
-    setupGracefulShutdown(logger as never)
-    process.emit('SIGTERM')
-
-    await vi.waitFor(() => {
-      expect(killSpy).toHaveBeenCalledWith(4242, 'SIGTERM')
-      expect(exitSpy).toHaveBeenCalledWith(0)
-    })
-
-    if (ppidDescriptor) {
-      Object.defineProperty(process, 'ppid', ppidDescriptor)
-    }
-    killSpy.mockRestore()
-    vi.unstubAllEnvs()
-  })
 })

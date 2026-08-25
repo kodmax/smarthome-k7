@@ -36,7 +36,7 @@
       "command": [
         "sh",
         "-c",
-        "SWC_NODE_PROJECT=tsconfig.dev.json WATCH_PARENT_EXIT=1 exec node --watch --watch-path=./src --watch-path=../../packages -r tsconfig-paths/register -r @swc-node/register -r ./src/preload.ts src/index.ts"
+        "SWC_NODE_PROJECT=tsconfig.dev.json exec node --watch --watch-path=./src --watch-path=../../packages -r tsconfig-paths/register -r @swc-node/register -r ./scripts/watch-parent-exit.cjs -r ./src/preload.ts src/index.ts"
       ],
       "cache": false,
       "persistent": true

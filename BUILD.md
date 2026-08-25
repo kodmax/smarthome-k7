@@ -47,8 +47,10 @@ Turbo runs `service#dev` and `web#dev` via **direct task commands** (no Yarn wra
 immediately on SIGINT without waiting for the service to finish shutdown, which truncates logs before
 `Shutdown complete`.
 
-On Ctrl+C you should see the full shutdown sequence including `Shutdown complete`. Dev sets `WATCH_PARENT_EXIT=1` so
-after cleanup the `node --watch` parent also exits (otherwise Turbo would wait on the watcher).
+On Ctrl+C you should see the full shutdown sequence including `Shutdown complete`. Dev loads
+[`apps/service/scripts/watch-parent-exit.cjs`](apps/service/scripts/watch-parent-exit.cjs) via `-r` so that after the
+child exits on SIGINT the `node --watch` parent is also terminated (otherwise Turbo would wait on the watcher). Reload
+uses SIGTERM and does not kill the watch parent.
 
 If ports stay occupied after an interrupted session, run:
 
