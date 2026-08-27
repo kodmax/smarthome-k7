@@ -98,14 +98,11 @@ export function parseHourlySalaryCalculation(value: unknown): JobAdsHourlySalary
 
   const result = hourlySalaryCalculationSchema.safeParse(value)
   if (!result.success) {
-    const fieldIssue = result.error.issues.find((issue) => issue.path.length > 0)
+    const fieldIssue = result.error.issues.find(issue => issue.path.length > 0)
     if (fieldIssue !== undefined) {
       const field = String(fieldIssue.path[0])
       const record = typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null
-      captureInvalidInput(
-        `job-ads: invalid hourly salary calculation field ${field}`,
-        record?.[field] ?? value,
-      )
+      captureInvalidInput(`job-ads: invalid hourly salary calculation field ${field}`, record?.[field] ?? value)
     } else {
       captureInvalidInput('job-ads: invalid hourly salary calculation value', value)
     }

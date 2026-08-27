@@ -7,18 +7,19 @@ import { syncJobAdsFromSources } from './syncJobAdsFromSources'
 import * as jjitFetch from './jjit/jjit'
 import * as nfjFetch from './nfj/nfj'
 import * as theprotocolFetch from './theprotocol/theprotocol'
-import * as wellfoundFetch from './wellfound/fetchWellfoundAds'
+// wellfound disabled
+// import * as wellfoundFetch from './wellfound/fetchWellfoundAds'
 import { digestJjitId } from './jjit/digestJjitId'
 import { digestNfjId } from './nfj/digestNfjId'
-import { digestWellfoundId } from './wellfound/digestWellfoundId'
+// import { digestWellfoundId } from './wellfound/digestWellfoundId'
 import { NoFluffJobsAd } from './nfj/types'
 import { Ad } from './theprotocol/types'
-import type { WellfoundListing } from './wellfound/types'
+// import type { WellfoundListing } from './wellfound/types'
 
 vi.mock('./jjit/jjit')
 vi.mock('./nfj/nfj')
 vi.mock('./theprotocol/theprotocol')
-vi.mock('./wellfound/fetchWellfoundAds')
+// vi.mock('./wellfound/fetchWellfoundAds')
 
 const sampleJjAd = (): JustJoinAd => ({
   title: 'React Dev',
@@ -113,21 +114,22 @@ const sampleTpAd = (): Ad =>
     alpha: null,
   }) as Ad
 
-const sampleWellfoundListing = (): WellfoundListing => ({
-  companyName: 'Global Co',
-  companyLogoUrl: '',
-  job: {
-    __typename: 'JobListingSearchResult',
-    id: 'wf-1',
-    slug: 'platform-engineer',
-    title: 'Platform Engineer',
-    compensation: '$100k – $140k',
-    remote: true,
-    remoteConfig: { __typename: 'JobListingRemoteConfig', kind: 'REMOTE', wfhFlexible: true },
-    acceptedRemoteLocationNames: [],
-    liveStartAt: Math.floor(Date.now() / 1_000) - 86_400,
-  },
-})
+// wellfound disabled
+// const sampleWellfoundListing = (): WellfoundListing => ({
+//   companyName: 'Global Co',
+//   companyLogoUrl: '',
+//   job: {
+//     __typename: 'JobListingSearchResult',
+//     id: 'wf-1',
+//     slug: 'platform-engineer',
+//     title: 'Platform Engineer',
+//     compensation: '$100k – $140k',
+//     remote: true,
+//     remoteConfig: { __typename: 'JobListingRemoteConfig', kind: 'REMOTE', wfhFlexible: true },
+//     acceptedRemoteLocationNames: [],
+//     liveStartAt: Math.floor(Date.now() / 1_000) - 86_400,
+//   },
+// })
 
 describe('syncJobAdsFromSources', () => {
   const db = {} as Sql
@@ -137,22 +139,21 @@ describe('syncJobAdsFromSources', () => {
     vi.spyOn(jjitFetch, 'fetchJustJoinAds').mockResolvedValue([sampleJjAd()])
     vi.spyOn(nfjFetch, 'fetchNfjListing').mockResolvedValue({ postings: [sampleNfjAd()], hybridIds: new Set() })
     vi.spyOn(theprotocolFetch, 'fetchTheprotocolOffers').mockResolvedValue([sampleTpAd()])
-    vi.spyOn(wellfoundFetch, 'fetchWellfoundAds').mockResolvedValue([])
+    // vi.spyOn(wellfoundFetch, 'fetchWellfoundAds').mockResolvedValue([])
     vi.spyOn(jobAdsRepository, 'loadJobAdDedupKeys').mockResolvedValue(new Map())
   })
 
   it('inserts new ads and returns listing ids', async () => {
-    vi.spyOn(wellfoundFetch, 'fetchWellfoundAds').mockResolvedValue([sampleWellfoundListing()])
     vi.spyOn(jobAdsRepository, 'loadExistingJobAdIds').mockResolvedValue(new Set())
     const batchUpdateLastSeen = vi.spyOn(jobAdsRepository, 'batchUpdateLastSeen').mockResolvedValue(undefined)
     const batchInsertJobAds = vi.spyOn(jobAdsRepository, 'batchInsertJobAds').mockResolvedValue(undefined)
 
     const result = await syncJobAdsFromSources(db)
 
-    expect(result.listingIds).toHaveLength(4)
+    expect(result.listingIds).toHaveLength(3)
     expect(batchUpdateLastSeen).not.toHaveBeenCalled()
     expect(batchInsertJobAds).toHaveBeenCalledTimes(1)
-    expect(batchInsertJobAds.mock.calls[0]?.[1]).toHaveLength(4)
+    expect(batchInsertJobAds.mock.calls[0]?.[1]).toHaveLength(3)
   })
 
   it('updates last_seen for existing ads without inserting', async () => {
@@ -260,26 +261,27 @@ describe('syncJobAdsFromSources', () => {
     expect(batchInsertJobAds.mock.calls[0]?.[1]?.[0]?.id).toBe(jjId)
   })
 
-  it('inserts wellfound ads with originalSalary', async () => {
-    vi.spyOn(jjitFetch, 'fetchJustJoinAds').mockResolvedValue([])
-    vi.spyOn(nfjFetch, 'fetchNfjListing').mockResolvedValue({ postings: [], hybridIds: new Set() })
-    vi.spyOn(theprotocolFetch, 'fetchTheprotocolOffers').mockResolvedValue([])
-    vi.spyOn(wellfoundFetch, 'fetchWellfoundAds').mockResolvedValue([sampleWellfoundListing()])
-
-    vi.spyOn(jobAdsRepository, 'loadExistingJobAdIds').mockResolvedValue(new Set())
-    vi.spyOn(jobAdsRepository, 'batchUpdateLastSeen').mockResolvedValue(undefined)
-    const batchInsertJobAds = vi.spyOn(jobAdsRepository, 'batchInsertJobAds').mockResolvedValue(undefined)
-
-    const result = await syncJobAdsFromSources(db)
-
-    expect(result.listingIds).toEqual([digestWellfoundId('wf-1')])
-    expect(batchInsertJobAds.mock.calls[0]?.[1]?.[0]?.document.content.originalSalary).toEqual({
-      from: 100_000,
-      to: 140_000,
-      period: 'Year',
-      currency: 'USD',
-    })
-  })
+  // wellfound disabled
+  // it('inserts wellfound ads with originalSalary', async () => {
+  //   vi.spyOn(jjitFetch, 'fetchJustJoinAds').mockResolvedValue([])
+  //   vi.spyOn(nfjFetch, 'fetchNfjListing').mockResolvedValue({ postings: [], hybridIds: new Set() })
+  //   vi.spyOn(theprotocolFetch, 'fetchTheprotocolOffers').mockResolvedValue([])
+  //   vi.spyOn(wellfoundFetch, 'fetchWellfoundAds').mockResolvedValue([sampleWellfoundListing()])
+  //
+  //   vi.spyOn(jobAdsRepository, 'loadExistingJobAdIds').mockResolvedValue(new Set())
+  //   vi.spyOn(jobAdsRepository, 'batchUpdateLastSeen').mockResolvedValue(undefined)
+  //   const batchInsertJobAds = vi.spyOn(jobAdsRepository, 'batchInsertJobAds').mockResolvedValue(undefined)
+  //
+  //   const result = await syncJobAdsFromSources(db)
+  //
+  //   expect(result.listingIds).toEqual([digestWellfoundId('wf-1')])
+  //   expect(batchInsertJobAds.mock.calls[0]?.[1]?.[0]?.document.content.originalSalary).toEqual({
+  //     from: 100_000,
+  //     to: 140_000,
+  //     period: 'Year',
+  //     currency: 'USD',
+  //   })
+  // })
 })
 
 describe('createJobAdDocument integration', () => {

@@ -33,13 +33,10 @@ export function parseStockMarketTickers(value: unknown): string[] | null {
 
   const result = stockMarketTickersSchema.safeParse(value)
   if (!result.success) {
-    const itemIssue = result.error.issues.find((issue) => issue.path.length > 0)
+    const itemIssue = result.error.issues.find(issue => issue.path.length > 0)
     if (itemIssue !== undefined && Array.isArray(value)) {
       const index = itemIssue.path[0]
-      captureInvalidInput(
-        'stock-market: invalid ticker symbol',
-        typeof index === 'number' ? value[index] : value,
-      )
+      captureInvalidInput('stock-market: invalid ticker symbol', typeof index === 'number' ? value[index] : value)
       return null
     }
 

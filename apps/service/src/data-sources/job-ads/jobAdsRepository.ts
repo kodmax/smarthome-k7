@@ -38,6 +38,7 @@ export async function loadJobAdDedupKeys(db: Sql): Promise<Map<string, string>> 
         data->'content'->>'companyName' as company_name,
         data->'content'->>'title' as title
       from job_ads
+      where data->'content'->>'origin' <> 'wellfound'
     `,
   )
 
@@ -98,7 +99,13 @@ export async function loadJobAdsByIds(db: Sql, ids: string[]): Promise<Map<strin
   const rows = await observeDbQuery(
     'select',
     'job_ads',
-    () => db<JobAdRow[]>`select id, data from job_ads where id in ${db(ids)}`,
+    () =>
+      db<JobAdRow[]>`
+      select id, data
+      from job_ads
+      where id in ${db(ids)}
+        and data->'content'->>'origin' <> 'wellfound'
+    `,
   )
 
   const byId = new Map<string, JobAdDocument>()
