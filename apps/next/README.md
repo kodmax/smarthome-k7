@@ -13,20 +13,23 @@ Next-specific glue (`AppRouterCacheProvider`, `InitColorSchemeScript`, Inter fon
 ## Running
 
 ```sh
-yarn workspace next-app dev    # http://localhost:3000
-turbo dev                      # with web + service
+yarn workspace next-app dev:next   # http://localhost:3000
+yarn dev:next                      # same from repo root
 ```
+
+Not part of `yarn build` / Turbo `build` (playground only). Use `yarn workspace next-app build:next` when you need a
+production Next build.
 
 ## Scripts
 
-| Script   | Description                  |
-| -------- | ---------------------------- |
-| `dev`    | Next dev (:3000)             |
-| `build`  | Production build             |
-| `start`  | Production server            |
-| `lint`   | ESLint                       |
-| `test`   | Vitest                       |
-| `format` | Prettier                     |
-| `verify` | format + lint + test + build |
+| Script       | Description                       |
+| ------------ | --------------------------------- |
+| `dev:next`   | Next dev (:3000)                  |
+| `build:next` | Production build (manual only)    |
+| `start`      | Production server                 |
+| `lint`       | ESLint                            |
+| `test`       | Vitest                            |
+| `format`     | Prettier                          |
+| `verify`     | format + lint + test + build:next |
 
 Dashboard (Vite SPA): [`apps/web`](../web) on port **5173**.

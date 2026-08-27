@@ -45,11 +45,6 @@
       "command": ["node", "../../node_modules/vite/bin/vite.js", "--host", "--clearScreen", "false"],
       "cache": false,
       "persistent": true
-    },
-    "next-app#build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
     }
   }
 }

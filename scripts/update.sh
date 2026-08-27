@@ -28,7 +28,8 @@ yarn install --frozen-lockfile
 export SENTRY_RELEASE="$(git rev-parse HEAD)"
 export VITE_SENTRY_RELEASE="$SENTRY_RELEASE"
 
-yarn build
+# Pi: colder full rebuilds can swap-thrash at turbo.json's concurrency=15.
+yarn turbo run build --concurrency=4
 
 tmp="$(mktemp /tmp/apollo.env.XXXXXX)"
 trap 'rm -f "$tmp"' EXIT

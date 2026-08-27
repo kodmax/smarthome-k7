@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev:next": "next dev --hostname 0.0.0.0",
-    "build": "next build",
+    "build:next": "next build",
     "start": "next start --hostname 0.0.0.0 --port 3000",
     "format": "prettier --write \"**/*.{ts,tsx,md}\" --ignore-path .gitignore",
     "lint": "eslint \"app/**/*.ts?\" \"app/**/*.tsx\" \"i18n/**/*.ts?\" \"i18n/**/*.tsx\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify": "yarn format && yarn lint && yarn test && yarn build"
+    "verify": "yarn format && yarn lint && yarn test && yarn build:next"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
