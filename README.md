@@ -30,13 +30,14 @@ WebSocket.
 
 ## Requirements
 
-- Node.js
+- **Node.js 26** (see [`.nvmrc`](.nvmrc) — `nvm use`, fnm, asdf)
 - Yarn 1.x (`packageManager`: yarn@1.22.22)
 - Bun (bundling in `apps/service`)
 
 ## Quick start
 
 ```sh
+nvm use   # or equivalent
 yarn install
 yarn dev
 ```
@@ -149,6 +150,12 @@ Vite serves the UI and proxies `/ws` → `localhost:3679` — no extra config. S
 `docker compose -f docker-compose.deps.yml down`.
 
 Uses the same `postgres-data` volume as the full stack, so data survives switching between modes.
+
+## Production (Pi)
+
+[`scripts/service.sh`](scripts/service.sh) picks Node from [`.nvmrc`](.nvmrc) (latest installed `v<major>.*` under
+`~/.nvm`) and runs `apps/service/dist/index.js`. Deploy via [`scripts/update.sh`](scripts/update.sh). On the Pi:
+`nvm install` in the repo root before the first systemd start.
 
 ## Tooling
 
