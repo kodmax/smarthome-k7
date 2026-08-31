@@ -40,7 +40,8 @@ HTTP API and WebSocket share port **3679** (`API_PORT`). WebSocket path: `/ws`.
 Process starts with preload [`src/preload.ts`](src/preload.ts): `load-env` → Sentry → OpenTelemetry. In dev, preload is
 required via `-r ./src/preload.ts`; in production via compiled `dist/preload.js`.
 
-Traces export via env auto-config (NodeSDK reads `OTEL_*`); metrics also merge into `/metrics` (Prometheus + OTEL).
+Traces export via env auto-config (NodeSDK reads `OTEL_*`). Prometheus `/metrics` is **prom-client only** (OpenTelemetry
+metrics are not scraped — auto-instrumentation / library meters would inflate Grafana Cloud series cardinality).
 
 | Variable                      | Production                           | Local dev (`.env`) |
 | ----------------------------- | ------------------------------------ | ------------------ |
@@ -50,7 +51,7 @@ Traces export via env auto-config (NodeSDK reads `OTEL_*`); metrics also merge i
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | e.g. `http://127.0.0.1:4318` (Alloy) | unset              |
 | `OTEL_TRACES_SAMPLER`         | `parentbased_traceidratio`           | —                  |
 | `OTEL_TRACES_SAMPLER_ARG`     | `0.2`                                | —                  |
-| `OTEL_METRICS_EXPORTER`       | unset (Prometheus in code)           | `none`             |
+| `OTEL_METRICS_EXPORTER`       | `none` (no OTEL metric reader)       | `none`             |
 
 **Sentry** (errors only, no performance traces): initialized in preload before OpenTelemetry, with
 `skipOpenTelemetrySetup: true`. Exceptions get `trace_id` / `span_id` tags from the active OTEL span for lookup in

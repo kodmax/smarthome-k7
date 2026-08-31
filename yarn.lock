@@ -2149,7 +2149,7 @@
     "@opentelemetry/resources" "2.2.0"
     "@opentelemetry/sdk-metrics" "2.2.0"
 
-"@opentelemetry/exporter-prometheus@0.221.0", "@opentelemetry/exporter-prometheus@^0.221.0":
+"@opentelemetry/exporter-prometheus@0.221.0":
   version "0.221.0"
   resolved "https://registry.npmjs.org/@opentelemetry/exporter-prometheus/-/exporter-prometheus-0.221.0.tgz"
   integrity sha512-kW79a20qWESIuAdDrxzg9WKM98twV/NBWBFRAH57ap/+ssZhiCo0hckzKT0zpuwR/gSHrFAQhJL0bYDrnEM34g==
@@ -6903,10 +6903,10 @@ joycon@^3.1.1:
   resolved "https://registry.npmjs.org/joycon/-/joycon-3.1.1.tgz"
   integrity sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==
 
-js-knx@^3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/js-knx/-/js-knx-3.4.1.tgz#46dd307efad78976c17fdec823a3cdd2212ea749"
-  integrity sha512-+oFlofsnik95z8zA0+mimYi9gW+GgX/uE8Q+B+930ZdzYUdEzd+txirThfQ6vdyWKQMHKT/QPiKredseetEwCw==
+js-knx@^3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/js-knx/-/js-knx-3.5.0.tgz#0c0eaaa0f88999b72ca66d6d704a994b2c13bea9"
+  integrity sha512-41Lg5DFpq9MlrX9ZPIymnAbIxIDvQs8GFqmYcxBrhIO4sESRcgmeKFVpmPqOqr+WuvBfX8DP3v0tOV0xah4ztA==
   dependencies:
     "@opentelemetry/api" "^1.9.0"
 

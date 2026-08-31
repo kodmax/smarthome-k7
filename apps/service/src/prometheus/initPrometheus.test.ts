@@ -20,10 +20,6 @@ vi.mock('prom-client', () => ({
   },
 }))
 
-vi.mock('../otel-instrumentation', () => ({
-  collectOtelPrometheusMetrics: vi.fn().mockResolvedValue({ metrics: '', errors: [] }),
-}))
-
 const silentLogger = {
   info: vi.fn(),
   warn: vi.fn(),

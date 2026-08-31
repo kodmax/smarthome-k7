@@ -1,7 +1,6 @@
 // Loaded via preload.ts (load-env → Sentry → OTEL).
 import { W3CTraceContextPropagator } from '@opentelemetry/core'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
-import { PrometheusExporter, PrometheusSerializer } from '@opentelemetry/exporter-prometheus'
 import { PinoInstrumentation } from '@opentelemetry/instrumentation-pino'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 
@@ -9,15 +8,8 @@ const serviceName = process.env.OTEL_SERVICE_NAME ?? 'apollo-daemon'
 const otelSdkDisabled = process.env.OTEL_SDK_DISABLED?.trim().toLowerCase()
 const sdkEnabled = otelSdkDisabled !== 'true' && otelSdkDisabled !== '1'
 
-export const otelPrometheusExporter = new PrometheusExporter({
-  preventServerStart: true,
-})
-
-const otelPrometheusSerializer = new PrometheusSerializer()
-
 const sdk = new NodeSDK({
   serviceName,
-  metricReaders: [otelPrometheusExporter],
   textMapPropagator: new W3CTraceContextPropagator(),
   instrumentations: [
     getNodeAutoInstrumentations({
@@ -35,24 +27,6 @@ const sdk = new NodeSDK({
     }),
   ],
 })
-
-export type OtelPrometheusMetricsCollection = {
-  metrics: string
-  errors: unknown[]
-}
-
-export const collectOtelPrometheusMetrics = async (): Promise<OtelPrometheusMetricsCollection> => {
-  if (!sdkEnabled) {
-    return { metrics: '', errors: [] }
-  }
-
-  const { resourceMetrics, errors } = await otelPrometheusExporter.collect()
-
-  return {
-    metrics: otelPrometheusSerializer.serialize(resourceMetrics),
-    errors,
-  }
-}
 
 if (sdkEnabled) {
   sdk.start()
