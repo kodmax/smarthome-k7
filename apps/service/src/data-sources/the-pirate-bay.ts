@@ -31,7 +31,7 @@ export class TorrentSource extends DataSource<Torrent[]> {
   protected async fetchData(): Promise<Torrent[]> {
     const url =
       this.query !== ''
-        ? `https://apibay.org/q.php?q=${encodeURIComponent(this.query)}&cat=207`
+        ? `https://apibay.org/q.php?q=${encodeURIComponent(this.query)}&cat=205,207,208,211,212`
         : 'https://apibay.org/precompiled/data_top100_207.json'
 
     return observeHttpFetch(url, 'json', () => fetchJSON<Torrent[]>(url))

@@ -184,7 +184,7 @@ export function registerDashboardTools(server: McpServer): void {
     {
       title: 'Szukaj torrentów',
       description:
-        'Wyszukuje torrenty na TPB (kategoria filmów) po frazie — tak jak wyszukiwarka na karcie dashboardu. Zwraca surową listę wyników, bez grupowania po tytułach.',
+        'Wyszukuje torrenty na TPB w kategoriach filmów HD/4K i seriali (205,207,208,211,212) po frazie — tak jak wyszukiwarka na karcie dashboardu. Zwraca surową listę wyników, bez grupowania po tytułach.',
       inputSchema: {
         query: z.string().min(1).describe('Fraza wyszukiwania, np. "Spider-Man", "Project Hail Mary 1080p"'),
       },
