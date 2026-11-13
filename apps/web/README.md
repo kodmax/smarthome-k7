@@ -75,3 +75,28 @@ Cards in `src/pages/Dashboard/cards/` map WebSocket topics to UI components. App
 The dashboard supports **dark and light** themes via `@repo/design-tokens`. By default it follows the OS preference
 (`defaultMode='system'` in `src/main.tsx`). Use `theme.vars.palette.*` in styled components for scheme-aware colors.
 Tests pin `defaultMode='dark'` for stable snapshots.
+
+## WebMCP
+
+The app exposes 16 browser-native tools through `document.modelContext.registerTool()` when the browser supports it. An
+agent needs WebMCP integration and an open K7 tab to discover and invoke them. This experimental API may require browser
+flags or an origin trial; see the
+[Chrome guide](https://developer.chrome.com/docs/modern-web-guidance/guides/webmcp/agentic-javascript-tools). Browsers
+without the API continue to work normally. No polyfill, extra server, or dependency on `apps/mcp` is required.
+
+Implementation: `src/webmcp/`. Tools register while the app layout is online and unregister on unmount or offline
+transition. Cleanup also cancels outstanding requests. Requests use the same API base URL as the dashboard, including
+`VITE_BACKEND_BASE_URL`, and the browser's normal fetch authentication behavior.
+
+Available tools: `ping`, `knx_temperatures`, `home_heating`, `home_air_quality`, `home_energy`, `outdoor_weather`,
+`stock_quote`, `stock_market_overview`, `job_offers`, `news_headlines`, `torrents_status`, `search_torrents`,
+`download_torrent`, `home_lights`, `control_light`, and `dashboard_summary`.
+
+Tools return structured JSON rather than the text formatting of the standalone MCP server. Combined feed results include
+per-feed errors when a source is unavailable. `ping` checks the page integration only. Torrent search updates the
+dashboard results but does not download anything. Light commands validate the circuit against the current feed and poll
+for confirmation for up to 20 seconds; a timeout does not mean that the command was not sent.
+
+Validation: `yarn workspace web test src/webmcp/webmcp.test.ts`. Tests use mocked HTTP responses and a fake browser
+registration interface, so they do not operate real devices. To check native discovery, open K7 in a WebMCP-enabled
+browser and inspect its registered tools using the browser's WebMCP tooling, then call a read-only tool first.
